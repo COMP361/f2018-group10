@@ -1,0 +1,17 @@
+# Ignore virtual environments, tox files, and
+**/venv/**
+**/.idea/**
+**/.tox/**
+
+# Ignore any .egg stuff
+**/FlashPoint.egg*
+
+# Ignore any .pyc files
+**/.pyc/**
+
+# Ignore pytest caches
+**/.pytest*/**
+
+# Ignore coverage reports
+**/.coverage
+**/htmlcov/**
