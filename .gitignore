@@ -11,6 +11,7 @@
 
 # Ignore pytest caches
 **/.pytest*/**
+**/__pycache__/**
 
 # Ignore coverage reports
 **/.coverage

@@ -1,6 +1,27 @@
+import sys
+
+# If PyCharm is issuing warnings on pygame methods, suppress it. it's a bug with PyCharm
+import pygame
+
 
 def main():
-    print("Hello")
+    # Initialize pygame modules, get the screen and clock
+    pygame.init()
+    screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+    clock = pygame.time.Clock()
+
+    # Run main loop
+    while True:
+        # Lock frame rate at 60 FPS. Should only be called once per loop.
+        clock.tick(60)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                sys.exit()
+
+        # Clear the screen to black and flip the double buffer
+        screen.fill((0, 0, 0))
+        pygame.display.flip()
 
 
 if __name__ == '__main__':
