@@ -9,10 +9,6 @@ setup(
     packages=['src'],  # This must match the directory (package) containing our code.
     install_requires=[  # All dependencies must be in this list!!!
         'pygame',
-        'pytest',
-        'pytest-cov',
-        'pytest-flakes',
-        'pytest-pep8',
     ],
     entry_points="""
         [console_scripts]
