@@ -2,6 +2,7 @@
 **/venv/**
 **/.idea/**
 **/.tox/**
+**/codeEnv/**
 
 # Ignore any .egg stuff
 **/FlashPoint.egg*
