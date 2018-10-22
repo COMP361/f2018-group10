@@ -741,16 +741,17 @@
 	\textbf{Scope:} Flash Point\\
 	\textbf{Level:} Subfunction\\
 	\textbf{Intention in Context:} The intention of the \textit{Player} who is playing as the \textit{Captain} role is to command other \textit{Player} to the specified location.\\
-	\textbf{Multiplicity: }A \textit{Captain Player} may command one \textit{Player} at a time, and can command multiple times as long as the Action Point (AP) is enough.\\
+	\textbf{Multiplicity: }A \textit{Captain Player} may command one \textit{Player} at a time, and can command two times for free, or more as long as the Action Point (AP) is enough.\\
 	\textbf{Primary Actor:} \textit{Captain Player}\\
 	\textbf{Secondary Actors:} \textit{Player}\\
 	\textbf{Main Success Scenario:}\\
 	\begin{tabular}{l l}
 		&1. \textit{Captain Player} informs the \textit{System} that they wish to command a \textit{Player}.\\
 		&2. The \textit{Captain Player} informs the \textit{System} of which \textit{Player} that they wish to command.\\
-		&3. The \textit{Captain Player} informs the \textit{System} of where they want to move the \textit{Player} to.\\
+		&3. The \textit{Captain Player} informs the \textit{System} of their command for the \textit{Player}, such as \underline{Move} to a\\
+		&\qquad location, \underline{Open/Close Doors} or \underline{Pick Up/Down Victim/Hazmat}.\\
 		&4. The \textit{System} deducts the AP from the \textit{Captain Player}.\\
-		&5. The \textit{System} moves the \textit{Player} according to the command.\\
+		&5. The \textit{System} executes the command on the \textit{Player}.\\
 		&6. The \textit{System} informs all \textit{Player} of the result.\\
 		&7. The case returns to \underline{Execute Turn}, Step 3.
 	\end{tabular}\\
@@ -760,7 +761,7 @@
 		&\qquad2a)1. The case returns to \underline{Execute Turn}, Step 3.\\
 		&2-3b) \textit{Captain Player} cancels the action.\\
 		&\qquad2a-3b)1. The case returns to \underline{Execute Turn}, Step 3.\\
-		&4c) \textit{Captain Player} chose an invalid location to move the \textit{Player}.\\
+		&4c) \textit{Captain Player} provided an invalid command to the \textit{Player}.\\
 		&\qquad The \textit{System} informs the \textit{Captain Player} and prompts the action again (Repeat (3)).
 	\end{tabular}\\
 	
@@ -775,21 +776,17 @@
 	\textbf{Main Success Scenario:}\\
 	\begin{tabular}{l l}
 		&1. The \textit{Player} informs the \textit{System} that they wish to fire a deck gun.\\
-		&2. The \textit{System} shows the valid Quadrants to the \textit{Player} and prompts for their choice.\\
-		&3. The \textit{Player} chooses a Quadrant.\\
-		&4. The \textit{System} deducts the AP from the \textit{Player}, depending on their role.\\
+		&2. The \textit{System} deducts the AP from the \textit{Player}, depending on their role.\\
 		&\qquad (2AP for Driver/Operator and 4AP for others)\\
-		&5. The \textit{System} calculates the deck gun’s target space. Then, the \textit{System} \underline{extinguishes} all smoke\\
+		&3. The \textit{System} calculates the deck gun’s target space. Then, the \textit{System} \underline{extinguishes} all smoke\\
 		&\qquad and fire in the target space, and splashes over into each adjacent space, completely\\ &\qquad\underline{extinguishing} any fire or smoke.\\
-		&6. The \textit{System} informs all \textit{Player} of the result.\\
-		&7. The case returns to \underline{Execute Turn}, Step 3.
+		&4. The \textit{System} informs all \textit{Player} of the result.\\
+		&5. The case returns to \underline{Execute Turn}, Step 3.
 	\end{tabular}\\
 	\textbf{Extensions:}\\
 	\begin{tabular}{l l}
 		&2a) The \textit{System} detects that the \textit{Player} does not have enough AP.\\ &\qquad\textit{System} signals the \textit{Player}.\\
 		&\qquad2a)1. The case returns to \underline{Execute Turn}, Step 3.\\
-		&2-3b) \textit{Player} cancels the action.\\
-		&\qquad2-3b)1. The case returns to \underline{Execute Turn}, Step 3.
 	\end{tabular}\\
 	
 	\section*{Swap Role}
@@ -805,7 +802,7 @@
 		&1. The \textit{Player} informs the \textit{System} that they wish to \underline{swap role}.\\
 		&2. The \textit{System} shows the Specialists available that are not currently in play and prompts\\ &\qquad the \textit{Player} for their choice.\\
 		&3. The \textit{Player} chooses a Specialist role.\\
-		&4. The \textit{System} deducts 2 AP from the \textit{Player} and assigns to the \textit{Player} the special abilities\\
+		&4. The \textit{System} deducts 2 AP from the \textit{Player} and assigns new role to the \textit{Player}.\\
 		&\qquad of the newly selected Specialist for the entire turn.\\
 		&6. The \textit{System} informs all \textit{Player} of the result.\\
 		&7. The case returns to \underline{Execute Turn}, Step 3.
@@ -890,7 +887,7 @@
 		&1.c) If the Tile adjacent to the Target is a Wall, the Wall is damaged by 1. \\
 		&1.d) If the Tile adjacent to the Target is a closed door, the Door is removed from the game.\\
 	\end{tabular}\\
-	\section*{Pick up victim/Hazmat}
+	\section*{Pick up Victim/Hazmat}
 	\textbf{Use Case:} Pick up Victim/Hazmat\\
 	\textbf{Scope:} FlashPoint\\
 	\textbf{Level:} Subfunction\\
@@ -899,9 +896,9 @@
 	\textbf{Primary Actor:} \textit{Player}\\
 	\textbf{Main Success Scenario:}\\
 	\begin{tabular}{l l}
-		&1. When \textit{Player} is in the vicinity of pickable objects,\\
-		&\qquad\textit{System} unlocks the pick up action for the \textit{Player}.\\
-		&2. \textit{Player} informs the \textit{System} that they wish to pick up the specified items.\\
+		&1. \textit{System} validates if \textit{Player Character} is adjacent to an object that can be picked up\\
+		&\qquad(i.e. Victim or HazMat), then unlocks the pick up action for the \textit{Player}.\\
+		&2. \textit{Player} informs the \textit{System} that they wish to pick up the specified object.\\
 		&3. \textit{System} deducts 2 AP from the \textit{Player}. \textit{Player} picks up the object.\\
 		&4. \textit{System} informs all \textit{Players} the result of this action.\\
 		&5. Use Case returns to Execute Turn, Step 3.
