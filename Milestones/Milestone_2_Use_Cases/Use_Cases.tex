@@ -22,158 +22,164 @@
 \date{October 2018}
 
 \begin{document}
-	
+
 	\maketitle
-	\section*{PlayFlashPoint}
-	\textbf{Use Case: } PlayFlashPoint\\
+	\section*{Play Flash Point}
+	\textbf{Use Case: } Play Flash Point\\
 	\textbf{Scope:} Flash Point\\
 	\textbf{Level: }
 	User Goal\\
-	\textbf{Intention of context: }
-	The intention of \textit{Player} is to play a game of Flash Point with other players\\
+	\textbf{Intention in context: }
+	The intention of \textit{Player} is to play a game of Flash Point with other Players\\
 	\textbf{Multiplicity: }
-	Multiple \textit{players} can play against one another\\
+	Multiple \textit{Players} can play together at the same time. There must be at least 2 \textit{Players} with the maximum being 6.\\
 	\textbf{Primary actor: }
 	\textit{Player}\\
-	\textbf{Secondary actor(s):} Other players, namely \textit{Comrades}\\
+	\textbf{Secondary actor(s):} Other Players\\
 	\textbf{Main Success Scenario:}\\
 	\begin{tabular}{l l}
-		&1.\textit{Player} \underline{logs in} to the \textit{System}\\
-		&2.\textit{System} displays to \textit{player} a menu to either select \underline{HostGame} or \underline{JoinGame}\\
-		&3.\textit{System} displays to \textit{player} a \underline{CharacterSelection} menu\\
-		&\quad\textit{System waits until enough players are connected to the Game Board to continue to step 4.}\\
-		&4.\textit{System} displays initial \textit{Game Board} setup\\
-		&5. \textit{Player} informs \textit{system} of his starting position\\
-		&\qquad\textit{System waits until enough players are connected to continue to next step}\\
-		&6. \textit{Players} agree over \underline{chat} who goes first.\\
-		&7. \textit{Player} votes to inform system who should play first.\\
-		&\qquad\textit{Step 8 is executed until the game is over, or until players quit.}\\
-		&8.\textit{Players} take \underline{turns} one after another.\\
-		&9.\textit{System} informs the \textit{players} whether they won the game.
+		&1. \underline{Player Log In} to the \textit{System}.\\
+		&2. \textit{System} prompts the \textit{Player} to choose between \underline{Host Game} or \underline{Join Game}.\\
+		&3. \textit{Player} informs the \textit{System} of their choice.\\
+		&4. \textit{System} prompts the \textit{player} to \underline{select a Character}.\\
+		&5. \textit{Player} informs the \textit{System} of their choice.\\
+		&6. \textit{Host} informs the \textit{System} to start the game.\\
+		&7. \textit{System} prompts the \textit{Host} to choose a preset or generate a random \textit{Game Board}.\\
+		&8. \textit{Player} informs \textit{system} of his starting position\\
+		&\qquad\textit{System waits until enough Players are connected to continue to next step}\\
+		&9. \textit{Players} agree over \underline{chat} who goes first.\\
+		&10. \textit{Player} votes to inform system who should play first.\\
+		&\qquad\textit{Step 8 is executed until the game is over, or until Players quit.}\\
+		&11. \textit{Players} take \underline{turns} one after another.\\
+		&12. \textit{System} informs the \textit{Players} whether they won the game.
 	\end{tabular}\\
 	\textbf{Extensions:}\\
 	\begin{tabular}{l l}
 		&1a. \textit{Player} was not able to log in with the right credentials. Use case continues at step 1.\\
-		&3a. \textit{Player was not able to create or join a game. Use case continues at step 2.}\\
-		&5a. \textit{Player's} Starting position was not legal. Use Case continues at step 5\\
-		&7a. \textit{Player} decides to quit game before game is over.\\
-		&\qquad 7a.1. \textit{System} Prompts \textit{player} whether they want to save game\\
-		&\qquad 7a.2. \textit{System} informs \textit{player} of the ip address stored for this game.\\
-		&\qquad 7a.3. Game is saved in database. End of Use Case.
+		&3a. The player chose \underline{Host Game}.\\
+		&\qquad3a.1. \underline{Host Game}\\
+		&3b. The Player chose \underline{Join Game}.\\
+		&\qquad3b.1a. \underline{Join Game}\\
+		&3c. \textit{Player} was not able to create or join a game. Use Case continues at step 2.\\
+		&6a. \textit{System} detects that there are not enough \textit{Players} connected. Use Case continues at step 6.\\
+		&8a. \textit{Player's} Starting position was not legal. Use Case continues at step 8.\\
+		&10a. \textit{Player} decides to quit game before game is over.\\
+		&\qquad 10a.1. \textit{System} Prompts \textit{Player} whether they want to save game\\
+		&\qquad 10a.2. \textit{System} informs \textit{Player} of the IP address stored for this game.\\
+		&\qquad 10a.3. Game is saved in \textit{Database}. End of Use Case.
 	\end{tabular}
-	\section*{Player login}
+	\section*{Player Login}
 	\textbf{Use Case:} Player Login\\
 	\textbf{Scope:}
 	Flash Point\\
 	\textbf{Level:}
 	Subfunction\\
-	\textbf{Intention of Context}
-	The intention of \textit{player} is to log in to the main \textit{system} server.\\
+	\textbf{Intention in Context}
+	The intention of \textit{Player} is to log in to the main \textit{system} server.\\
 	\textbf{Multiplicity:}
-	Many \textit{players} can login to the game server.\\
+	Many \textit{Players} can log in to the game server. Each \textit{Player} can only log in once per session.\\
 	\textbf{Primary actor: } \textit{Player}\\
-	\textbf{Secondary actors:} \textit{System}, \textit{Database}\\
+	\textbf{Secondary actors:} \textit{Database}\\
 	\textbf{Main Success Scenario}\\
 	\begin{tabular}{l l}
-		&1. \textit{System} takes credentials from \textit{player}\\
-		&2. \textit{System} searches \textit{database} to find \textit{player's} credentials\\
-		&3. \textit{System} informs \textit{player} the login was successful
+		&1. \textit{Player} provides credentials to the \textit{System}\\
+		&2. \textit{System} searches \textit{database} to find \textit{Player's} credentials\\
+		&3. \textit{System} informs \textit{Player} the login was successful
 	\end{tabular}
 	\subsubsection*{Extensions:}
 	\begin{tabular}{l l}
-		&2a. \textit{System} fails to find \textit{player's} credentials within \textit{database}. Use case continues at step 1.
+		&2a. \textit{System} fails to find \textit{Player's} credentials within \textit{database}. Use case continues at step 1.
 	\end{tabular}
-	\section*{JoinGame}
-	\textbf{Use Case:} JoinGame\\
+	\section*{Join Game}
+	\textbf{Use Case:} Join Game\\
 	\textbf{Scope:}
 	Flash Point\\
 	\textbf{Level:}
 	Subfunction\\
-	\textbf{Intention of Context}
-	The intention of \textit{player} is to join a game that has already been initialized by someone else.\\
+	\textbf{Intention in Context}
+	The intention of \textit{Player} is to join a game that has already been initialized by someone else.\\
 	\textbf{Multiplicity:}
-	Many \textit{players} can join an existing game.\\
+	Many \textit{Players} can join an existing game.\\
 	\textbf{Primary actor: }
 	Player.\\
-	\textbf{Secondary actors:} \textit{System}.\\
 	\textbf{Main Success Scenario}\\
 	\begin{tabular}{l l}
-		&1.\textit{System} displays a list of existing games that \textit{player} could potentially join\\
+		&1.\textit{System} displays a list of existing games that \textit{Player} could potentially join\\
 		&2.\textit{Player} chooses the available game of his choice.
 	\end{tabular}\\
 	\textbf{Extensions:}\\
 	\begin{tabular}{l l}
-		&2a. \textit{System} fails to connect \textit{player} to the game board. Player is redirected to step 1\\
+		&2a. \textit{System} fails to connect \textit{Player} to the game board. Player is redirected to step 1\\
 	\end{tabular}
 	
-	\section*{HostGame}
-	\textbf{Use Case:}  HostGame\\
+	\section*{Host Game}
+	\textbf{Use Case:}  Host Game\\
 	\textbf{Scope:} Flash Point\\
 	\textbf{Level:} Subfunction\\
-	\textbf{Intention of context}: 
-	The intention of \textit{player} is to Host a game.\\
-	\textbf{Multiplicity:} Many \textit{players} can host a game\\
+	\textbf{Intention in Context}: 
+	The intention of \textit{Player} is to Host a game.\\
+	\textbf{Multiplicity:} Many \textit{Players} can host a game\\
 	\textbf{Primary actor:} \textit{Player}\\
 	\textbf{Main Success Scenario:}\\
 	\begin{tabular}{l l}
-		&1. \textit{System} prompts \textit{player} whether he/she wants to \underline{HostExistingGame} or \underline{CreateGame}\\
+		&1. \textit{System} prompts \textit{Player} whether he/she wants to \underline{Host Existing Game} or \underline{Create Game}\\
 	\end{tabular}
-	\section*{CreateGame}
-	\textbf{Use Case:} CreateGame\\
+	\section*{Create Game}
+	\textbf{Use Case:} Create Game\\
 	\textbf{Scope:}
 	Flash Point\\
 	\textbf{Level:}
 	Subfunction\\
-	\textbf{Intention of Context}
-	The intention of \textit{player} is to create a new game.\\
+	\textbf{Intention in Context}
+	The intention of \textit{Player} is to create a new game.\\
 	\textbf{Multiplicity:}
 	Multiple instances of the \textit{game} can be created within the \textit{network}.\\
 	\textbf{Primary actor: } \textit{Player}\\
 	\textbf{Secondary actor(s):} \textit{System}\\
 	\textbf{Main Success Scenario}\\
 	\begin{tabular}{l l}
-		&1. \textit{System} prompts \textit{player} if \underline{HostExistingGame} instead\\
-		&2. \textit{System} displays an input menu to \textit{player} for game settings\\
+		&1. \textit{System} prompts \textit{Player} if \underline{Host Existing Game} instead\\
+		&2. \textit{System} displays an input menu to \textit{Player} for game settings\\
 		&3. \textit{Player} makes game private or public\\
 		&4. \textit{Player} chooses the game mode\\
 		&\qquad \textit{Game mode can either be Family, Beginner. Veteran, Heroic}\\
-		&5. \textit{Player} specifies number of \textit{players}\\
-		&6. \textit{Player} specifies to \textit{System} to play on a classic board or \underline{GenerateRandomBoard}\\
-		&6. \textit{System} identifies ip address of the \textit{player}.\\
-		&7. \textit{System} informs the \textit{player} the creation of the game was successful
+		&5. \textit{Player} specifies number of \textit{Players}\\
+		&6. \textit{Player} specifies to \textit{System} to play on a classic board or \underline{Generate Random GameBoard}\\
+		&6. \textit{System} identifies ip address of the \textit{Player}.\\
+		&7. \textit{System} informs the \textit{Player} the creation of the game was successful
 	\end{tabular}\\
 	\textbf{Extensions:}\\
 	\begin{tabular}{l l}
-		&1a. \textit{Player} selected \underline{HostExistingGame}. End of CreateGame Use Case.\\
+		&1a. \textit{Player} selected \underline{Host Existing Game}. End of Use Case.\\
 		&7a. \textit{System} was not able to create the desired game. Use Case continues to step 1.
 	\end{tabular}
-	\section*{HostExistingGame}
-	\textbf{Use Case:} HostExistingGame\\
+	\section*{Host Existing Game}
+	\textbf{Use Case:} Host Existing Game\\
 	\textbf{Scope:} Flash Point\\
 	\textbf{Level:} Subfunction\\
-	\textbf{Intention of Context:} The intention of \textit{player} is to host a pre-existing game within the \textit{database}.\\
-	\textbf{Multiplicity}: Many \textit{players} can host pre-existing games simultaneously.\\
+	\textbf{Intention in Context:} The intention of \textit{Player} is to host a pre-existing game within the \textit{database}.\\
+	\textbf{Multiplicity}: Many \textit{Players} can host pre-existing games simultaneously.\\
 	\textbf{Primary actor:} \textit{Player}\\
 	\textbf{Main Success Scenario:}\\
 	\begin{tabular}{l l}
-		&1. \textit{System} displays an input field prompting \textit{player} for a specific game ip address\\
-		&\qquad\textit{Games are stored in system as ip addresses}\\
+		&1. \textit{System} displays an input field prompting \textit{Player} for a specific game ip address\\
+		&\qquad\textit{Games are stored in system as IP addresses}\\
 		&2. \textit{System} searches database for this game\\
-		&3. \textit{System} displays previously loaded game board to \textit{player}\\
+		&3. \textit{System} displays previously loaded game board to \textit{Player}\\
 		&4. \textit{Player} confirms the game board to system.\\
-		&\qquad\textit{System waits until enough players have joined the game.}
+		&\qquad\textit{System waits until enough Players have joined the game.}
 	\end{tabular}\\
 	\textbf{Extensions:}\\
 	\begin{tabular}{l l}
-		&2a. \textit{System} failed to retrieve the request from \textit{player}. Use case continues to step 1.\\
+		&2a. \textit{System} failed to retrieve the request from \textit{Player}. Use case continues to step 1.\\
 		&4a. \textit{Player} declines the loaded game board. Use case continues at step 1.
 	\end{tabular}
-	\section*{GenerateRandomBoard}
-	\textbf{Use Case:} GenerateRandomBoard\\
+	\section*{Generate Random GameBoard}
+	\textbf{Use Case:} Generate Random GameBoard\\
 	\textbf{Scope:} Flash Point\\
 	\textbf{Level:} Subfunction\\
-	\textbf{Intention of Context:} \textit{System} generates a random board setup.\\
-	\textbf{Multiplicity:} Many calls to GenerateRandomBoard can be made simultaneously.\\
+	\textbf{Intention in Context:} \textit{System} generates a random board setup.\\
+	\textbf{Multiplicity:} Many calls to Generate Random GameBoard can be made simultaneously.\\
 	\textbf{Primary actor:} \textit{Controller}\\
 	\textbf{Main Success Scenario:}\\
 	\begin{tabular}{l l}
@@ -188,18 +194,18 @@
 	\textbf{Use Case:} PlayerSelectionMenu\\
 	\textbf{Scope:} FlashPoint\\
 	\textbf{Level:}  Subfunction\\
-	\textbf{Intention of context:} The intent of \textit{player} is to select a character in order to join the Game Board\\
-	\textbf{Multiplicity:} Many \textit{players} may choose a character simultaneously.\\
+	\textbf{Intention in Context:} The intent of \textit{Player} is to select a character in order to join the Game Board\\
+	\textbf{Multiplicity:} Many \textit{Players} may choose a character simultaneously.\\
 	\textbf{Primary actor:} \textit{Player}\\
 	\textbf{Main Success Scenario:}\\
 	\begin{tabular}{l l}
-		&1. \textit{System} diplays to \textit{player} a menu of available characters\\
+		&1. \textit{System} diplays to \textit{Player} a menu of available characters\\
 		&\qquad\textit{Available characters are: Imaging Technician, Driver/Operator, Rescue Specialist}\\
 		&\qquad\qquad\textit{Paramedic, CAFS, HazMat tech, Generalist and Fire Captain }\\
 		&2. \textit{Player} informs \textit{system} of the character he selected.
 	\end{tabular}\\
 	\begin{tabular}{l l}
-		&2a. Selected Character was already taken by another \textit{player}. Use case continues to step 1.\\
+		&2a. Selected Character was already taken by another \textit{Player}. Use case continues to step 1.\\
 		&\qquad\textit{System has to update the list of available characters.}
 	\end{tabular}
 	\section*{Executing Turn}
@@ -207,7 +213,7 @@
 	\textbf{Scope:} FlashPoint\\
 	\textbf{Level:} User Goal\\
 	\textbf{Intention in Context: } The intention of the \textit{Player} is to perform their turn within a game of FlashPoint.\\
-	\textbf{Multiplicity: } One player may execute their turn at one time. They will execute a turn multiple times in \textit{Game}.\\
+	\textbf{Multiplicity: } One Player may execute their turn at one time. They will execute a turn multiple times in \textit{Game}.\\
 	\textbf{Primary Actor:} \textit{Player} \\
 	\textbf{Secondary Actors:} \textit{Player (other than the Current Player)}.\\
 	\textbf{Main Success Scenario:}\\
@@ -235,7 +241,7 @@
 	\textbf{Scope:} FlashPoint\\
 	\textbf{Level:} Subfunction\\
 	\textbf{Intention in Context: } The intention of the \textit{Player} is to \textit{Move} to a specified \textit{Tile}.\\
-	\textbf{Multiplicity: } One player may \textit{Move} at one time. A \textit{Player} may \textit{Move} more than once per Turn.
+	\textbf{Multiplicity: } One Player may \textit{Move} at one time. A \textit{Player} may \textit{Move} more than once per Turn.
 	\textbf{Primary Actor:} \textit{Player} \\
 	\textbf{Secondary Actors:} \\
 	\textbf{Main Success Scenario:}\\
@@ -284,7 +290,7 @@
 	\textbf{Scope:} FlashPoint\\
 	\textbf{Level:} Subfunction\\
 	\textbf{Intention in Context: } The intention of the \textit{Player} is to \textit{Chop} a specified \textit{Wall}.\\
-	\textbf{Multiplicity: } One player may \textit{Chop} at one time. A \textit{Player} may \textit{Chop} more than once per Turn.\\
+	\textbf{Multiplicity: } One Player may \textit{Chop} at one time. A \textit{Player} may \textit{Chop} more than once per Turn.\\
 	\textbf{Primary Actor:} \textit{Player} \\
 	\textbf{Secondary Actors:}\\
 	\textbf{Main Success Scenario:}\\
@@ -314,7 +320,7 @@
 	\textbf{Scope:} FlashPoint\\
 	\textbf{Level:} Subfunction\\
 	\textbf{Intention in Context: } The intention of the \textit{Player} is to \textit{Extinguish} a \textit{Fire} or \textit{Smoke}. \\
-	\textbf{Multiplicity: } One player may \textit{Extinguish} at one time. A \textit{Player} may \textit{Extinguish} more than once per Turn.\\
+	\textbf{Multiplicity: } One Player may \textit{Extinguish} at one time. A \textit{Player} may \textit{Extinguish} more than once per Turn.\\
 	\textbf{Primary Actor:} \textit{Player} \\
 	\textbf{Secondary Actors:}\\
 	\textbf{Main Success Scenario:}\\
@@ -343,7 +349,7 @@
 	\textbf{Scope:} FlashPoint\\
 	\textbf{Level:} Subfunction\\
 	\textbf{Intention in Context:} The intention of the \textit{Player} is to \textit{Extinguish Smoke} \\
-	\textbf{Multiplicity: } One player may \textit{Extinguish Smoke} at one time. A \textit{Player} may \textit{Extinguish Smoke} more than once per Turn.\\
+	\textbf{Multiplicity: } One Player may \textit{Extinguish Smoke} at one time. A \textit{Player} may \textit{Extinguish Smoke} more than once per Turn.\\
 	\textbf{Primary Actor:} \textit{Player}\\
 	\textbf{Secondary Actors:}\\
 	\textbf{Main Success Scenario:}\\
@@ -369,7 +375,7 @@
 	\textbf{Scope:} FlashPoint\\
 	\textbf{Level:} Subfunction\\
 	\textbf{Intention in Context:} The intention of the \textit{Player} is to \textit{Extinguish Fire} \\
-	\textbf{Multiplicity: } One player may \textit{Extinguish Fire} at one time. A \textit{Player} may \textit{Extinguish Fire} more than once per Turn.\\
+	\textbf{Multiplicity: } One Player may \textit{Extinguish Fire} at one time. A \textit{Player} may \textit{Extinguish Fire} more than once per Turn.\\
 	\textbf{Primary Actor:} \textit{Player}\\
 	\textbf{Secondary Actors:}\\
 	\textbf{Main Success Scenario:}\\
@@ -403,7 +409,7 @@
 	\textbf{Scope:} FlashPoint\\
 	\textbf{Level:} Subfunction\\
 	\textbf{Intention in Context:} The intention of the \textit{Player} is to \textit{Open} or \textit{Close} a \textit{Door} \\
-	\textbf{Multiplicity: } One player may \textit{Open/Close Door} at one time. A \textit{Player} may \textit{Open/Close Door} more than once per Turn.\\
+	\textbf{Multiplicity: } One Player may \textit{Open/Close Door} at one time. A \textit{Player} may \textit{Open/Close Door} more than once per Turn.\\
 	\textbf{Primary Actor:} \textit{Player}\\
 	\textbf{Secondary Actors:}\\
 	\textbf{Main Success Scenario:}\\
@@ -435,7 +441,7 @@
 	\textbf{Scope:} FlashPoint\\
 	\textbf{Level:} Subfunction\\
 	\textbf{Intention in Context:} The intention of the \textit{Player} is to \textit{Drive} a Vehicle.\\
-	\textbf{Multiplicity: } One player may \textit{Drive} at one time. A \textit{Player} may \textit{Drive} more than once per Turn.\\
+	\textbf{Multiplicity: } One Player may \textit{Drive} at one time. A \textit{Player} may \textit{Drive} more than once per Turn.\\
 	\textbf{Primary Actor:} \textit{Player}\\
 	\textbf{Secondary Actors:}\\
 	\textbf{Main Success Scenario:}\\
@@ -455,7 +461,7 @@
 	\textbf{Scope:} FlashPoint\\
 	\textbf{Level:} Subfunction\\
 	\textbf{Intention in Context:} The intention of the \textit{Player} is to \textit{Drive Ambulance}\\
-	\textbf{Multiplicity: } One player may \textit{Call Ambulance} at one time. A \textit{Player} may \textit{Call Ambulance} more than once per Turn.\\
+	\textbf{Multiplicity: } One Player may \textit{Call Ambulance} at one time. A \textit{Player} may \textit{Call Ambulance} more than once per Turn.\\
 	\textbf{Primary Actor:} \textit{Player}\\
 	\textbf{Secondary Actors:}\\
 	\textbf{Main Success Scenario:}\\
@@ -467,7 +473,7 @@
 	\textbf{Extensions: } \\
 	\begin{tabular}{l l}
 		&2a) The \textit{Player} does not have at least 2 \textit{Action Points} \\
-		&\qquad2a.1) The \textit{System} informs the player that the request was invalid. \\
+		&\qquad2a.1) The \textit{System} informs the Player that the request was invalid. \\
 		&\qquad2a.2) The case returns to \underline{Executing Turn}, Step 3.\\
 	\end{tabular}
 	
@@ -476,7 +482,7 @@
 	\textbf{Scope:} FlashPoint\\
 	\textbf{Level:} Subfunction\\
 	\textbf{Intention in Context:} The intention of the \textit{Player} is to \textit{Drive Engine}.\\
-	\textbf{Multiplicity: } One player may \textit{Drive Engine} at one time. A \textit{Player} may \textit{Drive Engine} more than once per Turn.\\
+	\textbf{Multiplicity: } One Player may \textit{Drive Engine} at one time. A \textit{Player} may \textit{Drive Engine} more than once per Turn.\\
 	\textbf{Primary Actor:} \textit{Player}\\
 	\textbf{Secondary Actors:}\\
 	\textbf{Main Success Scenario:}\\
@@ -488,25 +494,25 @@
 	\textbf{Extensions: } \\
 	\begin{tabular}{l l}
 		&2a) The \textit{Player} does not have at least 2 \textit{Action Points}.\\
-		&\qquad2a.1) The \textit{System} informs the player that the request was invalid. \\
+		&\qquad2a.1) The \textit{System} informs the Player that the request was invalid. \\
 		&\qquad2a.2) The case returns to \underline{Executing Turn}, Step 3.\\
 		&2b) The \textit{Player Character} is currently not on the same Tile as the Engine.\\
-		&\qquad2b.1) The \textit{System} informs the player that the request was invalid. \\
+		&\qquad2b.1) The \textit{System} informs the Player that the request was invalid. \\
 		&\qquad2b.2) The case returns to \underline{Executing Turn}, Step 3.\\
 	\end{tabular}
 	\section*{Resuscitate}
 	\textbf{Use Case:} Resuscitate Victim\\
 	\textbf{Scope:} Flash Point\\
 	\textbf{Level:} User Goal\\
-	\textbf{Intention of Context:} The intention of \textit{player} is to resuscitate a victim.\\
-	\textbf{Multiplicity}: Many \textit{players} can resuscitate victims.\\
+	\textbf{Intention in Context:} The intention of \textit{Player} is to resuscitate a victim.\\
+	\textbf{Multiplicity}: Many \textit{Players} can resuscitate victims.\\
 	\textbf{Primary actor:} \textit{Player}\\
 	\textbf{Main Success Scenario:}\\
 	\begin{tabular}{l l}
 		&1. \textit{Player} informs \textit{System} he wants to resuscitate a victim.\\
-		&2. \textit{System} deducts 1 action point from \textit{player}\\
-		&3. \textit{System} informs all \textit{players} a victim has been resuscitated\\
-		&4. \textit{System} checks if the \textit{player} has the Paramedic Role\\
+		&2. \textit{System} deducts 1 action point from \textit{Player}\\
+		&3. \textit{System} informs all \textit{Players} a victim has been resuscitated\\
+		&4. \textit{System} checks if the \textit{Player} has the Paramedic Role\\
 	\end{tabular}\\
 	\textbf{Extensions:}\\
 	\begin{tabular}{l l}
@@ -516,15 +522,15 @@
 	\textbf{Use Case:} Disposal of Hazardous Materials\\
 	\textbf{Scope:} Flash Point\\
 	\textbf{Level:} User Goal\\
-	\textbf{Intention of Context:} The intention of \textit{player} is to dispose of hazardous materials.\\
-	\textbf{Multiplicity}: Many \textit{players} can dispose of hazardous materials.\\
+	\textbf{Intention in Context:} The intention of \textit{Player} is to dispose of hazardous materials.\\
+	\textbf{Multiplicity}: Many \textit{Players} can dispose of hazardous materials.\\
 	\textbf{Primary actor:} \textit{Player}\\
 	\textbf{Main Success Scenario:}\\
 	\begin{tabular}{l l}
 		&1. \textit{Player} informs \textit{System} he wants to Dispose Hazardous Material.\\
-		&2. \textit{System} deducts 2 action points from \textit{player}\\
-		&3. \textit{System} informs all \textit{players} a hazardous material has been disposed\\
-		&4. \textit{System} checks if \textit{players} has the Hazmat Technician Role\\
+		&2. \textit{System} deducts 2 action points from \textit{Player}\\
+		&3. \textit{System} informs all \textit{Players} a hazardous material has been disposed\\
+		&4. \textit{System} checks if \textit{Players} has the Hazmat Technician Role\\
 	\end{tabular}\\
 	\textbf{Extensions:}\\
 	\begin{tabular}{l l}
@@ -534,15 +540,15 @@
 	\textbf{Use Case:} Identify Victim\\
 	\textbf{Scope:} Flash Point\\
 	\textbf{Level:} User Goal\\
-	\textbf{Intention of Context:} The intention of \textit{player} is to identify a victim.\\
-	\textbf{Multiplicity}: Many \textit{players} can identify victims.\\
+	\textbf{Intention in Context:} The intention of \textit{Player} is to identify a victim.\\
+	\textbf{Multiplicity}: Many \textit{Players} can identify victims.\\
 	\textbf{Primary actor:} \textit{Player}\\
 	\textbf{Main Success Scenario:}\\
 	\begin{tabular}{l l}
 		&1. \textit{Player} informs \textit{System} identify a victim.\\
-		&2. \textit{System} deducts 1 action points from \textit{player}\\
-		&3. \textit{System} informs all \textit{players} a victim has been resuscitated\\
-		&4. \textit{System} checks if \textit{players} has the Imaging Technician Role\\
+		&2. \textit{System} deducts 1 action points from \textit{Player}\\
+		&3. \textit{System} informs all \textit{Players} a victim has been resuscitated\\
+		&4. \textit{System} checks if \textit{Players} has the Imaging Technician Role\\
 	\end{tabular}\\
 	\textbf{Extensions:}\\
 	\begin{tabular}{l l}
@@ -623,13 +629,13 @@
 	\textbf{Scope:} Flash Point\\
 	\textbf{Level:} User Goal\\
 	\textbf{Intention in Context:} The intention of the \textit{Player} is to call for vote to decide on something.\\
-	\textbf{Multiplicity: } Every player may \underline{Call for Vote}, but only one vote can exist at a time.\\
+	\textbf{Multiplicity: } Every Player may \underline{Call for Vote}, but only one vote can exist at a time.\\
 	\textbf{Primary Actor:} \textit{Player}\\
 	\textbf{Secondary Actors:} \textit{Player (other than the Current Player)}\\
 	\textbf{Main Success Scenario:}\\
 	\begin{tabular}{l l}
 		1.) The \textit{Player} informs the \textit{System} that they want to \underline{Call for Vote}.\\
-		2.) The \textit{Player} chooses to \underline{Call for timeout}, or \underline{Vote to kick player}.\\
+		2.) The \textit{Player} chooses to \underline{Call for timeout}, or \underline{Vote to kick Player}.\\
 		3.) The \textit{System} validates the request.\\
 		4.) Other \textit{Players} cast their votes.\\
 		5.) The \textit{System} collects the \textit{Players'} choices and calculates the result.\\
@@ -645,7 +651,7 @@
 	\textbf{Scope:} Flash Point\\
 	\textbf{Level:} Subfunction\\
 	\textbf{Intention in Context:} The intention of the \textit{Player} is to pause the game state.\\
-	\textbf{Multiplicity: } Every player may \underline{Call for Vote}, but only one vote can exist at a time.\\
+	\textbf{Multiplicity: } Every Player may \underline{Call for Vote}, but only one vote can exist at a time.\\
 	\textbf{Primary Actor:} \textit{Player}\\
 	\textbf{Secondary Actors:} \textit{Player (other than the Current Player)}\\
 	\textbf{Main Success Scenario:}\\
@@ -662,8 +668,8 @@
 		&3a) Most Players disagree to pause the game, the vote is canceled and the game state is not paused.\\
 		&3b) Majority of the Players do not cast a vote, voting is canceled and the game state is not paused.
 	\end{tabular}
-	\section*{Vote to kick player}
-	\textbf{Use Case:} Vote to kick player\\
+	\section*{Vote to kick Player}
+	\textbf{Use Case:} Vote to kick Player\\
 	\textbf{Scope:} Flash Point\\
 	\textbf{Level:} Subfunction\\
 	\textbf{Intention in Context:} The intention of the \textit{Player} is to kick another \textit{Player} from the game.\\
@@ -688,7 +694,7 @@
 	\textbf{Use Case:} Cast vote\\
 	\textbf{Scope:} Flash Point\\
 	\textbf{Level:} User Goal\\
-	\textbf{Intention of Context:} The intention of the \textit{Player} is to cast a vote.\\
+	\textbf{Intention in Context:} The intention of the \textit{Player} is to cast a vote.\\
 	\textbf{Multiplicity: }Each \textit{Player}, except the one who initiated the vote and the one being targeted for kick out, can cast a vote.\\
 	\textbf{Primary Actor:} \textit{Player}\\
 	\textbf{Main Success Scenario:}\\
@@ -702,15 +708,15 @@
 	\textbf{Use Case:} Place a Marker\\
 	\textbf{Scope:} Flash Point\\
 	\textbf{Level:} User Goal\\
-	\textbf{Intention of Context:} The intention of the \textit{Player} is to place a marker on the game board.\\
-	\textbf{Multiplicity: }Each \textit{player} can place can place a marker for each type\\
+	\textbf{Intention in Context:} The intention of the \textit{Player} is to place a marker on the game board.\\
+	\textbf{Multiplicity: }Each \textit{Player} can place can place a marker for each type\\
 	\textbf{Primary actor:} \textit{Player}\\
 	\textbf{Main Success Scenario:}\\
 	\begin{tabular}{l l}
 		&1. \textit{Player} informs \textit{system that they want to place a marker}\\
 		&2. \textit{Player} chooses the type of marker to be placed.\\
 		&3. \textit{Player} informs \textit{system} of the location on the board where the marker is to be placed.\\
-		&4. \textit{System} displays to all \textit{players} the marker on the board.
+		&4. \textit{System} displays to all \textit{Players} the marker on the board.
 	\end{tabular}\\
 	\begin{tabular}{l l}
 		
@@ -720,7 +726,7 @@
 	\textbf{Use Case:} View Player's Information\\
 	\textbf{Scope:} Flash Point\\
 	\textbf{Level:} User Goal\\
-	\textbf{Intention of Context:} The intention of the \textit{Player} is to view other \textit{Player's} information.\\
+	\textbf{Intention in Context:} The intention of the \textit{Player} is to view other \textit{Player's} information.\\
 	\textbf{Multiplicity: }Each \textit{Player} can view other \textit{Players'} information.\\
 	\textbf{Primary Actor:} \textit{Player (who requested the information)}\\
 	\textbf{Secondary Actors:} \textit{Player (whose information is being requested)}\\
@@ -734,7 +740,7 @@
 	\textbf{Use Case:} Command a Player\\
 	\textbf{Scope:} Flash Point\\
 	\textbf{Level:} Subfunction\\
-	\textbf{Intention of Context:} The intention of the \textit{Player} who is playing as the \textit{Captain} role is to command other \textit{Player} to the specified location.\\
+	\textbf{Intention in Context:} The intention of the \textit{Player} who is playing as the \textit{Captain} role is to command other \textit{Player} to the specified location.\\
 	\textbf{Multiplicity: }A \textit{Captain Player} may command one \textit{Player} at a time, and can command multiple times as long as the Action Point (AP) is enough.\\
 	\textbf{Primary Actor:} \textit{Captain Player}\\
 	\textbf{Secondary Actors:} \textit{Player}\\
@@ -762,7 +768,7 @@
 	\textbf{Use Case:} Fire Deck Gun\\
 	\textbf{Scope:} Flash Point\\
 	\textbf{Level:} Subfunction\\
-	\textbf{Intention of Context:} The intention of the \textit{Player} is to fire a deck gun at a specified Quadrant.\\
+	\textbf{Intention in Context:} The intention of the \textit{Player} is to fire a deck gun at a specified Quadrant.\\
 	\textbf{Multiplicity: }Only one \textit{Player} can use the deck gun at a time. A \textit{Player} can fire the deck gun multiple times, as long as they have enough Action Points (AP).\\
 	\textbf{Primary Actor:} \textit{Players}\\
 	\textbf{Secondary Actors:}\\
@@ -790,7 +796,7 @@
 	\textbf{Use Case:} Swap Role\\
 	\textbf{Scope:} Flash Point\\
 	\textbf{Level:} Subfunction\\
-	\textbf{Intention of Context:} The intention of the \textit{Player} is to change into other role.\\
+	\textbf{Intention in Context:} The intention of the \textit{Player} is to change into other role.\\
 	\textbf{Multiplicity: }Every \textit{Player} can swap role.\\
 	\textbf{Primary Actor:} \textit{Players}\\
 	\textbf{Secondary Actors:}\\
@@ -819,14 +825,14 @@
 	\textbf{Use Case:} ReplenishPointOfInterest\\
 	\textbf{Scope:} Flash Point\\
 	\textbf{Level:} Subfunction\\
-	\textbf{Intention of context:} The intent of Controller is to replenish the game board with according points of interest.\\
+	\textbf{Intention in Context:} The intent of Controller is to replenish the game board with according points of interest.\\
 	\textbf{Multiplicity:} 3 points must be on the game board after each turn.\\
 	\textbf{Primary actor:} \textit{Controller}\\
 	\textbf{Main Success Scenario:}\\
 	\begin{tabular}{l l}
 		&1. \textit{Controller} goes through game board squares to check if 3 POIs are present.\\
 		&2. \textit{Controller} randomly chooses a tile to place missing POI.\\
-		&3. \textit{System} displays to all \textit{players} a new POI a the randomly chosen tile.
+		&3. \textit{System} displays to all \textit{Players} a new POI a the randomly chosen tile.
 	\end{tabular}\\
 	\textbf{Extensions:}\\
 	\begin{tabular}{l l}
@@ -834,13 +840,13 @@
 		&3a. \textit{Controller} placed new POI on fire or smoke token.\\
 		&\qquad3a.1 \textit{System} replaces token by POI. Use Case continues at step 3.\\
 		&3b. \textit{Controller} placed new POI on a character position.\\
-		&\qquad3b.1 \textit{System} reveals POI to all \textit{players}. Use Case continues at step 1.
+		&\qquad3b.1 \textit{System} reveals POI to all \textit{Players}. Use Case continues at step 1.
 	\end{tabular}
 	\section*{Advance Fire}
 	\textbf{Use Case:} Advance Fire\\
 	\textbf{Scope:} Flash Point\\
 	\textbf{Level:} Subfunction\\
-	\textbf{Intention of Context:} A Turn has ended and the \textit{Controller} needs to \text{Advance Fire}.\\
+	\textbf{Intention in Context:} A Turn has ended and the \textit{Controller} needs to \text{Advance Fire}.\\
 	\textbf{Multiplicity}: This occurs once per turn by only the \textit{Controller}.\\
 	\textbf{Primary actor:} \textit{Controller}\\
 	\textbf{Secondary actor:} \textit{Player}\\
@@ -869,7 +875,7 @@
 	\textbf{Use Case:} Explosion\\
 	\textbf{Scope:} Flash Point\\
 	\textbf{Level:} Subfunction\\
-	\textbf{Intention of Context:} During \underline{Advance Fire}, the \textit{Controller} must spread Fire in all 4 directions from the Target Tile.\\
+	\textbf{Intention in Context:} During \underline{Advance Fire}, the \textit{Controller} must spread Fire in all 4 directions from the Target Tile.\\
 	\textbf{Multiplicity}: This can occur more than once per Turn by only the \textit{Controller}.\\
 	\textbf{Primary actor:} \textit{Controller}\\
 	\textbf{Secondary actor:} \textit{Player}\\
@@ -889,7 +895,7 @@
 	\textbf{Scope:} FlashPoint\\
 	\textbf{Level:} Subfunction\\
 	\textbf{Intention in Context:} The \textit{Player} intends to pick up the victim or hazmat.\\
-	\textbf{Multiplicity:} Only the \textit{player} whose turn it is currently can do pick up action.\\
+	\textbf{Multiplicity:} Only the \textit{Player} whose turn it is currently can do pick up action.\\
 	\textbf{Primary Actor:} \textit{Player}\\
 	\textbf{Main Success Scenario:}\\
 	\begin{tabular}{l l}
@@ -905,7 +911,7 @@
 	\textbf{Scope:} FlashPoint\\
 	\textbf{Level:} Subfunction\\
 	\textbf{Intention in Context:} The Player intends to put down the victim or hazmat.\\
-	\textbf{Multiplicity:} Only the player whose turn it is currently and is carrying an object can do put down action.\\
+	\textbf{Multiplicity:} Only the Player whose turn it is currently and is carrying an object can do put down action.\\
 	\textbf{Primary Actor:} Player\\
 	\textbf{Main Success Scenario:}\\
 	\begin{tabular}{l l}
@@ -918,7 +924,7 @@
 	\textbf{Extensions:}\\
 	\begin{tabular}{l l}
 		&2a) \textit{System} determines that the \textit{Player’s} location is invalid to put down the object.\\
-		&\qquad\textit{It signals the Player with the error.} \textit{System} informs \textit{player} of an error.\\
+		&\qquad\textit{It signals the Player with the error.} \textit{System} informs \textit{Player} of an error.\\
 		&\qquad2a)-1. Use Case returns to Execute Turn, Step 3.
 	\end{tabular}
 \end{document}
