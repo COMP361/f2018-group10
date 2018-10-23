@@ -224,6 +224,8 @@
 		&3.) The \textit{Player} spends their available \textit{Action Points}\\
 		&4.) The \textit{System} informs the \textit{Player} that their \textit{Turn} has ended.\\
 		&5.) The \textit{System} processes the \textit{Game State} and displays the result to all \textit{Players}\\
+		&6.) \underline{Advance Fire}\\
+		&7.) \underline{Replenish POI}\\
 	\end{tabular}\\
 	\textbf{Extensions: }\\
 	\begin{tabular}{l l}
@@ -656,7 +658,7 @@
 	\textbf{Extensions:}\\
 	\begin{tabular}{l l}
 		&2a) The \textit{Player} cancels the action.\\
-		&2a.1) End of use case.
+		&2a.1) End of use case.\\
 		&4b) Not enough \textit{Players} vote, end of use case.
 	\end{tabular}
 	\section*{Call for Timeout}
@@ -834,10 +836,11 @@
 	\textbf{Scope:} Flash Point\\
 	\textbf{Level:} Subfunction\\
 	\textbf{Intention in Context:} The intent of Controller is to replenish the game board with according points of interest.\\
-	\textbf{Multiplicity:} 3 points must be on the game board after each turn.\\
+	\textbf{Multiplicity:} The Controller \textit{Replenish Point Of Interest} once per Turn. \\
 	\textbf{Primary actor:} \textit{Controller}\\
 	\textbf{Main Success Scenario:}\\
 	\begin{tabular}{l l}
+		&\textit{Steps 1 through 3 can be repeated until there are 3 POI's present}\\
 		&1. \textit{Controller} goes through game board squares to check if 3 POIs are present.\\
 		&2. \textit{Controller} randomly chooses a tile to place missing POI.\\
 		&3. \textit{System} displays to all \textit{Players} a new POI a the randomly chosen tile.
