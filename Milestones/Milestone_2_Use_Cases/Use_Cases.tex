@@ -32,7 +32,7 @@
 	\textbf{Intention in context: }
 	The intention of \textit{Player} is to play a game of Flash Point with other Players\\
 	\textbf{Multiplicity: }
-	Multiple \textit{Players} can play together at the same time. There must be at least 2 \textit{Players} with the maximum being 6.\\
+	Multiple \textit{Players} can play together at the same time. There must be at least 3 \textit{Players} with the maximum being 6.\\
 	\textbf{Primary actor: }
 	\textit{Player}\\
 	\textbf{Secondary actor(s):} Other Players\\
@@ -47,9 +47,9 @@
 		&7. \textit{System} prompts the \textit{Host} to choose a preset or generate a random \textit{Game Board}.\\
 		&8. \textit{Player} informs \textit{system} of his starting position\\
 		&\qquad\textit{System waits until enough Players are connected to continue to next step}\\
-		&9. \textit{Players} agree over \underline{chat} who goes first.\\
+		&9. \textit{Players} agree over \underline{Chat} who goes first.\\
 		&10. \textit{Player} votes to inform system who should play first.\\
-		&\qquad\textit{Step 8 is executed until the game is over, or until Players quit.}\\
+		&\qquad\textit{Step 11 is executed until the game is over, or until Players quit.}\\
 		&11. \textit{Players} take \underline{turns} one after another.\\
 		&12. \textit{System} informs the \textit{Players} whether they won the game.
 	\end{tabular}\\
@@ -97,7 +97,7 @@
 	\textbf{Level:}
 	Subfunction\\
 	\textbf{Intention in Context}
-	The intention of \textit{Player} is to join a game that has already been initialized by someone else.\\
+	The intention of \textit{Player} is to join a game that has already been created by someone else.\\
 	\textbf{Multiplicity:}
 	Many \textit{Players} can join an existing game.\\
 	\textbf{Primary actor: }
@@ -133,19 +133,18 @@
 	\textbf{Intention in Context}
 	The intention of \textit{Player} is to create a new game.\\
 	\textbf{Multiplicity:}
-	Multiple instances of the \textit{game} can be created within the \textit{network}.\\
+	Multiple instances of the \textit{Game} can be created within the \textit{network}.\\
 	\textbf{Primary actor: } \textit{Player}\\
 	\textbf{Secondary actor(s):} \textit{System}\\
 	\textbf{Main Success Scenario}\\
 	\begin{tabular}{l l}
 		&1. \textit{System} prompts \textit{Player} if \underline{Host Existing Game} instead\\
 		&2. \textit{System} displays an input menu to \textit{Player} for game settings\\
-		&3. \textit{Player} makes game private or public\\
-		&4. \textit{Player} chooses the game mode\\
+		&3. \textit{Player} informs the \textit{System} whether the game should be private or public\\
+		&4. \textit{Player} informs the \textit{System} which Game Mode they would like to play.\\
 		&\qquad \textit{Game mode can either be Family, Beginner. Veteran, Heroic}\\
 		&5. \textit{Player} specifies number of \textit{Players}\\
-		&6. \textit{Player} specifies to \textit{System} to play on a classic board or \underline{Generate Random GameBoard}\\
-		&6. \textit{System} identifies ip address of the \textit{Player}.\\
+		&6. \textit{Player} specifies to \textit{System} to play on a preset Classic Board or \underline{Generate Random GameBoard}\\
 		&7. \textit{System} informs the \textit{Player} the creation of the game was successful
 	\end{tabular}\\
 	\textbf{Extensions:}\\
@@ -160,38 +159,38 @@
 	\textbf{Intention in Context:} The intention of \textit{Player} is to host a pre-existing game within the \textit{database}.\\
 	\textbf{Multiplicity}: Many \textit{Players} can host pre-existing games simultaneously.\\
 	\textbf{Primary actor:} \textit{Player}\\
+	\textbf{Secondary Actor:} \textit{Database}\\
 	\textbf{Main Success Scenario:}\\
 	\begin{tabular}{l l}
-		&1. \textit{System} displays an input field prompting \textit{Player} for a specific game ip address\\
-		&\qquad\textit{Games are stored in system as IP addresses}\\
-		&2. \textit{System} searches database for this game\\
-		&3. \textit{System} displays previously loaded game board to \textit{Player}\\
-		&4. \textit{Player} confirms the game board to system.\\
+		&1. \textit The \textit{Player} informs the \textit{System} which game they would like to join.\\
+		&2. \textit{System} requests the \textit{Database} for this game\\
+		&3. \textit{System} displays previously created game board to \textit{Player}\\
+		&4. \textit{Player} confirms the game board to \textit{System}.\\
 		&\qquad\textit{System waits until enough Players have joined the game.}
 	\end{tabular}\\
 	\textbf{Extensions:}\\
 	\begin{tabular}{l l}
-		&2a. \textit{System} failed to retrieve the request from \textit{Player}. Use case continues to step 1.\\
+		&2a. \textit{Database} informs the \textit{System} that the requested game was not found. Use case continues to step 1.\\
 		&4a. \textit{Player} declines the loaded game board. Use case continues at step 1.
 	\end{tabular}
 	\section*{Generate Random GameBoard}
 	\textbf{Use Case:} Generate Random GameBoard\\
 	\textbf{Scope:} Flash Point\\
 	\textbf{Level:} Subfunction\\
-	\textbf{Intention in Context:} \textit{System} generates a random board setup.\\
-	\textbf{Multiplicity:} Many calls to Generate Random GameBoard can be made simultaneously.\\
-	\textbf{Primary actor:} \textit{Controller}\\
+	\textbf{Intention in Context:} \textit{Player} requested the  \textit{System} to generate a random board setup.\\
+	\textbf{Multiplicity:} Many Players may Generate Random GameBoard, several times.\\
+	\textbf{Primary actor:} \textit{Player}\\
 	\textbf{Main Success Scenario:}\\
 	\begin{tabular}{l l}
-		&1. \textit{Controller} generates a random game setup.\\
+		&1. \textit{System} generates a random game board.\\
 		&2. \textit{Player} notifies \textit{system} he accepts the generated game board.
 	\end{tabular}\\
 	\textbf{Extensions:}\\
 	\begin{tabular}{l l}
 		&2a. \textit{Player} does not accept the generated game board. Use Case continues to step 1. 
 	\end{tabular}
-	\section*{PlayerSelectionMenu}
-	\textbf{Use Case:} PlayerSelectionMenu\\
+	\section*{CharacterSelectionMenu}
+	\textbf{Use Case:} CharacterSelectionMenu\\
 	\textbf{Scope:} FlashPoint\\
 	\textbf{Level:}  Subfunction\\
 	\textbf{Intention in Context:} The intent of \textit{Player} is to select a character in order to join the Game Board\\
@@ -202,7 +201,7 @@
 		&1. \textit{System} diplays to \textit{Player} a menu of available characters\\
 		&\qquad\textit{Available characters are: Imaging Technician, Driver/Operator, Rescue Specialist}\\
 		&\qquad\qquad\textit{Paramedic, CAFS, HazMat tech, Generalist and Fire Captain }\\
-		&2. \textit{Player} informs \textit{system} of the character he selected.
+		&2. \textit{Player} informs \textit{System} of the character he selected.
 	\end{tabular}\\
 	\begin{tabular}{l l}
 		&2a. Selected Character was already taken by another \textit{Player}. Use case continues to step 1.\\
@@ -224,7 +223,7 @@
 		&\qquad \textit{or informs the System of their desire to end their Turn.}\\
 		&3.) The \textit{Player} spends their available \textit{Action Points}\\
 		&4.) The \textit{System} informs the \textit{Player} that their \textit{Turn} has ended.\\
-		&5.) The \textit{System} processes the \textit{Game State} and displays the result to all \textit{Players}
+		&5.) The \textit{System} processes the \textit{Game State} and displays the result to all \textit{Players}\\
 	\end{tabular}\\
 	\textbf{Extensions: }\\
 	\begin{tabular}{l l}
@@ -232,8 +231,12 @@
 		&3b) The \textit{Player} performs a \underline{Chop}\\
 		&3c) The \textit{Player} performs a \underline{Extinguish}\\
 		&3d) The \textit{Player} performs a \underline{Open/Close Door}\\
-		&3e) The \textit{Player} performs a \underline{Special Action}\\
-		&3f) The \textit{Player} performs a  \underline{Drive}
+		&3e) The \textit{Player} performs a \underline{Drive}\\
+		&3f) The \textit{Player} performs a \underline{Rescusitate}\\
+		&3g) The \textit{Player} performs a \underline{Identify}\\
+		&3h) The \textit{Player} performs a \underline{Dispose HazMat}\\
+		&3i) The \textit{Player} performs a \underline{Command Player}\\
+		&3j) The \textit{Player} performs a  \underline{Swap Role}\\
 	\end{tabular}
 	
 	\section*{Move}
@@ -450,9 +453,9 @@
 	\end{tabular}\\
 	\textbf{Extensions: } \\
 	\begin{tabular}{l l}
-		&1a) The \textit{Player} informed the \textit{System} that they wish to \textit{Drive} the Ambulance. \\
+		&1a) The \textit{Player} informed the \textit{System} that they wish to \textit{Drive Ambulance}. \\
 		&\qquad1a.1) \underline{Call Ambulance}.\\
-		&1b) The \textit{Player} informed the \textit{System} that they wish to \textit{Drivethe Engine.}\\
+		&1b) The \textit{Player} informed the \textit{System} that they wish to \textit{Drive  Engine.}\\
 		&\qquad1b.1) \underline{Drive Engine}\\
 	\end{tabular}\\
 	
@@ -460,7 +463,7 @@
 	\textbf{Use Case:} Call Ambulance\\
 	\textbf{Scope:} FlashPoint\\
 	\textbf{Level:} Subfunction\\
-	\textbf{Intention in Context:} The intention of the \textit{Player} is to \textit{Drive Ambulance}\\
+	\textbf{Intention in Context:} The intention of the \textit{Player} is to \textit{Call Ambulance}\\
 	\textbf{Multiplicity: } One Player may \textit{Call Ambulance} at one time. A \textit{Player} may \textit{Call Ambulance} more than once per Turn.\\
 	\textbf{Primary Actor:} \textit{Player}\\
 	\textbf{Secondary Actors:}\\
@@ -510,13 +513,16 @@
 	\textbf{Main Success Scenario:}\\
 	\begin{tabular}{l l}
 		&1. \textit{Player} informs \textit{System} he wants to resuscitate a victim.\\
-		&2. \textit{System} deducts 1 action point from \textit{Player}\\
-		&3. \textit{System} informs all \textit{Players} a victim has been resuscitated\\
-		&4. \textit{System} checks if the \textit{Player} has the Paramedic Role\\
+		&2. \textit{System} checks if the \textit{Player} is currently playing the Paramedic Role and that the \textit{Player} has enough \textit{Action Points}\\	
+		&3. \textit{System} deducts 1 action point from \textit{Player}\\
+		&4. \textit{System} informs all \textit{Players} a victim has been resuscitated\\
+	
 	\end{tabular}\\
 	\textbf{Extensions:}\\
 	\begin{tabular}{l l}
-		&2a. \textit{System} informs \textit{Player} he did not have enough action points. End of Use Case.
+		&2a.\textit{Player} did not have enough action points, or is not playing the Paramedic Role.\\
+		&\qquad2a.1)The \textit{System} informs the \textit{Player} that the request was invalid.\\
+		&\qquad2a.2) The use case returns to \underline{Turn} step 3.
 	\end{tabular}
 	\section*{Dispose}
 	\textbf{Use Case:} Disposal of Hazardous Materials\\
@@ -528,13 +534,16 @@
 	\textbf{Main Success Scenario:}\\
 	\begin{tabular}{l l}
 		&1. \textit{Player} informs \textit{System} he wants to Dispose Hazardous Material.\\
-		&2. \textit{System} deducts 2 action points from \textit{Player}\\
-		&3. \textit{System} informs all \textit{Players} a hazardous material has been disposed\\
-		&4. \textit{System} checks if \textit{Players} has the Hazmat Technician Role\\
+		&2. \textit{System} checks if \textit{Players} has the Hazmat Technician Role and has enough Action Points\\
+		&3. \textit{System} deducts 2 action points from \textit{Player}\\
+		&4. \textit{System} informs all \textit{Players} a hazardous material has been disposed\\
+		
 	\end{tabular}\\
 	\textbf{Extensions:}\\
 	\begin{tabular}{l l}
-		&2a. \textit{System} informs \textit{Player} he did not have enough action points. End of Use Case.
+		&2a.\textit{Player} did not have enough action points, or is not playing the HazMat Technician Role.\\
+		&\qquad2a.1)The \textit{System} informs the \textit{Player} that the request was invalid.\\
+		&\qquad2a.2) The use case returns to \underline{Turn} step 3.
 	\end{tabular}
 	\section*{Identify}
 	\textbf{Use Case:} Identify Victim\\
@@ -546,13 +555,16 @@
 	\textbf{Main Success Scenario:}\\
 	\begin{tabular}{l l}
 		&1. \textit{Player} informs \textit{System} identify a victim.\\
-		&2. \textit{System} deducts 1 action points from \textit{Player}\\
-		&3. \textit{System} informs all \textit{Players} a victim has been resuscitated\\
-		&4. \textit{System} checks if \textit{Players} has the Imaging Technician Role\\
+		&2. \textit{System} checks if \textit{Players} has the Imaging Technician Role and has enough Action Points\\
+		&3. \textit{System} deducts 1 action points from \textit{Player}\\
+		&4. \textit{System} informs all \textit{Players} of the revealed POI\\
+		
 	\end{tabular}\\
 	\textbf{Extensions:}\\
 	\begin{tabular}{l l}
-		&2a. \textit{System} informs \textit{Player} he did not have enough action points. End of Use Case.
+		&2a.\textit{Player} did not have enough action points, or is not playing the Imaging Technician Role.\\
+		&\qquad2a.1)The \textit{System} informs the \textit{Player} that the request was invalid.\\
+		&\qquad2a.2) The use case returns to \underline{Turn} step 3.
 	\end{tabular}
 	\section*{Chat}
 	\textbf{Use Case:} Chat\\
@@ -565,7 +577,7 @@
 	\textbf{Main Success Scenario:}\\
 	\begin{tabular}{l l}
 		&1. \textit{Player} informs the \textit{System} that they want to chat using either \underline{text message} or \underline{audio message}.\\
-		&2. Other \textit{Players} receive the message.
+		&2. The \textit{System} displays the message to all \textit{Players}
 	\end{tabular}
 	\section*{Send text message}
 	\textbf{Use Case:} Send text message\\
@@ -635,16 +647,17 @@
 	\textbf{Main Success Scenario:}\\
 	\begin{tabular}{l l}
 		1.) The \textit{Player} informs the \textit{System} that they want to \underline{Call for Vote}.\\
-		2.) The \textit{Player} chooses to \underline{Call for timeout}, or \underline{Vote to kick Player}.\\
+		2.) The \textit{Player} informs the \textit{System} of their choice to \underline{Call for timeout}, or \underline{Vote to kick Player}.\\
 		3.) The \textit{System} validates the request.\\
-		4.) Other \textit{Players} cast their votes.\\
+		4.) Other \textit{Players} cast their votes to the \textit{System}\\
 		5.) The \textit{System} collects the \textit{Players'} choices and calculates the result.\\
 		6.) The \textit{System} informs the \textit{Players} of the result.
 	\end{tabular}\\
 	\textbf{Extensions:}\\
 	\begin{tabular}{l l}
 		&2a) The \textit{Player} cancels the action.\\
-		&4b) Not enough \textit{Players} vote, voting is canceled.
+		&2a.1) End of use case.
+		&4b) Not enough \textit{Players} vote, end of use case.
 	\end{tabular}
 	\section*{Call for Timeout}
 	\textbf{Use Case:} Call for timeout\\
@@ -658,8 +671,8 @@
 	\begin{tabular}{l l}
 		&1.) The \textit{Player} initiates the vote.\\
 		&2.) The other \textit{Players} \underline{cast their vote}.\\
-		&3.) Most \textit{Players} agree to pause the game, the game state is paused for 2 minutes.\\
-		&4.) The system shows the \textit{Player} the time remaining for timeout\\
+		&3.) Most \textit{Players} agree to pause the game, the game state is paused for a predetermined lenght of time.\\
+		&4.) The system shows all \textit{Players} the time remaining for timeout\\
 		&5.) Repeat (4) until timer reaches 0.\\
 		&6.) Resume game state.\\
 	\end{tabular}\\
@@ -678,16 +691,15 @@
 	\textbf{Secondary Actors:} \textit{Player (other than the Current Player)}\\
 	\textbf{Main Success Scenario:}\\
 	\begin{tabular}{l l}
-		&1. The \textit{Player} initiates the vote.\\
+		&1. The \textit{Player} informs the \textit{System} that they would like to initiate the vote.\\
 		&2. The other \textit{Players} \underline{cast their votes}, except the \textit{Player} who is being voted to kick out.\\
-		&3. Most \textit{Players} agree to kick the targeted \textit{Player},\\
 		&\qquad the \textit{System} then removes the targeted \textit{Player} from the game.
 	\end{tabular}\\
 	\textbf{Extensions: }\\
 	\begin{tabular}{l l}
-		&3a Most \textit{Players} disagree to kick the targeted \textit{Player},\\
+		&2a Most \textit{Players} disagree to kick the targeted \textit{Player},\\
 		&\qquad the vote is canceled and the targeted \textit{Player} remains in game.\\
-		&3b Majority of the \textit{Players} do not cast a vote,\\
+		&2b Majority of the \textit{Players} do not cast a vote,\\
 		&\qquad voting is canceled and the \textit{Player} remains in game.
 	\end{tabular}
 	\section*{Cast vote}
@@ -700,9 +712,8 @@
 	\textbf{Main Success Scenario:}\\
 	\begin{tabular}{l l}
 		&1. The \textit{System} asks the \textit{Player} to \underline{cast a vote}.\\
-		&2. The \textit{Player} makes a choice.\\
-		&3. The \textit{System} collects the \textit{Player's} choice and calculates the result.\\
-		&4. The \textit{System} informs the \textit{Player} of the result.
+		&2. All \textit{Players} inform the \textit{System} of their choice.\\
+		&3. The \textit{System} informs all \textit{Players} of the result.
 	\end{tabular}
 	\section*{Place a Marker}
 	\textbf{Use Case:} Place a Marker\\
