@@ -4,9 +4,10 @@ import pygame
 
 from src.UIComponents.Text import Text
 from src.UIComponents.RectLabel import RectLabel
+from src.UIComponents.Interactable import Interactable
 
 
-class RectButton(RectLabel):
+class RectButton(RectLabel, Interactable):
     def __init__(self,
                  rect: pygame.Rect,
                  color: Tuple[int, int, int],
