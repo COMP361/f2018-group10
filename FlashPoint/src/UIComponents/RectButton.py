@@ -8,11 +8,16 @@ from src.UIComponents.Interactable import Interactable
 
 
 class RectButton(RectLabel, Interactable):
+    """
+    Creates a RectLabel and detects mouseclicks on the object
+    """
     def __init__(self,
                  rect: pygame.Rect,
                  color: Tuple[int, int, int],
                  txtobj: Optional[Text] = None,
                  width: int=0):
+        __doc__ = RectLabel.__doc__
+
         super(RectButton, self).__init__(rect, color, txtobj, width)
         self.click_event = None
 

@@ -5,7 +5,9 @@ import pygame
 
 
 class Interactable(metaclass=abc.ABCMeta):
-
+    """
+    Interface class for objects that can be clicked
+    """
     @abc.abstractmethod
     def on_click(self, click_event: Union[pygame.event, Callable]):
         """
