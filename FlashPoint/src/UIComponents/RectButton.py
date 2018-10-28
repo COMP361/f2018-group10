@@ -11,12 +11,11 @@ class RectButton(RectLabel):
                  rect: pygame.Rect,
                  color: Tuple[int, int, int],
                  txtobj: Optional[Text] = None,
-                 surface: pygame.Surface=pygame.display.get_surface(),
                  width: int=0):
-        super(RectButton, self).__init__(rect, color, txtobj, surface, width)
+        super(RectButton, self).__init__(rect, color, txtobj, width)
         self.click_event = None
 
-    def attach_click_handler(self):
+    def update(self):
         mouse = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()
         rect = super(RectButton, self).rect

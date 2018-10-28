@@ -13,7 +13,7 @@ class Text(object):
         Constructor.
         :param font: Defines font style. MUST BE an instance of pygame.font.Font()
         :param text: String for your Text object
-        :param color: (optional) int[3] - Color for your Text object, in the form of RGB array. Default: black
+        :param color: (optional) int[3] - Color for your Text object, in the form of RGB triplet. Default: black
         :param anti_alias: (optional) Boolean - Anti aliasing option
         """
         self.font = font

@@ -5,7 +5,7 @@ import pygame
 from src.UIComponents.Text import Text
 
 
-class RectLabel(object):
+class RectLabel(pygame.sprite.Sprite):
     """
         Draws a rectangle object and (optionally) inserts a text on it.
         This is a shorthand of pygame.draw.Rect()
@@ -14,21 +14,29 @@ class RectLabel(object):
                  rect: pygame.Rect,
                  color: Tuple[int, int, int],
                  txtobj: Optional[Text] = None,
-                 surface: pygame.Surface=pygame.display.get_surface(),
                  width: int=0):
-        pygame.init()
+        """
+        Constructor.
+        :param rect: Rect object to be drawn
+        :param color: RGB triplet for the background color
+        :param txtobj: Text object to be inserted at the center of this label
+        :param surface: Surface that this object is drawn on (I think LOL)
+        :param width: Outer width of the Rect object (to be drawn)
+        """
+        pygame.sprite.Sprite.__init__(self)
         self.rect = rect
         self.color = color
         self.width = width
-        self.surface = surface
         self.txtobj = txtobj
+        self.image = None
         self.render()
 
     def render(self):
-        pygame.draw.Rect(self.surface, self.color, self.rect, self.width)
+        self.image = pygame.Surface([self.rect.width, self.rect.height])
+        self.image.fill(self.color)
         if self.txtobj:
-            self.txtobj.set_center(((self.rect.left + (self.rect.width/2)), (self.rect.top + (self.rect.height/2))))
-            self.surface.blit(self.txtobj.get_surf(), self.txtobj.get_rect())
+            self.txtobj.set_center((self.rect.width/2), (self.rect.height/2))
+            self.image.blit(self.txtobj.get_surf(), self.txtobj.get_rect())
 
     def change_color(self, color:Tuple[int,int,int]):
         self.color = color
