@@ -28,7 +28,7 @@ class EllipseButton(EllipseLabel, Interactable):
         rect = super(EllipseButton, self).rect
 
         if rect.x+rect.w > mouse[0] > rect.x and rect.y+rect.h > mouse[1] > rect.y:
-            """ Only executes the hover function when the mouse is first moved into the button """
+            # Only executes the hover function when the mouse is first moved into the button
             if not self.isHover:
                 self.hover()
                 self.isHover = True
@@ -36,7 +36,7 @@ class EllipseButton(EllipseLabel, Interactable):
             if click[0] and self.click_event and self.isEnabled:
                 self.click()
         else:
-            """ Indicate that the mouse has moved out of bound so that the hover function can be run again next time """
+            # Indicate that the mouse has moved out of bound so that the hover function can be run again next time
             self.isHover = False
 
     def hover(self):

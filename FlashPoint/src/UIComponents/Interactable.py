@@ -1,7 +1,4 @@
-from typing import Callable, Union, Optional
-
 import abc
-import pygame
 
 
 class Interactable(metaclass=abc.ABCMeta):
