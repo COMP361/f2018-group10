@@ -3,29 +3,29 @@ from typing import Tuple, Optional
 import pygame
 
 from src.UIComponents.Text import Text
-from src.UIComponents.RectLabel import RectLabel
+from src.UIComponents.EllipseLabel import EllipseLabel
 from src.UIComponents.Interactable import Interactable
 
 
-class RectButton(RectLabel, Interactable):
+class EllipseButton(EllipseLabel, Interactable):
     """
-    Creates a RectLabel and detects mouseclicks on the object
+    Creates a EllipseLabel and detects mouseclicks on the object
     """
     def __init__(self,
                  rect: pygame.Rect,
                  color: Tuple[int, int, int],
                  txtobj: Optional[Text] = None,
                  width: int=0):
-        __doc__ = RectLabel.__doc__
+        __doc__ = EllipseLabel.__doc__
 
-        super(RectButton, self).__init__(rect, color, txtobj, width)
+        super(EllipseButton, self).__init__(rect, color, txtobj, width)
         self.isHover = False
         self.isEnabled = True
 
     def update(self):
         mouse = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()
-        rect = super(RectButton, self).rect
+        rect = super(EllipseButton, self).rect
 
         if rect.x+rect.w > mouse[0] > rect.x and rect.y+rect.h > mouse[1] > rect.y:
             """ Only executes the hover function when the mouse is first moved into the button """

@@ -1,4 +1,4 @@
-from typing import Callable, Union
+from typing import Callable, Union, Optional
 
 import abc
 import pygame
@@ -9,18 +9,33 @@ class Interactable(metaclass=abc.ABCMeta):
     Interface class for objects that can be clicked
     """
     @abc.abstractmethod
-    def on_click(self, click_event: Union[pygame.event, Callable]):
+    def click(self):
         """
-        Hook for click event
-        :param click_event: Defines the action when the object is clicked
+        Defines the click event
         :return:
         """
         pass
 
     @abc.abstractmethod
-    def off_click(self):
+    def hover(self):
         """
-        Removes the click event hook
+        Defines the hover event
+        :return:
+        """
+        pass
+
+    @abc.abstractmethod
+    def enable(self):
+        """
+        Enables the click event hook
+        :return:
+        """
+        pass
+
+    @abc.abstractmethod
+    def disable(self):
+        """
+        Disables the click event hook
         :return:
         """
         pass
