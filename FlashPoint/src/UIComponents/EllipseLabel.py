@@ -34,7 +34,7 @@ class EllipseLabel(pygame.sprite.Sprite):
         pygame.draw.ellipse(self.image, self.color, self.rect, self.width)
         if self.txtobj:
             self.txtobj.set_center((self.rect.width/2), (self.rect.height/2))
-            self.image.blit(self.txtobj.text_surf, self.txtobj.text_rect)
+            self.image.blit(self.txtobj.get_surf(), self.txtobj.get_rect())
 
     def change_color(self, color: Tuple[int, int, int]):
         self.color = color

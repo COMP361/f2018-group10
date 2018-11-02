@@ -44,3 +44,6 @@ class Text(object):
     def set_center(self, pos: Tuple[int,int]):
         self.text_rect.center = pos
         self.render()
+    def get_surf(self,text,font):
+        textSurface = font.render(text, True, self.color)
+        return textSurface

@@ -34,8 +34,9 @@ class RectLabel(pygame.sprite.Sprite):
         self.image = pygame.Surface([self.rect.width, self.rect.height])
         self.image.fill(self.color)
         if self.txtobj:
-            self.txtobj.set_center((self.rect.width/2), (self.rect.height/2))
-            self.image.blit(self.txtobj.text_surf, self.txtobj.text_rect)
+            textSur = self.txtobj.get_surf(self.txtobj.text,self.txtobj.font)
+            self.txtobj.set_center(((self.rect.width/2), (self.rect.height/2)))
+            self.image.blit(textSur, textSur.get_rect())
 
     def change_color(self, color: Tuple[int, int, int]):
         self.color = color

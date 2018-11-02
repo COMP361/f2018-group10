@@ -1,7 +1,9 @@
 import sys
-
+from src.Login import Login
 # If PyCharm is issuing warnings on pygame methods, suppress it. it's a bug with PyCharm
 import pygame
+#from src.Test import Display
+
 
 
 def main():
@@ -20,8 +22,12 @@ def main():
                 sys.exit()
 
         # Clear the screen to black and flip the double buffer
-        screen.fill((0, 0, 0))
+        screen.fill((255, 255, 255))
         pygame.display.flip()
+        #display = Display(screen)
+        #display.game_intro()
+        log = Login()
+        log.display()
 
 
 if __name__ == '__main__':
