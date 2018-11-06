@@ -41,6 +41,6 @@ class Text(object):
         self.color = color
         self.render()
 
-    def set_center(self, pos: Tuple[int,int]):
+    def set_center(self, pos: Tuple[int, int]):
         self.text_rect.center = pos
         self.render()

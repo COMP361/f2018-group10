@@ -25,7 +25,7 @@ class RectButton(RectLabel, Interactable):
     def update(self):
         mouse = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()
-        rect = super(RectButton, self).rect
+        rect = self.rect
 
         if rect.x+rect.w > mouse[0] > rect.x and rect.y+rect.h > mouse[1] > rect.y:
             # Only executes the hover function when the mouse is first moved into the button
@@ -33,7 +33,7 @@ class RectButton(RectLabel, Interactable):
                 self.hover()
                 self.isHover = True
 
-            if click[0] and self.click_event and self.isEnabled:
+            if click[0] and self.isEnabled:
                 self.click()
         else:
             # Indicate that the mouse has moved out of bound so that the hover function can be run again next time

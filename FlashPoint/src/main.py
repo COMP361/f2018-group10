@@ -3,12 +3,18 @@ import sys
 # If PyCharm is issuing warnings on pygame methods, suppress it. it's a bug with PyCharm
 import pygame
 
+from src.UIComponents.RectButton import RectButton
+
 
 def main():
     # Initialize pygame modules, get the screen and clock
     pygame.init()
-    screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+    screen = pygame.display.set_mode((1280, 720))
     clock = pygame.time.Clock()
+
+    btn_grp = pygame.sprite.Group()
+    btn1 = RectButton(pygame.Rect(10, 10, 30, 20), (255, 255, 255))
+    btn_grp.add(btn1)
 
     # Run main loop
     while True:
@@ -21,6 +27,8 @@ def main():
 
         # Clear the screen to black and flip the double buffer
         screen.fill((0, 0, 0))
+        btn_grp.draw(screen)
+        btn_grp.update()
         pygame.display.flip()
 
 
