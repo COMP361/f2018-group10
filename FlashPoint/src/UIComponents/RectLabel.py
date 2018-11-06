@@ -17,8 +17,8 @@ class RectLabel(pygame.sprite.Sprite):
                  width: int,
                  height: int,
                  background: Union[Tuple[int, int, int], str]=(0, 0, 0),
-                 txt_obj: Optional[Text] = None,
-                 outer_width: int=0):
+                 txt_obj: Optional[Text]=None,
+                 txt_pos: Optional[Text.Position]=Text.Position.CENTER):
         """
         Constructor
         :param x: x position of the object on screen
@@ -27,7 +27,7 @@ class RectLabel(pygame.sprite.Sprite):
         :param height: height of the object
         :param background: Background of the object, can be either RGB color tuples or imported image
         :param txt_obj: Text object to be inserted at the center of this label
-        :param outer_width: Outer width of the Rect object (to be drawn)
+        :param txt_pos: Text position in the label, must be one of Text.Position
         """
         pygame.sprite.Sprite.__init__(self)
         self.x = x
@@ -35,8 +35,8 @@ class RectLabel(pygame.sprite.Sprite):
         self.width = width
         self.height = height
         self.background = background
-        self.outer_width = outer_width
         self.txt_obj = txt_obj
+        self.txt_pos = txt_pos
         self.image = None
         self.rect = None
         self.render()
@@ -55,9 +55,9 @@ class RectLabel(pygame.sprite.Sprite):
         self.rect.x = self.x
         self.rect.y = self.y
 
-        if self.txtobj:
-            self.txtobj.set_center((self.rect.width/2, self.rect.height/2))
-            self.image.blit(self.txtobj.text_surf, self.txtobj.text_rect)
+        if self.txt_obj:
+            self.txt_obj.set_pos(self.rect, self.txt_pos)
+            self.image.blit(self.txt_obj.text_surf, self.txt_obj.text_rect)
 
     def change_color(self, color: Tuple[int, int, int]):
         self.background = color

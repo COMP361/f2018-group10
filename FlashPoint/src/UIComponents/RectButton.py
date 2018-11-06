@@ -1,4 +1,4 @@
-from typing import Tuple, Optional
+from typing import Tuple, Optional, Union
 
 import pygame
 
@@ -12,13 +12,16 @@ class RectButton(RectLabel, Interactable):
     Creates a RectLabel and detects mouseclicks on the object
     """
     def __init__(self,
-                 rect: pygame.Rect,
-                 color: Tuple[int, int, int],
-                 txtobj: Optional[Text] = None,
-                 width: int=0):
+                 x: int,
+                 y: int,
+                 width: int,
+                 height: int,
+                 background: Union[Tuple[int, int, int], str] = (0, 0, 0),
+                 txt_obj: Optional[Text] = None,
+                 txt_pos: Optional[Text.Position] = Text.Position.CENTER):
         __doc__ = RectLabel.__doc__
 
-        super(RectButton, self).__init__(rect, color, txtobj, width)
+        super(RectButton, self).__init__(x, y, width, height, background, txt_obj, txt_pos)
         self.isHover = False
         self.isEnabled = True
 

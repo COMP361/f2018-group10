@@ -1,4 +1,5 @@
 from typing import Tuple
+from enum import Enum
 
 import pygame
 
@@ -7,6 +8,16 @@ class Text(object):
     """
         Creates a text object based on your configurations.
     """
+
+    class Position(Enum):
+        """
+        Sub class for text position
+        """
+        TOP = 0
+        CENTER = 1
+        BOTTOM = 2
+        LEFT = 3
+        RIGHT = 4
 
     def __init__(self, font: pygame.font.Font, text: str, color: Tuple[int, int, int]=(0, 0, 0), anti_alias: bool=True):
         """
@@ -41,6 +52,28 @@ class Text(object):
         self.color = color
         self.render()
 
-    def set_center(self, pos: Tuple[int, int]):
-        self.text_rect.center = pos
+    def set_center(self, rect: pygame.rect.Rect):
+        self.text_rect.center = (rect.width/2, rect.height/2)
+
+    def set_top(self, rect: pygame.rect.Rect):
+        self.text_rect.top = (rect.width/2, 0)
+
+    def set_bottom(self, rect: pygame.rect.Rect):
+        self.text_rect.bottom = (rect.width/2, rect.height)
+
+    def set_left(self, rect: pygame.rect.Rect):
+        self.text_rect.left = (0, rect.height/2)
+
+    def set_right(self, rect: pygame.rect.Rect):
+        self.text_rect.right = (rect.width, rect.height/2)
+
+    def set_pos(self, rect: pygame.rect.Rect, pos: Position):
+        switcher = {
+            self.Position.TOP: self.set_top(rect),
+            self.Position.CENTER: self.set_center(rect),
+            self.Position.BOTTOM: self.set_bottom(rect),
+            self.Position.LEFT: self.set_left(rect),
+            self.Position.RIGHT: self.set_right(rect)
+        }
+        switcher.get(pos, "Invalid argument!")
         self.render()
