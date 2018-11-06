@@ -1,8 +1,9 @@
-from typing import Tuple, Optional
+from typing import Tuple, Optional, Union
 
 import pygame
 
 from src.UIComponents.Text import Text
+from src.UIComponents.FileImporter import FileImporter
 
 
 class EllipseLabel(pygame.sprite.Sprite):
@@ -11,34 +12,65 @@ class EllipseLabel(pygame.sprite.Sprite):
     This is a shorthand of pygame.draw.ellipse()
     """
     def __init__(self,
-                 rect: pygame.Rect,
-                 color: Tuple[int, int, int],
-                 txtobj: Optional[Text] = None,
-                 width: int = 0):
+                 x: int,
+                 y: int,
+                 width: int,
+                 height: int,
+                 background: Union[Tuple[int, int, int], str] = (0, 0, 0),
+                 outer_width: int=0,
+                 txt_obj: Optional[Text] = None,
+                 txt_pos: Optional[Text.Position] = Text.Position.CENTER):
         """
-        Constructor.
-        :param rect: Defines the area that the circle (ellipse) will be drawn
-        :param color: RGB triplet for the background color
-        :param txtobj: Text object to be inserted at the center of this label
-        :param width: The thickness to draw the outer edge. If width is zero then the ellipse will be filled.
+        Constructor
+        :param x: x position of the object on screen
+        :param y: y position of the object on screen
+        :param width: width of the object
+        :param height: height of the object
+        :param background: Background of the object, can be either RGB color tuples or imported image
+        :param outer_width: The thickness of the outer edge. If width is zero then the object will be filled.
+        :param txt_obj: Text object to be inserted at the center of this label
+        :param txt_pos: Text position in the label, must be one of Text.Position
         """
         pygame.sprite.Sprite.__init__(self)
-        self.rect = rect
-        self.color = color
-        self.txtObj = txtobj
+        self.x = x
+        self.y = y
         self.width = width
+        self.height = height
+        self.background = background
+        self.outer_width = outer_width
+        self.txt_obj = txt_obj
+        self.txt_pos = txt_pos
         self.image = None
+        self.rect = None
+        self.render()
 
     def render(self):
-        self.image = pygame.Surface([self.rect.width, self.rect.height])
-        pygame.draw.ellipse(self.image, self.color, self.rect, self.width)
-        if self.txtobj:
-            self.txtobj.set_center((self.rect.width/2), (self.rect.height/2))
-            self.image.blit(self.txtobj.text_surf, self.txtobj.text_rect)
+        self.image = pygame.Surface([self.width, self.height])
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
+
+        if isinstance(self.background, Tuple):
+            pygame.draw.ellipse(self.image, self.background, self.rect, self.outer_width)
+        else:
+            pygame.draw.ellipse(self.image, (0, 0, 0), self.rect, self.outer_width)
+            image_file = FileImporter.import_image(self.background)
+            self.image.blit(image_file, self.image)
+
+        if self.txt_obj:
+            self.txt_obj.set_pos(self.rect, self.txt_pos)
+            self.image.blit(self.txt_obj.text_surf, self.txt_obj.text_rect)
 
     def change_color(self, color: Tuple[int, int, int]):
-        self.color = color
+        self.background = color
         self.render()
+
+    def change_bg_image(self, file_path: str):
+        if FileImporter.file_exists(file_path):
+            self.background = file_path
+            self.render()
+        else:
+            raise Exception("File not found!")
 
     def change_rect(self, rect: pygame.Rect, width: int=0):
         self.rect = rect

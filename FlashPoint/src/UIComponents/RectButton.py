@@ -17,11 +17,12 @@ class RectButton(RectLabel, Interactable):
                  width: int,
                  height: int,
                  background: Union[Tuple[int, int, int], str] = (0, 0, 0),
+                 outer_width: int=0,
                  txt_obj: Optional[Text] = None,
-                 txt_pos: Optional[Text.Position] = Text.Position.CENTER):
+                 txt_pos: Text.Position = Text.Position.CENTER):
         __doc__ = RectLabel.__doc__
 
-        super(RectButton, self).__init__(x, y, width, height, background, txt_obj, txt_pos)
+        super(RectButton, self).__init__(x, y, width, height, background, outer_width, txt_obj, txt_pos)
         self.isHover = False
         self.isEnabled = True
 

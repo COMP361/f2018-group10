@@ -4,7 +4,7 @@ from enum import Enum
 import pygame
 
 
-class Text(object):
+class Text(pygame.sprite.Sprite):
     """
         Creates a text object based on your configurations.
     """
@@ -27,11 +27,11 @@ class Text(object):
         :param color: (optional) int[3] - Color for your Text object, in the form of RGB triplet. Default: black
         :param anti_alias: (optional) Boolean - Anti aliasing option
         """
+        pygame.sprite.Sprite.__init__(self)
         self.font = font
         self.text = text
         self.color = color
         self.anti_alias = anti_alias
-        pygame.init()
         self.text_surf = None
         self.text_rect = None
         self.render()

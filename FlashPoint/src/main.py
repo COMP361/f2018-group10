@@ -13,7 +13,7 @@ def main():
     clock = pygame.time.Clock()
 
     btn_grp = pygame.sprite.Group()
-    btn1 = RectButton(pygame.Rect(10, 10, 30, 20), (255, 255, 255))
+    btn1 = RectButton(10, 10, 60, 40, (255, 255, 255))
     btn_grp.add(btn1)
 
     # Run main loop
