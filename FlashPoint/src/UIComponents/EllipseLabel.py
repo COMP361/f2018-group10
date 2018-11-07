@@ -43,9 +43,9 @@ class EllipseLabel(pygame.sprite.Sprite, Components):
         self.txt_pos = txt_pos
         self.image = None
         self.rect = None
-        self.__render__()
+        self._render()
 
-    def __render__(self):
+    def _render(self):
         self.image = pygame.Surface([self.width, self.height])
         self.rect = self.image.get_rect()
         self.rect.x = self.x
@@ -62,26 +62,29 @@ class EllipseLabel(pygame.sprite.Sprite, Components):
             self.txt_obj.set_pos(self.rect, self.txt_pos)
             self.image.blit(self.txt_obj.text_surf, self.txt_obj.text_rect)
 
+    def draw(self, surface: pygame.Surface):
+        surface.blit(self.image, self.rect)
+
     def change_color(self, color: Tuple[int, int, int]):
         self.background = color
-        self.__render__()
+        self._render()
 
     def change_bg_image(self, file_path: str):
         if FileImporter.file_exists(file_path):
             self.background = file_path
-            self.__render__()
+            self._render()
         else:
             raise Exception("File not found!")
 
     def change_rect(self, rect: pygame.Rect, width: int=0):
         self.rect = rect
         self.width = width
-        self.__render__()
+        self._render()
 
     def change_pos(self, x: int, y: int):
         self.x = x
         self.y = y
-        self.__render__()
+        self._render()
 
     def get_height(self):
         return self.height

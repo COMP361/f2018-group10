@@ -73,7 +73,7 @@ class MenuWindow(pygame.sprite.Sprite):
 
     # TODO: Finish the class. Not sure if I need to call update here or not...
 
-    def __render__(self):
+    def _render(self):
         x = self.x + self.padding
         y = self.y + self.padding
         for child in self.children:

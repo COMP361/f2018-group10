@@ -34,7 +34,7 @@ class RectBar(pygame.sprite.Sprite, Components):
         self.bg_color = bg_color
         self.image = None
         self.rect = None
-        self.__render__()
+        self._render()
 
     def progress_update(self):
         inner_width = self._progress * (self.width - 2 * self.outer_width) / 100
@@ -46,8 +46,8 @@ class RectBar(pygame.sprite.Sprite, Components):
         # draw the inner progress bar
         pygame.draw.rect(inner_image, self.color, inner_rect, 0)
 
-    def __render__(self):
-        # TODO complete the __render__ func
+    def _render(self):
+        # TODO complete the _render func
         self.image = pygame.Surface([self.width, self.height])
         self.rect = self.image.get_rect()
         self.rect.x = self.x
@@ -61,6 +61,9 @@ class RectBar(pygame.sprite.Sprite, Components):
             self.txt_obj.set_pos(self.rect, self.txt_pos)
             self.image.blit(self.txt_obj.text_surf, self.txt_obj.text_rect)
 
+    def draw(self, surface: pygame.Surface):
+        surface.blit(self.image, self.rect)
+
     def set_progress(self, progress: int):
         self._progress = progress
         self.progress_update()
@@ -68,12 +71,12 @@ class RectBar(pygame.sprite.Sprite, Components):
     def change_color(self, color: Tuple[int, int, int], bg_color: Tuple[int, int, int]):
         self.color = color
         self.bg_color = bg_color
-        self.__render__()
+        self._render()
 
     def change_pos(self, x: int, y: int):
         self.x = x
         self.y = y
-        self.__render__()
+        self._render()
 
     def get_height(self):
         return self.height
