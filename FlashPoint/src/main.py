@@ -4,6 +4,7 @@ import sys
 import pygame
 
 from src.UIComponents.RectButton import RectButton
+from src.UIComponents.Text import Text
 
 
 def main():
@@ -13,7 +14,7 @@ def main():
     clock = pygame.time.Clock()
 
     btn_grp = pygame.sprite.Group()
-    btn1 = RectButton(10, 10, 60, 40, (255, 255, 255))
+    btn1 = RectButton(10, 10, 60, 40, (255, 255, 255), 0, Text(pygame.font.SysFont('Arial', 12), "Hover me", (0, 255, 0)))
     btn_grp.add(btn1)
 
     # Run main loop

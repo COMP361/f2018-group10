@@ -54,30 +54,34 @@ class Text(pygame.sprite.Sprite, Components):
         self.color = color
         self.render()
 
+    # TODO: fix the freaking coordinates
     def set_center(self, rect: pygame.rect.Rect):
-        self.text_rect.center = (rect.width/2, rect.height/2)
+        self.text_rect.center = (rect.x + rect.width/2, rect.y + rect.height/2)
+        print(self.text_rect)
 
     def set_top(self, rect: pygame.rect.Rect):
-        self.text_rect.top = (rect.width/2, 0)
+        self.text_rect.top = (rect.x + rect.width/2, rect.y)
 
     def set_bottom(self, rect: pygame.rect.Rect):
-        self.text_rect.bottom = (rect.width/2, rect.height)
+        self.text_rect.bottom = (rect.x + rect.width/2, rect.y + rect.height)
 
     def set_left(self, rect: pygame.rect.Rect):
-        self.text_rect.left = (0, rect.height/2)
+        self.text_rect.left = (rect.x, rect.y + rect.height/2)
 
     def set_right(self, rect: pygame.rect.Rect):
-        self.text_rect.right = (rect.width, rect.height/2)
+        self.text_rect.right = (rect.x + rect.width, rect.y + rect.height/2)
 
     def set_pos(self, rect: pygame.rect.Rect, pos: Position):
-        switcher = {
-            self.Position.TOP: self.set_top(rect),
-            self.Position.CENTER: self.set_center(rect),
-            self.Position.BOTTOM: self.set_bottom(rect),
-            self.Position.LEFT: self.set_left(rect),
-            self.Position.RIGHT: self.set_right(rect)
-        }
-        switcher.get(pos, "Invalid argument!")
+        if pos is self.Position.TOP:
+            self.set_top(rect),
+        elif pos is self.Position.CENTER:
+            self.set_center(rect)
+        elif pos is self.Position.BOTTOM:
+            self.set_bottom(rect)
+        elif pos is self.Position.LEFT:
+            self.set_left(rect)
+        elif pos is self.Position.RIGHT:
+            self.set_right(rect)
         self.render()
 
     def get_height(self):

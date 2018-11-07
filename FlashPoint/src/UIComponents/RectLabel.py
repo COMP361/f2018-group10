@@ -20,7 +20,7 @@ class RectLabel(pygame.sprite.Sprite, Components):
                  background: Union[Tuple[int, int, int], str]=(0, 0, 0),
                  outer_width: int=0,
                  txt_obj: Optional[Text]=None,
-                 txt_pos: Text.Position=Text.Position.CENTER):
+                 txt_pos: Text.Position = Text.Position.CENTER):
         """
         Constructor
         :param x: x position of the object on screen
@@ -50,15 +50,16 @@ class RectLabel(pygame.sprite.Sprite, Components):
         # Otherwise, self.background is an imported image (Surface) so we try to import it and assign as the background
         self.image = pygame.Surface([self.width, self.height])
         self.rect = self.image.get_rect()
-        self.rect.x = self.x
-        self.rect.y = self.y
 
         if isinstance(self.background, Tuple):
-            pygame.draw.rect(self.image, self.background, self.rect, self.outer_width)
+            self.rect = pygame.draw.rect(self.image, self.background, self.rect, self.outer_width)
         else:
-            pygame.draw.rect(self.image, (0, 0, 0), self.rect, self.outer_width)
+            self.rect = pygame.draw.rect(self.image, (0, 0, 0), self.rect, self.outer_width)
             image_file = FileImporter.import_image(self.background)
             self.image.blit(image_file, self.image)
+
+        self.rect.x = self.x
+        self.rect.y = self.y
 
         if self.txt_obj:
             self.txt_obj.set_pos(self.rect, self.txt_pos)
