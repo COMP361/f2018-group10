@@ -1,4 +1,4 @@
-from typing import Tuple, Optional
+from typing import Tuple, Optional, Union
 
 import pygame
 
@@ -12,20 +12,24 @@ class RectButton(RectLabel, Interactable):
     Creates a RectLabel and detects mouseclicks on the object
     """
     def __init__(self,
-                 rect: pygame.Rect,
-                 color: Tuple[int, int, int],
-                 txtobj: Optional[Text] = None,
-                 width: int=0):
+                 x: int,
+                 y: int,
+                 width: int,
+                 height: int,
+                 background: Union[Tuple[int, int, int], str] = (0, 0, 0),
+                 outer_width: int=0,
+                 txt_obj: Optional[Text] = None,
+                 txt_pos: Text.Position = Text.Position.CENTER):
         __doc__ = RectLabel.__doc__
 
-        super(RectButton, self).__init__(rect, color, txtobj, width)
+        super(RectButton, self).__init__(x, y, width, height, background, outer_width, txt_obj, txt_pos)
         self.isHover = False
         self.isEnabled = True
 
     def update(self):
         mouse = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()
-        rect = super(RectButton, self).rect
+        rect = self.rect
 
         if rect.x+rect.w > mouse[0] > rect.x and rect.y+rect.h > mouse[1] > rect.y:
             # Only executes the hover function when the mouse is first moved into the button
@@ -33,7 +37,7 @@ class RectButton(RectLabel, Interactable):
                 self.hover()
                 self.isHover = True
 
-            if click[0] and self.click_event and self.isEnabled:
+            if click[0] and self.isEnabled:
                 self.click()
         else:
             # Indicate that the mouse has moved out of bound so that the hover function can be run again next time
