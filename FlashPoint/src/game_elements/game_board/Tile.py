@@ -1,5 +1,6 @@
 import pygame
 
+from src.constants.Color import Color
 
 class Tile(pygame.sprite.Sprite):
 
@@ -13,11 +14,12 @@ class Tile(pygame.sprite.Sprite):
         self.is_hovered = False
         self.x_coordinate = 0
         self.y_coordinate = 0
-        self._initialize()
+        self._render()
 
-    def _initialize(self):
+    def _render(self):
         """Eventually this might have some randomization logic? Dunno how we'll generate boards :( """
-        self.image.fill((100, 100, 100), self.rect)  # eventually this will be an actual tile image.
+        self.image.fill(Color.GREY, self.rect)  # eventually this will be an actual tile image.
+        return ""
 
     def check_mouse_over(self):
         mouse = pygame.mouse.get_pos()
@@ -28,7 +30,7 @@ class Tile(pygame.sprite.Sprite):
         if self.check_mouse_over():
             if not self.is_hovered:
                 self.is_hovered = True
-                self.image.fill((255, 255, 0))
+                self.image.fill(Color.YELLOW)
         else:
-            self.image.fill((100, 100, 100))
+            self.image.fill(Color.GREY)
             self.is_hovered = False
