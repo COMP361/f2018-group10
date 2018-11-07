@@ -18,7 +18,7 @@ class Tile(pygame.sprite.Sprite):
 
     def _render(self):
         """Eventually this might have some randomization logic? Dunno how we'll generate boards :( """
-        self.image.fill(Color.GREY, self.rect)  # eventually this will be an actual tile image.
+        self.image.fill(Color.GREY.value, self.rect)  # eventually this will be an actual tile image.
         return ""
 
     def check_mouse_over(self):

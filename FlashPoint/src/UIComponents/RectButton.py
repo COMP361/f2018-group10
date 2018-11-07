@@ -47,7 +47,7 @@ class RectButton(RectLabel, Interactable):
         print("Holy Francis")
 
     def click(self):
-        print("Holy Francis")
+        print("ME")
 
     def enable(self):
         self.isEnabled = True
