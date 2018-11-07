@@ -17,7 +17,7 @@ class EllipseLabel(pygame.sprite.Sprite, Components):
                  y: int,
                  width: int,
                  height: int,
-                 background: Union[Tuple[int, int, int], str] = (0, 0, 0),
+                 background: Union[Tuple[int, int, int, Optional[int]], str] = (0, 0, 0),
                  outer_width: int=0,
                  txt_obj: Optional[Text] = None,
                  txt_pos: Optional[Text.Position] = Text.Position.CENTER):
@@ -27,7 +27,7 @@ class EllipseLabel(pygame.sprite.Sprite, Components):
         :param y: y position of the object on screen
         :param width: width of the object
         :param height: height of the object
-        :param background: Background of the object, can be either RGB color tuples or imported image
+        :param background: Background of the object, can be either RGB color (Alpha optional) tuples or imported image
         :param outer_width: The thickness of the outer edge. If width is zero then the object will be filled.
         :param txt_obj: Text object to be inserted at the center of this label
         :param txt_pos: Text position in the label, must be one of Text.Position
@@ -65,7 +65,7 @@ class EllipseLabel(pygame.sprite.Sprite, Components):
     def draw(self, surface: pygame.Surface):
         surface.blit(self.image, self.rect)
 
-    def change_color(self, color: Tuple[int, int, int]):
+    def change_color(self, color: Tuple[int, int, int, Optional[int]]):
         self.background = color
         self._render()
 

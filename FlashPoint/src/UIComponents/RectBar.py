@@ -15,12 +15,25 @@ class RectBar(pygame.sprite.Sprite, Components):
                  y: int,
                  width: int,
                  height: int,
-                 color: Tuple[int, int, int],
-                 bg_color: Tuple[int, int, int],
+                 color: Tuple[int, int, int, Optional[int]],
+                 bg_color: Tuple[int, int, int, Optional[int]],
                  outer_width: int = 2,
                  txt_obj: Optional[Text] = None,
                  txt_pos: Optional[Text.Position] = Text.Position.CENTER,
                  progress: int = 100):
+        """
+        Constructor
+        :param x: X position of the object on screen
+        :param y: Y position of the object on screen
+        :param width: Width of the object
+        :param height: Height of the object
+        :param color: Color of the progress bar represented by an RGB tuple (Alpha optional)
+        :param bg_color: Color of the background represented by an RGB tuple (Alpha optional)
+        :param outer_width: Outer width of the progress bar
+        :param txt_obj: Text object to be shown
+        :param txt_pos: Position of the Text object
+        :param progress: Progress of the object, should be between 0(%) -> 100(%)
+        """
         pygame.sprite.Sprite.__init__(self)
         self.x = x
         self.y = y

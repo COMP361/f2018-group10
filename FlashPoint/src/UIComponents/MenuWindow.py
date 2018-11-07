@@ -17,8 +17,16 @@ class MenuWindow(pygame.sprite.Sprite):
                  width: int,
                  height: Optional[int],
                  def_position: Optional[Tuple[int, int]],
-                 color: Tuple[int, int, int, int] = (175, 175, 175, 0.5),
+                 color: Tuple[int, int, int, Optional[int]] = (175, 175, 175, 0.5),
                  padding: int=5):
+        """
+        Constructor
+        :param width: Width of the object
+        :param height: Height of the object
+        :param def_position: Defined position for the object. Optional
+        :param color: Background color of the object represented by an RGB tuple (Alpha optional)
+        :param padding: Padding for the menu
+        """
         pygame.sprite.Sprite.__init__(self)
         self.def_width = width
         self.def_height = None

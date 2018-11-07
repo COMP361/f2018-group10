@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Tuple, Optional
 from enum import Enum
 
 import pygame
@@ -21,12 +21,16 @@ class Text(pygame.sprite.Sprite, Components):
         LEFT = 3
         RIGHT = 4
 
-    def __init__(self, font: pygame.font.Font, text: str, color: Tuple[int, int, int]=(0, 0, 0), anti_alias: bool=True):
+    def __init__(self,
+                 font: pygame.font.Font,
+                 text: str,
+                 color: Tuple[int, int, int, Optional[int]]=(0, 0, 0),
+                 anti_alias: bool=True):
         """
         Constructor.
         :param font: Defines font style. MUST BE an instance of pygame.font.Font()
         :param text: String for your Text object
-        :param color: (optional) int[3] - Color for your Text object, in the form of RGB triplet. Default: black
+        :param color: Color for your Text object, in the form of RGB triplet. Alpha is optional. Default: black
         :param anti_alias: (optional) Boolean - Anti aliasing option
         """
         pygame.sprite.Sprite.__init__(self)
@@ -42,15 +46,15 @@ class Text(pygame.sprite.Sprite, Components):
         self.text_surf = self.font.render(self.text, self.anti_alias, self.color)
         self.text_rect = self.text_surf.get_rect()
 
-    def set_font(self, font):
+    def set_font(self, font: pygame.font.Font):
         self.font = font
         self.render()
 
-    def set_text(self, text):
+    def set_text(self, text: str):
         self.text = text
         self.render()
 
-    def set_color(self, color):
+    def set_color(self, color: Tuple[int, int, int, int, Optional[int]]):
         self.color = color
         self.render()
 
