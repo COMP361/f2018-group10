@@ -3,7 +3,8 @@ import sys
 
 
 import pygame
-#from src.Test import Display
+
+from src.Login import Login
 
 
 from src.constants.Color import Color
@@ -20,7 +21,10 @@ class Main(object):
         pygame.display.set_caption(Main.WINDOW_TITLE)
         self.screen = pygame.display.set_mode(Main.SCREEN_RESOLUTION)
         self.clock = pygame.time.Clock()
-        self.current_scene = GameBoardScene(self.screen)
+        #self.current_scene = GameBoardScene(self.screen)
+        self.current_scene = Login()
+
+
 
 
     def main(self):
@@ -36,12 +40,14 @@ class Main(object):
 
 
             # Clear the screen to black
-            self.screen.fill(Color.BLACK)
+            self.screen.fill(Color.BLACK.value)
 
             self.current_scene.update()
             self.current_scene.draw()
             # Flip double buffer
             pygame.display.flip()
+
+           # self.current_scene.draw()
 
 
 # Should only be used for debugging purposes
