@@ -29,6 +29,8 @@ class Main(object):
             # Clear the screen to black
             self.screen.fill((0, 0, 0))
 
+            self.current_scene.update()
+            self.current_scene.draw()
             # Flip double buffer
             pygame.display.flip()
 
