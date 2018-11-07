@@ -2,16 +2,19 @@ import sys
 
 import pygame
 
+from src.constants.Color import Color
 from src.scenes.GameBoardScene import GameBoardScene
 
 
 class Main(object):
     """Class for running the main game loop and maintaining game state."""
+    SCREEN_RESOLUTION = (1280, 700)
+    WINDOW_TITLE = "Flash Point"
 
     def __init__(self):
         pygame.init()
-        pygame.display.set_caption("Flash Point")
-        self.screen = pygame.display.set_mode((1280, 700))
+        pygame.display.set_caption(Main.WINDOW_TITLE)
+        self.screen = pygame.display.set_mode(Main.SCREEN_RESOLUTION)
         self.clock = pygame.time.Clock()
         self.current_scene = GameBoardScene(self.screen)
 
@@ -27,7 +30,7 @@ class Main(object):
                     sys.exit()
 
             # Clear the screen to black
-            self.screen.fill((0, 0, 0))
+            self.screen.fill(Color.BLACK)
 
             self.current_scene.update()
             self.current_scene.draw()
