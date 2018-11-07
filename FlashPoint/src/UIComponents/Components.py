@@ -20,3 +20,24 @@ class Components(metaclass=abc.ABCMeta):
         :return:
         """
         pass
+
+    def change_pos(self, x: int, y: int):
+        """
+        Changes the position of the component
+        :return:
+        """
+        pass
+
+    def get_x(self):
+        """
+        Gets the X coordinates of the component
+        :return:
+        """
+        pass
+
+    def get_y(self):
+        """
+        Gets the Y coordinates of the component
+        :return:
+        """
+        pass

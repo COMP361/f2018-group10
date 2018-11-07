@@ -43,9 +43,9 @@ class RectLabel(pygame.sprite.Sprite, Components):
         self.txt_pos = txt_pos
         self.image = None
         self.rect = None
-        self.render()
+        self.__render__()
 
-    def render(self):
+    def __render__(self):
         # If self.background is an instance of Tuple, we assign that RGB tuple as the background color
         # Otherwise, self.background is an imported image (Surface) so we try to import it and assign as the background
         self.image = pygame.Surface([self.width, self.height])
@@ -66,22 +66,33 @@ class RectLabel(pygame.sprite.Sprite, Components):
 
     def change_color(self, color: Tuple[int, int, int]):
         self.background = color
-        self.render()
+        self.__render__()
 
     def change_bg_image(self, file_path: str):
         if FileImporter.file_exists(file_path):
             self.background = file_path
-            self.render()
+            self.__render__()
         else:
             raise Exception("File not found!")
 
     def change_rect(self, rect: pygame.Rect, width: int=0):
         self.rect = rect
         self.width = width
-        self.render()
+        self.__render__()
+
+    def change_pos(self, x: int, y: int):
+        self.x = x
+        self.y = y
+        self.__render__()
 
     def get_height(self):
         return self.height
 
     def get_width(self):
         return self.width
+
+    def get_x(self):
+        return self.x
+
+    def get_y(self):
+        return self.y
