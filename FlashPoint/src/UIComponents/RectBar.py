@@ -3,9 +3,10 @@ from typing import Tuple, Optional
 import pygame
 
 from src.UIComponents.Text import Text
+from src.UIComponents.Components import Components
 
 
-class RectBar(pygame.sprite.Sprite):
+class RectBar(pygame.sprite.Sprite, Components):
     """
     Draws a rectangular bar and sets the fill value of its content
     """
@@ -28,12 +29,22 @@ class RectBar(pygame.sprite.Sprite):
         self.outer_width = outer_width
         self.txt_obj = txt_obj
         self.txt_pos = txt_pos
-        self.progress = progress
+        self._progress = progress
         self.color = color
         self.bg_color = bg_color
         self.image = None
         self.rect = None
         self.render()
+
+    def progress_update(self):
+        inner_width = self._progress * (self.width - 2 * self.outer_width) / 100
+        inner_image = pygame.Surface([inner_width, self.height - 2 * self.outer_width])
+        inner_rect = inner_image.get_rect()
+        inner_rect.x = self.x + self.outer_width
+        inner_rect.y = self.y + self.outer_width
+
+        # draw the inner progress bar
+        pygame.draw.rect(inner_image, self.color, inner_rect, 0)
 
     def render(self):
         # TODO complete the render func
@@ -44,15 +55,23 @@ class RectBar(pygame.sprite.Sprite):
 
         # draw the outer border of the bar
         pygame.draw.rect(self.image, self.bg_color, self.rect, self.outer_width)
-        inner_width = self.progress * (self.width - 2*self.outer_width)/100
-        inner_image = pygame.Surface([inner_width, self.height - 2*self.outer_width])
-        inner_rect = inner_image.get_rect()
-        inner_rect.x = self.x + self.outer_width
-        inner_rect.y = self.y + self.outer_width
-
-        # draw the inner progress bar
-        pygame.draw.rect(inner_image, self.color, inner_rect, 0)
+        self.progress_update()
 
         if self.txt_obj:
             self.txt_obj.set_pos(self.rect, self.txt_pos)
             self.image.blit(self.txt_obj.text_surf, self.txt_obj.text_rect)
+
+    def set_progress(self, progress: int):
+        self._progress = progress
+        self.progress_update()
+
+    def change_color(self, color: Tuple[int, int, int], bg_color: Tuple[int, int, int]):
+        self.color = color
+        self.bg_color = bg_color
+        self.render()
+
+    def get_width(self):
+        return self.width
+
+    def get_height(self):
+        return self.height

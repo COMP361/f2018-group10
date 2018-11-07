@@ -3,8 +3,10 @@ from enum import Enum
 
 import pygame
 
+from src.UIComponents.Components import Components
 
-class Text(pygame.sprite.Sprite):
+
+class Text(pygame.sprite.Sprite, Components):
     """
         Creates a text object based on your configurations.
     """
@@ -77,3 +79,9 @@ class Text(pygame.sprite.Sprite):
         }
         switcher.get(pos, "Invalid argument!")
         self.render()
+
+    def get_height(self):
+        return self.text_rect.height
+
+    def get_width(self):
+        return self.text_rect.width

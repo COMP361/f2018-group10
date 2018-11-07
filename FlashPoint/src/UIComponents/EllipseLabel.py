@@ -4,9 +4,10 @@ import pygame
 
 from src.UIComponents.Text import Text
 from src.UIComponents.FileImporter import FileImporter
+from src.UIComponents.Components import Components
 
 
-class EllipseLabel(pygame.sprite.Sprite):
+class EllipseLabel(pygame.sprite.Sprite, Components):
     """
     Draws a rectangle object and (optionally) inserts a text on it.
     This is a shorthand of pygame.draw.ellipse()
@@ -76,3 +77,9 @@ class EllipseLabel(pygame.sprite.Sprite):
         self.rect = rect
         self.width = width
         self.render()
+
+    def get_height(self):
+        return self.height
+
+    def get_width(self):
+        return self.width
