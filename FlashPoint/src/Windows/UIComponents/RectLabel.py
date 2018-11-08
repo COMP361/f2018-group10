@@ -2,9 +2,9 @@ from typing import Tuple, Optional, Union
 
 import pygame
 
-from src.UIComponents.Text import Text
-from src.UIComponents.FileImporter import FileImporter
-from src.UIComponents.Components import Components
+from src.Windows.UIComponents.Text import Text
+from src.Windows.UIComponents.FileImporter import FileImporter
+from src.Windows.UIComponents.Components import Components
 
 
 class RectLabel(pygame.sprite.Sprite, Components):

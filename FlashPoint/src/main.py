@@ -3,8 +3,8 @@ import sys
 # If PyCharm is issuing warnings on pygame methods, suppress it. it's a bug with PyCharm
 import pygame
 
-from src.UIComponents.RectButton import RectButton
-from src.UIComponents.Text import Text
+from src.Windows.UIComponents.RectButton import RectButton
+from src.Windows.UIComponents.Text import Text
 
 
 def main():
@@ -14,7 +14,7 @@ def main():
     clock = pygame.time.Clock()
 
     btn_grp = pygame.sprite.Group()
-    btn1 = RectButton(10, 10, 60, 40, (255, 255, 255), 0, Text(pygame.font.SysFont('Arial', 12), "Hover me", (0, 255, 0)))
+    btn1 = RectButton(10, 10, 300, 100, (255, 76, 255), 0, Text(pygame.font.SysFont('Arial', 12), "Hover me", (0, 255,0)))
     btn_grp.add(btn1)
 
     # Run main loop
