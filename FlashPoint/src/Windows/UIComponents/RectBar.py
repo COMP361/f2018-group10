@@ -90,15 +90,3 @@ class RectBar(pygame.sprite.Sprite, Components):
         self.x = x
         self.y = y
         self._render()
-
-    def get_height(self):
-        return self.height
-
-    def get_width(self):
-        return self.width
-
-    def get_x(self):
-        return self.x
-
-    def get_y(self):
-        return self.y
