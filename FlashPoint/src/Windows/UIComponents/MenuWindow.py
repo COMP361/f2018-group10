@@ -2,8 +2,8 @@ from typing import Tuple, Optional
 
 import pygame
 
-from src.UIComponents.Components import Components
-from src.UIComponents.RectButton import RectButton
+from src.Windows.UIComponents.Components import Components
+from src.Windows.UIComponents.RectButton import RectButton
 
 
 class MenuWindow(pygame.sprite.Sprite):

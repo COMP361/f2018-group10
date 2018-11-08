@@ -3,7 +3,7 @@ from enum import Enum
 
 import pygame
 
-from src.UIComponents.Components import Components
+from src.Windows.UIComponents.Components import Components
 
 
 class Text(pygame.sprite.Sprite, Components):
