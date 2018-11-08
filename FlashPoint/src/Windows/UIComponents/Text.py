@@ -25,7 +25,6 @@ class Text(pygame.sprite.Sprite, Components):
                  font: pygame.font.Font,
                  text: str,
                  color: Tuple[int, ...]=(0, 0, 0),
-                 pos: Position=Position.CENTER,
                  anti_alias: bool=True):
         """
         Constructor.
