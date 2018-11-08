@@ -9,7 +9,7 @@ class Components(metaclass=abc.ABCMeta):
     def get_height(self):
         """
         Gets the height of the component
-        :return:
+        :return: int
         """
         pass
 
@@ -17,7 +17,7 @@ class Components(metaclass=abc.ABCMeta):
     def get_width(self):
         """
         Gets the width of the component
-        :return:
+        :return: int
         """
         pass
 
@@ -31,13 +31,13 @@ class Components(metaclass=abc.ABCMeta):
     def get_x(self):
         """
         Gets the X coordinates of the component
-        :return:
+        :return: int
         """
         pass
 
     def get_y(self):
         """
         Gets the Y coordinates of the component
-        :return:
+        :return: int
         """
         pass

@@ -45,6 +45,10 @@ class MenuWindow(pygame.sprite.Sprite):
             self.def_position = def_position
 
     def toggle(self):
+        """
+        Toggles the popup menu
+        :return: void
+        """
         main_display = pygame.display.get_surface()
 
         if self.is_open:
@@ -74,7 +78,7 @@ class MenuWindow(pygame.sprite.Sprite):
                 self.y = self.def_position[1]
 
             # draw the menu on screen
-            menu_window = pygame.rect.Rect(x, y, width, height)
+            menu_window = pygame.rect.Rect(self.x, self.y, width, height)
             pygame.draw.rect(main_display, self.color, menu_window)
 
             self.is_open = True
