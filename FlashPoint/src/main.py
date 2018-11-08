@@ -14,7 +14,9 @@ def main():
     clock = pygame.time.Clock()
 
     btn_grp = pygame.sprite.Group()
-    btn1 = RectButton(10, 10, 300, 100, (255, 76, 255), 0, Text(pygame.font.SysFont('Arial', 12), "Hover me", (0, 255,0)))
+    btn1 = RectButton(10, 10, 300, 100,
+                      (255, 76, 255), 0,
+                      Text(pygame.font.SysFont('Arial', 12), "Hover me", (255, 255, 255)))
     btn_grp.add(btn1)
 
     # Run main loop

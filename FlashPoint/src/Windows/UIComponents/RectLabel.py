@@ -17,7 +17,7 @@ class RectLabel(pygame.sprite.Sprite, Components):
                  y: int,
                  width: int,
                  height: int,
-                 background: Union[Tuple[int, int, int, Optional[int]], str]=(0, 0, 0),
+                 background: Union[Tuple[int, ...], str]=(0, 0, 0),
                  outer_width: int=0,
                  txt_obj: Optional[Text]=None,
                  txt_pos: Text.Position = Text.Position.CENTER):
@@ -68,7 +68,7 @@ class RectLabel(pygame.sprite.Sprite, Components):
     def draw(self, surface: pygame.Surface):
         surface.blit(self.image, self.rect)
 
-    def change_color(self, color: Tuple[int, int, int, Optional[int]]):
+    def change_color(self, color: Tuple[int, ...]):
         self.background = color
         self._render()
 
