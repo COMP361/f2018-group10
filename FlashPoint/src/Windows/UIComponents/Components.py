@@ -5,11 +5,11 @@ class Components(metaclass=abc.ABCMeta):
     """
     Interface class for UI Components
     """
-    def __init__(self):
-        self.height = None
-        self.width = None
-        self.x = None
-        self.y = None
+    def __init__(self, x: int, y: int, width: int, height: int):
+        self._height = height
+        self._width = width
+        self._x = x
+        self._y = y
 
     @property
     def height(self):
@@ -17,11 +17,11 @@ class Components(metaclass=abc.ABCMeta):
         Gets the height of the component
         :return: int
         """
-        return self.height
+        return self._height
 
     @height.setter
     def height(self, height: int):
-        self.height = height
+        self._height = height
 
     @property
     def width(self):
@@ -29,11 +29,11 @@ class Components(metaclass=abc.ABCMeta):
         Gets the width of the component
         :return: int
         """
-        return self.width
+        return self._width
 
     @width.setter
     def width(self, width):
-        self.width = width
+        self._width = width
 
     @abc.abstractmethod
     def change_pos(self, x: int, y: int):
@@ -49,11 +49,11 @@ class Components(metaclass=abc.ABCMeta):
         Gets the X coordinates of the component
         :return: int
         """
-        return self.x
+        return self._x
 
     @x.setter
     def x(self, x):
-        self.x = x
+        self._x = x
 
     @property
     def y(self):
@@ -61,8 +61,8 @@ class Components(metaclass=abc.ABCMeta):
         Gets the Y coordinates of the component
         :return: int
         """
-        return self.y
+        return self._y
 
     @y.setter
     def y(self, y):
-        self.y = y
+        self._y = y
