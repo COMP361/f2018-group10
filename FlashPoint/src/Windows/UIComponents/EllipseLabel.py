@@ -2,25 +2,25 @@ from typing import Tuple, Optional, Union
 
 import pygame
 
-from src.UIComponents.Text import Text
-from src.UIComponents.FileImporter import FileImporter
-from src.UIComponents.Components import Components
+from src.Windows.UIComponents.Text import Text
+from src.Windows.UIComponents.FileImporter import FileImporter
+from src.Windows.UIComponents.Components import Components
 
 
-class RectLabel(pygame.sprite.Sprite, Components):
+class EllipseLabel(pygame.sprite.Sprite, Components):
     """
     Draws a rectangle object and (optionally) inserts a text on it.
-    This is a shorthand of pygame.draw.rect()
+    This is a shorthand of pygame.draw.ellipse()
     """
     def __init__(self,
                  x: int,
                  y: int,
                  width: int,
                  height: int,
-                 background: Union[Tuple[int, int, int, Optional[int]], str]=(0, 0, 0),
+                 background: Union[Tuple[int, ...], str] = (0, 0, 0),
                  outer_width: int=0,
-                 txt_obj: Optional[Text]=None,
-                 txt_pos: Text.Position = Text.Position.CENTER):
+                 txt_obj: Optional[Text] = None,
+                 txt_pos: Optional[Text.Position] = Text.Position.CENTER):
         """
         Constructor
         :param x: x position of the object on screen
@@ -46,20 +46,17 @@ class RectLabel(pygame.sprite.Sprite, Components):
         self._render()
 
     def _render(self):
-        # If self.background is an instance of Tuple, we assign that RGB tuple as the background color
-        # Otherwise, self.background is an imported image (Surface) so we try to import it and assign as the background
         self.image = pygame.Surface([self.width, self.height])
         self.rect = self.image.get_rect()
-
-        if isinstance(self.background, Tuple):
-            self.rect = pygame.draw.rect(self.image, self.background, self.rect, self.outer_width)
-        else:
-            self.rect = pygame.draw.rect(self.image, (0, 0, 0), self.rect, self.outer_width)
-            image_file = FileImporter.import_image(self.background)
-            self.image.blit(image_file, self.image)
-
         self.rect.x = self.x
         self.rect.y = self.y
+
+        if isinstance(self.background, Tuple):
+            pygame.draw.ellipse(self.image, self.background, self.rect, self.outer_width)
+        else:
+            pygame.draw.ellipse(self.image, (0, 0, 0), self.rect, self.outer_width)
+            image_file = FileImporter.import_image(self.background)
+            self.image.blit(image_file, self.image)
 
         if self.txt_obj:
             self.txt_obj.set_pos(self.rect, self.txt_pos)
@@ -68,7 +65,7 @@ class RectLabel(pygame.sprite.Sprite, Components):
     def draw(self, surface: pygame.Surface):
         surface.blit(self.image, self.rect)
 
-    def change_color(self, color: Tuple[int, int, int, Optional[int]]):
+    def change_color(self, color: Tuple[int, ...]):
         self.background = color
         self._render()
 
@@ -88,15 +85,3 @@ class RectLabel(pygame.sprite.Sprite, Components):
         self.x = x
         self.y = y
         self._render()
-
-    def get_height(self):
-        return self.height
-
-    def get_width(self):
-        return self.width
-
-    def get_x(self):
-        return self.x
-
-    def get_y(self):
-        return self.y

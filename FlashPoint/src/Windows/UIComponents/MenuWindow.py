@@ -1,9 +1,10 @@
-from typing import Tuple, Optional
+from typing import Tuple, Optional, Union, Callable, NamedTuple
 
 import pygame
 
-from src.UIComponents.Components import Components
-from src.UIComponents.RectButton import RectButton
+from src.Windows.UIComponents.Components import Components
+from src.Windows.UIComponents.RectButton import RectButton
+from src.Windows.UIComponents.Text import Text
 
 
 class MenuWindow(pygame.sprite.Sprite):
@@ -17,7 +18,7 @@ class MenuWindow(pygame.sprite.Sprite):
                  width: int,
                  height: Optional[int],
                  def_position: Optional[Tuple[int, int]],
-                 color: Tuple[int, int, int, Optional[int]] = (175, 175, 175, 0.5),
+                 color: Tuple[int, ...] = (175, 175, 175, 0.5),
                  padding: int=5):
         """
         Constructor
@@ -45,6 +46,10 @@ class MenuWindow(pygame.sprite.Sprite):
             self.def_position = def_position
 
     def toggle(self):
+        """
+        Toggles the popup menu
+        :return: void
+        """
         main_display = pygame.display.get_surface()
 
         if self.is_open:
@@ -74,7 +79,7 @@ class MenuWindow(pygame.sprite.Sprite):
                 self.y = self.def_position[1]
 
             # draw the menu on screen
-            menu_window = pygame.rect.Rect(x, y, width, height)
+            menu_window = pygame.rect.Rect(self.x, self.y, width, height)
             pygame.draw.rect(main_display, self.color, menu_window)
 
             self.is_open = True
@@ -88,5 +93,10 @@ class MenuWindow(pygame.sprite.Sprite):
             child.change_pos(x, y)
             y += child.get_height + self.SPACE_BETWEEN
 
-    def add_child(self):
-        new_btn = RectButton()
+    def add_child(self, args: Union[
+                    NamedTuple[int, int, Union[str, Text], Callable],
+                    Components]):
+        if isinstance(args, Components):
+            self.children.append(args)
+        else:
+

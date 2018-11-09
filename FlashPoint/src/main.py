@@ -6,8 +6,10 @@ import pygame
 from src.Login import Login
 from src.constants.Color import Color
 from src.scenes.GameBoardScene import GameBoardScene
-from src.UIComponents.RectButton import RectButton
-from src.UIComponents.Text import Text
+
+
+from src.Windows.UIComponents.RectButton import RectButton
+from src.Windows.UIComponents.Text import Text
 
 
 class Main(object):
@@ -20,15 +22,18 @@ class Main(object):
         pygame.display.set_caption(Main.WINDOW_TITLE)
         self.screen = pygame.display.set_mode(Main.SCREEN_RESOLUTION)
         self.clock = pygame.time.Clock()
-        self.current_scene = GameBoardScene(self.screen)
+        #self.current_scene = GameBoardScene(self.screen)
         self.current_scene = Login(self.screen)
+   
+        
+ 
 
 
     def main(self):
         # Initialize pygame modules, get the screen and clock
 
-
-
+        
+       
 
         # btn_grp = pygame.sprite.Group()
         # btn1 = RectButton(10, 10, 60, 40, (255, 255, 255), 0, Text(pygame.font.SysFont('Arial', 12), "Hover msssse", (0, 255, 0)))

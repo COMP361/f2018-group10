@@ -2,9 +2,9 @@ from typing import Tuple, Optional, Union
 
 import pygame
 
-from src.UIComponents.Text import Text
-from src.UIComponents.EllipseLabel import EllipseLabel
-from src.UIComponents.Interactable import Interactable
+from src.Windows.UIComponents.Text import Text
+from src.Windows.UIComponents.EllipseLabel import EllipseLabel
+from src.Windows.UIComponents.Interactable import Interactable
 
 
 class EllipseButton(EllipseLabel, Interactable):

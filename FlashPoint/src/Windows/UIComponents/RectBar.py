@@ -2,8 +2,8 @@ from typing import Tuple, Optional
 
 import pygame
 
-from src.UIComponents.Text import Text
-from src.UIComponents.Components import Components
+from src.Windows.UIComponents.Text import Text
+from src.Windows.UIComponents.Components import Components
 
 
 class RectBar(pygame.sprite.Sprite, Components):
@@ -15,8 +15,8 @@ class RectBar(pygame.sprite.Sprite, Components):
                  y: int,
                  width: int,
                  height: int,
-                 color: Tuple[int, int, int, Optional[int]],
-                 bg_color: Tuple[int, int, int, Optional[int]],
+                 color: Tuple[int, ...],
+                 bg_color: Tuple[int, ...],
                  outer_width: int = 2,
                  txt_obj: Optional[Text] = None,
                  txt_pos: Optional[Text.Position] = Text.Position.CENTER,
@@ -90,15 +90,3 @@ class RectBar(pygame.sprite.Sprite, Components):
         self.x = x
         self.y = y
         self._render()
-
-    def get_height(self):
-        return self.height
-
-    def get_width(self):
-        return self.width
-
-    def get_x(self):
-        return self.x
-
-    def get_y(self):
-        return self.y
