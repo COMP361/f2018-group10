@@ -3,8 +3,6 @@ from typing import Tuple, Optional, Union, Callable, NamedTuple
 import pygame
 
 from src.Windows.UIComponents.Components import Components
-from src.Windows.UIComponents.RectButton import RectButton
-from src.Windows.UIComponents.Text import Text
 
 
 class MenuWindow(pygame.sprite.Sprite):
@@ -93,10 +91,14 @@ class MenuWindow(pygame.sprite.Sprite):
             child.change_pos(x, y)
             y += child.get_height + self.SPACE_BETWEEN
 
-    def add_child(self, args: Union[
-                    NamedTuple[int, int, Union[str, Text], Callable],
-                    Components]):
-        if isinstance(args, Components):
-            self.children.append(args)
+    def add_child(self, child: Components, index: Optional[int]=None):
+        """
+        Adds component into the end of the menu, if index is defined, adds the child to the specified index.
+        :param child:
+        :param index:
+        :return:
+        """
+        if index is None:
+            self.children.append(child)
         else:
-
+            self.children.insert(index, child)

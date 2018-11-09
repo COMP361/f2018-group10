@@ -1,12 +1,10 @@
-from typing import Tuple, Optional
+from typing import Tuple
 from enum import Enum
 
 import pygame
 
-from src.Windows.UIComponents.Components import Components
 
-
-class Text(pygame.sprite.Sprite, Components):
+class Text(pygame.sprite.Sprite):
     """
         Creates a text object based on your configurations.
     """

@@ -33,10 +33,7 @@ class EllipseLabel(pygame.sprite.Sprite, Components):
         :param txt_pos: Text position in the label, must be one of Text.Position
         """
         pygame.sprite.Sprite.__init__(self)
-        self.x = x
-        self.y = y
-        self.width = width
-        self.height = height
+        Components.__init__(self, x, y, width, height)
         self.background = background
         self.outer_width = outer_width
         self.txt_obj = txt_obj
@@ -76,12 +73,12 @@ class EllipseLabel(pygame.sprite.Sprite, Components):
         else:
             raise Exception("File not found!")
 
-    def change_rect(self, rect: pygame.Rect, width: int=0):
+    def change_rect(self, rect: pygame.Rect, outer_width: int=0):
         self.rect = rect
-        self.width = width
+        self.outer_width = outer_width
         self._render()
 
     def change_pos(self, x: int, y: int):
-        self.x = x
-        self.y = y
+        self.x(x)
+        self.y(y)
         self._render()
