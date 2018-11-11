@@ -3,7 +3,7 @@ import abc
 
 class Components(metaclass=abc.ABCMeta):
     """
-    Interface class for UI Components
+    Abstract class for UI Components
     """
     def __init__(self, x: int, y: int, width: int, height: int):
         self._height = height
