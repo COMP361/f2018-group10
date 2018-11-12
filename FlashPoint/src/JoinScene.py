@@ -6,7 +6,7 @@ from src.Windows.UIComponents.RectLabel import RectLabel
 from src.Windows.UIComponents.Text import Text
 
 
-class StartScene(object):
+class JoinScene(object):
     def __init__(self, screen):
         self.screen = screen
         self.label_grp = pygame.sprite.Group()
@@ -15,12 +15,11 @@ class StartScene(object):
         self.resolution = (self.info_object.current_w, self.info_object.current_h)
 
         self._init_log_box()
-        self._init_text_box(342, 250, "Username:")
-        self._init_text_box(342, 334, "Password:")
-        self._init_text_bar()
+        self._init_text_box(342, 250, "Enter IP:")
 
-        self._init_btn(594, 436, "Login")
-        self._init_btn(791, 436, "Register")
+        # self._init_text_bar()
+
+        self._init_btn(575, 436, "Connect")
 
     def draw(self):
         self.label_grp.draw(self.screen)

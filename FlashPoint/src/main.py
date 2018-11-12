@@ -4,6 +4,9 @@ import sys
 import pygame
 
 import src.constants.Color as Color
+from src.HostJoinScene import HostJoinScene
+from src.HostMenuScene import HostMenuScene
+from src.JoinScene import JoinScene
 from src.StartScene import StartScene
 
 
@@ -18,7 +21,12 @@ class Main(object):
         self.screen = pygame.display.set_mode(Main.SCREEN_RESOLUTION)
         self.clock = pygame.time.Clock()
 
+        # each of these comments below are each of the scenes
+
         self.current_scene = StartScene(self.screen)
+        # self.current_scene = JoinScene(self.screen)
+        # self.current_scene = HostMenuScene(self.screen)
+        # self.current_scene = HostJoinScene(self.screen)
 
     def main(self):
         # Initialize pygame modules, get the screen and clock

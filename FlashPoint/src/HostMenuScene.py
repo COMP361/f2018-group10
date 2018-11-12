@@ -6,7 +6,7 @@ from src.Windows.UIComponents.RectLabel import RectLabel
 from src.Windows.UIComponents.Text import Text
 
 
-class StartScene(object):
+class HostMenuScene(object):
     def __init__(self, screen):
         self.screen = screen
         self.label_grp = pygame.sprite.Group()
@@ -15,12 +15,8 @@ class StartScene(object):
         self.resolution = (self.info_object.current_w, self.info_object.current_h)
 
         self._init_log_box()
-        self._init_text_box(342, 250, "Username:")
-        self._init_text_box(342, 334, "Password:")
-        self._init_text_bar()
-
-        self._init_btn(594, 436, "Login")
-        self._init_btn(791, 436, "Register")
+        self._init_btn(575, 381, "New Game")
+        self._init_btn(575, 271, "Load Existing Game")
 
     def draw(self):
         self.label_grp.draw(self.screen)
@@ -35,18 +31,8 @@ class StartScene(object):
         log_box = RectLabel(x_pos, y_pos, box_size[0], box_size[1], Color.GREEN)
         self.label_grp.add(log_box)
 
-    def _init_text_box(self, x_pos, y_pos, text):
-        box_size = (136, 32)
-
-        user_box = RectLabel(x_pos, y_pos, box_size[0], box_size[1], Color.BLUE, 0,
-                             Text(pygame.font.SysFont('Arial', 20), text, (0, 255, 0, 0)))
-        self.label_grp.add(user_box)
-
     def _init_btn(self, x_pos, y_pos, text):
         box_size = (130, 48)
         button = RectButton(x_pos, y_pos, box_size[0], box_size[1], Color.BLUE, 0,
                             Text(pygame.font.SysFont('Arial', 20), text, (0, 255, 0, 0)))
         self.label_grp.add(button)
-
-    def _init_text_bar(self):
-        pass
