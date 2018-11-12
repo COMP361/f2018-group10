@@ -3,13 +3,8 @@ import sys
 # If PyCharm is issuing warnings on pygame methods, suppress it. it's a bug with PyCharm
 import pygame
 
-from src.Login import Login
-from src.constants.Color import Color
-from src.scenes.GameBoardScene import GameBoardScene
-
-
-from src.Windows.UIComponents.RectButton import RectButton
-from src.Windows.UIComponents.Text import Text
+import src.constants.Color as Color
+from src.StartScene import StartScene
 
 
 class Main(object):
@@ -22,22 +17,11 @@ class Main(object):
         pygame.display.set_caption(Main.WINDOW_TITLE)
         self.screen = pygame.display.set_mode(Main.SCREEN_RESOLUTION)
         self.clock = pygame.time.Clock()
-        #self.current_scene = GameBoardScene(self.screen)
-        self.current_scene = Login(self.screen)
-   
-        
- 
 
+        self.current_scene = StartScene(self.screen)
 
     def main(self):
         # Initialize pygame modules, get the screen and clock
-
-        
-       
-
-        # btn_grp = pygame.sprite.Group()
-        # btn1 = RectButton(10, 10, 60, 40, (255, 255, 255), 0, Text(pygame.font.SysFont('Arial', 12), "Hover msssse", (0, 255, 0)))
-        # btn_grp.add(btn1)
 
         # Run main loop
         while True:
@@ -49,12 +33,10 @@ class Main(object):
                     sys.exit()
 
             # Clear the screen to black and flip the double buffer
-            self.screen.fill(Color.BLACK.value)
-            # btn_grp.draw(self.screen)
-            # btn_grp.update()
+            self.screen.fill(Color.BLACK)
+
             self.current_scene.draw()
             self.current_scene.update()
-
 
             pygame.display.flip()
 
