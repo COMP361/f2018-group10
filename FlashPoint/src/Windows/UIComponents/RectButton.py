@@ -23,10 +23,4 @@ class RectButton(RectLabel, Interactable):
         __doc__ = RectLabel.__doc__
 
         RectLabel.__init__(self, x, y, width, height, background, outer_width, txt_obj, txt_pos)
-        Interactable.__init__(self, self.rect, self.click(), self.hover())
-
-    def hover(self):
-        print("Holy Francis")
-
-    def click(self):
-        print("ME")
+        Interactable.__init__(self, self.rect)

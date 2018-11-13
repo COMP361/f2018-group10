@@ -9,6 +9,8 @@ from src.HostMenuScene import HostMenuScene
 from src.JoinScene import JoinScene
 from src.StartScene import StartScene
 
+def click():
+    print("Holy Francis")
 
 class Main(object):
     """Class for running the main game loop and maintaining game state."""
