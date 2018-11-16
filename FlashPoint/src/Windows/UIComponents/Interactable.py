@@ -47,13 +47,11 @@ class Interactable(pygame.sprite.Sprite):
             # Only executes the hover function when the mouse is first moved into the button
             if not self._isHover:
                 self.hover()
-                self._isHover = True
 
             if click[0]:
                 self.click()
         else:
             # Indicate that the mouse has moved out of bound so that the hover function can be run again next time
-            self._isHover = False
             self.exit_hover()
 
     # I hope it works LOL
@@ -76,6 +74,7 @@ class Interactable(pygame.sprite.Sprite):
         if self._isEnabled and not self._isHover:
             if isinstance(self._hover_action, Callable):
                 self._hover_action(*self._hover_args, **self._hover_kwargs)
+                self._isHover = True
 
     def exit_hover(self):
         """
@@ -85,6 +84,7 @@ class Interactable(pygame.sprite.Sprite):
         if self._isEnabled and self._isHover:
             if isinstance(self._off_hover_action, Callable):
                 self._off_hover_action(*self._off_hover_args, **self._off_hover_kwargs)
+                self._isHover = False
 
     def enable(self):
         """

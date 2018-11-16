@@ -17,6 +17,10 @@ def hover(btn: RectButton):
     btn.change_color((255, 255, 76))
 
 
+def off(btn: RectButton):
+    btn.change_color((255, 76, 255))
+
+
 def main():
     # Initialize pygame modules, get the screen and clock
     pygame.init()
@@ -29,6 +33,7 @@ def main():
                       Text(pygame.font.SysFont('Arial', 12), "Hover me", (255, 255, 255)))
     btn1.on_click(click, btn1)
     btn1.on_hover(hover, btn1)
+    btn1.off_hover(off, btn1)
     btn_grp.add(btn1)
 
     # Run main loop
