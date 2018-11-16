@@ -6,11 +6,16 @@ import pygame
 from src.Windows.UIComponents.RectButton import RectButton
 from src.Windows.UIComponents.Text import Text
 
-def click():
-    print("Holy Francis")
 
-def hover():
+def click(btn: RectButton):
     print("Holy Francis")
+    btn.change_color((76, 255, 255))
+
+
+def hover(btn: RectButton):
+    print("Holy Francis")
+    btn.change_color((255, 255, 76))
+
 
 def main():
     # Initialize pygame modules, get the screen and clock
@@ -22,8 +27,8 @@ def main():
     btn1 = RectButton(10, 10, 300, 100,
                       (255, 76, 255), 0,
                       Text(pygame.font.SysFont('Arial', 12), "Hover me", (255, 255, 255)))
-    btn1.on_click(click)
-    btn1.on_hover(hover)
+    btn1.on_click(click, btn1)
+    btn1.on_hover(hover, btn1)
     btn_grp.add(btn1)
 
     # Run main loop
