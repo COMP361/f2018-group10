@@ -9,8 +9,10 @@ from src.HostMenuScene import HostMenuScene
 from src.JoinScene import JoinScene
 from src.StartScene import StartScene
 
-def click():
+
+def click(btn: RectButton):
     print("Holy Francis")
+    btn.change_color((76, 255, 255))
 
 class Main(object):
     """Class for running the main game loop and maintaining game state."""

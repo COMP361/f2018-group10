@@ -29,9 +29,14 @@ class Interactable(pygame.sprite.Sprite):
         self._isEnabled = True
         self._rect = rect
         self._click_action = None
-        self._click_args = {}
+        self._click_args = None
+        self._click_kwargs = None
         self._hover_action = None
-        self._hover_args = {}
+        self._hover_args = None
+        self._hover_kwargs = None
+        self._off_hover_action = None
+        self._off_hover_args = None
+        self._off_hover_kwargs = None
 
     def update(self):
         mouse = pygame.mouse.get_pos()
@@ -42,13 +47,12 @@ class Interactable(pygame.sprite.Sprite):
             # Only executes the hover function when the mouse is first moved into the button
             if not self._isHover:
                 self.hover()
-                self._isHover = True
 
             if click[0]:
                 self.click()
         else:
             # Indicate that the mouse has moved out of bound so that the hover function can be run again next time
-            self._isHover = False
+            self.exit_hover()
 
     # I hope it works LOL
     def click(self):
@@ -59,10 +63,7 @@ class Interactable(pygame.sprite.Sprite):
         if self._isEnabled and not self._clicked:
             self._clicked = True
             if isinstance(self._click_action, Callable):
-                if len(self._click_args) > 0:
-                    self._click_action(**self._click_args)
-                else:
-                    self._click_action()
+                self._click_action(*self._click_args, **self._click_kwargs)
             self._clicked = False
 
     def hover(self):
@@ -72,10 +73,18 @@ class Interactable(pygame.sprite.Sprite):
         """
         if self._isEnabled and not self._isHover:
             if isinstance(self._hover_action, Callable):
-                if len(self._hover_args) > 0:
-                    self._hover_action(**self._hover_args)
-                else:
-                    self._hover_action()
+                self._hover_action(*self._hover_args, **self._hover_kwargs)
+                self._isHover = True
+
+    def exit_hover(self):
+        """
+        Defines the off hover event
+        :return:
+        """
+        if self._isEnabled and self._isHover:
+            if isinstance(self._off_hover_action, Callable):
+                self._off_hover_action(*self._off_hover_args, **self._off_hover_kwargs)
+                self._isHover = False
 
     def enable(self):
         """
@@ -91,27 +100,47 @@ class Interactable(pygame.sprite.Sprite):
         """
         self._isEnabled = False
 
-    def on_click(self, click_action: Callable, click_args: Optional[Mapping]=None):
+    def on_click(self, click_action: Callable, *args, **kwargs):
         """
         Assign a function to the click hook
         :param click_action: function to be executed when clicked
-        :param click_args: arguments for the function
+        :param args: Non key-worded arguments for the function
+        :param kwargs: Key-worded parameters for the function
         :return:
         """
         self._click_action = click_action
-        if isinstance(click_args, Mapping):
-            self._click_args = click_args
+        if args is not None:
+            self._click_args = args
+        if kwargs is not None:
+            self._click_kwargs = kwargs
 
-    def on_hover(self, hover_action: Callable, hover_args: Optional[Mapping]=None):
+    def on_hover(self, hover_action: Callable, *args, **kwargs):
         """
-        Assign a function to the hover hook
+        Assign a function to the ON hover hook
         :param hover_action: function to be executed when hovered
-        :param hover_args: arguments for the function
+        :param args: Non key-worded arguments for the function
+        :param kwargs: Key-worded arguments for the function
         :return:
         """
         self._hover_action = hover_action
-        if isinstance(hover_args, Mapping):
-            self._hover_args = hover_args
+        if args is not None:
+            self._hover_args = args
+        if kwargs is not None:
+            self._hover_kwargs = kwargs
+
+    def off_hover(self, off_hover_action: Callable, *args, **kwargs):
+        """
+        Assign a function to the OFF hover hook
+        :param off_hover_action: function to be executed when exiting hovered state
+        :param args: Non key-worded arguments for the function
+        :param kwargs: Key-worded arguments for the function
+        :return:
+        """
+        self._off_hover_action = off_hover_action
+        if args is not None:
+            self._off_hover_args = args
+        if kwargs is not None:
+            self._off_hover_kwargs = kwargs
 
     # why is this so hard
     @property
@@ -129,5 +158,13 @@ class Interactable(pygame.sprite.Sprite):
     @hover_action.setter
     def hover_action(self, action: Callable):
         self._hover_action = action
+
+    @property
+    def off_hover_action(self):
+        return self._off_hover_action
+
+    @off_hover_action.setter
+    def off_hover_action(self, action: Callable):
+        self._off_hover_action = action
 
     # SAVE ME FROM THIS MISERY
