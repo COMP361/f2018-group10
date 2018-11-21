@@ -20,6 +20,7 @@ class JoinScene(object):
         # self._init_text_bar()
 
         self._init_btn(575, 436, "Connect")
+        self._init_btn_back(100, 100, "Back")
 
     def draw(self):
         self.label_grp.draw(self.screen)
@@ -43,9 +44,15 @@ class JoinScene(object):
 
     def _init_btn(self, x_pos, y_pos, text):
         box_size = (130, 48)
-        button = RectButton(x_pos, y_pos, box_size[0], box_size[1], Color.BLUE, 0,
-                            Text(pygame.font.SysFont('Arial', 20), text, (0, 255, 0, 0)))
-        self.label_grp.add(button)
+        self.button = RectButton(x_pos, y_pos, box_size[0], box_size[1], Color.BLUE, 0,
+                                 Text(pygame.font.SysFont('Arial', 20), text, (0, 255, 0, 0)))
+        self.label_grp.add(self.button)
+
+    def _init_btn_back(self, x_pos, y_pos, text):
+        box_size = (130, 48)
+        self.buttonBack = RectButton(x_pos, y_pos, box_size[0], box_size[1], Color.BLUE, 0,
+                                     Text(pygame.font.SysFont('Arial', 20), text, (0, 255, 0, 0)))
+        self.label_grp.add(self.buttonBack)
 
     def _init_text_bar(self):
         pass
