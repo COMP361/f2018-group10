@@ -10,7 +10,7 @@ class Interactable(pygame.sprite.Sprite):
     @TODO ---- NURI PLEASE READ THIS @
     To add a click action to the object, use this syntax:
 
-        Object.on_click(function, {arg1, arg2,...})
+        Object.on_click(function, arg1, arg2,...)
 
         - Assume "Object" inherits Interactable
         - function must be only the name (i.e. without brackets)
@@ -48,8 +48,12 @@ class Interactable(pygame.sprite.Sprite):
             if not self._isHover:
                 self.hover()
 
-            if click[0]:
+            if click[0] and not self._clicked:
+                self._clicked = True
                 self.click()
+
+            if not click[0]:
+                self._clicked = False
         else:
             # Indicate that the mouse has moved out of bound so that the hover function can be run again next time
             self.exit_hover()
@@ -60,11 +64,9 @@ class Interactable(pygame.sprite.Sprite):
         Defines the click event
         :return:
         """
-        if self._isEnabled and not self._clicked:
-            self._clicked = True
+        if self._isEnabled:
             if isinstance(self._click_action, Callable):
                 self._click_action(*self._click_args, **self._click_kwargs)
-            self._clicked = False
 
     def hover(self):
         """
