@@ -1,35 +1,43 @@
-from typing import Optional, Callable
-from functools import partial
-
-import abc
+from typing import Optional, Callable, Mapping
 
 import pygame
 
 
-class Interactable(metaclass=abc.ABCMeta):
+class Interactable(pygame.sprite.Sprite):
     """
-    Abstract class for objects that can be clicked
+    Class for objects that can be clicked
+
+    @TODO ---- NURI PLEASE READ THIS @
+    To add a click action to the object, use this syntax:
+
+        Object.on_click(function, arg1, arg2,...)
+
+        - Assume "Object" inherits Interactable
+        - function must be only the name (i.e. without brackets)
+
+    Same idea goes for hover action (see my main.py for example)
+    @TODO implement an asynchronous event loop for clickable actions
     """
-    def __init__(self, rect: pygame.rect.Rect, click_action: Optional[Callable], hover_action: Optional[Callable]):
+    def __init__(self, rect: pygame.rect.Rect):
         """
         Initialize the interactive component
         :param rect: Rect area of the component
-        :param click_action: Function to be called when clicked
-        :param hover_action: Function to be called when hovered over
         """
+        pygame.sprite.Sprite.__init__(self)
         self._isHover = False
         self._clicked = False
         self._isEnabled = True
         self._rect = rect
         self._click_action = None
+        self._click_args = None
+        self._click_kwargs = None
         self._hover_action = None
-        # assign click and hover action
-        if click_action:
-            self._click_action = click_action
-        if hover_action:
-            self._hover_action = hover_action
+        self._hover_args = None
+        self._hover_kwargs = None
+        self._off_hover_action = None
+        self._off_hover_args = None
+        self._off_hover_kwargs = None
 
-    # WTF am I doing
     def update(self):
         mouse = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()
@@ -38,33 +46,47 @@ class Interactable(metaclass=abc.ABCMeta):
         if rect.x+rect.w > mouse[0] > rect.x and rect.y+rect.h > mouse[1] > rect.y:
             # Only executes the hover function when the mouse is first moved into the button
             if not self._isHover:
-                self.on_hover()
-                self._isHover = True
+                self.hover()
 
-            if click[0]:
-                self.on_click()
+            if click[0] and not self._clicked:
+                self._clicked = True
+                self.click()
+
+            if not click[0]:
+                self._clicked = False
         else:
             # Indicate that the mouse has moved out of bound so that the hover function can be run again next time
-            self._isHover = False
+            self.exit_hover()
 
     # I hope it works LOL
-    async def on_click(self):
+    def click(self):
         """
         Defines the click event
         :return:
         """
-        if self._isEnabled and not self._clicked:
-            self._clicked = True
-            await self.click_action()
-            self._clicked = False
+        if self._isEnabled:
+            if isinstance(self._click_action, Callable):
+                self._click_action(*self._click_args, **self._click_kwargs)
 
-    def on_hover(self):
+    def hover(self):
         """
         Defines the hover event
         :return:
         """
         if self._isEnabled and not self._isHover:
-            self.hover_action()
+            if isinstance(self._hover_action, Callable):
+                self._hover_action(*self._hover_args, **self._hover_kwargs)
+                self._isHover = True
+
+    def exit_hover(self):
+        """
+        Defines the off hover event
+        :return:
+        """
+        if self._isEnabled and self._isHover:
+            if isinstance(self._off_hover_action, Callable):
+                self._off_hover_action(*self._off_hover_args, **self._off_hover_kwargs)
+                self._isHover = False
 
     def enable(self):
         """
@@ -79,6 +101,48 @@ class Interactable(metaclass=abc.ABCMeta):
         :return:
         """
         self._isEnabled = False
+
+    def on_click(self, click_action: Callable, *args, **kwargs):
+        """
+        Assign a function to the click hook
+        :param click_action: function to be executed when clicked
+        :param args: Non key-worded arguments for the function
+        :param kwargs: Key-worded parameters for the function
+        :return:
+        """
+        self._click_action = click_action
+        if args is not None:
+            self._click_args = args
+        if kwargs is not None:
+            self._click_kwargs = kwargs
+
+    def on_hover(self, hover_action: Callable, *args, **kwargs):
+        """
+        Assign a function to the ON hover hook
+        :param hover_action: function to be executed when hovered
+        :param args: Non key-worded arguments for the function
+        :param kwargs: Key-worded arguments for the function
+        :return:
+        """
+        self._hover_action = hover_action
+        if args is not None:
+            self._hover_args = args
+        if kwargs is not None:
+            self._hover_kwargs = kwargs
+
+    def off_hover(self, off_hover_action: Callable, *args, **kwargs):
+        """
+        Assign a function to the OFF hover hook
+        :param off_hover_action: function to be executed when exiting hovered state
+        :param args: Non key-worded arguments for the function
+        :param kwargs: Key-worded arguments for the function
+        :return:
+        """
+        self._off_hover_action = off_hover_action
+        if args is not None:
+            self._off_hover_args = args
+        if kwargs is not None:
+            self._off_hover_kwargs = kwargs
 
     # why is this so hard
     @property
@@ -96,5 +160,13 @@ class Interactable(metaclass=abc.ABCMeta):
     @hover_action.setter
     def hover_action(self, action: Callable):
         self._hover_action = action
+
+    @property
+    def off_hover_action(self):
+        return self._off_hover_action
+
+    @off_hover_action.setter
+    def off_hover_action(self, action: Callable):
+        self._off_hover_action = action
 
     # SAVE ME FROM THIS MISERY
