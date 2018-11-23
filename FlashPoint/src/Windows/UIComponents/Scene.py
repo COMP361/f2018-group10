@@ -18,12 +18,15 @@ class Scene(pygame.sprite.Sprite):
             self.screen = screen
         self.sprite_grp = pygame.sprite.Group()
         self.info = pygame.display.Info()
+        self.enabled = False
 
     def draw(self):
         self.sprite_grp.draw(self.screen)
+        self.enabled = True
 
     def update(self):
-        self.sprite_grp.update()
+        if self.enabled:
+            self.sprite_grp.update()
 
     @property
     def resolution(self):
