@@ -8,6 +8,9 @@ from src.HostJoinScene import HostJoinScene
 from src.HostMenuScene import HostMenuScene
 from src.JoinScene import JoinScene
 from src.StartScene import StartScene
+from src.Windows.CharacterSelectionMenu.CharacterScene import CharacterSelectionMenu
+
+from src.Windows.UIComponents.SceneManager import SceneManager
 
 
 class Main(object):
@@ -21,15 +24,24 @@ class Main(object):
         self.screen = pygame.display.set_mode(Main.SCREEN_RESOLUTION)
         self.clock = pygame.time.Clock()
 
-        # each of these comments below are each of the scenes
-        self.start_scene = StartScene(self.screen)
-        self.hj_scene = HostJoinScene(self.screen)
-        self.js_scene = JoinScene(self.screen)
-        self.hm_scene = HostMenuScene(self.screen)
+        self.hjs = HostJoinScene
+        self.hms = HostMenuScene
+        self.js = JoinScene
+        self.ss = StartScene(self.screen)
+        self.css = CharacterSelectionMenu
 
-        self.current_scene = self.start_scene
-        self.start_scene.buttonLogin.on_click(self.switch, self.hj_scene)
-        self.start_scene.buttonRegister.on_click(self.switch, self.hj_scene)
+        self.manager = SceneManager  # this is what will help us switch from one scene to another.
+
+        # each of these comments below are each of the scenes
+        # self.start_scene = StartScene(self.screen)
+        # self.hj_scene = HostJoinScene(self.screen)
+        # self.js_scene = JoinScene(self.screen)
+        # self.hm_scene = HostMenuScene(self.screen)
+        # self.cs_scene = CharacterSelectionMenu(self.screen)
+        #
+        self.current_scene = self.cs_scene
+        self.ss.buttonLogin.on_click(self.manager.switch(self.hjs.sprite_grp))
+        self.StartScene.buttonRegister.on_click(self.switch, self.hj_scene)
         self.hj_scene.buttonJoin.on_click(self.switch, self.js_scene)
         self.hj_scene.buttonHost.on_click(self.switch, self.hm_scene)
         self.hj_scene.buttonBack.on_click(self.switch, self.start_scene)
@@ -38,7 +50,6 @@ class Main(object):
 
     def switch(self, scene):
         self.current_scene = scene
-    
 
     def main(self):
         # Initialize pygame modules, get the screen and clock
@@ -56,8 +67,8 @@ class Main(object):
 
             # Clear the screen to black and flip the double buffer
 
-            self.current_scene.draw()
-            self.current_scene.update()
+            self.manager.draw()
+            self.manager.update()
 
             pygame.display.flip()
 
