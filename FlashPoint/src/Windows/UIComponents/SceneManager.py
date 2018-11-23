@@ -9,7 +9,7 @@ class SceneManager(object):
     def __init__(self, screen: Optional[pygame.Surface]=None, default_scene: Optional[Scene]=None):
         """
         Scene Manager. Initialize this before the game loop
-        
+
         :param screen:
         :param default_scene:
         """
