@@ -6,7 +6,6 @@ import src.constants.Color as Color
 import src.constants.MainConstants as MainConst
 from src.scenes.GameBoardScene import GameBoardScene
 
-
 class Main(object):
     """Class for running the main game loop and maintaining game state."""
 
@@ -16,7 +15,7 @@ class Main(object):
         self.screen = pygame.display.set_mode(MainConst.SCREEN_RESOLUTION)
         self.clock = pygame.time.Clock()
         self.current_scene = GameBoardScene(self.screen)
-        
+
     def main(self):
         # Run main game loop
         while True:
