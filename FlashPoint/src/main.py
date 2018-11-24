@@ -23,13 +23,13 @@ def off(btn: RectButton):
 
 
 def hover2(btn: RectButton):
-    FileImporter.import_audio("D:\\Users\\User\\Music\\recording.mp3")
+    FileImporter.import_audio("media\\recording.mp3")
     pygame.mixer.music.play(-1, 0.5)
-    btn.change_bg_image("D:\\Users\\User\\Pictures\\2lvzph.jpg")
+    btn.change_bg_image("media\\2lvzph.jpg")
 
 
 def off2(btn: RectButton):
-    btn.change_bg_image("D:\\Users\\User\\Pictures\\francis.jpg")
+    btn.change_bg_image("media\\francis.jpg")
 
 
 def main():

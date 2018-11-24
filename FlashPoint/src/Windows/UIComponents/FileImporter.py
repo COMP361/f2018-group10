@@ -6,7 +6,7 @@ import pygame
 class FileImporter:
     @staticmethod
     def file_exists(file_path: str):
-        return os.path.exists(file_path)
+        return os.path.exists(os.path.abspath(file_path))
 
     @staticmethod
     def import_image(file_path: str):
