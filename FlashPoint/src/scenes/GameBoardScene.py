@@ -9,15 +9,12 @@ class GameBoardScene(object):
         """:param screen : The display passed from main on which to draw the Scene."""
         self.screen = screen
         self.active_sprites = pygame.sprite.Group()   # Maybe add separate groups for different things later
-        self._init_sprites()
-
-    def _init_sprites(self):
-        self.active_sprites.add(GameBoard())
+        self.game_board = GameBoard()
 
     def draw(self):
         """Draw all currently active sprites."""
-        self.active_sprites.draw(self.screen)
+        self.game_board.draw(self.screen)
 
     def update(self):
         """Call the update() function of everything in this class."""
-        self.active_sprites.update()
+        self.game_board.update()
