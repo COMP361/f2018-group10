@@ -81,6 +81,8 @@ class MenuWindow(object):
                 self.window.x = self.def_position[0]
                 self.window.y = self.def_position[1]
 
+            self.grp.add(self.background, self.window)
+
             # draw the menu on screen
             # menu_window = pygame.rect.Rect(self.x, self.y, width, height)
             # pygame.draw.rect(main_display, self.color, menu_window)
