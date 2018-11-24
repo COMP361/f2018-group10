@@ -26,7 +26,12 @@ class SceneManager(object):
         if isinstance(self._active_scene, Scene):
             self._active_scene.enabled = False
         self._active_scene = scene
-        self._active_scene.draw(self.screen)
+
+    def draw(self, screen: Optional[pygame.Surface]=None):
+        if screen is not None:
+            self._active_scene.draw(screen)
+        else:
+            self._active_scene.draw(self.screen)
 
     def update(self):
         self._active_scene.update()
