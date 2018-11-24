@@ -23,8 +23,7 @@ def off(btn: RectButton):
 
 
 def hover2(btn: RectButton):
-    FileImporter.import_audio("media\\recording.mp3")
-    pygame.mixer.music.play(-1, 0.5)
+    FileImporter.play_audio("media\\recording.wav")
     btn.change_bg_image("media\\2lvzph.jpg")
 
 
@@ -34,9 +33,12 @@ def off2(btn: RectButton):
 
 def main():
     # Initialize pygame modules, get the screen and clock
+    pygame.mixer.pre_init(44100, 16, 2, 4096)
     pygame.init()
     screen = pygame.display.set_mode((1280, 720))
     clock = pygame.time.Clock()
+
+    FileImporter.play_music("media\\nightbells.mp3")
 
     btn_grp = pygame.sprite.Group()
     btn1 = RectButton(10, 10, 300, 100,

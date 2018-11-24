@@ -16,8 +16,17 @@ class FileImporter:
             raise Exception("Path not found!")
 
     @staticmethod
-    def import_audio(file_path: str):
+    def play_music(file_path: str):
         if FileImporter.file_exists(file_path):
-            return pygame.mixer.music.load(os.path.abspath(file_path))
+            pygame.mixer.music.load(os.path.abspath(file_path))
+            return pygame.mixer.music.play()
+        else:
+            raise Exception("Path not found!")
+
+    @staticmethod
+    def play_audio(file_path: str):
+        if FileImporter.file_exists(file_path):
+            audio = pygame.mixer.Sound(os.path.abspath(file_path))
+            return pygame.mixer.Sound.play(audio)
         else:
             raise Exception("Path not found!")
