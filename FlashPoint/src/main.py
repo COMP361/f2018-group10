@@ -5,6 +5,7 @@ import pygame
 
 from src.Windows.UIComponents.RectButton import RectButton
 from src.Windows.UIComponents.Text import Text
+from src.Windows.UIComponents.FileImporter import FileImporter
 
 
 def click(btn: RectButton):
@@ -21,6 +22,16 @@ def off(btn: RectButton):
     btn.change_color((255, 76, 255))
 
 
+def hover2(btn: RectButton):
+    FileImporter.import_audio("D:\\Users\\User\\Music\\recording.mp3")
+    pygame.mixer.music.play(-1, 0.5)
+    btn.change_bg_image("D:\\Users\\User\\Pictures\\2lvzph.jpg")
+
+
+def off2(btn: RectButton):
+    btn.change_bg_image("D:\\Users\\User\\Pictures\\francis.jpg")
+
+
 def main():
     # Initialize pygame modules, get the screen and clock
     pygame.init()
@@ -35,6 +46,10 @@ def main():
     btn1.on_hover(hover, btn1)
     btn1.off_hover(off, btn1)
     btn_grp.add(btn1)
+    btn2 = RectButton(500, 50, 200, 280, "D:\\Users\\User\\Pictures\\francis.jpg")
+    btn2.on_hover(hover2, btn2)
+    btn2.off_hover(off2, btn2)
+    btn_grp.add(btn2)
 
     # Run main loop
     while True:

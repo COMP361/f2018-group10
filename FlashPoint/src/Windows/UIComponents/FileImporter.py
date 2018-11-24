@@ -11,7 +11,13 @@ class FileImporter:
     @staticmethod
     def import_image(file_path: str):
         if FileImporter.file_exists(file_path):
-            image = pygame.image.load(os.path.abspath(file_path))
-            return image
+            return pygame.image.load(os.path.abspath(file_path))
+        else:
+            raise Exception("Path not found!")
+
+    @staticmethod
+    def import_audio(file_path: str):
+        if FileImporter.file_exists(file_path):
+            return pygame.mixer.music.load(os.path.abspath(file_path))
         else:
             raise Exception("Path not found!")

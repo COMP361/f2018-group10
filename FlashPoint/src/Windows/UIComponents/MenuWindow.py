@@ -14,8 +14,8 @@ class MenuWindow(object):
     """
     def __init__(self,
                  width: int,
-                 height: Optional[int],
-                 def_position: Optional[Tuple[int, int]],
+                 height: Optional[int]=0,
+                 def_position: Optional[Tuple[int, int]]=None,
                  color: Tuple[int, ...] = (175, 175, 175, 0.5),
                  padding: int=5):
         """
