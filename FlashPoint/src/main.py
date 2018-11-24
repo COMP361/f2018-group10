@@ -38,7 +38,7 @@ def main():
     screen = pygame.display.set_mode((1280, 720))
     clock = pygame.time.Clock()
 
-    FileImporter.play_music("media\\nightbells.mp3")
+    FileImporter.play_music("media\\nightbells.mp3", -1)
 
     btn_grp = pygame.sprite.Group()
     btn1 = RectButton(10, 10, 300, 100,
