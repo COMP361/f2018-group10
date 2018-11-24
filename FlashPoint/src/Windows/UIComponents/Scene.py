@@ -28,6 +28,12 @@ class Scene(pygame.sprite.Sprite):
         if self.enabled:
             self.sprite_grp.update()
 
+    def add(self, *sprites):
+        self.sprite_grp.add(*sprites)
+
+    def remove(self, *sprites):
+        self.sprite_grp.remove(*sprites)
+
     @property
     def resolution(self):
         return self.info.current_w, self.info.current_h
