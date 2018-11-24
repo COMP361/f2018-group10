@@ -38,7 +38,7 @@ def main():
     screen = pygame.display.set_mode((1280, 720))
     clock = pygame.time.Clock()
 
-    FileImporter.play_music("media\\nightbells.mp3", -1)
+    FileImporter.play_music("media/nightbells.mp3", -1)
 
     btn_grp = pygame.sprite.Group()
     btn1 = RectButton(10, 10, 300, 100,
@@ -48,7 +48,7 @@ def main():
     btn1.on_hover(hover, btn1)
     btn1.off_hover(off, btn1)
     btn_grp.add(btn1)
-    btn2 = RectButton(500, 50, 200, 280, "D:\\Users\\User\\Pictures\\francis.jpg")
+    btn2 = RectButton(500, 50, 200, 280, "media/francis.jpg")
     btn2.on_hover(hover2, btn2)
     btn2.off_hover(off2, btn2)
     btn_grp.add(btn2)
