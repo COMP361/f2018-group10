@@ -5,7 +5,7 @@ import pygame
 from src.Windows.UIComponents.Components import Components
 
 
-class MenuWindow(pygame.sprite.Sprite):
+class MenuWindow(object):
 
     SPACE_BETWEEN = 5
 
@@ -26,7 +26,7 @@ class MenuWindow(pygame.sprite.Sprite):
         :param color: Background color of the object represented by an RGB tuple (Alpha optional)
         :param padding: Padding for the menu
         """
-        pygame.sprite.Sprite.__init__(self)
+        self.window = pygame.sprite.Sprite.__init__(self.window)
         self.def_width = width
         self.def_height = None
         self.def_position = None
@@ -39,7 +39,7 @@ class MenuWindow(pygame.sprite.Sprite):
         self.x = 0
         self.y = 0
         if height:
-            self.height = height
+            self.window.height = height
         if def_position:
             self.def_position = def_position
 

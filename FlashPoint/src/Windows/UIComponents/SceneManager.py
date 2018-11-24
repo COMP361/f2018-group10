@@ -17,7 +17,6 @@ class SceneManager(object):
             self.screen = pygame.display.get_surface()
         else:
             self.screen = screen
-        self._scene_grp = pygame.sprite.Group()
         self._active_scene = default_scene
 
         if self._active_scene is not None:
@@ -26,9 +25,8 @@ class SceneManager(object):
     def switch(self, scene: Scene):
         if isinstance(self._active_scene, Scene):
             self._active_scene.enabled = False
-        self._scene_grp.empty()
-        self._scene_grp.add(scene)
-        self._scene_grp.draw(self.screen)
+        self._active_scene = scene
+        self._active_scene.draw(self.screen)
 
     def update(self):
-        self._scene_grp.update()
+        self._active_scene.update()
