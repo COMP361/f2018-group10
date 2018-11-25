@@ -1,10 +1,10 @@
 import pygame
 
-from src.HostJoinScene import HostJoinScene
-from src.HostMenuScene import HostMenuScene
-from src.JoinScene import JoinScene
-from src.StartScene import StartScene
-from src.Game_Intial_Menu import CreateGameMenu
+from src.scenes.HostJoinScene import HostJoinScene
+from src.scenes.HostMenuScene import HostMenuScene
+from src.scenes.JoinScene import JoinScene
+from src.scenes.StartScene import StartScene
+from src.scenes.Game_Intial_Menu import CreateGameMenu
 from src.core.EventQueue import EventQueue
 
 

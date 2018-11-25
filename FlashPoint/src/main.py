@@ -20,10 +20,6 @@ class Main(object):
         self.scene_manager = SceneManager(self.screen)
         self.event_queue = EventQueue()
 
-        # this is what will help us switch from one scene to another.
-
-        # each of these comments below are each of the scenes
-
     def main(self):
         # Run main loop
         while True:
