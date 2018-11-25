@@ -9,6 +9,7 @@ from src.HostMenuScene import HostMenuScene
 from src.JoinScene import JoinScene
 from src.StartScene import StartScene
 from src.Windows.CharacterSelectionMenu.CharacterScene import CharacterSelectionMenu
+from src.Game_Intial_Menu import GameIntialMenu
 
 from src.Windows.UIComponents.SceneManager import SceneManager
 
@@ -23,33 +24,11 @@ class Main(object):
         pygame.display.set_caption(Main.WINDOW_TITLE)
         self.screen = pygame.display.set_mode(Main.SCREEN_RESOLUTION)
         self.clock = pygame.time.Clock()
+        self._init_buttons()
 
-        self.hjs = HostJoinScene
-        self.hms = HostMenuScene
-        self.js = JoinScene
-        self.ss = StartScene(self.screen)
-        self.css = CharacterSelectionMenu
-
-        self.manager = SceneManager  # this is what will help us switch from one scene to another.
+        # this is what will help us switch from one scene to another.
 
         # each of these comments below are each of the scenes
-        # self.start_scene = StartScene(self.screen)
-        # self.hj_scene = HostJoinScene(self.screen)
-        # self.js_scene = JoinScene(self.screen)
-        # self.hm_scene = HostMenuScene(self.screen)
-        # self.cs_scene = CharacterSelectionMenu(self.screen)
-        #
-        self.current_scene = self.cs_scene
-        self.ss.buttonLogin.on_click(self.manager.switch(self.hjs.sprite_grp))
-        self.StartScene.buttonRegister.on_click(self.switch, self.hj_scene)
-        self.hj_scene.buttonJoin.on_click(self.switch, self.js_scene)
-        self.hj_scene.buttonHost.on_click(self.switch, self.hm_scene)
-        self.hj_scene.buttonBack.on_click(self.switch, self.start_scene)
-        self.hm_scene.buttonBack.on_click(self.switch, self.hj_scene)
-        self.js_scene.buttonBack.on_click(self.switch, self.hj_scene)
-
-    def switch(self, scene):
-        self.current_scene = scene
 
     def main(self):
         # Initialize pygame modules, get the screen and clock
@@ -71,6 +50,25 @@ class Main(object):
             self.manager.update()
 
             pygame.display.flip()
+
+    def _init_buttons(self):
+        self.hjs = HostJoinScene(self.screen)
+        self.hms = HostMenuScene(self.screen)
+        self.js = JoinScene(self.screen)
+        self.ss = StartScene(self.screen)
+        self.css = CharacterSelectionMenu(self.screen)
+        self.gim = GameIntialMenu(self.screen)
+        self.manager = SceneManager(self.screen, self.ss)
+        self.ss.buttonLogin.on_click(self.manager.switch, self.hjs)
+        self.ss.buttonRegister.on_click(self.manager.switch, self.hjs)
+        self.hjs.buttonJoin.on_click(self.manager.switch, self.js)
+        self.hjs.buttonHost.on_click(self.manager.switch, self.hms)
+        self.hjs.buttonBack.on_click(self.manager.switch, self.ss)
+        self.hms.buttonBack.on_click(self.manager.switch, self.hjs)
+        self.js.buttonBack.on_click(self.manager.switch, self.hjs)
+        self.hms.button1.on_click(self.manager.switch, self.gim)
+        self.gim.buttonBack.on_click(self.manager.switch,self.hms)
+        #self.gim.buttonRegister.on_click(self.manager.switch, self.)
 
 
 if __name__ == '__main__':

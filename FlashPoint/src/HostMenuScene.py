@@ -7,36 +7,36 @@ from src.Windows.UIComponents.Text import Text
 from src.Windows.UIComponents.Scene import Scene
 
 
-class HostMenuScene(object):
+class HostMenuScene(Scene):
     def __init__(self, screen):
-        self.scene = Scene.__init__(screen)
+        Scene.__init__(self, screen)
 
         self._init_log_box()
-        self._init_btn(575, 381, "New Game")
-        self._init_btn(575, 271, "Load Existing Game")
+        self._init_btn1(575, 381, "New Game")
+        self._init_btn2(575, 271, "Load Existing Game")
         self._init_btn_back(100, 100, "Back")
 
-    def draw(self):
-        self.scene.sprite_grp.draw()
-
-    def update(self):
-        self.scene.sprite_grp.update()
-
     def _init_log_box(self):
-        box_size = (self.scene.resolution[0] / 2, self.scene.resolution[1] / 2)
-        x_pos = self.scene.resolution[0] / 2 - box_size[0] / 2
-        y_pos = self.scene.resolution[1] / 2 - box_size[1] / 2
+        box_size = (self.resolution[0] / 2, self.resolution[1] / 2)
+        x_pos = self.resolution[0] / 2 - box_size[0] / 2
+        y_pos = self.resolution[1] / 2 - box_size[1] / 2
         log_box = RectLabel(x_pos, y_pos, box_size[0], box_size[1], Color.GREEN)
-        self.scene.sprite_grp.add(log_box)
+        self.sprite_grp.add(log_box)
 
-    def _init_btn(self, x_pos, y_pos, text):
+    def _init_btn1(self, x_pos, y_pos, text):
         box_size = (130, 48)
-        button = RectButton(x_pos, y_pos, box_size[0], box_size[1], Color.BLUE, 0,
+        self.button1 = RectButton(x_pos, y_pos, box_size[0], box_size[1], Color.BLUE, 0,
                             Text(pygame.font.SysFont('Arial', 20), text, (0, 255, 0, 0)))
-        self.scene.sprite_grp.add(button)
+        self.sprite_grp.add(self.button1)
+
+    def _init_btn2(self, x_pos, y_pos, text):
+        box_size = (130, 48)
+        self.button2 = RectButton(x_pos, y_pos, box_size[0], box_size[1], Color.BLUE, 0,
+                                 Text(pygame.font.SysFont('Arial', 20), text, (0, 255, 0, 0)))
+        self.sprite_grp.add(self.button2)
 
     def _init_btn_back(self, x_pos, y_pos, text):
         box_size = (130, 48)
         self.buttonBack = RectButton(x_pos, y_pos, box_size[0], box_size[1], Color.BLUE, 0,
                                      Text(pygame.font.SysFont('Arial', 20), text, (0, 255, 0, 0)))
-        self.scene.sprite_grp.add(self.buttonBack)
+        self.sprite_grp.add(self.buttonBack)
