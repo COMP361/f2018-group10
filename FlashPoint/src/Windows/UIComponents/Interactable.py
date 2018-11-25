@@ -2,6 +2,8 @@ from typing import Optional, Callable, Mapping
 
 import pygame
 
+from src.core.EventQueue import EventQueue
+
 
 class Interactable(pygame.sprite.Sprite):
     """
@@ -38,7 +40,7 @@ class Interactable(pygame.sprite.Sprite):
         self._off_hover_args = None
         self._off_hover_kwargs = None
 
-    def update(self):
+    def update(self, event_queue: EventQueue):
         mouse = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()
         rect = self._rect
@@ -48,9 +50,10 @@ class Interactable(pygame.sprite.Sprite):
             if not self._isHover:
                 self.hover()
 
-            if click[0] and not self._clicked:
-                self._clicked = True
-                self.click()
+            for event in event_queue:
+                if event.type == pygame.MOUSEBUTTONUP and not self._clicked:
+                    self._clicked = True
+                    self.click()
 
             if not click[0]:
                 self._clicked = False

@@ -6,7 +6,7 @@ from src.Windows.UIComponents.RectButton import RectButton
 from src.Windows.UIComponents.RectLabel import RectLabel
 from src.Windows.UIComponents.Text import Text
 from src.Windows.UIComponents.Scene import Scene
-from src.Windows.UIComponents.TextBar import InputBox
+# from src.Windows.UIComponents.TextBar import InputBox
 
 
 class StartScene(Scene):
@@ -49,8 +49,8 @@ class StartScene(Scene):
 
         self.sprite_grp.add(self.buttonRegister)
 
-    def _init_text_bar(self):
-        input_box1 = InputBox(x=100, y=100, w=140, h=32)
+    # def _init_text_bar(self):
+    #     input_box1 = InputBox(x=100, y=100, w=140, h=32)
         # input_box2 = InputBox(x = 100,y= 300,w= 140,h= 32)
 
         # while not done:
@@ -67,4 +67,4 @@ class StartScene(Scene):
         #         for box in input_boxes:
         #             box.draw(screen)
 
-        self.sprite_grp.add(input_box1)
+        # self.sprite_grp.add(input_box1)

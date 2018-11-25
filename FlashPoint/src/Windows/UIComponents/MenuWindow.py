@@ -1,4 +1,4 @@
-from typing import Tuple, Optional, Union, Callable, NamedTuple
+from typing import Tuple, Optional
 
 import pygame
 
@@ -14,8 +14,8 @@ class MenuWindow(object):
     """
     def __init__(self,
                  width: int,
-                 height: Optional[int],
-                 def_position: Optional[Tuple[int, int]],
+                 height: Optional[int]=0,
+                 def_position: Optional[Tuple[int, int]]=None,
                  color: Tuple[int, ...] = (175, 175, 175, 0.5),
                  padding: int=5):
         """
@@ -26,7 +26,14 @@ class MenuWindow(object):
         :param color: Background color of the object represented by an RGB tuple (Alpha optional)
         :param padding: Padding for the menu
         """
-        self.window = pygame.sprite.Sprite.__init__(self.window)
+        self.grp = pygame.sprite.Group()
+        self.window = pygame.sprite.Sprite()
+
+        self.background = pygame.sprite.Sprite()
+        self.background.image = pygame.display.get_surface().copy()
+        self.background.image.fill(0, 0, 0)
+        self.background.image.set_alpha(120)
+
         self.def_width = width
         self.def_height = None
         self.def_position = None
@@ -36,12 +43,16 @@ class MenuWindow(object):
         self.is_open = False
         self.screen_copy = None
 
-        self.x = 0
-        self.y = 0
+        self.window.x = 0
+        self.window.y = 0
         if height:
             self.window.height = height
         if def_position:
             self.def_position = def_position
+
+    def update(self):
+        self.grp.draw(pygame.display.get_surface())
+        self.grp.update()
 
     def toggle(self):
         """
@@ -51,42 +62,37 @@ class MenuWindow(object):
         main_display = pygame.display.get_surface()
 
         if self.is_open:
-            main_display.fill((0, 0, 0, 0))
-            main_display.blit(self.screen_copy)
+            self.grp.remove(self.window, self.background)
             self.is_open = False
         else:
-            # copy the display and store in memory (so that we can redraw it)
-            self.screen_copy = main_display.copy()
-            # dim the main display
-            pygame.draw.rect(main_display, (0, 0, 0, 0.5), main_display.get_rect())
-
             # calculate the window's size
-            width = self.def_width
+            self.window.width = self.def_width
             if self.def_height is None:
-                height = self.padding * 2
+                self.window.height = self.padding * 2
                 for child in self.children:
-                    height += child.get_height() + self.SPACE_BETWEEN
+                    self.window.height += child.get_height() + self.SPACE_BETWEEN
             else:
-                height = self.def_height
+                self.window.height = self.def_height
 
             if self.def_position is None:
-                self.x = main_display.get_width()/2 - width/2
-                self.y = main_display.get_height()/2 - height/2
+                self.window.x = main_display.get_width()/2 - self.window.width/2
+                self.window.y = main_display.get_height()/2 - self.window.height/2
             else:
-                self.x = self.def_position[0]
-                self.y = self.def_position[1]
+                self.window.x = self.def_position[0]
+                self.window.y = self.def_position[1]
+
+            self.grp.add(self.background, self.window)
 
             # draw the menu on screen
-            menu_window = pygame.rect.Rect(self.x, self.y, width, height)
-            pygame.draw.rect(main_display, self.color, menu_window)
-
+            # menu_window = pygame.rect.Rect(self.x, self.y, width, height)
+            # pygame.draw.rect(main_display, self.color, menu_window)
             self.is_open = True
 
     # TODO: Finish the class. Not sure if I need to call update here or not...
 
     def _render(self):
-        x = self.x + self.padding
-        y = self.y + self.padding
+        x = self.window.x + self.padding
+        y = self.window.y + self.padding
         for child in self.children:
             child.change_pos(x, y)
             y += child.get_height + self.SPACE_BETWEEN
