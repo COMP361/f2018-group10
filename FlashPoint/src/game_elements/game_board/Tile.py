@@ -45,8 +45,10 @@ class Tile(pygame.sprite.Sprite):
         pressed = pygame.mouse.get_pressed()[2]             # right click
         movement = (current_mouse_pos[0] - self._mouse_pos[0], current_mouse_pos[1] - self._mouse_pos[1])
         if pressed:
-            if (self.groups()[0].rect.left < current_mouse_pos[0] < self.groups()[0].rect.right
-                    and self.groups()[0].rect.top < current_mouse_pos[1] < self.groups()[0].rect.bottom):
+            grid = self.groups()[0]
+            if (grid.rect.left < current_mouse_pos[0] < grid.rect.right
+                    and grid.rect.top < current_mouse_pos[1] < grid.rect.bottom):
+
                 self.rect.move_ip(movement)
                 self.mouse_rect.move_ip(movement)
         self._mouse_pos = current_mouse_pos

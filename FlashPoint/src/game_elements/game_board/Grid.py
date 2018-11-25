@@ -6,6 +6,7 @@ from src.game_elements.game_board.Tile import Tile
 
 
 class Grid(pygame.sprite.Group):
+
     """Class to Group Tile objects together, and implement Grid logic in to what will form the GameBoard."""
     def __init__(self, *sprites: pygame.sprite.Sprite,
                  x_coord: int, y_coord: int,
