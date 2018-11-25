@@ -6,19 +6,19 @@ from src.game_elements.game_board.Tile import Tile
 
 
 class Grid(pygame.sprite.Group):
+
     """Class to Group Tile objects together, and implement Grid logic in to what will form the GameBoard."""
-    def __init__(self, *sprites: pygame.sprite.Sprite, screen: pygame.Surface=None,
+    def __init__(self, *sprites: pygame.sprite.Sprite,
                  x_coord: int, y_coord: int,
-                 tile_size: int=64, tiles_x: int=12, tiles_y: int=8,):
+                 tile_size: int=128, tiles_x: int=12, tiles_y: int=8,):
         super().__init__(*sprites)
-        self.screen = screen
         self.height = tiles_y
         self.width = tiles_x
         self.image = pygame.Surface((tile_size*tiles_x, tile_size*tiles_y))
         self.rect = self.image.get_rect().move((x_coord, y_coord))
-        self.grid = self._generate_grid()
+        self.grid = self._generate_grid(tile_size)
 
-    def _generate_grid(self, tile_size: int=64) -> List[List[Tile]]:
+    def _generate_grid(self, tile_size) -> List[List[Tile]]:
         """Initialize an grid of Tiles, add to self Sprite Group."""
         grid = []
         x_coord = 0
@@ -26,7 +26,7 @@ class Grid(pygame.sprite.Group):
             grid.append([])
             y_coord = 0
             for j in range(0, self.height):
-                grid[i].append(Tile(self.rect.x + x_coord, self.rect.y + y_coord))
+                grid[i].append(Tile(self.rect.x, self.rect.y, x_coord, y_coord))
                 grid[i][j].x_coordinate = i
                 grid[i][j].y_coordinate = j
                 self.add(grid[i][j])

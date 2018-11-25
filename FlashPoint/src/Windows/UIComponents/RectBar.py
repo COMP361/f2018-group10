@@ -35,10 +35,7 @@ class RectBar(pygame.sprite.Sprite, Components):
         :param progress: Progress of the object, should be between 0(%) -> 100(%)
         """
         pygame.sprite.Sprite.__init__(self)
-        self.x = x
-        self.y = y
-        self.width = width
-        self.height = height
+        Components.__init__(self, x, y, width, height)
         self.outer_width = outer_width
         self.txt_obj = txt_obj
         self.txt_pos = txt_pos
@@ -87,18 +84,6 @@ class RectBar(pygame.sprite.Sprite, Components):
         self._render()
 
     def change_pos(self, x: int, y: int):
-        self.x = x
-        self.y = y
+        self.x(x)
+        self.y(y)
         self._render()
-
-    def get_height(self):
-        return self.height
-
-    def get_width(self):
-        return self.width
-
-    def get_x(self):
-        return self.x
-
-    def get_y(self):
-        return self.y

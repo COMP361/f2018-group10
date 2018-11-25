@@ -5,12 +5,12 @@ import src.constants.Color as Color
 
 class Tile(pygame.sprite.Sprite):
 
-    def __init__(self, x: int, y: int, size: int=64):
+    def __init__(self, x: int, y: int, x_offset: int, y_offset: int, size: int=128):
         """Create a tile, not sure what the sprite size should be..."""
         super().__init__()
         self.image = pygame.Surface([size, size])
-        self.rect = self.image.get_rect()
-        self.rect.move_ip(x, y)
+        self.rect = self.image.get_rect().move(x_offset, y_offset)
+        self.mouse_rect = pygame.Rect(self.rect).move(x, y)
         self.is_hovered = False
 
         self._render()
@@ -23,7 +23,7 @@ class Tile(pygame.sprite.Sprite):
 
     def _check_mouse_over(self):
         mouse = pygame.mouse.get_pos()
-        rect = self.rect
+        rect = self.mouse_rect
         x_max = rect.x + rect.w
         x_min = rect.x
         y_max = rect.y + rect.h
@@ -45,13 +45,12 @@ class Tile(pygame.sprite.Sprite):
         pressed = pygame.mouse.get_pressed()[2]             # right click
         movement = (current_mouse_pos[0] - self._mouse_pos[0], current_mouse_pos[1] - self._mouse_pos[1])
         if pressed:
-            print("Clicked")
-            print(f"{self.groups()[0].rect.bottom}, {self.groups()[0].rect.top}")
-            print(current_mouse_pos)
-            if (self.groups()[0].rect.left < current_mouse_pos[0] < self.groups()[0].rect.right
-                    and self.groups()[0].rect.top < current_mouse_pos[1] < self.groups()[0].rect.bottom):
-                print("Scrolling")
+            grid = self.groups()[0]
+            if (grid.rect.left < current_mouse_pos[0] < grid.rect.right
+                    and grid.rect.top < current_mouse_pos[1] < grid.rect.bottom):
+
                 self.rect.move_ip(movement)
+                self.mouse_rect.move_ip(movement)
         self._mouse_pos = current_mouse_pos
 
     def update(self):

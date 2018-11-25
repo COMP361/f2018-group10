@@ -17,7 +17,7 @@ class RectLabel(pygame.sprite.Sprite, Components):
                  y: int,
                  width: int,
                  height: int,
-                 background: Union[Tuple[int, ...], str]=(0, 0, 0),
+                 background: Union[Tuple[int, int, int], str]=(0, 0, 0),
                  outer_width: int=0,
                  txt_obj: Optional[Text]=None,
                  txt_pos: Text.Position = Text.Position.CENTER):
@@ -33,10 +33,7 @@ class RectLabel(pygame.sprite.Sprite, Components):
         :param txt_pos: Text position in the label, must be one of Text.Position
         """
         pygame.sprite.Sprite.__init__(self)
-        self.x = x
-        self.y = y
-        self.width = width
-        self.height = height
+        Components.__init__(self, x, y, width, height)
         self.background = background
         self.outer_width = outer_width
         self.txt_obj = txt_obj
@@ -56,7 +53,8 @@ class RectLabel(pygame.sprite.Sprite, Components):
         else:
             self.rect = pygame.draw.rect(self.image, (0, 0, 0), self.rect, self.outer_width)
             image_file = FileImporter.import_image(self.background)
-            self.image.blit(image_file, self.image)
+            image_file = pygame.transform.scale(image_file, (self.width, self.height))
+            self.image.blit(image_file, (0, 0))
 
         self.rect.x = self.x
         self.rect.y = self.y
@@ -68,7 +66,7 @@ class RectLabel(pygame.sprite.Sprite, Components):
     def draw(self, surface: pygame.Surface):
         surface.blit(self.image, self.rect)
 
-    def change_color(self, color: Tuple[int, ...]):
+    def change_color(self, color: Tuple[int, int, int]):
         self.background = color
         self._render()
 
@@ -79,24 +77,12 @@ class RectLabel(pygame.sprite.Sprite, Components):
         else:
             raise Exception("File not found!")
 
-    def change_rect(self, rect: pygame.Rect, width: int=0):
+    def change_rect(self, rect: pygame.Rect, outer_width: int=0):
         self.rect = rect
-        self.width = width
+        self.outer_width = outer_width
         self._render()
 
     def change_pos(self, x: int, y: int):
-        self.x = x
-        self.y = y
+        self.x(x)
+        self.y(y)
         self._render()
-
-    def get_height(self):
-        return self.height
-
-    def get_width(self):
-        return self.width
-
-    def get_x(self):
-        return self.x
-
-    def get_y(self):
-        return self.y
