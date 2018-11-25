@@ -1,6 +1,7 @@
-# Ignore virtual environments, tox files, and
+# Ignore virtual environments, tox files
 **/venv/**
 **/.idea/**
+**/.vscode/**
 **/.tox/**
 **/codeEnv/**
 
