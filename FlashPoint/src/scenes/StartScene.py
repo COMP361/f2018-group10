@@ -16,8 +16,8 @@ class StartScene(Scene):
         self._init_log_box()
         self._init_text_box(342, 250, "Username:")
         self._init_text_box(342, 334, "Password:")
-        self._init_text_bar(500, 250, 400,32)
-        self._init_text_bar(500, 334, 400,32)
+        self._init_text_bar(500, 250, 400, 32)
+        self._init_text_bar(500, 334, 400, 32)
         self._init_btn_login(594, 436, "Login")
         self._init_btn_register(791, 436, "Register")
 
@@ -49,8 +49,6 @@ class StartScene(Scene):
 
         self.sprite_grp.add(self.buttonRegister)
 
-    def _init_text_bar(self,x_pos,y_pos,width,height):
-        input_box1 = InputBox(x=x_pos, y=y_pos, w= width, h= height)
+    def _init_text_bar(self, x_pos, y_pos, width, height):
+        input_box1 = InputBox(x=x_pos, y=y_pos, w=width, h=height)
         self.sprite_grp.add(input_box1)
-
-

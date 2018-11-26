@@ -4,8 +4,8 @@ from src.core.EventQueue import EventQueue
 
 class InputBox(pg.sprite.Sprite):
 
-    def __init__(self, *group, x=0, y=0, w=0, h=0, text=''):
-        super().__init__(*group)
+    def __init__(self, *sprites, x=0, y=0, w=0, h=0, text=''):
+        super().__init__(*sprites)
         self.COLOR_INACTIVE = pg.Color('lightskyblue3')
         self.COLOR_ACTIVE = pg.Color('dodgerblue2')
         self.FONT = pg.font.Font(None, 32)
