@@ -1,7 +1,7 @@
 import pygame
 
 from src.game_elements.game_board.GameBoard import GameBoard
-
+from src.game_state.PlayerState import PlayerState
 
 class GameBoardScene(object):
     """Scene for displaying the main game view"""

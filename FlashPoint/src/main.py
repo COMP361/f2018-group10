@@ -6,7 +6,6 @@ import src.constants.Color as Color
 import src.constants.MainConstants as MainConst
 from src.scenes.GameBoardScene import GameBoardScene
 
-
 class Main(object):
     """Class for running the main game loop and maintaining game state."""
 
@@ -27,6 +26,7 @@ class Main(object):
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     sys.exit()
+
 
             # Clear the screen to black
             self.screen.fill(Color.BLACK)
