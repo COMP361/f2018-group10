@@ -2,6 +2,8 @@ from typing import Optional
 
 import pygame
 
+from src.core.EventQueue import EventQueue
+
 
 class Scene(pygame.sprite.Group):
     """
@@ -24,15 +26,9 @@ class Scene(pygame.sprite.Group):
         self.sprite_grp.draw(screen)
         self.enabled = True
 
-    def update(self):
+    def update(self, event_queue: EventQueue):
         if self.enabled:
-            self.sprite_grp.update()
-
-    def add(self, *sprites):
-        self.sprite_grp.add(*sprites)
-
-    def remove(self, *sprites):
-        self.sprite_grp.remove(*sprites)
+            self.sprite_grp.update(event_queue)
 
     @property
     def resolution(self):

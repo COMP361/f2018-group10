@@ -1,7 +1,5 @@
 from typing import Tuple, Optional, Union
 
-import pygame
-
 from src.Windows.UIComponents.Text import Text
 from src.Windows.UIComponents.EllipseLabel import EllipseLabel
 from src.Windows.UIComponents.Interactable import Interactable

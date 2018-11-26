@@ -1,5 +1,6 @@
 import pygame
 
+from src.core.EventQueue import EventQueue
 from src.game_elements.game_board.GameBoard import GameBoard
 
 
@@ -15,6 +16,6 @@ class GameBoardScene(object):
         """Draw all currently active sprites."""
         self.game_board.draw(self.screen)
 
-    def update(self):
+    def update(self, event_queue: EventQueue):
         """Call the update() function of everything in this class."""
-        self.game_board.update()
+        self.game_board.update(event_queue)
