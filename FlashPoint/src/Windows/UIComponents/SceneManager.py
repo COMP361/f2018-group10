@@ -6,6 +6,7 @@ from src.scenes.JoinScene import JoinScene
 from src.scenes.StartScene import StartScene
 from src.scenes.Game_Intial_Menu import CreateGameMenu
 from src.core.EventQueue import EventQueue
+from src.scenes.characterScene import CharacterScene
 
 
 class SceneManager(object):
@@ -52,6 +53,8 @@ class SceneManager(object):
 
         if isinstance(self._active_scene, CreateGameMenu):
             self._active_scene.buttonBack.on_click(self.next, HostJoinScene)
+        if isinstance(self._active_scene, CreateGameMenu):
+            self._active_scene.buttonRegister.on_click(self.next, CharacterScene)
 
     def draw(self):
         self._active_scene.draw(self.screen)
