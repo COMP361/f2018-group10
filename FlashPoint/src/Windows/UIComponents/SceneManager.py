@@ -46,6 +46,7 @@ class SceneManager(object):
 
         if isinstance(self._active_scene, JoinScene):
             self._active_scene.buttonBack.on_click(self.next, HostJoinScene)
+            self._active_scene.button.on_click(self.next, CharacterScene)
 
         if isinstance(self._active_scene, HostMenuScene):
             self._active_scene.buttonBack.on_click(self.next, HostJoinScene)
@@ -53,8 +54,9 @@ class SceneManager(object):
 
         if isinstance(self._active_scene, CreateGameMenu):
             self._active_scene.buttonBack.on_click(self.next, HostJoinScene)
-        if isinstance(self._active_scene, CreateGameMenu):
             self._active_scene.buttonRegister.on_click(self.next, CharacterScene)
+        if isinstance(self._active_scene, CharacterScene):
+            self._active_scene.buttonBack.on_click(self.next, CreateGameMenu)  # fix to lobby
 
     def draw(self):
         self._active_scene.draw(self.screen)

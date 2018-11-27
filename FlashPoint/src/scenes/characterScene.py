@@ -6,6 +6,7 @@ from src.Windows.UIComponents.RectButton import RectButton
 from src.Windows.UIComponents.RectLabel import RectLabel
 
 from src.Windows.UIComponents.Scene import Scene
+from src.Windows.UIComponents.Text import Text
 
 
 class CharacterScene(Scene):
@@ -36,6 +37,8 @@ class CharacterScene(Scene):
         self.create_butn_img(850, 450, 98, 150,
                              "media/rescue.png")
 
+        self._init_btn_back(100, 100, "Back")
+
     def create_butn_img(self, x, y, width, height, path):
         box_size = (width, height)
         self.this_img = RectButton(x, y, box_size[0], box_size[1], path)
@@ -48,3 +51,9 @@ class CharacterScene(Scene):
         y_pos = self.resolution[1] / 2 - box_size[1] / 2
         log_box = RectLabel(x_pos, y_pos, box_size[0], box_size[1], Color.BLACK)
         self.sprite_grp.add(log_box)
+
+    def _init_btn_back(self, x_pos, y_pos, text):
+        box_size = (130, 48)
+        self.buttonBack = RectButton(x_pos, y_pos, box_size[0], box_size[1], Color.BLUE, 0,
+                                     Text(pygame.font.SysFont('Arial', 20), text, (0, 255, 0, 0)))
+        self.sprite_grp.add(self.buttonBack)
