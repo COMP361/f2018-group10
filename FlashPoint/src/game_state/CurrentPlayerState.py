@@ -5,6 +5,7 @@ from pygame.surface import SurfaceType
 
 import src.constants.Color as Color
 from src.Windows.UIComponents.Text import Text
+from src.core.EventQueue import EventQueue
 
 
 class CurrentPlayerState(pygame.sprite.Sprite):
@@ -48,23 +49,7 @@ class CurrentPlayerState(pygame.sprite.Sprite):
 
 
 
-    def update(self):
-
-             #   self.is_hovered = True
-            #    self.image.fill(Color.CYAN)
-           #     #self.image.blit(self.text, self.text.get_rect())
-          #      self.image.blit(self.text_AP, self.AP_rect)
-         #       self.image.blit(self.text_SAP, self.SAP_rect)
-        #        pygame.draw.rect(self.image, Color.RED, self.image.get_rect(), 2)
-
-
-       # else:
-        #    self.image.fill(Color.BLUE)
-         #   self.image.blit(self.text, self.P_rect)
-          #  #self.image.blit(self.text_AP, self.AP_rect)
-           # self.is_hovered = False
-
-
+    def update(self,event_queue: EventQueue):
         self.image.fill(Color.GREEN)
         self.image.blit(self.text, self.P_rect)
         self.image.blit(self.text_AP, self.AP_rect)

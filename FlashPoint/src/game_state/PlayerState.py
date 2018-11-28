@@ -5,6 +5,7 @@ from pygame.surface import SurfaceType
 
 import src.constants.Color as Color
 from src.Windows.UIComponents.Text import Text
+from src.core.EventQueue import EventQueue
 
 
 class PlayerState(pygame.sprite.Sprite):
@@ -49,7 +50,7 @@ class PlayerState(pygame.sprite.Sprite):
 
 
 
-    def update(self):
+    def update(self, event_queue: EventQueue):
         if self.check_mouse_over():
             if not self.is_hovered:
                 self.is_hovered = True

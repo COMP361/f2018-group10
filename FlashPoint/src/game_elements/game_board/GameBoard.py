@@ -9,8 +9,8 @@ class GameBoard(pygame.sprite.Group):
     """Wrapper class for the Grid class. Contains methods specific for user interfacing."""
     def __init__(self):
         super().__init__()
-        self.image = pygame.Surface((MainConst.SCREEN_RESOLUTION[0]*2/3, MainConst.SCREEN_RESOLUTION[1]*0.8))
-        self.rect = self.image.get_rect().move((400, 100))
+        self.image = pygame.Surface((MainConst.SCREEN_RESOLUTION[0], MainConst.SCREEN_RESOLUTION[1]))
+        self.rect = self.image.get_rect()
         self.grid = Grid(x_coord=self.rect.left, y_coord=self.rect.top)
         self.add(self.grid)
 

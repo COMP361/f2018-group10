@@ -1,5 +1,7 @@
 import pygame
 import src.constants.Color as Color
+from src.core.EventQueue import EventQueue
+
 
 class VictimSaved(pygame.sprite.Sprite):
 
@@ -28,7 +30,7 @@ class VictimSaved(pygame.sprite.Sprite):
         self.max_rect = self.text_max.get_rect()
         self.max_rect.move_ip(100, 40)
 
-    def update(self):
+    def update(self, event_queue: EventQueue):
 
         self.image.fill(Color.GREEN)
         self.image.blit(self.text_name, self.name_rect)

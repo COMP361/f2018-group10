@@ -1,5 +1,6 @@
 import pygame
 
+from src.core.EventQueue import EventQueue
 from src.game_elements.game_board.GameBoard import GameBoard
 from src.game_state.PlayerState import PlayerState
 from src.game_state.CurrentPlayerState import CurrentPlayerState
@@ -21,7 +22,6 @@ class GameBoardScene(object):
         self._init_sprites()
 
     def _init_sprites(self):
-        self.active_sprites.add(GameBoard())
         self.active_sprites.add(PlayerState(0, 50, "Tim",Color.CYAN))
         self.active_sprites.add(PlayerState(0, 114, "Nuri",Color.GREEN))
         self.active_sprites.add(PlayerState(0, 178, "Francis",Color.WHITE))
@@ -33,12 +33,12 @@ class GameBoardScene(object):
         self.active_sprites.add(VictimSaved(626, 612))
         self.active_sprites.add(VictimDead(853, 612))
 
-    def draw(self):
+    def draw(self,screen: pygame.display):
         """Draw all currently active sprites."""
         self.game_board.draw(self.screen)
         self.active_sprites.draw(self.screen)
 
-    def update(self):
+    def update(self, event_queue: EventQueue):
         """Call the update() function of everything in this class."""
-        self.game_board.update()
-        self.active_sprites.update()
+        self.game_board.update(event_queue)
+        self.active_sprites.update(event_queue)

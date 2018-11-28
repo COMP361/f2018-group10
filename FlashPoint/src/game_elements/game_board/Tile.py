@@ -53,6 +53,6 @@ class Tile(pygame.sprite.Sprite):
                 self.mouse_rect.move_ip(movement)
         self._mouse_pos = current_mouse_pos
 
-    def update(self):
+    def update(self,event_queue):
         self._scroll()
         self._highlight()

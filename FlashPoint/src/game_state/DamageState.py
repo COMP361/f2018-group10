@@ -1,5 +1,7 @@
 import pygame
 import src.constants.Color as Color
+from src.core.EventQueue import EventQueue
+
 
 class DamageState(pygame.sprite.Sprite):
 
@@ -10,7 +12,7 @@ class DamageState(pygame.sprite.Sprite):
         self.font_other = pygame.font.SysFont('Arial', 25)
         self.name = "Damage: "
         self.current = str(5)
-        self.max = str(27)
+        self.max = str(24)
         self.slash = "/"
         self.text_name = self.font_name.render(self.name, True, (0, 0, 0))
         self.text_current = self.font_other.render(self.current, True, (0, 0, 0))
@@ -28,7 +30,7 @@ class DamageState(pygame.sprite.Sprite):
         self.max_rect = self.text_max.get_rect()
         self.max_rect.move_ip(100, 40)
 
-    def update(self):
+    def update(self,event_queue: EventQueue):
 
         self.image.fill(Color.GREEN)
         self.image.blit(self.text_name, self.name_rect)
