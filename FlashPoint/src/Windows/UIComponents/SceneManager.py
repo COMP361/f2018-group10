@@ -7,6 +7,7 @@ from src.scenes.StartScene import StartScene
 from src.scenes.Game_Intial_Menu import CreateGameMenu
 from src.core.EventQueue import EventQueue
 from src.scenes.characterScene import CharacterScene
+from src.scenes.LobbyScene import LobbyScene
 
 
 class SceneManager(object):
@@ -46,7 +47,7 @@ class SceneManager(object):
 
         if isinstance(self._active_scene, JoinScene):
             self._active_scene.buttonBack.on_click(self.next, HostJoinScene)
-            self._active_scene.button.on_click(self.next, CharacterScene)
+            self._active_scene.button.on_click(self.next, LobbyScene)
 
         if isinstance(self._active_scene, HostMenuScene):
             self._active_scene.buttonBack.on_click(self.next, HostJoinScene)
@@ -54,10 +55,12 @@ class SceneManager(object):
 
         if isinstance(self._active_scene, CreateGameMenu):
             self._active_scene.buttonBack.on_click(self.next, HostJoinScene)
-            self._active_scene.buttonRegister.on_click(self.next, CharacterScene)
+            self._active_scene.buttonRegister.on_click(self.next, LobbyScene)
         if isinstance(self._active_scene, CharacterScene):
-            self._active_scene.buttonBack.on_click(self.next, CreateGameMenu)  # fix to lobby
-
+            self._active_scene.buttonBack.on_click(self.next, LobbyScene)
+        if isinstance(self._active_scene, LobbyScene):
+            self._active_scene.buttonLogin.on_click(self.next, CharacterScene)
+            self._active_scene.buttonBack.on_click(self.next, HostJoinScene)
 
     def draw(self):
         self._active_scene.draw(self.screen)
