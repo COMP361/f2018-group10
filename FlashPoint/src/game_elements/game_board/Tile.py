@@ -16,7 +16,6 @@ class Tile(pygame.sprite.Sprite):
         self.rect = self.image.get_rect().move(x_offset, y_offset)
         self.mouse_rect = pygame.Rect(self.rect).move(x, y)
         self.is_hovered = False
-        self.character_place = CharacterSprite()
 
         self._render()
         self._mouse_pos = (0, 0)  # For keeping track of previous location.
@@ -64,16 +63,17 @@ class Tile(pygame.sprite.Sprite):
                 self.sprite_grp.remove(some_character)
 
     def find_character(self):
-        for sprites in self.sprite_grp:
-            if isinstance(sprites, CharacterSprite):
-                return sprites
+        for sprite in self.sprite_grp:
+            if isinstance(sprite, CharacterSprite):
+                return sprite
 
-    def draw_the_character(self):
-        self.sprite_grp.add(self.character_place)
+    def draw(self, screen: pygame.Surface):
+        self._highlight()
+        self.sprite_grp.draw(self.image)
+        screen.blit(self.image, self.rect)
 
     def update(self, event_queue):
-        self._scroll()
-        self._highlight()
         self.sprite_grp.update(event_queue)
+        self._scroll()
 
 

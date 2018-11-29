@@ -44,7 +44,7 @@ class GameBoardScene(object):
     def update(self, event_queue: EventQueue):
         """Call the update() function of everything in this class."""
         self.game_board.update(event_queue)
-        self.game_board.extra_update(event_queue)
+        self.game_board.update(event_queue)
         self.active_sprites.update(event_queue)
 
     def _init_text(self):

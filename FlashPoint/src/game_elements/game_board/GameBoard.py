@@ -2,6 +2,7 @@ import pygame
 
 import src.constants.Color as Color
 import src.constants.MainConstants as MainConst
+from src.game_elements.game_board.Character_sprite import CharacterSprite
 from src.game_elements.game_board.Grid import Grid
 from src.core.EventQueue import EventQueue
 
@@ -22,18 +23,16 @@ class GameBoard(pygame.sprite.Group):
         self.grid.draw(self.image)
         screen.blit(self.image, self.rect)
 
-    def extra_update(self, event_q: EventQueue):
-
+    def update(self, event_q: EventQueue):
         for event in event_q:
             if event.type == pygame.MOUSEBUTTONUP:
-
                 for tile in self.grid:
 
                     if tile.check_mouse_over():
-                        tile.draw_the_character()
-
+                        tile.sprite_grp.add(CharacterSprite())
 
                     else:
                         some_sprite = tile.find_character()
                         tile.remove_sprite_character(some_sprite)
 
+        self.grid.update(event_q)
