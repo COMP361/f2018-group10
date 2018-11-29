@@ -60,6 +60,7 @@ class Tile(pygame.sprite.Sprite):
     def update(self, event_queue):
         self._scroll()
         self._highlight()
+        self.sprite_grp.update(event_queue)
 
     def remove_sprite_character(self, some_character):
         for sprite in self.sprite_grp:

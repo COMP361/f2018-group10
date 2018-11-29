@@ -32,6 +32,7 @@ class GameBoard(pygame.sprite.Group):
                     if tile.check_mouse_over():
                         if some_sprite is not None:
                             tile.sprite_grp.add(some_sprite)
+
                         else:
                             tile.draw()
 
