@@ -56,7 +56,9 @@ class ChatBox:
             self.messages.append(self.chat_textbox.message)
             self.chat_textbox.message = ''
 
-            self._init_message_box(message)
+            self._init_message_box()
+
+        self.chat_textbox.rect.w = self.chat_history_bg.rect.w
 
     def draw(self, screen):
         #self.group.draw(screen)
@@ -66,24 +68,19 @@ class ChatBox:
         screen.blit(self.chat_history_bg.image, self.chat_history_bg.rect)
         self.chat_textbox.draw(screen)
 
-    def _init_message_box(self, new_message: str):
-        box_height = TEXT_BOX_FONT_SIZE + 2
+    def _init_message_box(self):
         message_box_x = self.offset
         message_box_w = self.chat_history_bg.rect.w - 2 * self.offset
-        message_box_h = box_height
+        message_box_h = TEXT_BOX_FONT_SIZE + 2
         chat_hist_bottom = self.chat_history_bg.rect.h
-        # new_message_box = RectLabel(message_box_x, new_message_box_y, message_box_w, message_box_h,
-        #                             background=Color.GREY, txt_pos=Text.Position.RIGHT,
-        #                             txt_obj=Text(font=pg.font.SysFont("Arial", TEXT_BOX_FONT_SIZE - 2), text=new_message))
 
-        max_messages = math.floor(self.chat_history_bg.rect.h/box_height)
+        max_messages = math.floor(self.chat_history_bg.rect.h/message_box_h)
         count = 0
-        # self.messages.reverse()
         self.chat_history = []
 
         for old_message in reversed(self.messages):
             if count < max_messages:
-                message_box_y = chat_hist_bottom - (box_height * (count+1))
+                message_box_y = chat_hist_bottom - (message_box_h * (count+1))
                 old_message_box = RectLabel(message_box_x, message_box_y, message_box_w, message_box_h,
                                     background=Color.GREY, txt_pos=Text.Position.RIGHT,
                                     txt_obj=Text(font=pg.font.SysFont("Arial", TEXT_BOX_FONT_SIZE - 2),
@@ -94,46 +91,3 @@ class ChatBox:
 
             else:
                 break
-
-        # self.chat_history.append(new_message_box)
-
-
-
-        # message_box_x = self.offset
-        # message_box_y = self.chat_history_bg.rect.h - TEXT_BOX_FONT_SIZE - 2
-        # message_box_w = self.chat_history_bg.rect.w - 2 * self.offset
-        # message_box_h = box_height
-        # new_message_box = RectLabel(message_box_x, message_box_y, message_box_w, message_box_h, background=Color.GREY,
-        #                         txt_obj=Text(font=pg.font.SysFont("Arial", TEXT_BOX_FONT_SIZE - 2), text=message),
-        #                         txt_pos=Text.Position.RIGHT)
-
-
-
-# def main():
-#     clock = pg.time.Clock()
-#     input_box1 = InputBox(100, 100, 140, 32)
-#     input_box2 = InputBox(100, 300, 140, 32)
-#     input_boxes = [input_box1, input_box2]
-#     done = False
-#
-#     while not done:
-#         for event in pg.event.get():
-#             if event.type == pg.QUIT:
-#                 done = True
-#             for box in input_boxes:
-#                 box.handle_event(event)
-#
-#         for box in input_boxes:
-#             box.update()
-#
-#         screen.fill((30, 30, 30))
-#         for box in input_boxes:
-#             box.draw(screen)
-#
-#         pg.display.flip()
-#         clock.tick(30)
-
-
-# if __name__ == '__main__':
-#     main()
-#     pg.quit()
