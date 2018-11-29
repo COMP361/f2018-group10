@@ -47,7 +47,7 @@ class GameBoardScene(object):
         return btn
 
     def _click_action(self):
-        menu = MenuWindow([self.active_sprites], 500, 500, (100, 100))
+        menu = MenuWindow([self.active_sprites, self.game_board], 500, 500, (100, 100))
         menu.add_component(PlayerState(0, 242, "Haw", Color.YELLOW))
         self.menu = menu
 
