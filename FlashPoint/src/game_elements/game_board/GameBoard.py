@@ -22,17 +22,18 @@ class GameBoard(pygame.sprite.Group):
         self.grid.draw(self.image)
         screen.blit(self.image, self.rect)
 
-    def update(self, event_q: EventQueue):
+    def extra_update(self, event_q: EventQueue):
+
         for event in event_q:
             if event.type == pygame.MOUSEBUTTONUP:
-                for tile in self:
-                    some_sprite = tile.find_character()
-                    tile.remove_sprite_character(some_sprite)
+
+                for tile in self.grid:
 
                     if tile.check_mouse_over():
-                        if some_sprite is not None:
-                            tile.sprite_grp.add(some_sprite)
+                        tile.draw_the_character()
 
-                        else:
-                            tile.draw()
+
+                    else:
+                        some_sprite = tile.find_character()
+                        tile.remove_sprite_character(some_sprite)
 

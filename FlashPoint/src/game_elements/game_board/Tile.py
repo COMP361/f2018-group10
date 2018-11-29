@@ -1,7 +1,7 @@
 import pygame
 
 import src.constants.Color as Color
-from src.game_elements.game_board.Character_sprite import character_sprite
+from src.game_elements.game_board.Character_sprite import CharacterSprite
 
 
 
@@ -16,7 +16,7 @@ class Tile(pygame.sprite.Sprite):
         self.rect = self.image.get_rect().move(x_offset, y_offset)
         self.mouse_rect = pygame.Rect(self.rect).move(x, y)
         self.is_hovered = False
-        self.character_place = character_sprite()
+        self.character_place = CharacterSprite()
 
         self._render()
         self._mouse_pos = (0, 0)  # For keeping track of previous location.
@@ -57,21 +57,23 @@ class Tile(pygame.sprite.Sprite):
                 self.mouse_rect.move_ip(movement)
         self._mouse_pos = current_mouse_pos
 
+    def remove_sprite_character(self, some_character):
+        for sprite in self.sprite_grp:
+            if isinstance(sprite, CharacterSprite) and sprite == some_character:
+                ##Takes care of not taking out other characters as well
+                self.sprite_grp.remove(some_character)
+
+    def find_character(self):
+        for sprites in self.sprite_grp:
+            if isinstance(sprites, CharacterSprite):
+                return sprites
+
+    def draw_the_character(self):
+        self.sprite_grp.add(self.character_place)
+
     def update(self, event_queue):
         self._scroll()
         self._highlight()
         self.sprite_grp.update(event_queue)
 
-    def remove_sprite_character(self, some_character):
-        for sprite in self.sprite_grp:
-            if isinstance(sprite, character_sprite) and sprite == some_character:
-                ##Takes care of not taking out other characters as well
-                self.sprite_grp.remove(some_character)
 
-    def draw(self):
-        self.sprite_grp.add(self.character_place)
-
-    def find_character(self):
-        for sprites in self.sprite_grp:
-            if isinstance(sprites, character_sprite):
-                return sprites
