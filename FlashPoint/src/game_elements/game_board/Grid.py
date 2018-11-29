@@ -10,7 +10,7 @@ class Grid(pygame.sprite.Group):
     """Class to Group Tile objects together, and implement Grid logic in to what will form the GameBoard."""
     def __init__(self, *sprites: pygame.sprite.Sprite,
                  x_coord: int, y_coord: int,
-                 tile_size: int=128, tiles_x: int=12, tiles_y: int=8,):
+                 tile_size: int=128, tiles_x: int=12, tiles_y: int=8):
         super().__init__(*sprites)
         self.height = tiles_y
         self.width = tiles_x

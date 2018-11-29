@@ -1,22 +1,16 @@
 import pygame
 import datetime
-import time
 import src.constants.Color as Color
 from src.core.EventQueue import EventQueue
 
 
 class TimeBar(pygame.sprite.Sprite):
 
-    def __init__(self, x: int, y: int) :
+    def __init__(self, x: int, y: int):
         super().__init__()
         self.image = pygame.Surface([1280, 50])
         self.rect = self.image.get_rect()
         self.rect.move_ip(x, y)
-
-
-
-
-
 
     def update(self,event_queue: EventQueue):
         self.image.fill(Color.GREEN)
@@ -28,5 +22,3 @@ class TimeBar(pygame.sprite.Sprite):
         text_rect.move_ip(500,0)
         self.image.blit(text,text_rect)
         #pygame.draw.rect(self.image, Color.RED, self.image.get_rect(), 2)
-
-

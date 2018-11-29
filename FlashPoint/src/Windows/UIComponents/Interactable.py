@@ -1,4 +1,4 @@
-from typing import Optional, Callable, Mapping
+from typing import Callable
 
 import pygame
 
@@ -26,9 +26,9 @@ class Interactable(pygame.sprite.Sprite):
         :param rect: Rect area of the component
         """
         pygame.sprite.Sprite.__init__(self)
-        self._isHover = False
+        self._is_hover = False
         self._clicked = False
-        self._isEnabled = True
+        self._is_enabled = True
         self._rect = rect
         self._click_action = None
         self._click_args = None
@@ -47,7 +47,7 @@ class Interactable(pygame.sprite.Sprite):
 
         if rect.x+rect.w > mouse[0] > rect.x and rect.y+rect.h > mouse[1] > rect.y:
             # Only executes the hover function when the mouse is first moved into the button
-            if not self._isHover:
+            if not self._is_hover:
                 self.hover()
 
             for event in event_queue:
@@ -67,7 +67,7 @@ class Interactable(pygame.sprite.Sprite):
         Defines the click event
         :return:
         """
-        if self._isEnabled:
+        if self._is_enabled:
             if isinstance(self._click_action, Callable):
                 self._click_action(*self._click_args, **self._click_kwargs)
 
@@ -76,34 +76,34 @@ class Interactable(pygame.sprite.Sprite):
         Defines the hover event
         :return:
         """
-        if self._isEnabled and not self._isHover:
+        if self._is_enabled and not self._is_hover:
             if isinstance(self._hover_action, Callable):
                 self._hover_action(*self._hover_args, **self._hover_kwargs)
-                self._isHover = True
+                self._is_hover = True
 
     def exit_hover(self):
         """
         Defines the off hover event
         :return:
         """
-        if self._isEnabled and self._isHover:
+        if self._is_enabled and self._is_hover:
             if isinstance(self._off_hover_action, Callable):
                 self._off_hover_action(*self._off_hover_args, **self._off_hover_kwargs)
-                self._isHover = False
+                self._is_hover = False
 
     def enable(self):
         """
         Enables the event hook
         :return:
         """
-        self._isEnabled = True
+        self._is_enabled = True
 
     def disable(self):
         """
         Disables the event hook
         :return:
         """
-        self._isEnabled = False
+        self._is_enabled = False
 
     def on_click(self, click_action: Callable, *args, **kwargs):
         """

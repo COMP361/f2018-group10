@@ -10,7 +10,7 @@ from src.core.EventQueue import EventQueue
 
 class PlayerState(pygame.sprite.Sprite):
 
-    def __init__(self,x: int, y: int, name: str,color: Color):
+    def __init__(self, x: int, y: int, name: str,color: Color):
         super().__init__()
         self.image = pygame.Surface([64*2, 64])
         self.font_name = pygame.font.SysFont('Arial', 30)
@@ -38,7 +38,6 @@ class PlayerState(pygame.sprite.Sprite):
     #def _render(self):
     #   self.image.fill(Color.GREY, self.rect)
 
-
     def check_mouse_over(self):
         mouse = pygame.mouse.get_pos()
         rect = self.rect
@@ -47,8 +46,6 @@ class PlayerState(pygame.sprite.Sprite):
         y_max = rect.y + rect.h
         y_min = rect.y
         return x_max > mouse[0] > x_min and y_max > mouse[1] > y_min
-
-
 
     def update(self, event_queue: EventQueue):
         if self.check_mouse_over():
@@ -59,7 +56,6 @@ class PlayerState(pygame.sprite.Sprite):
                 self.image.blit(self.text_AP, self.AP_rect)
                 self.image.blit(self.text_SAP, self.SAP_rect)
                 pygame.draw.rect(self.image, Color.RED, self.image.get_rect(), 2)
-
 
         else:
             self.image.fill(self.color)

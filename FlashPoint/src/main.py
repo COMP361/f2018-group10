@@ -31,7 +31,6 @@ class Main(object):
                 if event.type == pygame.QUIT:
                     sys.exit()
 
-
             # Clear the screen to black
             self.screen.fill(Color.BLACK)
 

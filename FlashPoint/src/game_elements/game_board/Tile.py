@@ -1,6 +1,7 @@
 import pygame
 
 import src.constants.Color as Color
+from src.core.EventQueue import EventQueue
 
 
 class Tile(pygame.sprite.Sprite):
@@ -12,7 +13,6 @@ class Tile(pygame.sprite.Sprite):
         self.rect = self.image.get_rect().move(x_offset, y_offset)
         self.mouse_rect = pygame.Rect(self.rect).move(x, y)
         self.is_hovered = False
-
         self._render()
         self._mouse_pos = (0, 0)     # For keeping track of previous location.
         self.is_scrolling = False
@@ -53,6 +53,6 @@ class Tile(pygame.sprite.Sprite):
                 self.mouse_rect.move_ip(movement)
         self._mouse_pos = current_mouse_pos
 
-    def update(self,event_queue):
+    def update(self, event_queue: EventQueue):
         self._scroll()
         self._highlight()

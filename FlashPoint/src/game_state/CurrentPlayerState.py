@@ -47,8 +47,6 @@ class CurrentPlayerState(pygame.sprite.Sprite):
     #     y_min = rect.y
     #     return x_max > mouse[0] > x_min and y_max > mouse[1] > y_min
 
-
-
     def update(self,event_queue: EventQueue):
         self.image.fill(Color.GREEN)
         self.image.blit(self.text, self.P_rect)
