@@ -11,6 +11,9 @@ from src.game_state.VictimDead import VictimDead
 
 
 import src.constants.Color as Color
+from src.Windows.UIComponents.RectButton import RectButton
+from src.Windows.UIComponents.Text import Text
+
 
 class GameBoardScene(object):
     """Scene for displaying the main game view"""
@@ -42,3 +45,9 @@ class GameBoardScene(object):
         """Call the update() function of everything in this class."""
         self.game_board.update(event_queue)
         self.active_sprites.update(event_queue)
+
+    def _init_text(self):
+        self.start_pos = RectButton(500, 40, 400, 50, Color.BLACK, 0,
+                                    Text(pygame.font.SysFont('Arial', 35), "Choose Starting Position", (0, 255, 0, 0)))
+        self.active_sprites.add(self.start_pos)
+
