@@ -34,9 +34,9 @@ class Tile(pygame.sprite.Sprite):
         if self._check_mouse_over():
             if not self.is_hovered:
                 self.is_hovered = True
-                self.image.fill(Color.YELLOW.value)
+                self.image.fill(Color.YELLOW)
         else:
-            self.image.fill(Color.GREY.value)
+            self.image.fill(Color.GREY)
             self.is_hovered = False
 
     def _scroll(self):
@@ -53,6 +53,6 @@ class Tile(pygame.sprite.Sprite):
                 self.mouse_rect.move_ip(movement)
         self._mouse_pos = current_mouse_pos
 
-    def update(self):
+    def update(self,event_queue):
         self._scroll()
         self._highlight()

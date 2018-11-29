@@ -1,12 +1,10 @@
 import sys
 
-# If PyCharm is issuing warnings on pygame methods, suppress it. it's a bug with PyCharm
 import pygame
 
 import src.constants.Color as Color
 import src.constants.MainConstants as MainConst
-from src.Windows.UIComponents.SceneManager import SceneManager
-from src.core.EventQueue import EventQueue
+from src.scenes.GameBoardScene import GameBoardScene
 
 class Main(object):
     """Class for running the main game loop and maintaining game state."""
@@ -16,18 +14,16 @@ class Main(object):
         pygame.display.set_caption(MainConst.WINDOW_TITLE)
         self.screen = pygame.display.set_mode(MainConst.SCREEN_RESOLUTION)
         self.clock = pygame.time.Clock()
-        self.scene_manager = SceneManager(self.screen)
-        self.event_queue = EventQueue()
+        self.current_scene = GameBoardScene(self.screen)
 
     def main(self):
-        # Run main loop
+        # Run main game loop
         while True:
             # Lock frame rate at 60 FPS. Should only be called once per loop.
             self.clock.tick(60)
-            self.event_queue.fill_queue()
-            self.screen.fill(Color.BLACK)
-
-            for event in self.event_queue:
+            
+            # Check events for if the user closed the window.
+            for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     sys.exit()
 
@@ -35,13 +31,12 @@ class Main(object):
             # Clear the screen to black
             self.screen.fill(Color.BLACK)
 
-            self.scene_manager.draw()
-            self.scene_manager.update(self.event_queue)
-
-            self.event_queue.flush_queue()
-
+            self.current_scene.update()
+            self.current_scene.draw()
+            # Flip double buffer
             pygame.display.flip()
 
 
+# Should only be used for debugging purposes
 if __name__ == '__main__':
     Main().main()
