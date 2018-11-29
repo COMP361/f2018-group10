@@ -24,7 +24,7 @@ class GameBoard(pygame.sprite.Group):
 
     def update(self, event_q: EventQueue):
         for event in event_q:
-            if event.type == pygame.event.MOUSEBUTTONUP:
+            if event.type == pygame.MOUSEBUTTONUP:
                 for tile in self:
                     some_sprite = tile.find_character()
                     tile.remove_sprite_character(some_sprite)
