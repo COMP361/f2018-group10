@@ -10,7 +10,7 @@ class InputBox(pg.sprite.Sprite):
     def __init__(self, *sprites, x=0, y=0, w=0, h=0, text=''):
         super().__init__(*sprites)
         self.COLOR_INACTIVE = Color.BLACK
-        self.COLOR_ACTIVE = Color.GREY
+        self.COLOR_ACTIVE = Color.WHITE
         self.FONT = pg.font.Font(None, TEXT_BOX_FONT_SIZE)
         self.color = self.COLOR_INACTIVE
         self.text = text

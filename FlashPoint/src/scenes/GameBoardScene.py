@@ -1,6 +1,6 @@
 import pygame
 
-from src.Windows.ChatBox.ChatBox import ChatBox
+from src.Windows.UIComponents.ChatBox import ChatBox
 from src.core.EventQueue import EventQueue
 from src.game_elements.game_board.GameBoard import GameBoard
 

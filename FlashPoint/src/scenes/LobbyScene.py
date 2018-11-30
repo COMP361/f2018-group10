@@ -7,11 +7,13 @@ from src.Windows.UIComponents.RectLabel import RectLabel
 from src.Windows.UIComponents.Text import Text
 from src.Windows.UIComponents.Scene import Scene
 from src.Windows.UIComponents.InputBox import InputBox
+from src.Windows.UIComponents.ChatBox import ChatBox
 
 
-class LobbyScene(Scene):
+class LobbyScene(object):
     def __init__(self, screen, game_type: bool):
-        Scene.__init__(self, screen)
+        self.resolution = (1280, 700)
+        self.sprite_grp = pygame.sprite.Group()
         self._init_background()
         self._init_text_box(100, 314, 100, 32, "Player1", Color.BLUE)
         self._init_text_box(400, 239, 100, 32, "Player2", Color.BLUE)
@@ -23,6 +25,7 @@ class LobbyScene(Scene):
         self._init_text_box(780, 89, 100, 150, "", Color.GREY)
         self._init_text_box(1080, 164, 100, 150, "", Color.GREY)
         self._init_text_box(565, 375, 150, 200, "", Color.GREY)
+        self.chat_box = ChatBox()
         self.is_experienced = game_type
 
         if game_type:
@@ -66,3 +69,11 @@ class LobbyScene(Scene):
         self.buttonBack = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
                                      Text(pygame.font.SysFont('Arial', 20), text, color_text))
         self.sprite_grp.add(self.buttonBack)
+
+    def draw(self, screen):
+        self.sprite_grp.draw(screen)
+        self.chat_box.draw(screen)
+
+    def update(self, event_queue):
+        self.sprite_grp.update(event_queue)
+        self.chat_box.update(event_queue)

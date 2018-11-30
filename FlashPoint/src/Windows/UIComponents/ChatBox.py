@@ -61,7 +61,6 @@ class ChatBox:
         self.chat_textbox.rect.w = self.chat_history_bg.rect.w
 
     def draw(self, screen):
-        #self.group.draw(screen)
         for message in self.chat_history:
             self.chat_history_bg.image.blit(message.image, message.rect)
 
