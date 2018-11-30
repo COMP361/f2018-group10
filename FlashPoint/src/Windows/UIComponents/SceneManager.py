@@ -6,7 +6,7 @@ from src.scenes.JoinScene import JoinScene
 from src.scenes.StartScene import StartScene
 from src.scenes.Game_Intial_Menu import CreateGameMenu
 from src.core.EventQueue import EventQueue
-from src.scenes.GameBoardScene import GameBoardScene
+
 
 class SceneManager(object):
     def __init__(self, screen: pygame.Surface):
@@ -15,10 +15,9 @@ class SceneManager(object):
         :param screen: should be the main display
         """
         self.screen = screen
-        self._active_scene = GameBoardScene(self.screen)
-        #self._active_scene = StartScene(self.screen)
-        #self._active_scene.buttonLogin.on_click(self.next, HostJoinScene)
-        #self._active_scene.buttonRegister.on_click(self.next, HostJoinScene)
+        self._active_scene = StartScene(self.screen)
+        self._active_scene.buttonLogin.on_click(self.next, HostJoinScene)
+        self._active_scene.buttonRegister.on_click(self.next, HostJoinScene)
 
     def next(self, next_scene: callable):
         """Switch to the next logical scene. args is assumed to be: [SceneClass]
