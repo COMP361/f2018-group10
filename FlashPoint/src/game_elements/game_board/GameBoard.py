@@ -28,7 +28,7 @@ class GameBoard(pygame.sprite.Group):
             if event.type == pygame.MOUSEBUTTONUP:
                 for tile in self.grid:
 
-                    if tile.check_mouse_over():
+                    if tile.hover():
                         tile.sprite_grp.add(CharacterSprite())
 
                     else:

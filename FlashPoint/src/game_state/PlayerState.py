@@ -4,15 +4,17 @@ import pygame
 from pygame.surface import SurfaceType
 
 import src.constants.Color as Color
+from src.Windows.UIComponents.Interactable import Interactable
 from src.Windows.UIComponents.Text import Text
 from src.core.EventQueue import EventQueue
 
 
-class PlayerState(pygame.sprite.Sprite):
 
-    def __init__(self,x: int, y: int, name: str,color: Color):
-        super().__init__()
-        self.image = pygame.Surface([64*2, 64])
+class PlayerState(Interactable):
+
+    def __init__(self, x: int, y: int, name: str,color: Color):
+        self.image = pygame.Surface([64 * 2, 64])
+        super().__init__(self.image.get_rect())
         self.font_name = pygame.font.SysFont('Arial', 30)
         self.font_other = pygame.font.SysFont('Arial', 13)
         self.name = name
@@ -38,20 +40,36 @@ class PlayerState(pygame.sprite.Sprite):
     #def _render(self):
     #   self.image.fill(Color.GREY, self.rect)
 
+    def hover(self):
+        if self._is_enabled:
+            mouse = pygame.mouse.get_pos()
+            rect = self.rect
+            x_max = rect.x + rect.w
+            x_min = rect.x
+            y_max = rect.y + rect.h
+            y_min = rect.y
+            return x_max > mouse[0] > x_min and y_max > mouse[1] > y_min
+        else: return False
 
-    def check_mouse_over(self):
-        mouse = pygame.mouse.get_pos()
-        rect = self.rect
-        x_max = rect.x + rect.w
-        x_min = rect.x
-        y_max = rect.y + rect.h
-        y_min = rect.y
-        return x_max > mouse[0] > x_min and y_max > mouse[1] > y_min
+    
 
+    def enable(self):
+        """
+        Enables the event hook
+        :return:
+        """
+        self._is_enabled = True
+
+    def disable(self):
+        """
+        Disables the event hook
+        :return:
+        """
+        self._is_enabled = False
 
 
     def update(self, event_queue: EventQueue):
-        if self.check_mouse_over():
+        if self.hover():
             if not self.is_hovered:
                 self.is_hovered = True
                 self.image.fill(Color.RED)
@@ -60,9 +78,9 @@ class PlayerState(pygame.sprite.Sprite):
                 self.image.blit(self.text_SAP, self.SAP_rect)
                 pygame.draw.rect(self.image, Color.RED, self.image.get_rect(), 2)
 
-
         else:
             self.image.fill(self.color)
             self.image.blit(self.text, self.P_rect)
             #self.image.blit(self.text_AP, self.AP_rect)
             self.is_hovered = False
+

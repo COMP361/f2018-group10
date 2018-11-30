@@ -8,6 +8,7 @@ import src.constants.MainConstants as MainConst
 from src.Windows.UIComponents.SceneManager import SceneManager
 from src.core.EventQueue import EventQueue
 
+
 class Main(object):
     """Class for running the main game loop and maintaining game state."""
 
@@ -30,7 +31,6 @@ class Main(object):
             for event in self.event_queue:
                 if event.type == pygame.QUIT:
                     sys.exit()
-
 
             # Clear the screen to black
             self.screen.fill(Color.BLACK)

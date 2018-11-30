@@ -1,110 +1,67 @@
-from typing import Tuple, Optional
+from typing import Tuple, List
 
 import pygame
 
-from src.Windows.UIComponents.Components import Components
+from src.Windows.UIComponents.Interactable import Interactable
+from src.core.EventQueue import EventQueue
 
 
 class MenuWindow(object):
 
-    SPACE_BETWEEN = 5
-
     """
-    Popup Menu class
+    Popup Menu class. Simply pass in a List of Groups you wish to disable. They must be composed of Interactable objects.
+    They will be disabled upon the instantiation of this object. They will be reenabled when either:
+        1) this object gets garbage collected
+        2) close() is called. (Delete this object()).
     """
     def __init__(self,
+                 buttons_to_disable: List[pygame.sprite.Group],
                  width: int,
-                 height: Optional[int]=0,
-                 def_position: Optional[Tuple[int, int]]=None,
-                 color: Tuple[int, ...] = (175, 175, 175, 0.5),
-                 padding: int=5):
+                 height: int,
+                 position: Tuple[int, int],
+                 bg_color: Tuple[int, int, int, int] = (175, 175, 175, 0.5),
+                 components: pygame.sprite.Group = None):
         """
         Constructor
         :param width: Width of the object
         :param height: Height of the object
-        :param def_position: Defined position for the object. Optional
+        :param position: Defined position for the object. Optional
         :param color: Background color of the object represented by an RGB tuple (Alpha optional)
-        :param padding: Padding for the menu
         """
-        self.grp = pygame.sprite.Group()
-        self.window = pygame.sprite.Sprite()
+        # Disable all buttons.
+        self.is_closed = True # Used to delete the menu from outside. Stupid python doesn't allow call-by-reference >:(
+        self._image = pygame.Surface((width, height))
+        self._bg_color = bg_color
+        self._rect = self._image.get_rect().move(position[0], position[1])
+        self._buttons_to_disable = buttons_to_disable
+        self._components: pygame.sprite.Group = components if components else pygame.sprite.Group()
+        self._open()
 
-        self.background = pygame.sprite.Sprite()
-        self.background.image = pygame.display.get_surface().copy()
-        self.background.image.fill(0, 0, 0)
-        self.background.image.set_alpha(120)
+    def add_component(self, component):
+        component.rect.move_ip(self._rect.x, self._rect.y)
+        self._components.add(component)
 
-        self.def_width = width
-        self.def_height = None
-        self.def_position = None
-        self.color = color
-        self.padding = padding
-        self.children = Tuple[Components]
-        self.is_open = False
-        self.screen_copy = None
+    def draw(self, screen):
+        # alpha = self._bg_color[3] if len(self._bg_color) == 4 else 100
+        self._image.fill(self._bg_color[0])
+        screen.blit(self._image, self._rect)
+        self._components.draw(screen)
 
-        self.window.x = 0
-        self.window.y = 0
-        if height:
-            self.window.height = height
-        if def_position:
-            self.def_position = def_position
+    def update(self, event_queue: EventQueue):
+        self._components.update(event_queue)
 
-    def update(self):
-        self.grp.draw(pygame.display.get_surface())
-        self.grp.update()
+    def _open(self):
+        """Disable all buttons under this window."""
+        self.is_closed = False
+        for group in self._buttons_to_disable:
+            for button in group:
+                if isinstance(button, Interactable):
+                    button.disable()
 
-    def toggle(self):
-        """
-        Toggles the popup menu
-        :return: void
-        """
-        main_display = pygame.display.get_surface()
-
-        if self.is_open:
-            self.grp.remove(self.window, self.background)
-            self.is_open = False
-        else:
-            # calculate the window's size
-            self.window.width = self.def_width
-            if self.def_height is None:
-                self.window.height = self.padding * 2
-                for child in self.children:
-                    self.window.height += child.get_height() + self.SPACE_BETWEEN
-            else:
-                self.window.height = self.def_height
-
-            if self.def_position is None:
-                self.window.x = main_display.get_width()/2 - self.window.width/2
-                self.window.y = main_display.get_height()/2 - self.window.height/2
-            else:
-                self.window.x = self.def_position[0]
-                self.window.y = self.def_position[1]
-
-            self.grp.add(self.background, self.window)
-
-            # draw the menu on screen
-            # menu_window = pygame.rect.Rect(self.x, self.y, width, height)
-            # pygame.draw.rect(main_display, self.color, menu_window)
-            self.is_open = True
-
-    # TODO: Finish the class. Not sure if I need to call update here or not...
-
-    def _render(self):
-        x = self.window.x + self.padding
-        y = self.window.y + self.padding
-        for child in self.children:
-            child.change_pos(x, y)
-            y += child.get_height + self.SPACE_BETWEEN
-
-    def add_child(self, child: Components, index: Optional[int]=None):
-        """
-        Adds component into the end of the menu, if index is defined, adds the child to the specified index.
-        :param child:
-        :param index:
-        :return:
-        """
-        if index is None:
-            self.children.append(child)
-        else:
-            self.children.insert(index, child)
+    def close(self):
+        """Reenable all buttons under this window, and delete this object."""
+        for group in self._buttons_to_disable:
+            for button in group:
+                if isinstance(button, Interactable):
+                    button.enable()
+        self.is_closed = True
