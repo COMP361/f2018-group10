@@ -3,6 +3,7 @@ import pygame
 from src.Windows.UIComponents.MenuWindow import MenuWindow
 from src.Windows.UIComponents.RectButton import RectButton
 from src.Windows.UIComponents.Text import Text
+from src.Windows.ChatBox.ChatBox import ChatBox
 from src.core.EventQueue import EventQueue
 from src.game_elements.game_board.GameBoard import GameBoard
 from src.game_state.PlayerState import PlayerState
@@ -24,6 +25,7 @@ class GameBoardScene(object):
         self.quit_btn = None
         self.active_sprites = pygame.sprite.Group()   # Maybe add separate groups for different things later
         self.game_board = GameBoard()
+        self.chat_box = ChatBox()
         self.menu = None
         self._init_sprites()
 
@@ -67,12 +69,19 @@ class GameBoardScene(object):
         """Draw all currently active sprites."""
         self.game_board.draw(screen)
         self.active_sprites.draw(screen)
+
         if self.menu and not self.menu.is_closed:
             self.menu.draw(screen)
+
+        self.chat_box.draw(screen)
 
     def update(self, event_queue: EventQueue):
         """Call the update() function of everything in this class."""
         self.game_board.update(event_queue)
         self.active_sprites.update(event_queue)
+
         if self.menu and not self.menu.is_closed:
             self.menu.update(event_queue)
+
+        self.chat_box.update(event_queue)
+

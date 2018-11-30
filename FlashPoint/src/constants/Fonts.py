@@ -1,0 +1,2 @@
+
+TEXT_BOX_FONT_SIZE = 28

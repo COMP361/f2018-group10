@@ -1,5 +1,6 @@
 import pygame
 
+from src.scenes.GameBoardScene import GameBoardScene
 from src.scenes.HostJoinScene import HostJoinScene
 from src.scenes.HostMenuScene import HostMenuScene
 from src.scenes.JoinScene import JoinScene
@@ -15,9 +16,9 @@ class SceneManager(object):
         :param screen: should be the main display
         """
         self.screen = screen
-        self._active_scene = StartScene(self.screen)
-        self._active_scene.buttonLogin.on_click(self.next, HostJoinScene)
-        self._active_scene.buttonRegister.on_click(self.next, HostJoinScene)
+        self._active_scene = GameBoardScene(self.screen)
+        # self._active_scene.buttonLogin.on_click(self.next, HostJoinScene)
+        # self._active_scene.buttonRegister.on_click(self.next, HostJoinScene)
 
     def next(self, next_scene: callable):
         """Switch to the next logical scene. args is assumed to be: [SceneClass]
