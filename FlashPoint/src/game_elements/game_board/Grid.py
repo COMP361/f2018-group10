@@ -12,6 +12,7 @@ class Grid(pygame.sprite.Group):
                  x_coord: int, y_coord: int,
                  tile_size: int=128, tiles_x: int=12, tiles_y: int=8,):
         super().__init__(*sprites)
+        self.contains_player = False
         self.height = tiles_y
         self.width = tiles_x
         self.image = pygame.Surface((tile_size*tiles_x, tile_size*tiles_y))
@@ -34,3 +35,7 @@ class Grid(pygame.sprite.Group):
                 y_coord += tile_size
             x_coord += tile_size
         return grid
+
+    def draw(self, screen: pygame.Surface):
+        for tile in self:
+            tile.draw(screen)
