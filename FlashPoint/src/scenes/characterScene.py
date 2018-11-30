@@ -12,8 +12,9 @@ from src.Windows.UIComponents.Text import Text
 class CharacterScene(Scene):
     def __init__(self, screen):
         self.label_grp = pygame.sprite.Group()
+
         Scene.__init__(self, screen)
-        self._init_char_box()
+        self._init_background()
         self.createLabel(0, 0, 100, 150)
         self.create_butn_img(250, 150, 99, 150,
                              "media/cafs_firefighter.png")
@@ -39,9 +40,16 @@ class CharacterScene(Scene):
         self.create_butn_img(850, 450, 98, 150,
                              "media/rescue.png")
 
-        self._init_btn_back(60, 60, "Back")
+        self._init_btn_back(20, 20, "Back", Color.STANDARDBTN, Color.BLACK)
+
+        self._init_btn_confirm(1050, 575, "Confirm", Color.STANDARDBTN, Color.BLACK)
 
         self._init_title_text()
+
+    def _init_background(self):
+        box_size = (self.resolution[0], self.resolution[1])
+        background_box = RectLabel(0, 0, box_size[0], box_size[1], "media/FlashpointBackGround.png")
+        self.sprite_grp.add(background_box)
 
     def create_butn_img(self, x, y, width, height, path):
 
@@ -52,24 +60,14 @@ class CharacterScene(Scene):
         box_size = (width, height)
         self.this_img = RectButton(x, y, box_size[0], box_size[1], path)
 
-        # self.this_img.on_hover(label.change_color, Color.WHITE)
-        # self.this_img.off_hover(label.change_color, Color.BLACK)
-
         self.this_img.on_click(self.click_img, label)
 
         self.sprite_grp.add(self.this_img)
 
-    def _init_char_box(self):
-        box_size = (self.resolution[0] / 2, self.resolution[1] / 2)
-        x_pos = self.resolution[0] / 2 - box_size[0] / 2
-        y_pos = self.resolution[1] / 2 - box_size[1] / 2
-        log_box = RectLabel(x_pos, y_pos, box_size[0], box_size[1], Color.BLACK)
-        self.sprite_grp.add(log_box)
-
-    def _init_btn_back(self, x_pos, y_pos, text):
+    def _init_btn_back(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
         box_size = (130, 48)
-        self.buttonBack = RectButton(x_pos, y_pos, box_size[0], box_size[1], Color.BLUE, 0,
-                                     Text(pygame.font.SysFont('Arial', 20), text, (0, 255, 0, 0)))
+        self.buttonBack = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
+                                     Text(pygame.font.SysFont('Arial', 20), text, color_text))
         self.sprite_grp.add(self.buttonBack)
 
     def _init_title_text(self):
@@ -78,6 +76,12 @@ class CharacterScene(Scene):
                                      Text(pygame.font.SysFont('Arial', 35), "Character Selection", Color.WHITE))
 
         self.sprite_grp.add(self.text_title)
+
+    def _init_btn_confirm(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
+        box_size = (130, 48)
+        self.buttonConfirm = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
+                                        Text(pygame.font.SysFont('Arial', 20), text, color_text))
+        self.sprite_grp.add(self.buttonConfirm)
 
     def createLabel(self, x_pos, y_pos, width, height):
         return RectLabel(x_pos - 15, y_pos - 15, width + 30, height + 30, Color.BLACK)
