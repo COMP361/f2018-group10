@@ -1,9 +1,11 @@
 import pygame
 
 import src.constants.Color as Color
+from src.Windows.UIComponents.FileImporter import FileImporter
 from src.game_elements.game_board.CharacterSprite import CharacterSprite
 from src.Windows.UIComponents.Interactable import Interactable
 from src.core.EventQueue import EventQueue
+from src.game_elements.game_board.SpriteSheet import SpriteSheet
 
 
 class Tile(Interactable):
@@ -19,6 +21,7 @@ class Tile(Interactable):
         self._render()
         self._mouse_pos = (0, 0)  # For keeping track of previous location.
         self.is_scrolling = False
+        self.sprite_sheet = SpriteSheet("media/GameBoard.png")
 
     def _render(self):
         """Eventually this might have some randomization logic? Dunno how we'll generate boards :( """
@@ -49,7 +52,6 @@ class Tile(Interactable):
         """
         self._is_enabled = False
 
-
     # def _check_mouse_over(self):
     #     mouse = pygame.mouse.get_pos()
     #     rect = self.mouse_rect
@@ -65,7 +67,7 @@ class Tile(Interactable):
                 self.is_hovered = True
                 self.image.fill(Color.YELLOW)
         else:
-            self.image.fill(Color.GREY)
+            self.image.blit(self.sprite_sheet.image_at(self.rect), (0, 0))
             self.is_hovered = False
 
     def _scroll(self):
