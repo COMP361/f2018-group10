@@ -1,5 +1,7 @@
 import pygame
 
+from src.Windows.UIComponents.FileImporter import FileImporter
+from src.scenes.GameBoardScene import GameBoardScene
 from src.scenes.HostJoinScene import HostJoinScene
 from src.scenes.HostMenuScene import HostMenuScene
 from src.scenes.JoinScene import JoinScene
@@ -52,6 +54,8 @@ class SceneManager(object):
 
         if isinstance(self._active_scene, CreateGameMenu):
             self._active_scene.buttonBack.on_click(self.next, HostJoinScene)
+
+        FileImporter.play_audio("media/soundeffects/ButtonClick.wav", fade_ms=10)
 
     def draw(self):
         self._active_scene.draw(self.screen)

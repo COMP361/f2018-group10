@@ -17,7 +17,6 @@ from src.Windows.UIComponents.RectButton import RectButton
 from src.Windows.UIComponents.Text import Text
 
 
-
 class GameBoardScene(object):
     """Scene for displaying the main game view"""
     def __init__(self, screen: pygame.display):

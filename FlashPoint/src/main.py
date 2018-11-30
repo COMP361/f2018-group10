@@ -5,6 +5,7 @@ import pygame
 
 import src.constants.Color as Color
 import src.constants.MainConstants as MainConst
+from src.Windows.UIComponents.FileImporter import FileImporter
 from src.Windows.UIComponents.SceneManager import SceneManager
 from src.core.EventQueue import EventQueue
 
@@ -22,6 +23,7 @@ class Main(object):
 
     def main(self):
         # Run main loop
+        FileImporter.play_music("media/music/jorge_music/nightbells.mp3", -1)
         while True:
             # Lock frame rate at 60 FPS. Should only be called once per loop.
             self.clock.tick(60)
