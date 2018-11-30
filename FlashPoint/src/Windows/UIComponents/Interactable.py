@@ -96,6 +96,7 @@ class Interactable(pygame.sprite.Sprite):
         Enables the event hook
         :return:
         """
+        print(f"Enabling: {self}")
         self._is_enabled = True
 
     def disable(self):
@@ -103,6 +104,7 @@ class Interactable(pygame.sprite.Sprite):
         Disables the event hook
         :return:
         """
+        print(f"Disabling: {self}")
         self._is_enabled = False
 
     def on_click(self, click_action: Callable, *args, **kwargs):

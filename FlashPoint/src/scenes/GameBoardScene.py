@@ -21,6 +21,7 @@ class GameBoardScene(object):
     def __init__(self, screen: pygame.display):
         """:param screen : The display passed from main on which to draw the Scene."""
         self.screen = screen
+        self.quit_btn = None
         self.active_sprites = pygame.sprite.Group()   # Maybe add separate groups for different things later
         self.game_board = GameBoard()
         self.menu = None
@@ -39,7 +40,6 @@ class GameBoardScene(object):
         self.active_sprites.add(VictimDead(853, 612))
         self.active_sprites.add(self._init_menu_button())
 
-
     # Example of how to use the MenuClass YOU NEED TO MAKE ALL YOUR BUTTONS EXTEND INTERACTABLE!!!!!!!!!!!!!!!!!
     def _init_menu_button(self):
         btn = RectButton(0, 0, 100, 50, background=Color.GREEN, txt_obj=Text(pygame.font.SysFont('Arial', 23), "Menu"))
@@ -47,18 +47,32 @@ class GameBoardScene(object):
         return btn
 
     def _click_action(self):
-        menu = MenuWindow([self.active_sprites, self.game_board], 500, 500, (100, 100))
-        menu.add_component(PlayerState(0, 242, "Haw", Color.YELLOW))
+        menu = MenuWindow([self.active_sprites, self.game_board], 500, 500, (400, 150))
+        back_btn = RectButton(0, 0, 70, 50, txt_obj=Text(pygame.font.SysFont('Arial', 23), "Back"))
+        save_btn = RectButton(100, 150, 100, 50, txt_obj=Text(pygame.font.SysFont('Arial', 23), "Save"))
+        quit_btn = RectButton(100, 250, 100, 50, txt_obj=Text(pygame.font.SysFont('Arial', 23), "Quit"))
+
+        back_btn.on_click(menu.close)
+        # save_btn.on_click()   # Nothing yet
+
+        menu.add_component(back_btn)
+        menu.add_component(save_btn)
+        menu.add_component(quit_btn)
+
+        # Used by scene manager to know when to go back to lobby.
+        self.quit_btn = quit_btn
         self.menu = menu
 
     def draw(self, screen: pygame.display):
         """Draw all currently active sprites."""
         self.game_board.draw(screen)
         self.active_sprites.draw(screen)
-        if self.menu:
+        if self.menu and not self.menu.is_closed:
             self.menu.draw(screen)
 
     def update(self, event_queue: EventQueue):
         """Call the update() function of everything in this class."""
         self.game_board.update(event_queue)
         self.active_sprites.update(event_queue)
+        if self.menu and not self.menu.is_closed:
+            self.menu.update(event_queue)

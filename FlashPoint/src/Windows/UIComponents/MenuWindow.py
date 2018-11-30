@@ -1,8 +1,7 @@
-from typing import Tuple, Optional, List
+from typing import Tuple, List
 
 import pygame
 
-from src.Windows.UIComponents.Components import Components
 from src.Windows.UIComponents.Interactable import Interactable
 from src.core.EventQueue import EventQueue
 
@@ -30,6 +29,7 @@ class MenuWindow(object):
         :param color: Background color of the object represented by an RGB tuple (Alpha optional)
         """
         # Disable all buttons.
+        self.is_closed = True # Used to delete the menu from outside. Stupid python doesn't allow call-by-reference >:(
         self._image = pygame.Surface((width, height))
         self._bg_color = bg_color
         self._rect = self._image.get_rect().move(position[0], position[1])
@@ -37,22 +37,22 @@ class MenuWindow(object):
         self._components: pygame.sprite.Group = components if components else pygame.sprite.Group()
         self._open()
 
-    def add_component(self, component: pygame.sprite.Sprite):
+    def add_component(self, component):
+        component.rect.move_ip(self._rect.x, self._rect.y)
         self._components.add(component)
 
     def draw(self, screen):
         # alpha = self._bg_color[3] if len(self._bg_color) == 4 else 100
         self._image.fill(self._bg_color[0])
-        # self._image.set_alpha(alpha)
-        self._components.draw(self._image)
         screen.blit(self._image, self._rect)
+        self._components.draw(screen)
 
     def update(self, event_queue: EventQueue):
-        for component_group in self._components:
-            component_group.update(event_queue)
+        self._components.update(event_queue)
 
     def _open(self):
         """Disable all buttons under this window."""
+        self.is_closed = False
         for group in self._buttons_to_disable:
             for button in group:
                 if isinstance(button, Interactable):
@@ -64,4 +64,4 @@ class MenuWindow(object):
             for button in group:
                 if isinstance(button, Interactable):
                     button.enable()
-        del self
+        self.is_closed = True

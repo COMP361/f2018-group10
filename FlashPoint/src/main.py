@@ -8,6 +8,7 @@ import src.constants.MainConstants as MainConst
 from src.Windows.UIComponents.SceneManager import SceneManager
 from src.core.EventQueue import EventQueue
 
+
 class Main(object):
     """Class for running the main game loop and maintaining game state."""
 
