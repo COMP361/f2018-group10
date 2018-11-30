@@ -1,7 +1,7 @@
 import pygame
 
 import src.constants.Color as Color
-from src.game_elements.game_board.Character_sprite import CharacterSprite
+from src.game_elements.game_board.CharacterSprite import CharacterSprite
 from src.Windows.UIComponents.Interactable import Interactable
 from src.core.EventQueue import EventQueue
 

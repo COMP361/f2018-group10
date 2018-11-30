@@ -2,7 +2,7 @@ import pygame
 
 import src.constants.Color as Color
 import src.constants.MainConstants as MainConst
-from src.game_elements.game_board.Character_sprite import CharacterSprite
+from src.game_elements.game_board.CharacterSprite import CharacterSprite
 from src.game_elements.game_board.Grid import Grid
 from src.core.EventQueue import EventQueue
 
@@ -17,7 +17,6 @@ class GameBoard(pygame.sprite.Group):
         self.grid = Grid(x_coord=self.rect.left, y_coord=self.rect.top)
         self.add(self.grid)
 
-
     def draw(self, screen: pygame.Surface):
         self.image.fill(Color.BLACK)
         self.grid.draw(self.image)
@@ -25,7 +24,7 @@ class GameBoard(pygame.sprite.Group):
 
     def update(self, event_q: EventQueue):
         for event in event_q:
-            if event.type == pygame.MOUSEBUTTONUP:
+            if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 for tile in self.grid:
 
                     if tile.hover():
