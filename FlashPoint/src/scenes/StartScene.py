@@ -6,7 +6,7 @@ from src.Windows.UIComponents.RectButton import RectButton
 from src.Windows.UIComponents.RectLabel import RectLabel
 from src.Windows.UIComponents.Text import Text
 from src.Windows.UIComponents.Scene import Scene
-from src.Windows.UIComponents.TextBar import InputBox
+from src.Windows.UIComponents.InputBox import InputBox
 
 
 class StartScene(Scene):

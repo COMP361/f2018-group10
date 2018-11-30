@@ -64,13 +64,13 @@ class Text(pygame.sprite.Sprite):
         self.text_rect.top = (rect.width/2, 0)
 
     def set_bottom(self, rect: pygame.rect.Rect):
-        self.text_rect.bottom = (rect.width/2, rect.height)
+        self.text_rect.bottom = rect.height
 
     def set_left(self, rect: pygame.rect.Rect):
-        self.text_rect.left = (0, rect.height/2)
+        self.text_rect.left = 0
 
     def set_right(self, rect: pygame.rect.Rect):
-        self.text_rect.right = (rect.width, rect.height/2)
+        self.text_rect.right = rect.width
 
     def set_pos(self, rect: pygame.rect.Rect, pos: Position):
         """
