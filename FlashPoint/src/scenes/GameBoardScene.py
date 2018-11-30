@@ -1,7 +1,7 @@
 import pygame
 
+from src.Windows.UIComponents.ChatBox import ChatBox
 from src.Windows.UIComponents.MenuWindow import MenuWindow
-from src.Windows.ChatBox.ChatBox import ChatBox
 from src.core.EventQueue import EventQueue
 from src.game_elements.game_board.GameBoard import GameBoard
 from src.game_state.PlayerState import PlayerState
@@ -10,12 +10,9 @@ from src.game_state.TimeBar import TimeBar
 from src.game_state.DamageState import DamageState
 from src.game_state.VictimSaved import VictimSaved
 from src.game_state.VictimDead import VictimDead
-
-
 import src.constants.Color as Color
 from src.Windows.UIComponents.RectButton import RectButton
 from src.Windows.UIComponents.Text import Text
-
 
 
 class GameBoardScene(object):
@@ -23,7 +20,8 @@ class GameBoardScene(object):
     def __init__(self, screen: pygame.display):
         """:param screen : The display passed from main on which to draw the Scene."""
         self.screen = screen
-        self.quit_btn = None
+        self.quit_btn = RectButton(200, 250, 100,50, Color.STANDARDBTN, 0,
+                                     Text(pygame.font.SysFont('Arial', 20), "Quit", Color.BLACK))
         self.active_sprites = pygame.sprite.Group()   # Maybe add separate groups for different things later
         self.game_board = GameBoard()
         self.chat_box = ChatBox()
@@ -51,19 +49,19 @@ class GameBoardScene(object):
 
     def _click_action(self):
         menu = MenuWindow([self.active_sprites, self.game_board], 500, 500, (400, 150))
-        back_btn = RectButton(0, 0, 70, 50, txt_obj=Text(pygame.font.SysFont('Arial', 23), "Back"))
-        save_btn = RectButton(100, 150, 100, 50, txt_obj=Text(pygame.font.SysFont('Arial', 23), "Save"))
-        quit_btn = RectButton(100, 250, 100, 50, txt_obj=Text(pygame.font.SysFont('Arial', 23), "Quit"))
+        back_btn = RectButton(10,10,70,50, Color.STANDARDBTN, 0,
+                                     Text(pygame.font.SysFont('Arial', 20), "Back", Color.BLACK))
+        save_btn =RectButton(200, 150, 100, 50, Color.STANDARDBTN, 0,
+                                     Text(pygame.font.SysFont('Arial', 20), "Save", Color.BLACK))
 
         back_btn.on_click(menu.close)
+
         # save_btn.on_click()   # Nothing yet
 
         menu.add_component(back_btn)
         menu.add_component(save_btn)
-        menu.add_component(quit_btn)
+        menu.add_component(self.quit_btn)
 
-        # Used by scene manager to know when to go back to lobby.
-        self.quit_btn = quit_btn
         self.menu = menu
 
     def draw(self, screen: pygame.display):
