@@ -44,7 +44,7 @@ class ChatBox:
         chat_textbox_h = chat_box_h - chat_hist_h - 15
 
         self.chat_box = RectLabel(chat_box_x, chat_box_y, chat_box_w, chat_box_h, background=Color.BLACK)
-        self.chat_history_bg = RectLabel(chat_hist_x, chat_hist_y, chat_hist_w, chat_hist_h, background=Color.GREY)
+        self.chat_history_bg = RectLabel(chat_hist_x, chat_hist_y, chat_hist_w, chat_hist_h, background=Color.WHITE)
         self.chat_textbox = InputBox(x=chat_textbox_x, y=chat_textbox_y, w=chat_textbox_w, h=chat_textbox_h)
         self.chat_history = []
         self.group.add([self.chat_box, self.chat_history_bg, self.chat_textbox])
@@ -81,7 +81,7 @@ class ChatBox:
             if count < max_messages:
                 message_box_y = chat_hist_bottom - (message_box_h * (count+1))
                 old_message_box = RectLabel(message_box_x, message_box_y, message_box_w, message_box_h,
-                                    background=Color.GREY, txt_pos=Text.Position.RIGHT,
+                                    background=Color.WHITE, txt_pos=Text.Position.RIGHT,
                                     txt_obj=Text(font=pg.font.SysFont("Arial", TEXT_BOX_FONT_SIZE - 2),
                                                  text=old_message))
 

@@ -1,5 +1,6 @@
 import pygame
 
+from src.scenes.GameBoardScene import GameBoardScene
 from src.scenes.HostJoinScene import HostJoinScene
 from src.scenes.HostMenuScene import HostMenuScene
 from src.scenes.JoinScene import JoinScene
@@ -65,7 +66,12 @@ class SceneManager(object):
         if isinstance(self._active_scene, LobbyScene):
             if self._active_scene.is_experienced:
                 self._active_scene.buttonSelChar.on_click(self.next, CharacterScene)
+
             self._active_scene.buttonBack.on_click(self.next, HostJoinScene)
+            self._active_scene.buttonReady.on_click(self.next, GameBoardScene)
+
+        if isinstance(self._active_scene, GameBoardScene):
+            self._active_scene.quit_btn.on_click(self.next, StartScene)
 
     def draw(self):
         self._active_scene.draw(self.screen)

@@ -13,7 +13,7 @@ class HostMenuScene(Scene):
         self._init_background()
 
         self._init_btn_new_game(575, 481, "New Game", Color.STANDARDBTN, Color.BLACK)
-        self._init_btn_leg(575, 371, "Load Existing Game", Color.STANDARDBTN, Color.BLACK)
+        self._init_btn_leg(575, 371, "Load Game", Color.STANDARDBTN, Color.BLACK)
         self._init_btn_back(20, 20, "Back", Color.STANDARDBTN, Color.BLACK)
 
     def _init_background(self):
