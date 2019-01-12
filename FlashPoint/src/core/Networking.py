@@ -1,3 +1,6 @@
+import sys
+import socket
+
 from src.external.Mastermind import *
 
 
@@ -10,9 +13,22 @@ class Networking(object):
     def create_host(self):
         # We use UDP to broadcast the host
         self.host = MastermindServerUDP()
-        # Start accepting connection
+
+        server_ip = None
+        # find unused ip address
+        for i in range(255, 0, -1):
+            for j in range(255, 0, -1):
+                try:
+                    socket.gethostbyaddr("192.168."+str(i)+"."+str(j))
+                except socket.error:
+                    server_ip = "192.168."+str(i)+"."+str(j)
+                    break
+            if server_ip is not None:
+                break
+
         try:
-            self.host.connect("192.168.255.255", 20298)
+            self.host.connect(server_ip, 20298)
+            # Start accepting connection
             self.host.accepting_allow_wait_forever()
         except MastermindError:
                 print("Server error!")
