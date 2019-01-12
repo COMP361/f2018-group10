@@ -38,8 +38,10 @@ class Networking(object):
             print("Server error!")
 
     def join_host(self, ip, port=20298):
-        self.client = MastermindClientUDP()
+        global TIMEOUT_CONNECT, TIMEOUT_RECEIVE
+        self.client = MastermindClientUDP(TIMEOUT_CONNECT, TIMEOUT_RECEIVE)
         try:
+            print("Attempting to connect to host at "+ip+":"+port)
             self.client.connect(ip, port)
         except MastermindError:
             print("Error connecting to server at: "+ip+":"+port)
