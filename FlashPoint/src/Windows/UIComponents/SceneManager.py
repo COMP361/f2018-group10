@@ -11,6 +11,8 @@ from src.core.EventQueue import EventQueue
 from src.scenes.characterScene import CharacterScene
 from src.scenes.LobbyScene import LobbyScene
 
+from src.core.Networking import Networking
+
 
 class SceneManager(object):
     def __init__(self, screen: pygame.Surface):
@@ -44,7 +46,7 @@ class SceneManager(object):
 
         if isinstance(self._active_scene, HostJoinScene):
             self._active_scene.buttonJoin.on_click(self.next, JoinScene)
-            self._active_scene.buttonHost.on_click(self.next, HostMenuScene)
+            self._active_scene.buttonHost.on_click(self.host, HostMenuScene)
             self._active_scene.buttonBack.on_click(self.next, StartScene)
 
         if isinstance(self._active_scene, JoinScene):
@@ -52,11 +54,11 @@ class SceneManager(object):
             self._active_scene.buttonConnect.on_click(self.next, LobbyScene, True)
 
         if isinstance(self._active_scene, HostMenuScene):
-            self._active_scene.buttonBack.on_click(self.next, HostJoinScene)
+            self._active_scene.buttonBack.on_click(self.disconnect, HostJoinScene)
             self._active_scene.buttonNewGame.on_click(self.next, CreateGameMenu)
 
         if isinstance(self._active_scene, CreateGameMenu):
-            self._active_scene.buttonBack.on_click(self.next, HostJoinScene)
+            self._active_scene.buttonBack.on_click(self.disconnect, HostJoinScene)
             self._active_scene.buttonExp.on_click(self.next, LobbyScene, True)
             self._active_scene.buttonFamily.on_click(self.next, LobbyScene, False)
 
@@ -68,7 +70,7 @@ class SceneManager(object):
             if self._active_scene.is_experienced:
                 self._active_scene.buttonSelChar.on_click(self.next, CharacterScene)
 
-            self._active_scene.buttonBack.on_click(self.next, HostJoinScene)
+            self._active_scene.buttonBack.on_click(self.disconnect, HostJoinScene)
             self._active_scene.buttonReady.on_click(self.next, GameBoardScene)
 
         if isinstance(self._active_scene, GameBoardScene):
@@ -81,3 +83,17 @@ class SceneManager(object):
 
     def update(self, event_queue: EventQueue):
         self._active_scene.update(event_queue)
+
+    def host(self, next_scene):
+        print("Attempting to host...")
+        Networking.get_instance().create_host()
+
+        if next_scene is not None:
+            self.next(next_scene)
+
+    def disconnect(self, next_scene):
+        print("Disconnecting...")
+        Networking.get_instance().disconnect()
+
+        if next_scene is not None:
+            self.next(next_scene)
