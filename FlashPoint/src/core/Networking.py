@@ -59,7 +59,7 @@ class Networking:
             client_ip = "localhost"
 
             try:
-                print("Listening at "+server_ip+":"+str(port))
+                print("Listening to all IPs: "+server_ip+":"+str(port))
                 self.host.connect(server_ip, port)
 
                 print("Starts accepting connection")
