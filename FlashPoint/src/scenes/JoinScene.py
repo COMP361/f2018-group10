@@ -1,11 +1,10 @@
 import pygame
 
 import src.constants.Color as Color
-from src.Windows.UIComponents.RectButton import RectButton
-from src.Windows.UIComponents.RectLabel import RectLabel
-from src.Windows.UIComponents.Text import Text
-from src.Windows.UIComponents.Scene import Scene
-from src.Windows.UIComponents.InputBox import InputBox
+from src.UIComponents.RectButton import RectButton
+from src.UIComponents.RectLabel import RectLabel
+from src.UIComponents.Text import Text
+from src.UIComponents.InputBox import InputBox
 
 
 class JoinScene(object):
@@ -51,7 +50,6 @@ class JoinScene(object):
     def draw(self, screen):
         self.sprite_grp.draw(screen)
         self._text_bar.draw(screen)
-
 
     def update(self, event_queue):
         self.sprite_grp.update(event_queue)

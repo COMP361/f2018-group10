@@ -21,4 +21,4 @@ class TimeBar(pygame.sprite.Sprite):
         text_rect = text.get_rect()
         text_rect.move_ip(500,0)
         self.image.blit(text,text_rect)
-        #pygame.draw.rect(self.image, Color.RED, self.image.get_rect(), 2)
+        # pygame.draw.rect(self.image, Color.RED, self.image.get_rect(), 2)

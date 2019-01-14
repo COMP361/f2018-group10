@@ -2,10 +2,10 @@ import pygame
 
 import src.constants.Color as Color
 
-from src.Windows.UIComponents.RectButton import RectButton
-from src.Windows.UIComponents.RectLabel import RectLabel
-from src.Windows.UIComponents.Text import Text
-from src.Windows.UIComponents.ChatBox import ChatBox
+from src.UIComponents.RectButton import RectButton
+from src.UIComponents.RectLabel import RectLabel
+from src.UIComponents.Text import Text
+from src.UIComponents.ChatBox import ChatBox
 
 
 class LobbyScene(object):

@@ -1,10 +1,8 @@
 from typing import Tuple, Optional, Union
 
-import pygame
-
-from src.Windows.UIComponents.Text import Text
-from src.Windows.UIComponents.RectLabel import RectLabel
-from src.Windows.UIComponents.Interactable import Interactable
+from src.UIComponents.Text import Text
+from src.UIComponents.RectLabel import RectLabel
+from src.UIComponents.Interactable import Interactable
 
 
 class RectButton(RectLabel, Interactable):

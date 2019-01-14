@@ -2,7 +2,7 @@ from typing import Tuple, List
 
 import pygame
 
-from src.Windows.UIComponents.Interactable import Interactable
+from src.UIComponents.Interactable import Interactable
 from src.core.EventQueue import EventQueue
 
 

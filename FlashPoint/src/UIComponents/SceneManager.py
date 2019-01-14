@@ -1,14 +1,14 @@
 import pygame
 
-from src.Windows.UIComponents.FileImporter import FileImporter
+from src.UIComponents.FileImporter import FileImporter
 from src.scenes.GameBoardScene import GameBoardScene
 from src.scenes.HostJoinScene import HostJoinScene
 from src.scenes.HostMenuScene import HostMenuScene
 from src.scenes.JoinScene import JoinScene
 from src.scenes.StartScene import StartScene
-from src.scenes.Game_Intial_Menu import CreateGameMenu
+from src.scenes.GameIntialMenu import CreateGameMenu
 from src.core.EventQueue import EventQueue
-from src.scenes.characterScene import CharacterScene
+from src.scenes.CharacterScene import CharacterScene
 from src.scenes.LobbyScene import LobbyScene
 
 

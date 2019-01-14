@@ -1,13 +1,8 @@
-from typing import Any, Union
-
 import pygame
-from pygame.surface import SurfaceType
 
 import src.constants.Color as Color
-from src.Windows.UIComponents.Interactable import Interactable
-from src.Windows.UIComponents.Text import Text
+from src.UIComponents.Interactable import Interactable
 from src.core.EventQueue import EventQueue
-
 
 
 class PlayerState(Interactable):
@@ -49,9 +44,8 @@ class PlayerState(Interactable):
             y_max = rect.y + rect.h
             y_min = rect.y
             return x_max > mouse[0] > x_min and y_max > mouse[1] > y_min
-        else: return False
-
-    
+        else:
+            return False
 
     def enable(self):
         """
@@ -67,13 +61,12 @@ class PlayerState(Interactable):
         """
         self._is_enabled = False
 
-
     def update(self, event_queue: EventQueue):
         if self.hover():
             if not self.is_hovered:
                 self.is_hovered = True
                 self.image.fill(Color.RED)
-                #self.image.blit(self.text, self.text.get_rect())
+                # self.image.blit(self.text, self.text.get_rect())
                 self.image.blit(self.text_AP, self.AP_rect)
                 self.image.blit(self.text_SAP, self.SAP_rect)
                 pygame.draw.rect(self.image, Color.RED, self.image.get_rect(), 2)
@@ -81,6 +74,5 @@ class PlayerState(Interactable):
         else:
             self.image.fill(self.color)
             self.image.blit(self.text, self.P_rect)
-            #self.image.blit(self.text_AP, self.AP_rect)
+            # self.image.blit(self.text_AP, self.AP_rect)
             self.is_hovered = False
-

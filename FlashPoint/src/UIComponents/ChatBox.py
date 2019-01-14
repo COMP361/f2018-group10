@@ -1,9 +1,9 @@
 import pygame as pg
 
-from src.Windows.UIComponents.InputBox import InputBox
-from src.Windows.UIComponents.Text import Text
+from src.UIComponents.InputBox import InputBox
+from src.UIComponents.Text import Text
 from src.constants.MainConstants import SCREEN_RESOLUTION
-from src.Windows.UIComponents.RectLabel import RectLabel
+from src.UIComponents.RectLabel import RectLabel
 import src.constants.Color as Color
 from src.core.EventQueue import EventQueue
 from src.constants.Fonts import TEXT_BOX_FONT_SIZE
@@ -11,7 +11,6 @@ import math
 
 
 class ChatBox:
-
     def __init__(self):
         self.messages = []
         self.group = pg.sprite.Group()
@@ -81,12 +80,11 @@ class ChatBox:
             if count < max_messages:
                 message_box_y = chat_hist_bottom - (message_box_h * (count+1))
                 old_message_box = RectLabel(message_box_x, message_box_y, message_box_w, message_box_h,
-                                    background=Color.WHITE, txt_pos=Text.Position.RIGHT,
-                                    txt_obj=Text(font=pg.font.SysFont("Arial", TEXT_BOX_FONT_SIZE - 2),
-                                                 text=old_message))
+                                            background=Color.WHITE, txt_pos=Text.Position.RIGHT,
+                                            txt_obj=Text(font=pg.font.SysFont("Arial", TEXT_BOX_FONT_SIZE - 2),
+                                                         text=old_message))
 
                 self.chat_history.append(old_message_box)
                 count += 1
-
             else:
                 break

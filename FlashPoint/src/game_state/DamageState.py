@@ -3,7 +3,6 @@ import src.constants.Color as Color
 from src.core.EventQueue import EventQueue
 
 
-
 class DamageState(pygame.sprite.Sprite):
 
     def __init__(self, x: int, y: int):

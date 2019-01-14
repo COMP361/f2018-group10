@@ -1,8 +1,8 @@
 import pygame
 
 import src.constants.Color as Color
-from src.game_elements.game_board.Character_sprite import CharacterSprite
-from src.Windows.UIComponents.Interactable import Interactable
+from src.game_elements.game_board.CharacterSprite import CharacterSprite
+from src.UIComponents.Interactable import Interactable
 from src.core.EventQueue import EventQueue
 
 
@@ -33,7 +33,8 @@ class Tile(Interactable):
             y_max = rect.y + rect.h
             y_min = rect.y
             return x_max > mouse[0] > x_min and y_max > mouse[1] > y_min
-        else: return False
+        else:
+            return False
 
     def enable(self):
         """
@@ -48,7 +49,6 @@ class Tile(Interactable):
         :return:
         """
         self._is_enabled = False
-
 
     # def _check_mouse_over(self):
     #     mouse = pygame.mouse.get_pos()
@@ -84,7 +84,7 @@ class Tile(Interactable):
     def remove_sprite_character(self, some_character):
         for sprite in self.sprite_grp:
             if isinstance(sprite, CharacterSprite) and sprite == some_character:
-                ##Takes care of not taking out other characters as well
+                # Takes care of not taking out other characters as well
                 self.sprite_grp.remove(some_character)
 
     def find_character(self):
