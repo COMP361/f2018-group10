@@ -1,5 +1,4 @@
 import pygame
-from src.Windows.UIComponents.FileImporter import FileImporter
 
 
 class CharacterSprite(pygame.sprite.Sprite):

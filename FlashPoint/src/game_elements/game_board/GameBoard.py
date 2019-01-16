@@ -17,7 +17,6 @@ class GameBoard(pygame.sprite.Group):
         self.grid = Grid(x_coord=self.rect.left, y_coord=self.rect.top)
         self.add(self.grid)
 
-
     def draw(self, screen: pygame.Surface):
         self.image.fill(Color.BLACK)
         self.grid.draw(self.image)

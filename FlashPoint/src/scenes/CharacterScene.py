@@ -2,11 +2,11 @@ import pygame
 
 import src.constants.Color as Color
 
-from src.Windows.UIComponents.RectButton import RectButton
-from src.Windows.UIComponents.RectLabel import RectLabel
+from src.UIComponents.RectButton import RectButton
+from src.UIComponents.RectLabel import RectLabel
 
-from src.Windows.UIComponents.Scene import Scene
-from src.Windows.UIComponents.Text import Text
+from src.UIComponents.Scene import Scene
+from src.UIComponents.Text import Text
 
 
 class CharacterScene(Scene):
@@ -15,7 +15,7 @@ class CharacterScene(Scene):
 
         Scene.__init__(self, screen)
         self._init_background()
-        self.createLabel(0, 0, 100, 150)
+        self.create_label(0, 0, 100, 150)
         self.create_butn_img(250, 150, 99, 150,
                              "media/cafs_firefighter.png")
 
@@ -53,7 +53,7 @@ class CharacterScene(Scene):
 
     def create_butn_img(self, x, y, width, height, path):
 
-        label = self.createLabel(x, y, width, height)
+        label = self.create_label(x, y, width, height)
         self.label_grp.add(label)
         self.sprite_grp.add(label)
 
@@ -83,7 +83,7 @@ class CharacterScene(Scene):
                                         Text(pygame.font.SysFont('Arial', 20), text, color_text))
         self.sprite_grp.add(self.buttonConfirm)
 
-    def createLabel(self, x_pos, y_pos, width, height):
+    def create_label(self, x_pos: int, y_pos: int, width: int, height: int):
         return RectLabel(x_pos - 15, y_pos - 15, width + 30, height + 30, Color.BLACK)
 
     def click_img(self, btn):
