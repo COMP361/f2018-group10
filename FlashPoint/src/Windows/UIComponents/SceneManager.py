@@ -1,5 +1,8 @@
+from typing import Optional
+
 import pygame
 
+from src.Windows.UIComponents.Scene import Scene
 from src.Windows.UIComponents.FileImporter import FileImporter
 from src.scenes.GameBoardScene import GameBoardScene
 from src.scenes.HostJoinScene import HostJoinScene
@@ -84,15 +87,13 @@ class SceneManager(object):
     def update(self, event_queue: EventQueue):
         self._active_scene.update(event_queue)
 
-    def host(self, next_scene):
-        print("Attempting to host...")
+    def host(self, next_scene: Optional[Scene] = None):
         Networking.get_instance().create_host()
 
         if next_scene is not None:
             self.next(next_scene)
 
-    def disconnect(self, next_scene):
-        print("Disconnecting...")
+    def disconnect(self, next_scene: Optional[Scene] = None):
         Networking.get_instance().disconnect()
 
         if next_scene is not None:

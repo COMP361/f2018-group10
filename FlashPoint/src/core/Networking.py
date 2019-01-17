@@ -1,8 +1,12 @@
+import ipaddress
 import socket
 import threading
-import time
+import logging
 
 from src.external.Mastermind import *
+
+logger = logging.getLogger("networking")
+logger.setLevel(logging.INFO)
 
 
 class Networking:
@@ -21,6 +25,7 @@ class Networking:
         if Networking.__instance is None:
             Networking.__instance = Networking.NetworkingInner()
         else:
+            logger.exception("Attempted to instantiate another singleton")
             raise Exception("Networking is a Singleton")
 
     def __getattr__(self, name):
@@ -31,6 +36,12 @@ class Networking:
         client = None
         TIMEOUT_CONNECT = 200
         TIMEOUT_RECEIVE = 200
+
+        stop_broadcast = threading.Event()
+        stop_listen = threading.Event()
+
+        def __init__(self):
+            self.stop_broadcast.set()
 
         def create_host(self, port=20298):
             # We use UDP to broadcast the host
@@ -59,28 +70,61 @@ class Networking:
             client_ip = "localhost"
 
             try:
-                print("Listening to all IPs: "+server_ip+":"+str(port))
+                logger.info(f"Listening to all IPs: {server_ip}:{port}")
                 self.host.connect(server_ip, port)
 
-                print("Starts accepting connection")
-                t = threading.Thread(target=self.host.accepting_allow)
-                t.start()
+                logger.info("Starts accepting connection")
+                self.host.accepting_allow()
+
+                # Clear the broadcast blocker
+                self.stop_broadcast.clear()
+                broadcaster = threading.Thread(target=self.broadcast_game, args=(None, self.stop_broadcast))
+                broadcaster.start()
+
                 # The host also acts as a client
                 self.join_host(client_ip)
             except MastermindErrorSocket:
-                print("Failed to create a host")
+                logger.error("Failed to create a host")
 
         def join_host(self, ip, port=20298):
             self.client = MastermindClientUDP(self.TIMEOUT_CONNECT, self.TIMEOUT_RECEIVE)
             try:
-                print("Attempting to connect to host at "+ip+":"+str(port))
+                logger.info(f"Attempting to connect to host at {ip}:{port}")
                 self.client.connect(ip, port)
             except MastermindError:
-                print("Error connecting to server at: "+ip+":"+str(port))
+                logger.error(f"Error connecting to server at: {ip}:{port}")
+
+        @staticmethod
+        def broadcast_game(args, stop_event):
+            b_caster = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            b_caster.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            b_caster.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+            msg = f"{socket.gethostname()} {mastermind_get_local_ip()}"
+            bip = Networking.get_instance().get_broadcast_ip()
+            print(f"Broadcasting at {bip}:54545")
+
+            while not stop_event.is_set():
+                b_caster.sendto(str.encode(msg), (str(bip), 54545))
+
+        @staticmethod
+        def search_game(stop_event):
+            listener = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            listener.bind('')
+            while not stop_event.is_set():
+                msg = listener.recvfrom(2048)
+                return msg
 
         @property
         def is_host(self):
             return self.host is not None
+
+        @staticmethod
+        def get_ip():
+            return mastermind_get_local_ip()
+
+        @staticmethod
+        def get_broadcast_ip():
+            return ipaddress.IPv4Network(mastermind_get_local_ip()).broadcast_address
 
         @staticmethod
         def get_open_port():
@@ -93,10 +137,26 @@ class Networking:
 
         def disconnect(self):
             if self.client is not None:
+                logger.info("Disconnecting client")
                 self.client.disconnect()
+                self.client.__del__()
             if self.host is not None:
+                logger.info("Disconnecting host")
+                # Kill the broadcast
+                self.stop_broadcast.set()
+
+                self.host.accepting_disallow()
                 self.host.disconnect_clients()
                 self.host.disconnect()
+                self.host.__del__()
+
+        # If game is started, stops new client from connecting
+        def start_game(self):
+            # Kill the broadcast
+            self.stop_broadcast.set()
+
+            if self.host is not None:
+                self.host.accepting_disallow()
 
         def send(self, data, compress=0):
             self.client.send(data, compress)
