@@ -92,7 +92,8 @@ class Networking:
                 print(f"Attempting to connect to host at {ip}:{port}")
                 logger.info(f"Attempting to connect to host at {ip}:{port}")
                 self.client.connect(ip, port)
-            except MastermindError:
+                self.client.send("I've connected")
+            except MastermindErrorClient:
                 logger.error(f"Error connecting to server at: {ip}:{port}")
                 raise ConnectionError
             except OSError:
@@ -144,6 +145,7 @@ class Networking:
                 logger.info("Disconnecting client")
                 self.client.disconnect()
                 self.client.__del__()
+                self.client = None
             if self.host is not None:
                 logger.info("Disconnecting host")
                 # Kill the broadcast
@@ -153,6 +155,7 @@ class Networking:
                 self.host.disconnect_clients()
                 self.host.disconnect()
                 self.host.__del__()
+                self.host = None
 
         # If game is started, stops new client from connecting
         def start_game(self):
