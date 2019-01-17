@@ -89,10 +89,14 @@ class Networking:
         def join_host(self, ip, port=20298):
             self.client = MastermindClientUDP(self.TIMEOUT_CONNECT, self.TIMEOUT_RECEIVE)
             try:
+                print(f"Attempting to connect to host at {ip}:{port}")
                 logger.info(f"Attempting to connect to host at {ip}:{port}")
                 self.client.connect(ip, port)
             except MastermindError:
                 logger.error(f"Error connecting to server at: {ip}:{port}")
+                raise ConnectionError
+            except OSError:
+                raise OSError
 
         @staticmethod
         def broadcast_game(args, stop_event):

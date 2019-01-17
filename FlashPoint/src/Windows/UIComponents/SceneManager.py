@@ -54,7 +54,7 @@ class SceneManager(object):
 
         if isinstance(self._active_scene, JoinScene):
             self._active_scene.buttonBack.on_click(self.next, HostJoinScene)
-            self._active_scene.buttonConnect.on_click(self.next, LobbyScene, True)
+            self._active_scene.buttonConnect.on_click(self.join, self._active_scene.text_bar_msg, LobbyScene, True)
 
         if isinstance(self._active_scene, HostMenuScene):
             self._active_scene.buttonBack.on_click(self.disconnect, HostJoinScene)
@@ -67,7 +67,7 @@ class SceneManager(object):
 
         if isinstance(self._active_scene, CharacterScene):
             self._active_scene.buttonBack.on_click(self.next, LobbyScene, True)
-            self._active_scene.buttonConfirm.on_click(self.next,LobbyScene, True)
+            self._active_scene.buttonConfirm.on_click(self.next, LobbyScene, True)
 
         if isinstance(self._active_scene, LobbyScene):
             if self._active_scene.is_experienced:
@@ -86,15 +86,44 @@ class SceneManager(object):
 
     def update(self, event_queue: EventQueue):
         self._active_scene.update(event_queue)
+        for event in event_queue:
+            self.handle_event(event)
 
-    def host(self, next_scene: Optional[Scene] = None):
+    def handle_event(self, event):
+        # join event
+        if event.type == pygame.USEREVENT+1:
+            self.join(event.ip, LobbyScene, True)
+
+    def host(self, next_scene: Optional[callable] = None, *args):
         Networking.get_instance().create_host()
 
         if next_scene is not None:
-            self.next(next_scene)
+            self.next(next_scene, args)
 
-    def disconnect(self, next_scene: Optional[Scene] = None):
+    def join(self, ip_addr, next_scene: Optional[callable] = None, *args):
+        if isinstance(self._active_scene, JoinScene):
+            is_join_scene = True
+        else:
+            is_join_scene = False
+
+        try:
+            Networking.get_instance().join_host(ip_addr)
+
+            if next_scene is not None:
+                self.next(next_scene, args)
+        except ConnectionError:
+            msg = "Unable to connect"
+            print(msg)
+            if is_join_scene:
+                self._active_scene.init_error_message(msg)
+        except OSError:
+            msg = "Invalid IP address"
+            print(msg)
+            if is_join_scene:
+                self._active_scene.init_error_message(msg)
+
+    def disconnect(self, next_scene: Optional[callable] = None, *args):
         Networking.get_instance().disconnect()
 
         if next_scene is not None:
-            self.next(next_scene)
+            self.next(next_scene, args)
