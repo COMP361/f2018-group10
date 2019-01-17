@@ -98,7 +98,7 @@ class SceneManager(object):
         Networking.get_instance().create_host()
 
         if next_scene is not None:
-            self.next(next_scene, args)
+            self.next(next_scene, *args)
 
     def join(self, ip_addr, next_scene: Optional[callable] = None, *args):
         if isinstance(self._active_scene, JoinScene):
@@ -110,7 +110,7 @@ class SceneManager(object):
             Networking.get_instance().join_host(ip_addr)
 
             if next_scene is not None:
-                self.next(next_scene, args)
+                self.next(next_scene, *args)
         except ConnectionError:
             msg = "Unable to connect"
             print(msg)
@@ -126,4 +126,4 @@ class SceneManager(object):
         Networking.get_instance().disconnect()
 
         if next_scene is not None:
-            self.next(next_scene, args)
+            self.next(next_scene, *args)
