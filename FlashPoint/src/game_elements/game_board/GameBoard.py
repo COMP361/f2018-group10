@@ -25,13 +25,13 @@ class GameBoard(pygame.sprite.Group):
     def update(self, event_q: EventQueue):
         for event in event_q:
             if event.type == pygame.MOUSEBUTTONUP:
-                for tile in self.grid:
+                for tile_sprite in self.grid:
 
-                    if tile.hover():
-                        tile.sprite_grp.add(CharacterSprite())
+                    if tile_sprite.hover():
+                        tile_sprite.tile_model.game_unit_sprites.add(CharacterSprite())
 
-                    else:
-                        some_sprite = tile.find_character()
-                        tile.remove_sprite_character(some_sprite)
+                   # else:
+                        # some_sprite = tile_sprite.tile_model.find_character()
+                        # tile_sprite.tile_model.remove_sprite_character(some_sprite)
 
         self.grid.update(event_q)
