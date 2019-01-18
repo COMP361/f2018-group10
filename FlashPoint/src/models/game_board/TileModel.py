@@ -1,17 +1,17 @@
 import pygame
 
-from src.constants.enums.SpaceKindEnum import SpaceKind
-from src.constants.enums.SpaceStateEnum import SpaceState
+from src.constants.enums.SpaceKindEnum import SpaceKindEnum
+from src.constants.enums.SpaceStateEnum import SpaceStateEnum
 
 
 class TileModel(object):
     """Logical state of a Tile object."""
 
-    def __init__(self, x_coord: int, y_coord: int, space_kind: SpaceKind):
+    def __init__(self, x_coord: int, y_coord: int, space_kind: SpaceKindEnum):
         self._x_coord = x_coord
         self._y_coord = y_coord
         self._space_kind = space_kind
-        self._space_state = SpaceState.SAFE
+        self._space_state = SpaceStateEnum.SAFE
         self._hotspot = False
         self._game_unit_sprites = pygame.sprite.Group()
         self._adjacent_tiles = []

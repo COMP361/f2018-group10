@@ -2,6 +2,7 @@ from typing import List
 
 import pygame
 
+from src.constants.enums.SpaceKindEnum import SpaceKindEnum
 from src.models.game_board.TileModel import TileModel
 from src.sprites.TileSprite import TileSprite
 
@@ -27,7 +28,8 @@ class GridSprite(pygame.sprite.Group):
             grid.append([])
             y_offset = 0
             for j in range(0, self.height):
-                grid[i].append(TileSprite(self.rect.x, self.rect.y, x_offset, y_offset, TileModel(i, j, None)))
+                grid[i].append(
+                    TileSprite(self.rect.x, self.rect.y, x_offset, y_offset, TileModel(i, j, SpaceKindEnum.INDOOR)))
                 self.add(grid[i][j])
 
                 y_offset += tile_size

@@ -1,6 +1,6 @@
 from enum import Enum, auto
 
 
-class SpaceKind(Enum):
+class SpaceKindEnum(Enum):
     INDOOR = auto()
     OUTDOOR = auto()

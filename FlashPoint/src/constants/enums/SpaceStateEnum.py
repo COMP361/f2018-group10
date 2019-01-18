@@ -1,7 +1,7 @@
 from enum import Enum, auto
 
 
-class SpaceState(Enum):
+class SpaceStateEnum(Enum):
     SAFE = auto()
     SMOKE = auto()
     FIRE = auto()

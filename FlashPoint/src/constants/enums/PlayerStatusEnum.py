@@ -1,7 +1,7 @@
 from enum import Enum, auto
 
 
-class PlayerStatus(Enum):
+class PlayerStatusEnum(Enum):
     OFFLINE = auto()
     READY = auto()
     ONLINE = auto()
