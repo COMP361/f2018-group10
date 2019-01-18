@@ -3,12 +3,11 @@ import pygame
 from src.UIComponents.Interactable import Interactable
 from src.constants import Color
 from src.core.EventQueue import EventQueue
-from src.game_elements.game_board.CharacterSprite import CharacterSprite
-from src.game_elements.game_board.TileModel import TileModel
+from src.models.game_board import TileModel
 
 
 class TileSprite(Interactable):
-
+    """Graphical representation of a Tile and controls."""
     def __init__(self, grid_x_pos: int, grid_y_pos: int, x_offset, y_offset, tile_model: TileModel, size: int = 128):
         self.tile_model = tile_model
 
@@ -26,18 +25,6 @@ class TileSprite(Interactable):
     def _render(self):
         """Eventually this might have some randomization logic? Dunno how we'll generate boards :( """
         self.image.fill(Color.GREY, self.rect)  # eventually this will be an actual tile image.
-
-    def hover(self):
-        if self._is_enabled:
-            mouse = pygame.mouse.get_pos()
-            rect = self.rect
-            x_max = rect.x + rect.w
-            x_min = rect.x
-            y_max = rect.y + rect.h
-            y_min = rect.y
-            return x_max > mouse[0] > x_min and y_max > mouse[1] > y_min
-        else:
-            return False
 
     def _highlight(self):
         if self.hover() and self._is_enabled:
@@ -72,6 +59,18 @@ class TileSprite(Interactable):
     #     for sprite in self.tile_model.game_unit_sprites:
     #         if isinstance(sprite, CharacterSprite):
     #             return sprite
+
+    def hover(self):
+        if self._is_enabled:
+            mouse = pygame.mouse.get_pos()
+            rect = self.rect
+            x_max = rect.x + rect.w
+            x_min = rect.x
+            y_max = rect.y + rect.h
+            y_min = rect.y
+            return x_max > mouse[0] > x_min and y_max > mouse[1] > y_min
+        else:
+            return False
 
     def draw(self, screen: pygame.Surface):
         self._highlight()

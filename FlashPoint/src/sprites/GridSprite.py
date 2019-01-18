@@ -2,11 +2,11 @@ from typing import List
 
 import pygame
 
-from src.game_elements.game_board.TileModel import TileModel
-from src.game_elements.game_board.TileSprite import TileSprite
+from src.models.game_board.TileModel import TileModel
+from src.sprites.TileSprite import TileSprite
 
 
-class Grid(pygame.sprite.Group):
+class GridSprite(pygame.sprite.Group):
 
     """Class to Group Tile objects together, and implement Grid logic in to what will form the GameBoard."""
     def __init__(self, *sprites: pygame.sprite.Sprite,
@@ -29,8 +29,6 @@ class Grid(pygame.sprite.Group):
             y_offset = 0
             for j in range(0, self.height):
                 grid[i].append(TileSprite(self.rect.x, self.rect.y, x_offset, y_offset, TileModel(i, j, None)))
-                # grid[i][j].x_coordinate = i
-                # grid[i][j].y_coordinate = j
                 self.add(grid[i][j])
 
                 y_offset += tile_size

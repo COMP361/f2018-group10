@@ -2,8 +2,8 @@ import pygame
 
 import src.constants.Color as Color
 import src.constants.MainConstants as MainConst
-from src.game_elements.game_board.CharacterSprite import CharacterSprite
-from src.game_elements.game_board.Grid import Grid
+from src.sprites.GridSprite import GridSprite
+from src.sprites.CharacterSprite import CharacterSprite
 from src.core.EventQueue import EventQueue
 
 
@@ -14,7 +14,7 @@ class GameBoard(pygame.sprite.Group):
         super().__init__()
         self.image = pygame.Surface((MainConst.SCREEN_RESOLUTION[0], MainConst.SCREEN_RESOLUTION[1]))
         self.rect = self.image.get_rect()
-        self.grid = Grid(x_coord=self.rect.left, y_coord=self.rect.top)
+        self.grid = GridSprite(x_coord=self.rect.left, y_coord=self.rect.top)
         self.add(self.grid)
 
     def draw(self, screen: pygame.Surface):
