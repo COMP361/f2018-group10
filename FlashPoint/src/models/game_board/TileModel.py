@@ -1,18 +1,7 @@
 import pygame
 
-from enum import Enum, auto
-from typing import List
-
-
-class SpaceKind(Enum):
-    INDOOR = auto()
-    OUTDOOR = auto()
-
-
-class SpaceState(Enum):
-    SAFE = auto()
-    SMOKE = auto()
-    FIRE = auto()
+from src.constants.enums.SpaceKind import SpaceKind
+from src.constants.enums.SpaceState import SpaceState
 
 
 class TileModel(object):

@@ -7,5 +7,4 @@ class PlayerModel(GameUnit):
         super().__init__()
         self.user_name = ""
         self.password = ""
-        self.status = None   # Should be some status enum
-
+        self.status = None   # Could be some status enum
