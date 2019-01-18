@@ -1,7 +1,7 @@
 import pygame
 
-from src.constants.enums.SpaceKind import SpaceKind
-from src.constants.enums.SpaceState import SpaceState
+from src.constants.enums.SpaceKindEnum import SpaceKind
+from src.constants.enums.SpaceStateEnum import SpaceState
 
 
 class TileModel(object):
