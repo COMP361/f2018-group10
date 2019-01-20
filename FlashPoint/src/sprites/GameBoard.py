@@ -2,8 +2,8 @@ import pygame
 
 import src.constants.Color as Color
 import src.constants.MainConstants as MainConst
-from src.game_elements.game_board.CharacterSprite import CharacterSprite
-from src.game_elements.game_board.Grid import Grid
+from src.sprites.GridSprite import GridSprite
+from src.sprites.CharacterSprite import CharacterSprite
 from src.core.EventQueue import EventQueue
 
 
@@ -14,7 +14,7 @@ class GameBoard(pygame.sprite.Group):
         super().__init__()
         self.image = pygame.Surface((MainConst.SCREEN_RESOLUTION[0], MainConst.SCREEN_RESOLUTION[1]))
         self.rect = self.image.get_rect()
-        self.grid = Grid(x_coord=self.rect.left, y_coord=self.rect.top)
+        self.grid = GridSprite(x_coord=self.rect.left, y_coord=self.rect.top)
         self.add(self.grid)
 
     def draw(self, screen: pygame.Surface):
@@ -25,13 +25,13 @@ class GameBoard(pygame.sprite.Group):
     def update(self, event_q: EventQueue):
         for event in event_q:
             if event.type == pygame.MOUSEBUTTONUP:
-                for tile in self.grid:
+                for tile_sprite in self.grid:
 
-                    if tile.hover():
-                        tile.sprite_grp.add(CharacterSprite())
+                    if tile_sprite.hover():
+                        tile_sprite.tile_model.game_unit_sprites.add(CharacterSprite())
 
-                    else:
-                        some_sprite = tile.find_character()
-                        tile.remove_sprite_character(some_sprite)
+                   # else:
+                        # some_sprite = tile_sprite.tile_model.find_character()
+                        # tile_sprite.tile_model.remove_sprite_character(some_sprite)
 
         self.grid.update(event_q)
