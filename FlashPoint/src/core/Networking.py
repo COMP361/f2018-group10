@@ -2,6 +2,7 @@ import ipaddress
 import socket
 import threading
 import logging
+from enum import Enum
 
 from src.external.Mastermind import *
 
@@ -180,3 +181,18 @@ class Networking:
 
     class Client(MastermindClientUDP):
         """Override callbacks here"""
+
+    class DataPayload(object):
+        """
+            Unified data object to be sent over the network
+        """
+        # Constants for command type
+        class Command(Enum):
+            CHAT = 0
+            MOVE = 1
+            ACTION = 2
+
+        def __init__(self, cmd: Command, *args, **kwargs):
+            self.command = cmd
+            self.args = args
+            self.kwargs = kwargs
