@@ -45,7 +45,7 @@ class Networking:
 
         def create_host(self, port=20298):
             # We use UDP to broadcast the host
-            self.host = MastermindServerUDP()
+            self.host = Networking.Host()
 
             """
             # find unused ip address
@@ -87,7 +87,7 @@ class Networking:
                 logger.error("Failed to create a host")
 
         def join_host(self, ip, port=20298):
-            self.client = MastermindClientUDP(self.TIMEOUT_CONNECT, self.TIMEOUT_RECEIVE)
+            self.client = Networking.Client(self.TIMEOUT_CONNECT, self.TIMEOUT_RECEIVE)
             try:
                 print(f"Attempting to connect to host at {ip}:{port}")
                 logger.info(f"Attempting to connect to host at {ip}:{port}")
@@ -167,3 +167,16 @@ class Networking:
 
         def send(self, data, compress=0):
             self.client.send(data, compress)
+
+    """Overridden classes"""
+    class Host(MastermindServerUDP):
+        def callback_connect_client(self, connection_object):
+            print(f"Client at {connection_object.address} is connected")
+            return super(MastermindServerUDP, self).callback_connect_client(connection_object)
+
+        def callback_client_handle(self, connection_object, data):
+            print(f"Client at {connection_object.address} sent a message: {data}")
+            return super(MastermindServerUDP, self).callback_client_handle(connection_object, data)
+
+    class Client(MastermindClientUDP):
+        """Override callbacks here"""
