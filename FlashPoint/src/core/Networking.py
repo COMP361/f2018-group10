@@ -1,9 +1,11 @@
+import pygame
 import ipaddress
 import socket
 import threading
 import logging
 from enum import Enum
 
+from src.core.EventQueue import EventQueue
 from src.external.Mastermind import *
 
 logger = logging.getLogger("networking")
@@ -166,10 +168,21 @@ class Networking:
             if self.host is not None:
                 self.host.accepting_disallow()
 
+        def chat(self, message: str):
+            data = Networking.DataPayload.make_chat_data(message)
+            self.client.send(data, True)
+
         def send(self, data, compress=0):
             self.client.send(data, compress)
 
-    """Overridden classes"""
+        def handle_command(self, command):
+            """Handle the commands here"""
+
+        def update(self, event_queue: EventQueue):
+            for event in event_queue:
+                self.handle_command(event)
+
+    # Overridden classes
     class Host(MastermindServerUDP):
         def callback_connect_client(self, connection_object):
             print(f"Client at {connection_object.address} is connected")
@@ -188,11 +201,20 @@ class Networking:
         """
         # Constants for command type
         class Command(Enum):
-            CHAT = 0
-            MOVE = 1
-            ACTION = 2
+            CHAT = pygame.USEREVENT+20
+            MOVE = pygame.USEREVENT+21
+            ACTION = pygame.USEREVENT+22
 
         def __init__(self, cmd: Command, *args, **kwargs):
             self.command = cmd
             self.args = args
             self.kwargs = kwargs
+
+        # Factory methods
+        @staticmethod
+        def make_chat_data(*args, **kwargs):
+            return Networking.DataPayload(Networking.DataPayload.Command.CHAT, args, kwargs)
+
+        @staticmethod
+        def make_move_data(*args, **kwargs):
+            return Networking.DataPayload(Networking.DataPayload.Command.MOVE, args, kwargs)

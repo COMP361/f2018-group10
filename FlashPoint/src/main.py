@@ -9,6 +9,7 @@ import src.constants.MainConstants as MainConst
 from src.Windows.UIComponents.FileImporter import FileImporter
 from src.Windows.UIComponents.SceneManager import SceneManager
 from src.core.EventQueue import EventQueue
+from src.core.Networking import Networking
 
 
 class Main(object):
@@ -41,6 +42,8 @@ class Main(object):
 
             self.scene_manager.draw()
             self.scene_manager.update(self.event_queue)
+
+            Networking.get_instance().update(self.event_queue)
 
             self.event_queue.flush_queue()
 
