@@ -17,3 +17,6 @@
 # Ignore coverage reports
 **/.coverage
 **/htmlcov/**
+
+# Ignore docs
+**/docs/**

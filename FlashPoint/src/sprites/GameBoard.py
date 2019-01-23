@@ -18,6 +18,7 @@ class GameBoard(pygame.sprite.Group):
         self.add(self.grid)
 
     def draw(self, screen: pygame.Surface):
+
         self.image.fill(Color.BLACK)
         self.grid.draw(self.image)
         screen.blit(self.image, self.rect)
