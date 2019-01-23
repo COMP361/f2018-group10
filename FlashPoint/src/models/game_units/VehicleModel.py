@@ -1,12 +1,13 @@
 from src.models.game_board.TileModel import TileModel
-from src.models.game_units.GameUnit import GameUnit
+
+# TODO Make this an interface or abstract class
 
 
-class VehicleModel(GameUnit):
+class VehicleModel(object):
     """Base class for Ambulance and Engine"""
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, tile: TileModel):
+        super().__init__(tile)
 
     def drive(self, tile: TileModel):
         pass
