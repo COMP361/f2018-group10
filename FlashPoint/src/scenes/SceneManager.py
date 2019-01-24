@@ -1,6 +1,13 @@
+from typing import Optional
+
 import pygame
 
+<<<<<<< HEAD:FlashPoint/src/scenes/SceneManager.py
 from src.UIComponents.FileImporter import FileImporter
+=======
+from src.Windows.UIComponents.Scene import Scene
+from src.Windows.UIComponents.FileImporter import FileImporter
+>>>>>>> networking:FlashPoint/src/Windows/UIComponents/SceneManager.py
 from src.scenes.GameBoardScene import GameBoardScene
 from src.scenes.HostJoinScene import HostJoinScene
 from src.scenes.HostMenuScene import HostMenuScene
@@ -10,6 +17,8 @@ from src.scenes.GameIntialMenu import CreateGameMenu
 from src.core.EventQueue import EventQueue
 from src.scenes.CharacterScene import CharacterScene
 from src.scenes.LobbyScene import LobbyScene
+
+from src.core.Networking import Networking
 
 
 class SceneManager(object):
@@ -44,31 +53,31 @@ class SceneManager(object):
 
         if isinstance(self._active_scene, HostJoinScene):
             self._active_scene.buttonJoin.on_click(self.next, JoinScene)
-            self._active_scene.buttonHost.on_click(self.next, HostMenuScene)
+            self._active_scene.buttonHost.on_click(self.host, HostMenuScene)
             self._active_scene.buttonBack.on_click(self.next, StartScene)
 
         if isinstance(self._active_scene, JoinScene):
             self._active_scene.buttonBack.on_click(self.next, HostJoinScene)
-            self._active_scene.buttonConnect.on_click(self.next, LobbyScene, True)
+            self._active_scene.buttonConnect.on_click(self.join, self._active_scene.text_bar_msg, LobbyScene, True)
 
         if isinstance(self._active_scene, HostMenuScene):
-            self._active_scene.buttonBack.on_click(self.next, HostJoinScene)
+            self._active_scene.buttonBack.on_click(self.disconnect, HostJoinScene)
             self._active_scene.buttonNewGame.on_click(self.next, CreateGameMenu)
 
         if isinstance(self._active_scene, CreateGameMenu):
-            self._active_scene.buttonBack.on_click(self.next, HostJoinScene)
+            self._active_scene.buttonBack.on_click(self.disconnect, HostJoinScene)
             self._active_scene.buttonExp.on_click(self.next, LobbyScene, True)
             self._active_scene.buttonFamily.on_click(self.next, LobbyScene, False)
 
         if isinstance(self._active_scene, CharacterScene):
             self._active_scene.buttonBack.on_click(self.next, LobbyScene, True)
-            self._active_scene.buttonConfirm.on_click(self.next,LobbyScene, True)
+            self._active_scene.buttonConfirm.on_click(self.next, LobbyScene, True)
 
         if isinstance(self._active_scene, LobbyScene):
             if self._active_scene.is_experienced:
                 self._active_scene.buttonSelChar.on_click(self.next, CharacterScene)
 
-            self._active_scene.buttonBack.on_click(self.next, HostJoinScene)
+            self._active_scene.buttonBack.on_click(self.disconnect, HostJoinScene)
             self._active_scene.buttonReady.on_click(self.next, GameBoardScene)
 
         if isinstance(self._active_scene, GameBoardScene):
@@ -81,3 +90,44 @@ class SceneManager(object):
 
     def update(self, event_queue: EventQueue):
         self._active_scene.update(event_queue)
+        for event in event_queue:
+            self.handle_event(event)
+
+    def handle_event(self, event):
+        # join event
+        if event.type == pygame.USEREVENT+1:
+            self.join(event.ip, LobbyScene, True)
+
+    def host(self, next_scene: Optional[callable] = None, *args):
+        Networking.get_instance().create_host()
+
+        if next_scene is not None:
+            self.next(next_scene, *args)
+
+    def join(self, ip_addr, next_scene: Optional[callable] = None, *args):
+        if isinstance(self._active_scene, JoinScene):
+            is_join_scene = True
+        else:
+            is_join_scene = False
+
+        try:
+            Networking.get_instance().join_host(ip_addr)
+
+            if next_scene is not None:
+                self.next(next_scene, *args)
+        except ConnectionError:
+            msg = "Unable to connect"
+            print(msg)
+            if is_join_scene:
+                self._active_scene.init_error_message(msg)
+        except OSError:
+            msg = "Invalid IP address"
+            print(msg)
+            if is_join_scene:
+                self._active_scene.init_error_message(msg)
+
+    def disconnect(self, next_scene: Optional[callable] = None, *args):
+        Networking.get_instance().disconnect()
+
+        if next_scene is not None:
+            self.next(next_scene, *args)

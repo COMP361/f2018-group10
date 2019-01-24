@@ -2,10 +2,18 @@ import pygame
 
 import src.constants.Color as Color
 
+<<<<<<< HEAD
 from src.UIComponents.RectButton import RectButton
 from src.UIComponents.RectLabel import RectLabel
 from src.UIComponents.Text import Text
 from src.UIComponents.ChatBox import ChatBox
+=======
+from src.Windows.UIComponents.RectButton import RectButton
+from src.Windows.UIComponents.RectLabel import RectLabel
+from src.Windows.UIComponents.Text import Text
+from src.Windows.UIComponents.ChatBox import ChatBox
+from src.core.Networking import Networking
+>>>>>>> networking
 
 
 class LobbyScene(object):
@@ -23,6 +31,7 @@ class LobbyScene(object):
         self._init_text_box(780, 89, 100, 150, "", Color.GREY)
         self._init_text_box(1080, 164, 100, 150, "", Color.GREY)
         self._init_text_box(565, 375, 150, 200, "", Color.GREY)
+        self._init_ip_addr()
         self.chat_box = ChatBox()
         self.is_experienced = game_type
 
@@ -67,6 +76,16 @@ class LobbyScene(object):
         self.buttonBack = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
                                      Text(pygame.font.SysFont('Arial', 20), text, color_text))
         self.sprite_grp.add(self.buttonBack)
+
+    def _init_ip_addr(self):
+        if Networking.get_instance().is_host:
+            ip_addr = f"Your IP address: {Networking.get_instance().get_ip()}"
+            label_width = 400
+            label_left = (pygame.display.get_surface().get_size()[0]/2) - (label_width/2)
+            ip_addr_label = RectLabel(label_left, 20, label_width, 50, (255, 255, 255),
+                                      txt_obj=(Text(pygame.font.SysFont('Arial', 24), ip_addr)))
+            ip_addr_label.set_transparent_background(True)
+            self.sprite_grp.add(ip_addr_label)
 
     def draw(self, screen):
         self.sprite_grp.draw(screen)

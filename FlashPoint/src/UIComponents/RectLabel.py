@@ -40,12 +40,17 @@ class RectLabel(pygame.sprite.Sprite, Components):
         self.txt_pos = txt_pos
         self.image = None
         self.rect = None
+        self.transparent_bg = False
         self._render()
 
     def _render(self):
         # If self.background is an instance of Tuple, we assign that RGB tuple as the background color
         # Otherwise, self.background is an imported image (Surface) so we try to import it and assign as the background
         self.image = pygame.Surface([self.width, self.height])
+
+        if self.transparent_bg:
+            self.image.set_colorkey(self.background)
+
         self.rect = self.image.get_rect()
 
         if isinstance(self.background, Tuple):
@@ -85,4 +90,8 @@ class RectLabel(pygame.sprite.Sprite, Components):
     def change_pos(self, x: int, y: int):
         self.x(x)
         self.y(y)
+        self._render()
+
+    def set_transparent_background(self, x: bool):
+        self.transparent_bg = x
         self._render()
