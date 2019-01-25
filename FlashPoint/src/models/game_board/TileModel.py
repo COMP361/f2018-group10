@@ -1,12 +1,12 @@
-from typing import Optional
-
 import pygame
 
+from typing import Optional
+
+from models.game_board.EdgeObstacleModel import EdgeObstacleModel
 from src.constants.enums.DirectionEnum import DirectionEnum
-from src.core.exceptions.TilePositionOutOfBoundsException import TilePositionOutOfBoundsException
-from src.models.game_board.EdgeObstacleModel import EdgeObstacleModel
 from src.constants.enums.SpaceKindEnum import SpaceKindEnum
 from src.constants.enums.SpaceStatusEnum import SpaceStatusEnum
+from src.core.exceptions.TilePositionOutOfBoundsException import TilePositionOutOfBoundsException
 
 
 class TileModel(object):
@@ -17,7 +17,7 @@ class TileModel(object):
         self._y_coord = y_coord
         self._space_kind = space_kind
         self._space_state = SpaceStatusEnum.SAFE
-        self._hotspot = False
+        self._is_hotspot = False
         self._game_unit_sprites = pygame.sprite.Group()
 
         self._adjacent_tiles = {
@@ -33,6 +33,42 @@ class TileModel(object):
             DirectionEnum.WEST: None,
             DirectionEnum.SOUTH: None,
         }
+
+    # def add_game_unit_sprite(self, game_unit_sprite: GameUnitSprite):
+    #     """TODO: Should check if valid sprite type."""
+    #     self._game_unit_sprites.add(game_unit_sprite)
+
+    @property
+    def x_coord(self):
+        return self._x_coord
+
+    @property
+    def y_coord(self):
+        return self._y_coord
+
+    @property
+    def space_kind(self):
+        return self._space_kind
+
+    @property
+    def space_state(self):
+        return self._space_state
+
+    @property
+    def is_hotspot(self):
+        return self._is_hotspot
+
+    @property
+    def game_unit_sprites(self):
+        return self._game_unit_sprites
+
+    @property
+    def adjacent_tiles(self):
+        return self._adjacent_tiles
+
+    @property
+    def adjacent_edge_objects(self):
+        return self._adjacent_edge_objects
 
     @property
     def north_tile(self):
@@ -97,9 +133,6 @@ class TileModel(object):
     def set_adjacent_edge_obstacle(self, direction: DirectionEnum, edge_obstacle: EdgeObstacleModel):
         self._adjacent_edge_objects[direction] = edge_obstacle
 
-    def game_unit_sprites(self):
-        return self._game_unit_sprites
-
     def get_tile_in_direction(self, direction: DirectionEnum):
         """
         Get the TileModel in a specified direction.
@@ -120,4 +153,7 @@ class TileModel(object):
     # def add_game_unit_sprite(self, game_unit_sprite: GameUnitSprite):
     #     """TODO: Should check if valid sprite type."""
     #     self._game_unit_sprites.add(game_unit_sprite)
+
+    def __str__(self):
+        return f"Tile at: ({self.x_coord}, {self.y_coord})."
 
