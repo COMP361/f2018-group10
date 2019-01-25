@@ -1,9 +1,10 @@
 from typing import Optional
 
 import pygame
-from constants.enums.DirectionEnum import DirectionEnum
-from core.exceptions.TilePositionOutOfBoundsException import TilePositionOutOfBoundsException
 
+from src.constants.enums.DirectionEnum import DirectionEnum
+from src.core.exceptions.TilePositionOutOfBoundsException import TilePositionOutOfBoundsException
+from src.models.game_board.EdgeObstacleModel import EdgeObstacleModel
 from src.constants.enums.SpaceKindEnum import SpaceKindEnum
 from src.constants.enums.SpaceStatusEnum import SpaceStatusEnum
 
@@ -26,7 +27,7 @@ class TileModel(object):
             DirectionEnum.SOUTH: None,
         }
 
-        self._adjacent_edge_object = {
+        self._adjacent_edge_objects = {
             DirectionEnum.NORTH: None,
             DirectionEnum.EAST: None,
             DirectionEnum.WEST: None,
@@ -44,6 +45,10 @@ class TileModel(object):
             raise TilePositionOutOfBoundsException(self, DirectionEnum.NORTH)
         return tile
 
+    @north_tile.setter
+    def north_tile(self, tile):
+        self._adjacent_tiles[DirectionEnum.NORTH] = tile
+
     @property
     def east_tile(self):
         """
@@ -54,6 +59,10 @@ class TileModel(object):
         if not tile:
             raise TilePositionOutOfBoundsException(self, DirectionEnum.EAST)
         return tile
+
+    @east_tile.setter
+    def east_tile(self, tile):
+        self._adjacent_tiles[DirectionEnum.EAST] = tile
 
     @property
     def west_tile(self):
@@ -66,6 +75,10 @@ class TileModel(object):
             raise TilePositionOutOfBoundsException(self, DirectionEnum.WEST)
         return tile
 
+    @west_tile.setter
+    def west_tile(self, tile):
+        self._adjacent_tiles[DirectionEnum.WEST] = tile
+
     @property
     def south_tile(self):
         """
@@ -76,6 +89,13 @@ class TileModel(object):
         if not tile:
             raise TilePositionOutOfBoundsException(self, DirectionEnum.SOUTH)
         return tile
+
+    @south_tile.setter
+    def south_tile(self, tile):
+        self._adjacent_tiles[DirectionEnum.SOUTH] = tile
+
+    def set_adjacent_edge_obstacle(self, direction: DirectionEnum, edge_obstacle: EdgeObstacleModel):
+        self._adjacent_edge_objects[direction] = edge_obstacle
 
     def game_unit_sprites(self):
         return self._game_unit_sprites
@@ -90,12 +110,12 @@ class TileModel(object):
             raise TilePositionOutOfBoundsException(self, direction)
         return tile
 
-    def get_wall_in_direction(self, direction: DirectionEnum):
+    def get_obstacle_in_direction(self, direction: DirectionEnum) -> Optional['TileModel']:
         """
         Get the EdgeObstacle model
-        :return:
+        :return: EdgeObstacleModel in the direction specified, or None.
         """
-        pass
+        return self._adjacent_edge_objects.get(direction, None)
 
     # def add_game_unit_sprite(self, game_unit_sprite: GameUnitSprite):
     #     """TODO: Should check if valid sprite type."""
