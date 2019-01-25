@@ -1,5 +1,5 @@
-from constants.enums.DoorStatusEnum import DoorStatusEnum
-from models.game_board.EdgeObstacleModel import EdgeObstacleModel
+from src.constants.enums.DoorStatusEnum import DoorStatusEnum
+from src.models.game_board.EdgeObstacleModel import EdgeObstacleModel
 
 
 class DoorModel(EdgeObstacleModel):

@@ -1,7 +1,11 @@
 import pygame
 
+from src.sprites import CharacterSprite, FireSprite, SmokeSprite, HazMatSprite, VehicleSprite, VictimSprite
+from src.sprites.GameUnitSprite import GameUnitSprite
 from src.constants.enums.SpaceKindEnum import SpaceKindEnum
 from src.constants.enums.SpaceStatusEnum import SpaceStatusEnum
+from src.sprites.POISprite import POISprite
+from src.sprites.HazMatSprite import HazMatSprite
 
 
 class TileModel(object):
@@ -21,7 +25,20 @@ class TileModel(object):
     def game_unit_sprites(self):
         return self._game_unit_sprites
 
-    # def add_game_unit_sprite(self, game_unit_sprite: GameUnitSprite):
-    #     """TODO: Should check if valid sprite type."""
-    #     self._game_unit_sprites.add(game_unit_sprite)
+    def add_game_unit_sprite(self, game_unit_sprite: GameUnitSprite):
+        """TODO: Make sure to add raising exceptions if the added game sprite is illegal"""
+        type = game_unit_sprite.get_sprite()
 
+        if self._space_kind == SpaceKindEnum.INDOOR:
+            # Means only legal sprites on tiles should be POI, Character, Fire, Smoke, Hazmat
+
+            if isinstance(type, POISprite) or isinstance(type, CharacterSprite) or isinstance(type, FireSprite) or isinstance(
+                    type, SmokeSprite) or isinstance(type, HazMatSprite) or isinstance(type, VictimSprite):
+                self._game_unit_sprites.add(game_unit_sprite)
+
+        elif self._space_kind == SpaceKindEnum.OUTDOOR:
+            # means we can also have Vehicle Models.
+            # Cannot have fire, smoke , hazmat or POI out of th
+
+            if isinstance(type, VehicleSprite) or isinstance(type, CharacterSprite):
+                self._game_unit_sprites.add(game_unit_sprite)

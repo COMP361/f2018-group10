@@ -1,7 +1,7 @@
 from typing import Optional
 from abc import ABC, abstractmethod
 
-from models.game_board.TileModel import TileModel
+from src.models.game_board.TileModel import TileModel
 
 
 class GameUnit(ABC):
