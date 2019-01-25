@@ -1,6 +1,7 @@
 import pygame
 
 import src.constants.Color as Color
+from src.UIComponents.FileImporter import FileImporter
 from src.game_elements.game_board.CharacterSprite import CharacterSprite
 from src.UIComponents.Interactable import Interactable
 from src.core.EventQueue import EventQueue
@@ -16,13 +17,17 @@ class Tile(Interactable):
         self.rect = self.image.get_rect().move(x_offset, y_offset)
         self.mouse_rect = pygame.Rect(self.rect).move(x, y)
         self.is_hovered = False
+        self.image_file = FileImporter.import_image("media/tiles/grass.jpg")
+        self.image_file = pygame.transform.scale(self.image_file, (128, 128))
         self._render()
         self._mouse_pos = (0, 0)  # For keeping track of previous location.
         self.is_scrolling = False
 
+
     def _render(self):
         """Eventually this might have some randomization logic? Dunno how we'll generate boards :( """
-        self.image.fill(Color.GREY, self.rect)  # eventually this will be an actual tile image.
+       # self.image.fill(Color.GREY, self.rect)  # eventually this will be an actual tile image.
+        self.image.blit(self.image_file, (0, 0))
 
     def hover(self):
         if self._is_enabled:
@@ -65,8 +70,9 @@ class Tile(Interactable):
                 self.is_hovered = True
                 self.image.fill(Color.YELLOW)
         else:
-            self.image.fill(Color.GREY)
-            self.is_hovered = False
+           # self.image.fill(Color.GREY)
+           self.image.blit(self.image_file, (0, 0))
+           self.is_hovered = False
 
     def _scroll(self):
         """Move this Sprite in the direction of the scroll."""

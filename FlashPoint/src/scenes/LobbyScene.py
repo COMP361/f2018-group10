@@ -34,7 +34,7 @@ class LobbyScene(object):
 
     def _init_background(self):
         box_size = (self.resolution[0], self.resolution[1])
-        background_box = RectLabel(0, 0, box_size[0], box_size[1], "media/FlashpointBackGround.png")
+        background_box = RectLabel(0, 0, box_size[0], box_size[1], "media/Backgrounds/FlashpointBackGround.png")
         self.sprite_grp.add(background_box)
 
     def create_butn_img(self, x, y, width, height, path):
