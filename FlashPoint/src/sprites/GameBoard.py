@@ -3,7 +3,7 @@ import pygame
 import src.constants.Color as Color
 import src.constants.MainConstants as MainConst
 from src.sprites.GridSprite import GridSprite
-from src.sprites.CharacterSprite import CharacterSprite
+from src.sprites.PlayerSprite import CharacterSprite
 from src.core.EventQueue import EventQueue
 
 
