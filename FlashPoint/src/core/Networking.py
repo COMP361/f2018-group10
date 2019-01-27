@@ -47,6 +47,13 @@ class Networking:
             self.stop_broadcast.set()
 
         def create_host(self, port=20298):
+            """
+            Attempts to create a game host on localhost and a game client that connects to it.
+            A host machine is both a server (host) and a client so that the send message workflow can be simplified.
+            i.e. The send message can be hooked to a command without checking if the current machine is a host or not.
+            :param port: Port to be opened on the local machine. Defaults to 20298.
+            :return:
+            """
             # We use UDP to broadcast the host
             self.host = Networking.Host()
 
@@ -90,6 +97,12 @@ class Networking:
                 logger.error("Failed to create a host")
 
         def join_host(self, ip, port=20298):
+            """
+            Attempt to join host at the specified ip address
+            :param ip: IP address
+            :param port: Port to connect, defaults to 20298
+            :return:
+            """
             self.client = Networking.Client(self.TIMEOUT_CONNECT, self.TIMEOUT_RECEIVE)
             try:
                 print(f"Attempting to connect to host at {ip}:{port}")
@@ -104,6 +117,7 @@ class Networking:
 
         @staticmethod
         def broadcast_game(args, stop_event):
+            # TODO DON'T USE THIS YET
             b_caster = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             b_caster.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             b_caster.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
@@ -116,6 +130,7 @@ class Networking:
 
         @staticmethod
         def search_game(stop_event):
+            # TODO DON'T USE THIS YET
             listener = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             listener.bind('')
             while not stop_event.is_set():
@@ -124,6 +139,10 @@ class Networking:
 
         @property
         def is_host(self):
+            """
+            Returns True if the local machine is a host
+            :return:
+            """
             return self.host is not None
 
         @staticmethod
@@ -136,6 +155,10 @@ class Networking:
 
         @staticmethod
         def get_open_port():
+            """
+            Returns a port number that is unused
+            :return:
+            """
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.bind(("", 0))
             s.listen(1)
@@ -144,6 +167,10 @@ class Networking:
             return port
 
         def disconnect(self):
+            """
+            Disconnects the current machine. If the current machine is a host, it ends the game as well.
+            :return:
+            """
             if self.client is not None:
                 logger.info("Disconnecting client")
                 self.client.disconnect()
@@ -154,7 +181,9 @@ class Networking:
                 # Kill the broadcast
                 self.stop_broadcast.set()
 
+                # Stops accepting connection
                 self.host.accepting_disallow()
+                # Disconnects all clients
                 self.host.disconnect_clients()
                 self.host.disconnect()
                 self.host.__del__()
@@ -162,6 +191,10 @@ class Networking:
 
         # If game is started, stops new client from connecting
         def start_game(self):
+            """
+            Starts the game
+            :return:
+            """
             # Kill the broadcast
             self.stop_broadcast.set()
 

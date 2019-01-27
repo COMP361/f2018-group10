@@ -95,12 +95,25 @@ class SceneManager(object):
             self.join(event.ip, LobbyScene, True)
 
     def host(self, next_scene: Optional[callable] = None, *args):
+        """
+        Start the host process in Networking
+        :param next_scene: next scene to be called after the process completes
+        :param args: extra arguments for the next scene
+        :return:
+        """
         Networking.get_instance().create_host()
 
         if next_scene is not None:
             self.next(next_scene, *args)
 
     def join(self, ip_addr, next_scene: Optional[callable] = None, *args):
+        """
+        Start the join host process in Networking
+        :param ip_addr: ip address to connect
+        :param next_scene: next scene to be called after the process completes
+        :param args: extra arguments for the next scene
+        :return:
+        """
         if isinstance(self._active_scene, JoinScene):
             is_join_scene = True
         else:
@@ -123,6 +136,12 @@ class SceneManager(object):
                 self._active_scene.init_error_message(msg)
 
     def disconnect(self, next_scene: Optional[callable] = None, *args):
+        """
+        Start the disconnection process
+        :param next_scene: next scene to be called after the process completes
+        :param args: extra arguments for the next scene
+        :return:
+        """
         Networking.get_instance().disconnect()
 
         if next_scene is not None:
