@@ -177,10 +177,14 @@ class Networking:
 
         def handle_command(self, command):
             """Handle the commands here"""
+            if command.type == Networking.DataPayload.Command.CHAT:
+                """Chat action"""
 
         def update(self, event_queue: EventQueue):
             for event in event_queue:
-                self.handle_command(event)
+                # Handles the event if it's a command defined in DataPayload.Command
+                if event.type in [command.value for command in Networking.DataPayload.Command]:
+                    self.handle_command(event)
 
     # Overridden classes
     class Host(MastermindServerUDP):
@@ -189,7 +193,10 @@ class Networking:
             return super(MastermindServerUDP, self).callback_connect_client(connection_object)
 
         def callback_client_handle(self, connection_object, data):
-            print(f"Client at {connection_object.address} sent a message: {data}")
+            # print(f"Client at {connection_object.address} sent a message: {data}")
+            if isinstance(data, Networking.DataPayload):
+                params = {'args': data.args, 'kwargs': data.kwargs}
+                pygame.event.post(pygame.event.Event(data.command, **params))
             return super(MastermindServerUDP, self).callback_client_handle(connection_object, data)
 
     class Client(MastermindClientUDP):
