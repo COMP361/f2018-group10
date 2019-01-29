@@ -44,6 +44,8 @@ class Networking:
         stop_broadcast = threading.Event()
         stop_listen = threading.Event()
 
+        server_reply = None
+
         def __init__(self):
             self.stop_broadcast.set()
 
@@ -314,13 +316,47 @@ class Networking:
             :param compression: Compression, enabled by default
             :return:
             """
+            # define override here
             return super(MastermindServerUDP, self).callback_client_send(connection_object, data, compression)
 
         class ClientNotFoundException(Exception):
             pass
 
     class Client(MastermindClientUDP):
-        """Override callbacks here"""
+        pause_receive = threading.Event()
+        _server_reply = None
+
+        def connect(self, ip,port):
+            super(MastermindClientUDP, self).connect(ip, port)
+            receiver = threading.Thread(target=self.receive_data_from_server)
+            receiver.start()
+
+        def send(self, data, compression=None):
+            """
+            Send data to the server
+            :param data: data to be sent
+            :param compression: compression
+            :return:
+            """
+            self.pause_receive.set()
+            super(MastermindClientUDP, self).send(data, compression)
+            self.pause_receive.clear()
+
+        def receive_data_from_server(self):
+            """
+            Listen to the server and receives any data
+            :return:
+            """
+            while self is not None:
+                while not self.pause_receive.is_set():
+                    self._server_reply = self.receive(False)
+
+        def get_server_reply(self):
+            """
+            Retrieves the last message sent by the server
+            :return:
+            """
+            return self._server_reply
 
     class DataPayload(object):
         """
