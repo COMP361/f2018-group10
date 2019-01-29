@@ -6,6 +6,8 @@ from src.UIComponents.RectLabel import RectLabel
 from src.UIComponents.Text import Text
 from src.UIComponents.InputBox import InputBox
 
+from src.constants.enums.EventsEnum import EventsEnum
+
 
 class JoinScene(object):
     def __init__(self, screen):
@@ -66,7 +68,7 @@ class JoinScene(object):
         message = self._text_bar.message
         if message:
             data = {'ip': self._text_bar.message}
-            join_event = pygame.event.Event(pygame.USEREVENT+1, **data)
+            join_event = pygame.event.Event(EventsEnum.JOIN, **data)
             pygame.event.post(join_event)
             self._text_bar.message = ''
 

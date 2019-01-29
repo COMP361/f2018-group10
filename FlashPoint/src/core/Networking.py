@@ -221,16 +221,71 @@ class Networking:
 
     # Overridden classes
     class Host(MastermindServerUDP):
+        client_list = []
+
+        def lookup_client(self, ip_addr):
+            """
+            Look up the client list (array) and return the client id
+            :param ip_addr: IP address of the client
+            :return:
+            """
+            client_id = None
+            for i, addr in self.client_list:
+                if addr == ip_addr:
+                    client_id = i
+                    break
+            if client_id is not None:
+                return client_id
+            else:
+                raise Networking.Host.ClientNotFoundException
+
         def callback_connect_client(self, connection_object):
-            print(f"Client at {connection_object.address} is connected")
+            """
+            Called when a new client connects. This method can be overridden to provide useful information. It's good
+            practice to call "return super(MastermindServerTCP,self).callback_connect_client(connection_object)" at the
+            end of your override.
+            :param connection_object: Represents the appropriate connection
+            :return:
+            """
+            # print(f"Client at {connection_object.address} is connected")
+            # Assign a new connection object to the address (as a key value pair)
+            self.client_list.append(connection_object.address)
             return super(MastermindServerUDP, self).callback_connect_client(connection_object)
 
         def callback_client_handle(self, connection_object, data):
+            """
+            Called to handle data received from a connection. This method is often overridden to provide custom server
+            logic and useful information. It's good practice (and in this case essential) to call
+            "return super(MastermindServerTCP,self).callback_client_handle(connection_object,data)" at the end of your
+            override.
+            :param connection_object: Represents the appropriate connection
+            :param data: Data received from the connection
+            :return:
+            """
             # print(f"Client at {connection_object.address} sent a message: {data}")
             if isinstance(data, Networking.DataPayload):
-                params = {'args': data.args, 'kwargs': data.kwargs}
+                # look up and append the client id to the event post
+                client_id = self.lookup_client(connection_object.address)
+                params = {'client_id': client_id, 'args': data.args, 'kwargs': data.kwargs}
                 pygame.event.post(pygame.event.Event(data.command, **params))
             return super(MastermindServerUDP, self).callback_client_handle(connection_object, data)
+
+        def callback_client_send(self, connection_object, data, compression=True):
+            """
+            Called to when data is about to be sent to a connection. If sending fails, the connection is silently
+            terminated. This method can be overridden to provide useful information. It's good practice (and in this
+            case essential) to call
+            "return super(MastermindServerTCP,self).callback_client_send(connection_object,data,compression)" at the
+            end of your override.
+            :param connection_object: Represents the appropriate connection
+            :param data: Data to be sent
+            :param compression: Compression, enabled by default
+            :return:
+            """
+            return super(MastermindServerUDP, self).callback_client_send(connection_object, data, compression)
+
+        class ClientNotFoundException(Exception):
+            pass
 
     class Client(MastermindClientUDP):
         """Override callbacks here"""

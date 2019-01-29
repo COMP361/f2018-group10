@@ -6,6 +6,7 @@ from src.UIComponents.RectButton import RectButton
 from src.UIComponents.RectLabel import RectLabel
 from src.UIComponents.Text import Text
 from src.UIComponents.ChatBox import ChatBox
+from src.core.Networking import Networking
 
 
 class LobbyScene(object):

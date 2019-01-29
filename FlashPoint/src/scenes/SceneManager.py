@@ -14,6 +14,7 @@ from src.scenes.CharacterScene import CharacterScene
 from src.scenes.LobbyScene import LobbyScene
 
 from src.core.Networking import Networking
+from constants.enums.EventsEnum import EventsEnum
 
 
 class SceneManager(object):
@@ -76,7 +77,7 @@ class SceneManager(object):
             self._active_scene.buttonReady.on_click(self.next, GameBoardScene)
 
         if isinstance(self._active_scene, GameBoardScene):
-            self._active_scene.quit_btn.on_click(self.next, StartScene)
+            self._active_scene.quit_btn.on_click(self.disconnect, StartScene)
 
         FileImporter.play_audio("media/soundeffects/ButtonClick.wav", fade_ms=10)
 
@@ -90,7 +91,7 @@ class SceneManager(object):
 
     def handle_event(self, event):
         # join event
-        if event.type == pygame.USEREVENT+1:
+        if event.type == EventsEnum.JOIN:
             self.join(event.ip, LobbyScene, True)
 
     def host(self, next_scene: Optional[callable] = None, *args):
