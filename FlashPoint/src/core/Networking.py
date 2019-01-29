@@ -5,8 +5,8 @@ import threading
 import logging
 from enum import Enum
 
+import src.constants.CustomEvents as CustomEvents
 from src.core.EventQueue import EventQueue
-from src.constants.enums.EventsEnum import EventsEnum
 from src.external.Mastermind import *
 
 logger = logging.getLogger("networking")
@@ -281,7 +281,7 @@ class Networking:
             client_id = len(self.client_list)-1
 
             # inform the event queue that a client is connected, with the respective client id
-            event = pygame.event.Event(EventsEnum.CLIENT_CONNECTED, {'client_id': client_id})
+            event = pygame.event.Event(CustomEvents.CLIENT_CONNECTED, {'client_id': client_id})
             pygame.event.post(event)
 
             return super(MastermindServerUDP, self).callback_connect_client(connection_object)
@@ -323,10 +323,11 @@ class Networking:
             pass
 
     class Client(MastermindClientUDP):
-        pause_receive = threading.Event()
+        _pause_receive = threading.Event()
+        _stop_receive = threading.Event()
         _server_reply = None
 
-        def connect(self, ip,port):
+        def connect(self, ip, port):
             super(MastermindClientUDP, self).connect(ip, port)
             receiver = threading.Thread(target=self.receive_data_from_server)
             receiver.start()
@@ -338,18 +339,22 @@ class Networking:
             :param compression: compression
             :return:
             """
-            self.pause_receive.set()
+            self._pause_receive.set()
             super(MastermindClientUDP, self).send(data, compression)
-            self.pause_receive.clear()
+            self._pause_receive.clear()
 
         def receive_data_from_server(self):
             """
             Listen to the server and receives any data
             :return:
             """
-            while self is not None:
-                while not self.pause_receive.is_set():
+            while not self._stop_receive.is_set():
+                if not self._pause_receive.is_set():
                     self._server_reply = self.receive(False)
+
+        def disconnect(self):
+            self._stop_receive.set()
+            return super(MastermindClientUDP, self).disconnect()
 
         def get_server_reply(self):
             """

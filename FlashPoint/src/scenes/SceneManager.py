@@ -2,6 +2,8 @@ from typing import Optional
 
 import pygame
 
+import src.constants.CustomEvents as CustomEvents
+
 from src.UIComponents.FileImporter import FileImporter
 from src.scenes.GameBoardScene import GameBoardScene
 from src.scenes.HostJoinScene import HostJoinScene
@@ -14,7 +16,6 @@ from src.scenes.CharacterScene import CharacterScene
 from src.scenes.LobbyScene import LobbyScene
 
 from src.core.Networking import Networking
-from constants.enums.EventsEnum import EventsEnum
 
 
 class SceneManager(object):
@@ -91,7 +92,7 @@ class SceneManager(object):
 
     def handle_event(self, event):
         # join event
-        if event.type == EventsEnum.JOIN:
+        if event.type == CustomEvents.JOIN:
             self.join(event.ip, LobbyScene, True)
 
     def host(self, next_scene: Optional[callable] = None, *args):

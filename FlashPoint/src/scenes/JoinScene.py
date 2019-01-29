@@ -1,12 +1,11 @@
 import pygame
 
 import src.constants.Color as Color
+import src.constants.CustomEvents as CustomEvents
 from src.UIComponents.RectButton import RectButton
 from src.UIComponents.RectLabel import RectLabel
 from src.UIComponents.Text import Text
 from src.UIComponents.InputBox import InputBox
-
-from src.constants.enums.EventsEnum import EventsEnum
 
 
 class JoinScene(object):
@@ -68,7 +67,7 @@ class JoinScene(object):
         message = self._text_bar.message
         if message:
             data = {'ip': self._text_bar.message}
-            join_event = pygame.event.Event(EventsEnum.JOIN, **data)
+            join_event = pygame.event.Event(CustomEvents.JOIN, **data)
             pygame.event.post(join_event)
             self._text_bar.message = ''
 
