@@ -6,6 +6,7 @@ import logging
 from enum import Enum
 
 from src.core.EventQueue import EventQueue
+from src.constants.enums.EventsEnum import EventsEnum
 from src.external.Mastermind import *
 
 logger = logging.getLogger("networking")
@@ -205,8 +206,37 @@ class Networking:
             data = Networking.DataPayload.make_chat_data(message)
             self.client.send(data, True)
 
-        def send(self, data, compress=0):
-            self.client.send(data, compress)
+        def send_to_server(self, data, compress=True):
+            """
+            Send data to server
+            :param data: data to be sent
+            :param compress: compression, enabled by default
+            :return:
+            """
+            if self.client is not None:
+                try:
+                    self.client.send(data, compress)
+                except MastermindErrorSocket:
+                    raise MastermindErrorSocket("Connectivity problem")
+            else:
+                raise MastermindErrorClient("Client is not available")
+
+        def send_to_client(self, client_id: int, data, compress=True):
+            """
+            Send data to client
+            :param client_id: client id
+            :param data: data to be sent
+            :param compress: compression, enabled by default
+            :return:
+            """
+            if self.host is not None:
+                try:
+                    client_conn_obj = self.host.lookup_client(client_id)
+                    self.host.callback_client_send(client_conn_obj, data, compress)
+                except MastermindErrorSocket:
+                    raise MastermindErrorSocket("Connectivity problem")
+            else:
+                raise MastermindErrorServer("Server is not available")
 
         def handle_command(self, command):
             """Handle the commands here"""
@@ -223,19 +253,15 @@ class Networking:
     class Host(MastermindServerUDP):
         client_list = []
 
-        def lookup_client(self, ip_addr):
+        def lookup_client(self, client_id):
             """
-            Look up the client list (array) and return the client id
-            :param ip_addr: IP address of the client
+            Look up the client list (array) and return the connection object
+            :param client_id: client id
             :return:
             """
-            client_id = None
-            for i, addr in self.client_list:
-                if addr == ip_addr:
-                    client_id = i
-                    break
-            if client_id is not None:
-                return client_id
+            conn_obj = self.client_list[client_id]
+            if conn_obj is not None:
+                return conn_obj
             else:
                 raise Networking.Host.ClientNotFoundException
 
@@ -249,7 +275,13 @@ class Networking:
             """
             # print(f"Client at {connection_object.address} is connected")
             # Assign a new connection object to the address (as a key value pair)
-            self.client_list.append(connection_object.address)
+            self.client_list.append(connection_object)
+            client_id = len(self.client_list)-1
+
+            # inform the event queue that a client is connected, with the respective client id
+            event = pygame.event.Event(EventsEnum.CLIENT_CONNECTED, {'client_id': client_id})
+            pygame.event.post(event)
+
             return super(MastermindServerUDP, self).callback_connect_client(connection_object)
 
         def callback_client_handle(self, connection_object, data):
