@@ -19,7 +19,6 @@ class TileSprite(Interactable):
         self._mouse_pos = (0, 0)  # For keeping track of previous location.
         self.is_hovered = False
         self.is_scrolling = False
-
         self._render()
 
     def _render(self):

@@ -8,8 +8,8 @@ class DamageState(pygame.sprite.Sprite):
     def __init__(self, x: int, y: int):
         super().__init__()
         self.image = pygame.Surface([227, 88])
-        self.font_name = pygame.font.SysFont('Arial', 23)
-        self.font_other = pygame.font.SysFont('Arial', 25)
+        self.font_name = pygame.font.SysFont('Agency FB', 23)
+        self.font_other = pygame.font.SysFont('Agency FB', 25)
         self.name = "Damage: "
         self.current = str(5)
         self.max = str(24)
@@ -29,6 +29,11 @@ class DamageState(pygame.sprite.Sprite):
         self.slash_rect.move_ip(90,40)
         self.max_rect = self.text_max.get_rect()
         self.max_rect.move_ip(100, 40)
+
+
+
+
+
 
     def update(self,event_queue: EventQueue):
 

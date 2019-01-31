@@ -11,7 +11,7 @@ class GridSprite(pygame.sprite.Group):
     """Class to Group Tile objects together, and implement Grid logic in to what will form the GameBoard."""
     def __init__(self, *sprites: pygame.sprite.Sprite,
                  x_coord: int, y_coord: int,
-                 tile_size: int=128, tiles_x: int=12, tiles_y: int=8):
+                 tile_size: int=128, tiles_x: int=10, tiles_y: int=8):
         super().__init__(*sprites)
         self.contains_player = False
         self.height = tiles_y
@@ -21,7 +21,7 @@ class GridSprite(pygame.sprite.Group):
         self.grid = self._generate_grid(tile_size)
 
     def _generate_grid(self, tile_size: int) -> List[List[TileSprite]]:
-        """Initialize an grid of Tiles, add to self Sprite Group."""
+        """Initialize a grid of Tiles, add to self Sprite Group."""
         grid = []
         x_offset = 0
         for i in range(0, self.width):

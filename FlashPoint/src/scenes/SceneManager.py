@@ -1,13 +1,8 @@
 from typing import Optional
 
 import pygame
-
-<<<<<<< HEAD:FlashPoint/src/scenes/SceneManager.py
+from src.UIComponents.Scene import Scene
 from src.UIComponents.FileImporter import FileImporter
-=======
-from src.Windows.UIComponents.Scene import Scene
-from src.Windows.UIComponents.FileImporter import FileImporter
->>>>>>> networking:FlashPoint/src/Windows/UIComponents/SceneManager.py
 from src.scenes.GameBoardScene import GameBoardScene
 from src.scenes.HostJoinScene import HostJoinScene
 from src.scenes.HostMenuScene import HostMenuScene

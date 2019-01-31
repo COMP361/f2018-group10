@@ -1,17 +1,10 @@
 import pygame
 
 import src.constants.Color as Color
-<<<<<<< HEAD
 from src.UIComponents.RectButton import RectButton
 from src.UIComponents.RectLabel import RectLabel
 from src.UIComponents.Text import Text
 from src.UIComponents.InputBox import InputBox
-=======
-from src.Windows.UIComponents.RectButton import RectButton
-from src.Windows.UIComponents.RectLabel import RectLabel
-from src.Windows.UIComponents.Text import Text
-from src.Windows.UIComponents.InputBox import InputBox
->>>>>>> networking
 
 
 class JoinScene(object):
