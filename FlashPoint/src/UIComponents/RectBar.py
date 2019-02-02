@@ -2,8 +2,8 @@ from typing import Tuple, Optional
 
 import pygame
 
-from src.UIComponents.text import Text
-from src.UIComponents.components import Components
+from src.UIComponents.Text import Text
+from src.UIComponents.Components import Components
 
 
 class RectBar(pygame.sprite.Sprite, Components):
