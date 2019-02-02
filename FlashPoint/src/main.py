@@ -43,8 +43,6 @@ class Main(object):
             self.scene_manager.draw()
             self.scene_manager.update(self.event_queue)
 
-            Networking.get_instance().update(self.event_queue)
-
             self.event_queue.flush_queue()
 
             pygame.display.flip()

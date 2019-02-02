@@ -1,18 +1,10 @@
 import pygame
 
-<<<<<<< HEAD:FlashPoint/src/scenes/HostMenuScene.py
 import src.constants.color as Color
-from src.UIComponents.RectButton import RectButton
-from src.UIComponents.RectLabel import RectLabel
-from src.UIComponents.Text import Text
-from src.UIComponents.Scene import Scene
-=======
-import src.constants.Color as Color
 from src.UIComponents.rect_button import RectButton
 from src.UIComponents.rect_label import RectLabel
 from src.UIComponents.text import Text
 from src.UIComponents.scene import Scene
->>>>>>> GSD-Alek:FlashPoint/src/scenes/host_menu_scene.py
 
 
 class HostMenuScene(Scene):

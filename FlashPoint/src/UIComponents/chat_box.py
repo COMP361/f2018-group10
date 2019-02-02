@@ -4,21 +4,11 @@ import math
 from src.UIComponents.input_box import InputBox
 from src.UIComponents.text import Text
 from src.constants.main_constants import SCREEN_RESOLUTION
-from src.UIComponents.rect_button import RectLabel
-import src.constants.color as Color
-from src.core.event_queue import EventQueue
-from src.constants.fonts import TEXT_BOX_FONT_SIZE
-from src.core.networking import Networking
-
-from src.UIComponents.input_box import InputBox
-from src.UIComponents.text import Text
-from src.constants.main_constants import SCREEN_RESOLUTION
 from src.UIComponents.rect_label import RectLabel
 import src.constants.color as Color
 from src.core.event_queue import EventQueue
 from src.constants.fonts import TEXT_BOX_FONT_SIZE
 from src.core.networking import Networking
-
 
 
 class ChatBox:

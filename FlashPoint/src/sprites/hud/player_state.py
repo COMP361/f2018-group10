@@ -1,14 +1,8 @@
 import pygame
 
-<<<<<<< HEAD:FlashPoint/src/sprites/hud/PlayerState.py
 import src.constants.color as Color
-from src.UIComponents.Interactable import Interactable
-from src.core.event_queue import EventQueue
-=======
-import src.constants.Color as Color
 from src.UIComponents.interactable import Interactable
-from src.core.EventQueue import EventQueue
->>>>>>> GSD-Alek:FlashPoint/src/sprites/hud/player_state.py
+from src.core.event_queue import EventQueue
 
 
 class PlayerState(Interactable):

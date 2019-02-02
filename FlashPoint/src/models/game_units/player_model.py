@@ -1,12 +1,7 @@
 import src.constants.color as Color
-from models.game_board.TileModel import TileModel
-<<<<<<< HEAD:FlashPoint/src/models/game_units/PlayerModel.py
-from src.constants.enums.player_status_enum import PlayerStatusEnum
-from src.models.game_units.GameUnit import GameUnit
-=======
-from src.constants.enums.PlayerStatusEnum import PlayerStatusEnum
+from models.game_board.tile_model import TileModel
+from src.constants.state_enums import PlayerStatusEnum
 from src.models.game_units.game_unit import GameUnit
->>>>>>> GSD-Alek:FlashPoint/src/models/game_units/player_model.py
 
 
 class PlayerModel(GameUnit):

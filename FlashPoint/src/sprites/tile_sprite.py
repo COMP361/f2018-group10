@@ -1,16 +1,9 @@
 import pygame
 
-<<<<<<< HEAD:FlashPoint/src/sprites/TileSprite.py
-from src.UIComponents.Interactable import Interactable
-from src.constants import color
-from src.core.event_queue import EventQueue
-from src.models.game_board import TileModel
-=======
 from src.UIComponents.interactable import Interactable
-from src.constants import Color
-from src.core.EventQueue import EventQueue
+import src.constants.color as color
+from src.core.event_queue import EventQueue
 from src.models.game_board import tile_model
->>>>>>> GSD-Alek:FlashPoint/src/sprites/tile_sprite.py
 
 
 class TileSprite(Interactable):

@@ -5,13 +5,8 @@ import threading
 import logging
 
 import src.constants.CustomEvents as CustomEvents
-<<<<<<< HEAD
-from src.core.EventQueue import EventQueue
-from src.action_events.ActionEvent import ActionEvent
-=======
 from src.core.event_queue import EventQueue
 from src.action_events.action_event import ActionEvent
->>>>>>> parent of 47ce799... reverted merge branch
 from src.external.Mastermind import *
 
 logger = logging.getLogger("networking")
@@ -248,12 +243,6 @@ class Networking:
             """Handle the commands here"""
             if command.type == Networking.DataPayload.Command.CHAT:
                 """Chat action"""
-
-        def update(self, event_queue: EventQueue):
-            for event in event_queue:
-                # Handles the event if it's a command defined in DataPayload.Command
-                if event.type in [command.value for command in Networking.DataPayload.Command]:
-                    self.handle_command(event)
 
     # Overridden classes
     class Host(MastermindServerUDP):
