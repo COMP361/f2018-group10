@@ -23,7 +23,6 @@ class StartScene(object):
         self._text_bar1 = self._init_text_bar(((self.resolution[0]/2)-(500/2))-20, 600, 400, 32)
         self._init_btn_register(((self.resolution[0]/2)-(500/2))+400, 592, "Create Profile",
                                 color.STANDARDBTN, color.BLACK)
-        self.profile.add("Test")
 
         # self._text_bar1 = self._init_text_bar(500, 350, 400, 32)
         # self._text_bar2 = self._init_text_bar(500, 434, 400, 32)
@@ -58,7 +57,6 @@ class StartScene(object):
         box_size = (130, 48)
         self.buttonRegister = RectButton(x_pos, y_pos, box_size[0], box_size[1], clr, 0,
                                          Text(pygame.font.SysFont('Arial', 20), text, color_text))
-
         self.sprite_grp.add(self.buttonRegister)
 
     @staticmethod
@@ -68,14 +66,15 @@ class StartScene(object):
     def _init_profile_selector(self, x_pos, y_pos, clr):
         box_size = (500, 250)
         self.profile = ProfileList(x_pos, y_pos, box_size[0], box_size[1], 3, clr)
-        self.sprite_grp.add(self.profile)
 
     def draw(self, screen):
         self.sprite_grp.draw(screen)
         # self._text_bar2.draw(screen)
         self._text_bar1.draw(screen)
+        self.profile.draw(screen)
 
     def update(self, event_queue):
         self.sprite_grp.update(event_queue)
         self._text_bar1.update(event_queue)
+        self.profile.update(event_queue)
         # self._text_bar2.update(event_queue)

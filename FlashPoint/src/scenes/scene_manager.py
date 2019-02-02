@@ -26,6 +26,7 @@ class SceneManager(object):
         self.screen = screen
         self._active_scene = StartScene(self.screen)
         self._active_scene.buttonRegister.on_click(self.next, HostJoinScene)
+        self._active_scene.profile.set_profile(0, "Test", self.next, HostJoinScene)
         # self._active_scene.buttonLogin.on_click(self.next, HostJoinScene)
         # self._active_scene.buttonRegister.on_click(self.next, HostJoinScene)
 
@@ -48,6 +49,7 @@ class SceneManager(object):
             # self._active_scene.buttonLogin.on_click(self.next, HostJoinScene)
             # self._active_scene.buttonRegister.on_click(self.next, HostJoinScene)
             self._active_scene.buttonRegister.on_click(self.next, HostJoinScene)
+            self._active_scene.profile.set_profile(0, "Test", self.next, HostJoinScene)
 
         if isinstance(self._active_scene, HostJoinScene):
             self._active_scene.buttonJoin.on_click(self.next, JoinScene)

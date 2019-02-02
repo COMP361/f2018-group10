@@ -1,7 +1,8 @@
-from typing import Tuple, Optional, Union
+from typing import Tuple, Union
 
 import pygame
 
+from src.core.event_queue import EventQueue
 from src.UIComponents.file_importer import FileImporter
 from src.UIComponents.components import Components
 from src.UIComponents.rect_button import RectButton
@@ -25,8 +26,9 @@ class ProfileList(pygame.sprite.Sprite, Components):
         self.outer_width = outer_width
         self.image = None
         self.rect = None
-        self.profile_list = pygame.sprite.Group()
-        self._list = []
+        self._profile_list = pygame.sprite.Group()
+        self._btn_list = []
+        self._init_slots()
         self._render()
 
     def _render(self):
@@ -47,28 +49,35 @@ class ProfileList(pygame.sprite.Sprite, Components):
         self.rect.x = self.x
         self.rect.y = self.y
 
-    def draw(self, surface: pygame.Surface):
-        surface.blit(self.image, self.rect)
-        self.profile_list.draw(surface)
+        for btn in self._btn_list:
+            btn._render()
 
-    def add(self, name: str):
-        if self.can_add:
-            print(f"added {name}")
-            # margin between two buttons
-            margin = 10
-            index = len(self._list)
-            width = (self.width / self._limit) - margin
-            height = self.height - 40
-            self._list.append(name)
+    def _init_slots(self):
+        # margin between two buttons
+        margin = 30
+        width = (self.width / self._limit) - margin
+        height = self.height - 40
+        for i in range(self._limit):
             # draw the profile button for each profile
-            x = self.x + ((width + margin) * index) + (margin / 2)
+            x = self.x + ((width + margin) * i) + (margin / 2)
             y = self.y + 20
 
-            btn = RectButton(x, y, width, height, (0, 0, 0), 0,
-                             Text(pygame.font.SysFont('Arial', 20), name, color.BLACK))
-            self.profile_list.add(btn)
-        else:
-            raise OverflowError("Limit exceeded")
+            btn = RectButton(x, y, width, height, color.STANDARDBTN, 0,
+                             Text(pygame.font.SysFont('Arial', 20), "Empty", color.BLACK))
+            self._btn_list.append(btn)
+            self._profile_list.add(btn)
+
+    def set_profile(self, index: int, name: str, click_action: callable, *args, **kwargs):
+        self._btn_list[index].txt_obj = Text(pygame.font.SysFont('Arial', 20), name, color.BLACK)
+        self._btn_list[index].on_click(click_action, args, kwargs)
+        self._render()
+
+    def draw(self, surface: pygame.Surface):
+        surface.blit(self.image, self.rect)
+        self._profile_list.draw(surface)
+
+    def update(self, event_queue: EventQueue):
+        self._profile_list.update(event_queue)
 
     def change_color(self, clr: Tuple[int, int, int]):
         self.background = clr
@@ -90,11 +99,3 @@ class ProfileList(pygame.sprite.Sprite, Components):
         self.x(x)
         self.y(y)
         self._render()
-
-    @property
-    def can_add(self):
-        return len(self._list) <= self._limit
-
-    @property
-    def can_remove(self):
-        return len(self._list) > 0
