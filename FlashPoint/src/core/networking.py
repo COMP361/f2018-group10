@@ -5,8 +5,13 @@ import threading
 import logging
 
 import src.constants.CustomEvents as CustomEvents
+<<<<<<< HEAD
 from src.core.EventQueue import EventQueue
 from src.action_events.ActionEvent import ActionEvent
+=======
+from src.core.event_queue import EventQueue
+from src.action_events.action_event import ActionEvent
+>>>>>>> parent of 47ce799... reverted merge branch
 from src.external.Mastermind import *
 
 logger = logging.getLogger("networking")
