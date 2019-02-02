@@ -239,11 +239,6 @@ class Networking:
             else:
                 raise MastermindErrorServer("Server is not available")
 
-        def handle_command(self, command):
-            """Handle the commands here"""
-            if command.type == Networking.DataPayload.Command.CHAT:
-                """Chat action"""
-
     # Overridden classes
     class Host(MastermindServerUDP):
         client_list = []
@@ -294,7 +289,7 @@ class Networking:
                 data.execute()
             return super(MastermindServerUDP, self).callback_client_handle(connection_object, data)
 
-        def callback_client_send(self, connection_object, data, compression=True):
+        def callback_client_send(self, connection_object, data, compression=None):
             """
             Called to when data is about to be sent to a connection. If sending fails, the connection is silently
             terminated. This method can be overridden to provide useful information. It's good practice (and in this
@@ -322,7 +317,7 @@ class Networking:
             receiver = threading.Thread(target=self.receive_data_from_server)
             receiver.start()
 
-        def send(self, data: ActionEvent, compression=True):
+        def send(self, data: ActionEvent, compression=None):
             """
             Send data to the server
             :param data: data to be sent, MUST be an instance of ActionEvent

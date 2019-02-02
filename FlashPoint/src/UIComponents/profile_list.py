@@ -2,11 +2,11 @@ from typing import Tuple, Optional, Union
 
 import pygame
 
-from src.UIComponents.FileImporter import FileImporter
-from src.UIComponents.Components import Components
-from src.UIComponents.RectButton import RectButton
-from src.UIComponents.Text import Text
-import src.constants.Color as Color
+from src.UIComponents.file_importer import FileImporter
+from src.UIComponents.components import Components
+from src.UIComponents.rect_button import RectButton
+from src.UIComponents.text import Text
+import src.constants.color as color
 
 
 class ProfileList(pygame.sprite.Sprite, Components):
@@ -63,7 +63,7 @@ class ProfileList(pygame.sprite.Sprite, Components):
                 y = origin_y + 20
 
                 btn = RectButton(x, y, width, height, (0, 0, 0), 0,
-                                 Text(pygame.font.SysFont('Arial', 20), name, Color.BLACK))
+                                 Text(pygame.font.SysFont('Arial', 20), name, color.BLACK))
                 btn.add(profile_list)
 
     def draw(self, surface: pygame.Surface):
