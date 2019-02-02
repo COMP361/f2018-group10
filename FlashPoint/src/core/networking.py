@@ -203,10 +203,6 @@ class Networking:
             if self.host is not None:
                 self.host.accepting_disallow()
 
-        def chat(self, message: str):
-            data = Networking.DataPayload.make_chat_data(message)
-            self.client.send(data, True)
-
         def send_to_server(self, data, compress=True):
             """
             Send data to server
@@ -217,8 +213,8 @@ class Networking:
             if self.client is not None:
                 try:
                     self.client.send(data, compress)
-                except MastermindErrorSocket:
-                    raise MastermindErrorSocket("Connectivity problem")
+                except MastermindErrorSocket as e:
+                    raise MastermindErrorSocket(e)
             else:
                 raise MastermindErrorClient("Client is not available")
 
@@ -234,8 +230,8 @@ class Networking:
                 try:
                     client_conn_obj = self.host.lookup_client(client_id)
                     self.host.callback_client_send(client_conn_obj, data, compress)
-                except MastermindErrorSocket:
-                    raise MastermindErrorSocket("Connectivity problem")
+                except MastermindErrorSocket as e:
+                    raise MastermindErrorSocket(e)
             else:
                 raise MastermindErrorServer("Server is not available")
 
