@@ -4,14 +4,21 @@ from typing import Optional
 
 from models.game_board.EdgeObstacleModel import EdgeObstacleModel
 from models.game_board.NullTileModel import NullTileModel
-from src.constants.enums.DirectionEnum import DirectionEnum
+
 from src.core.exceptions.TilePositionOutOfBoundsException import TilePositionOutOfBoundsException
-from src.sprites import CharacterSprite, FireSprite, SmokeSprite, HazMatSprite, VehicleSprite, VictimSprite
+
+from src.sprites.CharacterSprite import CharacterSprite
+from src.sprites.FireSprite import FireSprite
+from src.sprites.SmokeSprite import SmokeSprite
+from src.sprites.VehicleSprite import VehicleSprite
+from src.sprites.VictimSprite import VictimSprite
 from src.sprites.GameUnitSprite import GameUnitSprite
-from src.constants.enums.SpaceKindEnum import SpaceKindEnum
-from src.constants.enums.SpaceStatusEnum import SpaceStatusEnum
 from src.sprites.POISprite import POISprite
 from src.sprites.HazMatSprite import HazMatSprite
+
+from src.constants.enums.DirectionEnum import DirectionEnum
+from src.constants.enums.SpaceKindEnum import SpaceKindEnum
+from src.constants.enums.SpaceStatusEnum import SpaceStatusEnum
 
 
 class TileModel(object):
@@ -157,7 +164,6 @@ class TileModel(object):
     # def add_game_unit_sprite(self, game_unit_sprite: GameUnitSprite):
     #     """TODO: Should check if valid sprite type."""
     #     self._game_unit_sprites.add(game_unit_sprite)
-
 
     def add_game_unit_sprite(self, game_unit_sprite: GameUnitSprite):
         """TODO: Make sure to add raising exceptions if the added game sprite is illegal"""
