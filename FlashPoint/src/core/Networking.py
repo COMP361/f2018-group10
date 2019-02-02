@@ -3,10 +3,10 @@ import ipaddress
 import socket
 import threading
 import logging
-from enum import Enum
 
 import src.constants.CustomEvents as CustomEvents
 from src.core.EventQueue import EventQueue
+from src.action_events.ActionEvent import ActionEvent
 from src.external.Mastermind import *
 
 logger = logging.getLogger("networking")
@@ -332,10 +332,10 @@ class Networking:
             receiver = threading.Thread(target=self.receive_data_from_server)
             receiver.start()
 
-        def send(self, data, compression=None):
+        def send(self, data: ActionEvent, compression=True):
             """
             Send data to the server
-            :param data: data to be sent
+            :param data: data to be sent, MUST be an instance of ActionEvent
             :param compression: compression
             :return:
             """
@@ -362,27 +362,3 @@ class Networking:
             :return:
             """
             return self._server_reply
-
-    class DataPayload(object):
-        """
-            Unified data object to be sent over the network
-        """
-        # Constants for command type
-        class Command(Enum):
-            CHAT = pygame.USEREVENT+20
-            MOVE = pygame.USEREVENT+21
-            ACTION = pygame.USEREVENT+22
-
-        def __init__(self, cmd: Command, *args, **kwargs):
-            self.command = cmd
-            self.args = args
-            self.kwargs = kwargs
-
-        # Factory methods
-        @staticmethod
-        def make_chat_data(*args, **kwargs):
-            return Networking.DataPayload(Networking.DataPayload.Command.CHAT, args, kwargs)
-
-        @staticmethod
-        def make_move_data(*args, **kwargs):
-            return Networking.DataPayload(Networking.DataPayload.Command.MOVE, args, kwargs)
