@@ -5,13 +5,8 @@ import threading
 import logging
 
 import src.constants.CustomEvents as CustomEvents
-<<<<<<< HEAD
-from src.core.event_queue import EventQueue
-from src.action_events.action_event import ActionEvent
-=======
 from src.core.EventQueue import EventQueue
 from src.action_events.ActionEvent import ActionEvent
->>>>>>> parent of 3b32d42... Merge branch 'game-state-design' into networking
 from src.external.Mastermind import *
 
 logger = logging.getLogger("networking")
