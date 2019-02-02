@@ -61,6 +61,48 @@ class Interactable(pygame.sprite.Sprite):
             # Indicate that the mouse has moved out of bound so that the hover function can be run again next time
             self.exit_hover()
 
+    def on_click(self, click_action: Callable, *args, **kwargs):
+        """
+        Assign a function to the click hook
+        :param click_action: function to be executed when clicked
+        :param args: Non key-worded arguments for the function
+        :param kwargs: Key-worded parameters for the function
+        :return:
+        """
+        self._click_action = click_action
+        if args is not None:
+            self._click_args = args
+        if kwargs is not None:
+            self._click_kwargs = kwargs
+
+    def on_hover(self, hover_action: Callable, *args, **kwargs):
+        """
+        Assign a function to the ON hover hook
+        :param hover_action: function to be executed when hovered
+        :param args: Non key-worded arguments for the function
+        :param kwargs: Key-worded arguments for the function
+        :return:
+        """
+        self._hover_action = hover_action
+        if args is not None:
+            self._hover_args = args
+        if kwargs is not None:
+            self._hover_kwargs = kwargs
+
+    def off_hover(self, off_hover_action: Callable, *args, **kwargs):
+        """
+        Assign a function to the OFF hover hook
+        :param off_hover_action: function to be executed when exiting hovered state
+        :param args: Non key-worded arguments for the function
+        :param kwargs: Key-worded arguments for the function
+        :return:
+        """
+        self._off_hover_action = off_hover_action
+        if args is not None:
+            self._off_hover_args = args
+        if kwargs is not None:
+            self._off_hover_kwargs = kwargs
+
     # I hope it works LOL
     def click(self):
         """
@@ -106,48 +148,6 @@ class Interactable(pygame.sprite.Sprite):
         """
         print(f"Disabling: {self}")
         self._is_enabled = False
-
-    def on_click(self, click_action: Callable, *args, **kwargs):
-        """
-        Assign a function to the click hook
-        :param click_action: function to be executed when clicked
-        :param args: Non key-worded arguments for the function
-        :param kwargs: Key-worded parameters for the function
-        :return:
-        """
-        self._click_action = click_action
-        if args is not None:
-            self._click_args = args
-        if kwargs is not None:
-            self._click_kwargs = kwargs
-
-    def on_hover(self, hover_action: Callable, *args, **kwargs):
-        """
-        Assign a function to the ON hover hook
-        :param hover_action: function to be executed when hovered
-        :param args: Non key-worded arguments for the function
-        :param kwargs: Key-worded arguments for the function
-        :return:
-        """
-        self._hover_action = hover_action
-        if args is not None:
-            self._hover_args = args
-        if kwargs is not None:
-            self._hover_kwargs = kwargs
-
-    def off_hover(self, off_hover_action: Callable, *args, **kwargs):
-        """
-        Assign a function to the OFF hover hook
-        :param off_hover_action: function to be executed when exiting hovered state
-        :param args: Non key-worded arguments for the function
-        :param kwargs: Key-worded arguments for the function
-        :return:
-        """
-        self._off_hover_action = off_hover_action
-        if args is not None:
-            self._off_hover_args = args
-        if kwargs is not None:
-            self._off_hover_kwargs = kwargs
 
     # why is this so hard
     @property

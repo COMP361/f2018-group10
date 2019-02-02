@@ -50,9 +50,14 @@ class ProfileList(pygame.sprite.Sprite, Components):
         self.rect.y = self.y
 
         for btn in self._btn_list:
+            # Not ideal but the only way I know to re-render
             btn._render()
 
     def _init_slots(self):
+        """
+        Initialize the profile slots
+        :return:
+        """
         # margin between two buttons
         margin = 30
         width = (self.width / self._limit) - margin
@@ -68,8 +73,17 @@ class ProfileList(pygame.sprite.Sprite, Components):
             self._profile_list.add(btn)
 
     def set_profile(self, index: int, name: str, click_action: callable, *args, **kwargs):
+        """
+        Set the name for the profile slot and assign callbacks to it
+        :param index: Index of the profile slot (0-2)
+        :param name: Name of the profile
+        :param click_action: Click callback
+        :param args:
+        :param kwargs:
+        :return:
+        """
         self._btn_list[index].txt_obj = Text(pygame.font.SysFont('Arial', 20), name, color.BLACK)
-        self._btn_list[index].on_click(click_action, args, kwargs)
+        self._btn_list[index].on_click(click_action, *args, **kwargs)
         self._render()
 
     def draw(self, surface: pygame.Surface):
