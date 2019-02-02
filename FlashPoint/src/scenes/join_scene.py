@@ -51,7 +51,8 @@ class JoinScene(object):
     def init_error_message(self, msg):
         label_width = 400
         label_left = (pygame.display.get_surface().get_size()[0] / 2) - (label_width / 2)
-        error_msg_label = RectLabel(label_left, 20, label_width, label_width, (255, 255, 255),
+        label_top = (pygame.display.get_surface().get_size()[1] / 6) * 2
+        error_msg_label = RectLabel(label_left, label_top, label_width, label_width, (255, 255, 255),
                                     txt_obj=(Text(pygame.font.SysFont('Arial', 24), msg, Color.RED)))
         error_msg_label.set_transparent_background(True)
         self.sprite_grp.add(error_msg_label)
