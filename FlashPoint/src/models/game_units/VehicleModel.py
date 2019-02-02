@@ -1,13 +1,16 @@
+from abc import ABC, abstractmethod
+
+from models.game_board.ParkingSpotModel import ParkingSpotModel
 from src.models.game_board.TileModel import TileModel
 
-# TODO Make this an interface or abstract class
 
-
-class VehicleModel(object):
+class VehicleModel(ABC):
     """Base class for Ambulance and Engine"""
 
-    def __init__(self, tile: TileModel):
-        super().__init__(tile)
+    def __init__(self, parking_spot: ParkingSpotModel):
+        super().__init__()
+        self._parking_spot = parking_spot
 
+    @abstractmethod
     def drive(self, tile: TileModel):
         pass
