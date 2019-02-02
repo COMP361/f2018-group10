@@ -2,7 +2,7 @@ from typing import Optional
 
 import pygame
 
-from src.core.EventQueue import EventQueue
+from src.core.event_queue import EventQueue
 
 
 class Scene(pygame.sprite.Group):

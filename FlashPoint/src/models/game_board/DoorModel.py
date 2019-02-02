@@ -1,4 +1,4 @@
-from src.constants.enums.DoorStatusEnum import DoorStatusEnum
+from src.constants.enums.door_status_enum import DoorStatusEnum
 from src.models.game_board.EdgeObstacleModel import EdgeObstacleModel
 
 

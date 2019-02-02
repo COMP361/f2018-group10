@@ -1,6 +1,6 @@
-import src.constants.Color as Color
+import src.constants.color as Color
 from models.game_board.TileModel import TileModel
-from src.constants.enums.PlayerStatusEnum import PlayerStatusEnum
+from src.constants.enums.player_status_enum import PlayerStatusEnum
 from src.models.game_units.GameUnit import GameUnit
 
 

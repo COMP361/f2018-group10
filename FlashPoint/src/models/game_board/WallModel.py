@@ -1,5 +1,5 @@
 from src.models.game_board.EdgeObstacleModel import EdgeObstacleModel
-from src.constants.enums.WallStatusEnum import WallStatusEnum
+from src.constants.enums.wall_status_enum import WallStatusEnum
 
 
 class WallModel(EdgeObstacleModel):

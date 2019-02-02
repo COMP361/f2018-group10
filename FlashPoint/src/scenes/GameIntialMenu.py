@@ -1,6 +1,6 @@
 import pygame
 
-import src.constants.Color as Color
+import src.constants.color as Color
 
 from src.UIComponents.RectButton import RectButton
 from src.UIComponents.RectLabel import RectLabel

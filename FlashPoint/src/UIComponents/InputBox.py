@@ -1,8 +1,8 @@
 import pygame as pg
 
-import src.constants.Color as Color
-from src.core.EventQueue import EventQueue
-from src.constants.Fonts import TEXT_BOX_FONT_SIZE
+import src.constants.color as Color
+from src.core.event_queue import EventQueue
+from src.constants.fonts import TEXT_BOX_FONT_SIZE
 
 
 class InputBox(pg.sprite.Sprite):

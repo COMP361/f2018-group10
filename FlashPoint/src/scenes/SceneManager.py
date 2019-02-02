@@ -9,11 +9,11 @@ from src.scenes.HostMenuScene import HostMenuScene
 from src.scenes.JoinScene import JoinScene
 from src.scenes.StartScene import StartScene
 from src.scenes.GameIntialMenu import CreateGameMenu
-from src.core.EventQueue import EventQueue
+from src.core.event_queue import EventQueue
 from src.scenes.CharacterScene import CharacterScene
 from src.scenes.LobbyScene import LobbyScene
 
-from src.core.Networking import Networking
+from src.core.networking import Networking
 
 
 class SceneManager(object):

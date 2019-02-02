@@ -1,4 +1,4 @@
-from src.constants.enums.VictimStateEnum import VictimStateEnum
+from src.constants.enums.victim_state_enum import VictimStateEnum
 from src.models.game_units.POIModel import POIModel
 
 

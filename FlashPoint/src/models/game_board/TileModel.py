@@ -16,9 +16,9 @@ from src.sprites.GameUnitSprite import GameUnitSprite
 from src.sprites.POISprite import POISprite
 from src.sprites.HazMatSprite import HazMatSprite
 
-from src.constants.enums.DirectionEnum import DirectionEnum
-from src.constants.enums.SpaceKindEnum import SpaceKindEnum
-from src.constants.enums.SpaceStatusEnum import SpaceStatusEnum
+from src.constants.enums.direction_enum import DirectionEnum
+from src.constants.enums.space_kind_enum import SpaceKindEnum
+from src.constants.enums.space_status_enum import SpaceStatusEnum
 
 
 class TileModel(object):

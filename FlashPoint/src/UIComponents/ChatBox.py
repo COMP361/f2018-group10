@@ -3,12 +3,12 @@ import math
 
 from src.UIComponents.InputBox import InputBox
 from src.UIComponents.Text import Text
-from src.constants.MainConstants import SCREEN_RESOLUTION
+from src.constants.main_constants import SCREEN_RESOLUTION
 from src.UIComponents.RectLabel import RectLabel
-import src.constants.Color as Color
-from src.core.EventQueue import EventQueue
-from src.constants.Fonts import TEXT_BOX_FONT_SIZE
-from src.core.Networking import Networking
+import src.constants.color as Color
+from src.core.event_queue import EventQueue
+from src.constants.fonts import TEXT_BOX_FONT_SIZE
+from src.core.networking import Networking
 
 
 class ChatBox:

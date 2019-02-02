@@ -1,5 +1,5 @@
 from src.models.game_board.TileModel import TileModel
-from src.constants.enums.POIStatusEnum import POIStatusEnum
+from src.constants.enums.poi_status_enum import POIStatusEnum
 from src.models.game_units.GameUnit import GameUnit
 
 
