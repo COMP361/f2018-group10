@@ -1,14 +1,12 @@
 import pygame
 
-<<<<<<< HEAD:FlashPoint/src/sprites/VehicleSprite.py
-from src.models.game_board import TileModel
-from src.constants.enums.vehicle_kind_enum import VehicleKindEnum
-from src.models.game_units import VehicleModel
-=======
+
+
+
 from src.models.game_board import tile_model
-from src.constants.enums.VehicleKindEnum import VehicleKindEnum
+from src.constants.enums import VehicleKindEnum
 from src.models.game_units import vehicle_model
->>>>>>> GSD-Alek:FlashPoint/src/sprites/vehicle_sprite.py
+
 
 
 class VehicleSprite(pygame.sprite.Sprite):

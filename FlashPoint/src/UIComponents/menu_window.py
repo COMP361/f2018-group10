@@ -2,13 +2,12 @@ from typing import Tuple, List
 
 import pygame
 
-<<<<<<< HEAD:FlashPoint/src/UIComponents/MenuWindow.py
-from src.UIComponents.Interactable import Interactable
-from src.core.event_queue import EventQueue
-=======
 from src.UIComponents.interactable import Interactable
-from src.core.EventQueue import EventQueue
->>>>>>> GSD-Alek:FlashPoint/src/UIComponents/menu_window.py
+from src.core.event_queue import EventQueue
+
+from src.UIComponents.interactable import Interactable
+from src.core.event_queue import EventQueue
+
 
 
 class MenuWindow(object):

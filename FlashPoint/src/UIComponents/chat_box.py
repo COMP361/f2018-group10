@@ -1,25 +1,24 @@
 import pygame as pg
 import math
 
-<<<<<<< HEAD:FlashPoint/src/UIComponents/ChatBox.py
-from src.UIComponents.InputBox import InputBox
-from src.UIComponents.Text import Text
+from src.UIComponents.input_box import InputBox
+from src.UIComponents.text import Text
 from src.constants.main_constants import SCREEN_RESOLUTION
-from src.UIComponents.RectLabel import RectLabel
+from src.UIComponents.rect_button import RectLabel
 import src.constants.color as Color
 from src.core.event_queue import EventQueue
 from src.constants.fonts import TEXT_BOX_FONT_SIZE
 from src.core.networking import Networking
-=======
+
 from src.UIComponents.input_box import InputBox
 from src.UIComponents.text import Text
-from src.constants.MainConstants import SCREEN_RESOLUTION
+from src.constants.main_constants import SCREEN_RESOLUTION
 from src.UIComponents.rect_label import RectLabel
-import src.constants.Color as Color
-from src.core.EventQueue import EventQueue
-from src.constants.Fonts import TEXT_BOX_FONT_SIZE
-from src.core.Networking import Networking
->>>>>>> GSD-Alek:FlashPoint/src/UIComponents/chat_box.py
+import src.constants.color as Color
+from src.core.event_queue import EventQueue
+from src.constants.fonts import TEXT_BOX_FONT_SIZE
+from src.core.networking import Networking
+
 
 
 class ChatBox:
