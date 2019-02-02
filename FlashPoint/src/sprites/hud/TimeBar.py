@@ -1,7 +1,7 @@
 import pygame
 import datetime
-import src.constants.Color as Color
-from src.core.EventQueue import EventQueue
+import src.constants.color as Color
+from src.core.event_queue import EventQueue
 
 
 class TimeBar(pygame.sprite.Sprite):

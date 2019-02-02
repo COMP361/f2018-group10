@@ -1,7 +1,7 @@
 import pygame
 
 from src.models.game_board import TileModel
-from src.constants.enums.VehicleKindEnum import VehicleKindEnum
+from src.constants.enums.vehicle_kind_enum import VehicleKindEnum
 from src.models.game_units import VehicleModel
 
 

@@ -1,8 +1,8 @@
 import pygame
 
 from src.UIComponents.Interactable import Interactable
-from src.constants import Color
-from src.core.EventQueue import EventQueue
+from src.constants import color
+from src.core.event_queue import EventQueue
 from src.models.game_board import TileModel
 
 
@@ -24,15 +24,15 @@ class TileSprite(Interactable):
 
     def _render(self):
         """Eventually this might have some randomization logic? Dunno how we'll generate boards :( """
-        self.image.fill(Color.GREY, self.rect)  # eventually this will be an actual tile image.
+        self.image.fill(color.GREY, self.rect)  # eventually this will be an actual tile image.
 
     def _highlight(self):
         if self.hover() and self._is_enabled:
             if not self.is_hovered:
                 self.is_hovered = True
-                self.image.fill(Color.YELLOW)
+                self.image.fill(color.YELLOW)
         else:
-            self.image.fill(Color.GREY)
+            self.image.fill(color.GREY)
             self.is_hovered = False
 
     def _scroll(self):

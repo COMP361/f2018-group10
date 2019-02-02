@@ -2,7 +2,7 @@ from typing import Callable
 
 import pygame
 
-from src.core.EventQueue import EventQueue
+from src.core.event_queue import EventQueue
 
 
 class Interactable(pygame.sprite.Sprite):

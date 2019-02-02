@@ -5,7 +5,7 @@ import threading
 import logging
 from enum import Enum
 
-from src.core.EventQueue import EventQueue
+from src.core.event_queue import EventQueue
 from src.external.Mastermind import *
 
 logger = logging.getLogger("networking")

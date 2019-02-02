@@ -2,7 +2,7 @@ import pygame
 
 from src.UIComponents.ChatBox import ChatBox
 from src.UIComponents.MenuWindow import MenuWindow
-from src.core.EventQueue import EventQueue
+from src.core.event_queue import EventQueue
 from src.sprites.GameBoard import GameBoard
 from src.sprites.hud.PlayerState import PlayerState
 from src.sprites.hud.CurrentPlayerState import CurrentPlayerState
@@ -10,7 +10,7 @@ from src.sprites.hud.TimeBar import TimeBar
 from src.sprites.hud.DamageState import DamageState
 from src.sprites.hud.VictimSaved import VictimSaved
 from src.sprites.hud.VictimDead import VictimDead
-import src.constants.Color as Color
+import src.constants.color as Color
 from src.UIComponents.RectButton import RectButton
 from src.UIComponents.Text import Text
 

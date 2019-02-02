@@ -2,7 +2,7 @@ from typing import List
 
 import pygame
 
-from src.constants.enums.SpaceKindEnum import SpaceKindEnum
+from src.constants.enums.space_kind_enum import SpaceKindEnum
 from src.models.game_board.TileModel import TileModel
 from src.sprites.TileSprite import TileSprite
 

@@ -3,7 +3,7 @@ from typing import Tuple
 from models.game_board.TileModel import TileModel
 from models.game_units.GameUnit import GameUnit
 from models.game_units.VehicleModel import VehicleModel
-from src.constants.enums.VehicleKindEnum import VehicleKindEnum
+from src.constants.enums.vehicle_kind_enum import VehicleKindEnum
 
 
 class ParkingSpotModel(GameUnit):

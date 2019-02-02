@@ -3,7 +3,7 @@ from typing import Tuple, List
 import pygame
 
 from src.UIComponents.Interactable import Interactable
-from src.core.EventQueue import EventQueue
+from src.core.event_queue import EventQueue
 
 
 class MenuWindow(object):
