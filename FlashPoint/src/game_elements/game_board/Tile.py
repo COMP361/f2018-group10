@@ -5,18 +5,21 @@ from src.UIComponents.FileImporter import FileImporter
 from src.game_elements.game_board.CharacterSprite import CharacterSprite
 from src.UIComponents.Interactable import Interactable
 from src.core.EventQueue import EventQueue
+from src.UIComponents.Spritesheet import Spritesheet
 
 
 class Tile(Interactable):
 
     def __init__(self, x: int, y: int, x_offset: int, y_offset: int, size: int = 128):
         """Create a tile, not sure what the sprite size should be..."""
+        self.index = 0
         self.sprite_grp = pygame.sprite.Group()
         self.image = pygame.Surface([size, size])
         super().__init__(self.image.get_rect())
         self.rect = self.image.get_rect().move(x_offset, y_offset)
         self.mouse_rect = pygame.Rect(self.rect).move(x, y)
         self.is_hovered = False
+        #self.s = Spritesheet("media/Updated.png", 10, 8)
         self.image_file = FileImporter.import_image("media/tiles/grass.jpg")
         self.image_file = pygame.transform.scale(self.image_file, (128, 128))
         self._render()
@@ -27,7 +30,8 @@ class Tile(Interactable):
     def _render(self):
         """Eventually this might have some randomization logic? Dunno how we'll generate boards :( """
        # self.image.fill(Color.GREY, self.rect)  # eventually this will be an actual tile image.
-        self.image.blit(self.image_file, (0, 0))
+        #self.image.blit(self.image_file, (0, 0))
+
 
     def hover(self):
         if self._is_enabled:
@@ -69,10 +73,12 @@ class Tile(Interactable):
             if not self.is_hovered:
                 self.is_hovered = True
                 self.image.fill(Color.YELLOW)
-        else:
+        # else:
            # self.image.fill(Color.GREY)
-           self.image.blit(self.image_file, (0, 0))
-           self.is_hovered = False
+           # self.image.blit(self.image_file, (0, 0))
+
+           # self.s.draw(self.image, self.index % self.s.total_cell_count, 1280, 1024, 4)
+           # self.is_hovered = False
 
     def _scroll(self):
         """Move this Sprite in the direction of the scroll."""

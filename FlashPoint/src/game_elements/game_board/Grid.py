@@ -2,6 +2,7 @@ from typing import List
 
 import pygame
 
+from src.UIComponents.Spritesheet import Spritesheet
 from src.game_elements.game_board.Tile import Tile
 
 
@@ -18,6 +19,7 @@ class Grid(pygame.sprite.Group):
         self.image = pygame.Surface((tile_size*tiles_x, tile_size*tiles_y))
         self.rect = self.image.get_rect().move((x_coord, y_coord))
         self.grid = self._generate_grid(tile_size)
+        self.spritesheet = Spritesheet("media/Updated.png", 10, 8)
 
     def _generate_grid(self, tile_size) -> List[List[Tile]]:
         """Initialize an grid of Tiles, add to self Sprite Group."""
@@ -37,5 +39,7 @@ class Grid(pygame.sprite.Group):
         return grid
 
     def draw(self, screen: pygame.Surface):
-        for tile in self:
-            tile.draw(screen)
+
+        # for tile in self:
+        #     tile.draw(screen)
+
