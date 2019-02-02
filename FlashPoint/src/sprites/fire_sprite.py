@@ -5,8 +5,7 @@ from src.models.game_units import fire_model
 
 
 class FireSprite(pygame.sprite.Sprite):
-
     def __init__(self, tile: tile_model, fire: fire_model):
-        super.__init__()
+        pygame.sprite.Sprite.__init__(self)
         self.tile_reference = tile
         self.fire_model = fire

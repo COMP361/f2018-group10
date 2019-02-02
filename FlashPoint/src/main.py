@@ -4,21 +4,12 @@ import logging
 # If PyCharm is issuing warnings on pygame methods, suppress it. it's a bug with PyCharm
 import pygame
 
-<<<<<<< HEAD
 import src.constants.color as Color
 import src.constants.main_constants as MainConst
-from src.UIComponents.FileImporter import FileImporter
-from src.scenes.SceneManager import SceneManager
-from src.core.event_queue import EventQueue
-from src.core.networking import Networking
-=======
-import src.constants.Color as Color
-import src.constants.MainConstants as MainConst
 from src.UIComponents.file_importer import FileImporter
 from src.scenes.scene_manager import SceneManager
-from src.core.EventQueue import EventQueue
-from src.core.Networking import Networking
->>>>>>> GSD-Alek
+from src.core.event_queue import EventQueue
+from src.core.networking import Networking
 
 
 class Main(object):

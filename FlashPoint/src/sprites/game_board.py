@@ -3,16 +3,9 @@ import pygame
 
 import src.constants.color as Color
 import src.constants.main_constants as MainConst
-from src.sprites.GridSprite import GridSprite
-from src.sprites.CharacterSprite import CharacterSprite
-from src.core.event_queue import EventQueue
-
-import src.constants.Color as Color
-import src.constants.MainConstants as MainConst
 from src.sprites.grid_sprite import GridSprite
 from src.sprites.player_sprite import CharacterSprite
-from src.core.EventQueue import EventQueue
-
+from src.core.event_queue import EventQueue
 
 
 class GameBoard(pygame.sprite.Group):

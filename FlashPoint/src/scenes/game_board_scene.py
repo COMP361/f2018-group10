@@ -1,23 +1,8 @@
 import pygame
 
-<<<<<<< HEAD:FlashPoint/src/scenes/GameBoardScene.py
-from src.UIComponents.ChatBox import ChatBox
-from src.UIComponents.MenuWindow import MenuWindow
-from src.core.event_queue import EventQueue
-from src.sprites.GameBoard import GameBoard
-from src.sprites.hud.PlayerState import PlayerState
-from src.sprites.hud.CurrentPlayerState import CurrentPlayerState
-from src.sprites.hud.TimeBar import TimeBar
-from src.sprites.hud.DamageState import DamageState
-from src.sprites.hud.VictimSaved import VictimSaved
-from src.sprites.hud.VictimDead import VictimDead
-import src.constants.color as Color
-from src.UIComponents.RectButton import RectButton
-from src.UIComponents.Text import Text
-=======
 from src.UIComponents.chat_box import ChatBox
 from src.UIComponents.menu_window import MenuWindow
-from src.core.EventQueue import EventQueue
+from src.core.event_queue import EventQueue
 from src.sprites.game_board import GameBoard
 from src.sprites.hud.player_state import PlayerState
 from src.sprites.hud.current_player_state import CurrentPlayerState
@@ -25,10 +10,9 @@ from src.sprites.hud.time_bar import TimeBar
 from src.sprites.hud.damage_state import DamageState
 from src.sprites.hud.victim_saved import VictimSaved
 from src.sprites.hud.victim_dead import VictimDead
-import src.constants.Color as Color
+import src.constants.color as Color
 from src.UIComponents.rect_button import RectButton
 from src.UIComponents.text import Text
->>>>>>> GSD-Alek:FlashPoint/src/scenes/game_board_scene.py
 
 
 class GameBoardScene(object):

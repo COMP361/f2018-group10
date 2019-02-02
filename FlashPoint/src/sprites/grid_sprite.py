@@ -2,15 +2,9 @@ from typing import List
 
 import pygame
 
-<<<<<<< HEAD:FlashPoint/src/sprites/GridSprite.py
-from src.constants.enums.space_kind_enum import SpaceKindEnum
-from src.models.game_board.TileModel import TileModel
-from src.sprites.TileSprite import TileSprite
-=======
-from src.constants.enums.SpaceKindEnum import SpaceKindEnum
+from src.constants.state_enums import SpaceKindEnum
 from src.models.game_board.tile_model import TileModel
 from src.sprites.tile_sprite import TileSprite
->>>>>>> GSD-Alek:FlashPoint/src/sprites/grid_sprite.py
 
 
 class GridSprite(pygame.sprite.Group):
