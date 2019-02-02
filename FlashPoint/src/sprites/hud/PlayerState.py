@@ -71,7 +71,7 @@ class PlayerState(Interactable):
         self.frame = pygame.image.load('media/frame.png')
         self.frame = pygame.transform.scale(self.frame,(150,64))
 
-        #TODO Add switch statement for each color!!!
+        #TODO Add switch statement for each player color!!!
 
 
 
