@@ -15,7 +15,7 @@ class RectButton(RectLabel, Interactable):
                  width: int,
                  height: int,
                  background: Union[Tuple[int, int, int], str] = (0, 0, 0),
-                 outer_width: int=0,
+                 outer_width: int = 0,
                  txt_obj: Optional[Text] = None,
                  txt_pos: Text.Position = Text.Position.CENTER):
         __doc__ = RectLabel.__doc__

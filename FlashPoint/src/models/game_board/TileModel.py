@@ -2,9 +2,9 @@ import pygame
 
 from typing import Optional
 
-from models.game_board.EdgeObstacleModel import EdgeObstacleModel
-from models.game_board.NullTileModel import NullTileModel
-from src.sprites.CharacterSprite import CharacterSprite
+from src.models.game_board.EdgeObstacleModel import EdgeObstacleModel
+from src.models.game_board.NullTileModel import NullTileModel
+import src.sprites.CharacterSprite as cs
 from src.sprites.FireSprite import FireSprite
 from src.sprites.SmokeSprite import SmokeSprite
 from src.sprites.VehicleSprite import VehicleSprite
@@ -169,7 +169,7 @@ class TileModel(object):
         if self._space_kind == SpaceKindEnum.INDOOR:
             # Means only legal sprites on tiles should be POI, Character, Fire, Smoke, Hazmat
 
-            if isinstance(type, POISprite) or isinstance(type, CharacterSprite) or isinstance(type, FireSprite) or isinstance(
+            if isinstance(type, POISprite) or isinstance(type, cs.CharacterSprite) or isinstance(type, FireSprite) or isinstance(
                     type, SmokeSprite) or isinstance(type, HazMatSprite) or isinstance(type, VictimSprite):
                 self._game_unit_sprites.add(game_unit_sprite)
 
@@ -177,5 +177,5 @@ class TileModel(object):
             # means we can also have Vehicle Models.
             # Cannot have fire, smoke , hazmat or POI out of th
 
-            if isinstance(type, VehicleSprite) or isinstance(type, CharacterSprite):
+            if isinstance(type, VehicleSprite) or isinstance(type, cs.CharacterSprite):
                 self._game_unit_sprites.add(game_unit_sprite)

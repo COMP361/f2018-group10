@@ -2,54 +2,36 @@ from typing import Tuple, Optional, Union
 
 import pygame
 
-from src.UIComponents.Text import Text
 from src.UIComponents.FileImporter import FileImporter
 from src.UIComponents.Components import Components
+from src.UIComponents.RectButton import RectButton
+from src.UIComponents.Text import Text
+import src.constants.Color as Color
 
 
-class RectLabel(pygame.sprite.Sprite, Components):
-    """
-    Draws a rectangle object and (optionally) inserts a text on it.
-    This is a shorthand of pygame.draw.rect()
-    """
+class ProfileList(pygame.sprite.Sprite, Components):
     def __init__(self,
                  x: int,
                  y: int,
                  width: int,
                  height: int,
+                 limit: int = 3,
                  background: Union[Tuple[int, int, int], str] = (0, 0, 0),
-                 outer_width: int = 0,
-                 txt_obj: Optional[Text] = None,
-                 txt_pos: Text.Position = Text.Position.CENTER):
-        """
-        Constructor
-        :param x: x position of the object on screen
-        :param y: y position of the object on screen
-        :param width: width of the object
-        :param height: height of the object
-        :param background: Background of the object, can be either RGB color (Alpha optional) tuples or imported image
-        :param outer_width: The thickness of the outer edge. If width is zero then the object will be filled.
-        :param txt_obj: Text object to be inserted at the center of this label
-        :param txt_pos: Text position in the label, must be one of Text.Position
-        """
+                 outer_width: int = 0):
         pygame.sprite.Sprite.__init__(self)
         Components.__init__(self, x, y, width, height)
+        self._limit = limit
         self.background = background
         self.outer_width = outer_width
-        self.txt_obj = txt_obj
-        self.txt_pos = txt_pos
         self.image = None
         self.rect = None
-        self.transparent_bg = False
+        self._list = []
         self._render()
 
     def _render(self):
         # If self.background is an instance of Tuple, we assign that RGB tuple as the background color
         # Otherwise, self.background is an imported image (Surface) so we try to import it and assign as the background
         self.image = pygame.Surface([self.width, self.height])
-
-        if self.transparent_bg:
-            self.image.set_colorkey(self.background)
 
         self.rect = self.image.get_rect()
 
@@ -64,12 +46,34 @@ class RectLabel(pygame.sprite.Sprite, Components):
         self.rect.x = self.x
         self.rect.y = self.y
 
-        if self.txt_obj:
-            self.txt_obj.set_pos(self.rect, self.txt_pos)
-            self.image.blit(self.txt_obj.text_surf, self.txt_obj.text_rect)
+        profile_list = None
+        if self.can_remove:
+            profile_list = pygame.sprite.Group
+            # margin between two buttons
+            margin = 10
+            index = len(self._list)
+            width = (self.width / self._limit) - margin
+            height = self.height - 40
+            origin_x = self.x
+            origin_y = self.y
+
+            for name in self._list:
+                # draw the profile button for each profile
+                x = origin_x + ((width + margin) * index) + (margin/2)
+                y = origin_y + 20
+
+                btn = RectButton(x, y, width, height, (0, 0, 0), 0,
+                                 Text(pygame.font.SysFont('Arial', 20), name, Color.BLACK))
+                btn.add(profile_list)
 
     def draw(self, surface: pygame.Surface):
         surface.blit(self.image, self.rect)
+
+    def add(self, name: str):
+        if self.can_add:
+            self._list.append(name)
+        else:
+            raise OverflowError("Limit exceeded")
 
     def change_color(self, color: Tuple[int, int, int]):
         self.background = color
@@ -82,7 +86,7 @@ class RectLabel(pygame.sprite.Sprite, Components):
         else:
             raise Exception("File not found!")
 
-    def change_rect(self, rect: pygame.Rect, outer_width: int=0):
+    def change_rect(self, rect: pygame.Rect, outer_width: int = 0):
         self.rect = rect
         self.outer_width = outer_width
         self._render()
@@ -92,6 +96,10 @@ class RectLabel(pygame.sprite.Sprite, Components):
         self.y(y)
         self._render()
 
-    def set_transparent_background(self, x: bool):
-        self.transparent_bg = x
-        self._render()
+    @property
+    def can_add(self):
+        return len(self._list) <= self._limit
+
+    @property
+    def can_remove(self):
+        return len(self._list) > 0

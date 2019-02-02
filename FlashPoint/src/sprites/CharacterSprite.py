@@ -1,11 +1,11 @@
 import pygame
-from src.models.game_board.TileModel import TileModel
+import src.models.game_board.TileModel as t
 from src.models.game_units.PlayerModel import PlayerModel
 
 
 class CharacterSprite(pygame.sprite.Sprite):
 
-    def __init__(self, tile: TileModel, player: PlayerModel):
+    def __init__(self, tile: t.TileModel, player: PlayerModel):
         super().__init__()
 
         self.player_model = player

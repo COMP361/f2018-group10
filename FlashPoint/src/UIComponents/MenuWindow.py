@@ -29,7 +29,7 @@ class MenuWindow(object):
         :param color: Background color of the object represented by an RGB tuple (Alpha optional)
         """
         # Disable all buttons.
-        self.is_closed = True # Used to delete the menu from outside. Stupid python doesn't allow call-by-reference >:(
+        self.is_closed = True  # Used to delete the menu from outside. Stupid python doesn't allow call-by-reference >:(
         self._image = pygame.Surface((width, height))
         self._bg_color = bg_color
         self._rect = self._image.get_rect().move(position[0], position[1])
