@@ -111,11 +111,11 @@ class Networking:
                 print(f"Attempting to connect to host at {ip}:{port}")
                 logger.info(f"Attempting to connect to host at {ip}:{port}")
                 self.client.connect(ip, port)
-            except MastermindErrorClient:
+            except MastermindErrorClient as e:
                 logger.error(f"Error connecting to server at: {ip}:{port}")
-                raise ConnectionError
-            except OSError:
-                raise OSError
+                raise MastermindErrorClient(e)
+            except OSError as e:
+                raise OSError(e)
 
         @staticmethod
         def broadcast_game(args, stop_event):
@@ -335,7 +335,10 @@ class Networking:
             """
             while not self._stop_receive.is_set():
                 if not self._pause_receive.is_set():
-                    self._server_reply = self.receive(False)
+                    try:
+                        self._server_reply = self.receive(False)
+                    except OSError as e:
+                        print(f"Error receiving data: {e}")
 
         def disconnect(self):
             self._stop_receive.set()
