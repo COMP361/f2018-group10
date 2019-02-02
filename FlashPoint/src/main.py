@@ -1,4 +1,5 @@
 import sys
+import logging
 
 # If PyCharm is issuing warnings on pygame methods, suppress it. it's a bug with PyCharm
 import pygame
@@ -8,6 +9,7 @@ import src.constants.MainConstants as MainConst
 from src.UIComponents.FileImporter import FileImporter
 from src.scenes.SceneManager import SceneManager
 from src.core.EventQueue import EventQueue
+from src.core.Networking import Networking
 
 
 class Main(object):
@@ -32,6 +34,7 @@ class Main(object):
 
             for event in self.event_queue:
                 if event.type == pygame.QUIT:
+                    self.scene_manager.disconnect()
                     sys.exit()
 
             # Clear the screen to black
@@ -39,6 +42,8 @@ class Main(object):
 
             self.scene_manager.draw()
             self.scene_manager.update(self.event_queue)
+
+            Networking.get_instance().update(self.event_queue)
 
             self.event_queue.flush_queue()
 

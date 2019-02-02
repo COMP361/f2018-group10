@@ -47,6 +47,14 @@ class JoinScene(object):
                                      Text(pygame.font.SysFont('Arial', 20), text, color_text))
         self.sprite_grp.add(self.buttonBack)
 
+    def init_error_message(self, msg):
+        label_width = 400
+        label_left = (pygame.display.get_surface().get_size()[0] / 2) - (label_width / 2)
+        error_msg_label = RectLabel(label_left, 20, label_width, label_width, (255, 255, 255),
+                                    txt_obj=(Text(pygame.font.SysFont('Arial', 24), msg, Color.RED)))
+        error_msg_label.set_transparent_background(True)
+        self.sprite_grp.add(error_msg_label)
+
     def draw(self, screen):
         self.sprite_grp.draw(screen)
         self._text_bar.draw(screen)
@@ -54,3 +62,14 @@ class JoinScene(object):
     def update(self, event_queue):
         self.sprite_grp.update(event_queue)
         self._text_bar.update(event_queue)
+
+        message = self._text_bar.message
+        if message:
+            data = {'ip': self._text_bar.message}
+            join_event = pygame.event.Event(pygame.USEREVENT+1, **data)
+            pygame.event.post(join_event)
+            self._text_bar.message = ''
+
+    @property
+    def text_bar_msg(self):
+        return self._text_bar.message
