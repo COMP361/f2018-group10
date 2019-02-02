@@ -1,4 +1,5 @@
 import pygame as pg
+import math
 
 from src.UIComponents.InputBox import InputBox
 from src.UIComponents.Text import Text
@@ -7,7 +8,7 @@ from src.UIComponents.RectLabel import RectLabel
 import src.constants.Color as Color
 from src.core.EventQueue import EventQueue
 from src.constants.Fonts import TEXT_BOX_FONT_SIZE
-import math
+from src.core.Networking import Networking
 
 
 class ChatBox:
