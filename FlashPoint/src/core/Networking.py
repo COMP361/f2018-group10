@@ -111,7 +111,6 @@ class Networking:
                 print(f"Attempting to connect to host at {ip}:{port}")
                 logger.info(f"Attempting to connect to host at {ip}:{port}")
                 self.client.connect(ip, port)
-                self.client.send("I've connected")
             except MastermindErrorClient:
                 logger.error(f"Error connecting to server at: {ip}:{port}")
                 raise ConnectionError
@@ -296,12 +295,9 @@ class Networking:
             :param data: Data received from the connection
             :return:
             """
-            # print(f"Client at {connection_object.address} sent a message: {data}")
-            if isinstance(data, Networking.DataPayload):
-                # look up and append the client id to the event post
-                client_id = self.lookup_client(connection_object.address)
-                params = {'client_id': client_id, 'args': data.args, 'kwargs': data.kwargs}
-                pygame.event.post(pygame.event.Event(data.command, **params))
+            print(f"Client at {connection_object.address} sent a message: {data}")
+            if isinstance(data, ActionEvent):
+                data.execute()
             return super(MastermindServerUDP, self).callback_client_handle(connection_object, data)
 
         def callback_client_send(self, connection_object, data, compression=True):
