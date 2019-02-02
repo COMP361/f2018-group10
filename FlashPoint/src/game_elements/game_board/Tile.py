@@ -1,37 +1,25 @@
 import pygame
 
 import src.constants.Color as Color
-from src.UIComponents.FileImporter import FileImporter
 from src.game_elements.game_board.CharacterSprite import CharacterSprite
 from src.UIComponents.Interactable import Interactable
 from src.core.EventQueue import EventQueue
-from src.UIComponents.Spritesheet import Spritesheet
 
 
 class Tile(Interactable):
 
-    def __init__(self, x: int, y: int, x_offset: int, y_offset: int, size: int = 128):
+    def __init__(self, image: pygame.Surface, x: int, y: int, x_offset: int, y_offset: int):
         """Create a tile, not sure what the sprite size should be..."""
         self.index = 0
         self.sprite_grp = pygame.sprite.Group()
-        self.image = pygame.Surface([size, size])
+        self.image = image
+        self._backup_image = image.copy()
         super().__init__(self.image.get_rect())
         self.rect = self.image.get_rect().move(x_offset, y_offset)
         self.mouse_rect = pygame.Rect(self.rect).move(x, y)
         self.is_hovered = False
-        #self.s = Spritesheet("media/Updated.png", 10, 8)
-        self.image_file = FileImporter.import_image("media/tiles/grass.jpg")
-        self.image_file = pygame.transform.scale(self.image_file, (128, 128))
-        self._render()
         self._mouse_pos = (0, 0)  # For keeping track of previous location.
         self.is_scrolling = False
-
-
-    def _render(self):
-        """Eventually this might have some randomization logic? Dunno how we'll generate boards :( """
-       # self.image.fill(Color.GREY, self.rect)  # eventually this will be an actual tile image.
-        #self.image.blit(self.image_file, (0, 0))
-
 
     def hover(self):
         if self._is_enabled:
@@ -59,26 +47,15 @@ class Tile(Interactable):
         """
         self._is_enabled = False
 
-    # def _check_mouse_over(self):
-    #     mouse = pygame.mouse.get_pos()
-    #     rect = self.mouse_rect
-    #     x_max = rect.x + rect.w
-    #     x_min = rect.x
-    #     y_max = rect.y + rect.h
-    #     y_min = rect.y
-    #     return x_max > mouse[0] > x_min and y_max > mouse[1] > y_min
-
     def _highlight(self):
         if self.hover() and self._is_enabled:
             if not self.is_hovered:
                 self.is_hovered = True
+                self.image = self._backup_image.copy()
                 self.image.fill(Color.YELLOW)
-        # else:
-           # self.image.fill(Color.GREY)
-           # self.image.blit(self.image_file, (0, 0))
-
-           # self.s.draw(self.image, self.index % self.s.total_cell_count, 1280, 1024, 4)
-           # self.is_hovered = False
+        else:
+            self.image = self._backup_image
+            self.is_hovered = False
 
     def _scroll(self):
         """Move this Sprite in the direction of the scroll."""
