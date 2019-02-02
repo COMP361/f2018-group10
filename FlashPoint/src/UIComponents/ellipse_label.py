@@ -13,12 +13,12 @@ class EllipseLabel(pygame.sprite.Sprite, Components):
     This is a shorthand of pygame.draw.ellipse()
     """
     def __init__(self,
-                 x: int,
-                 y: int,
-                 width: int,
-                 height: int,
+                 x: Union[int, float],
+                 y: Union[int, float],
+                 width: Union[int, float],
+                 height: Union[int, float],
                  background: Union[Tuple[int, int, int], str] = (0, 0, 0),
-                 outer_width: int=0,
+                 outer_width: Union[int, float] = 0,
                  txt_obj: Optional[Text] = None,
                  txt_pos: Optional[Text.Position] = Text.Position.CENTER):
         """

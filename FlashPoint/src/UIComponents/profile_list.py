@@ -25,6 +25,7 @@ class ProfileList(pygame.sprite.Sprite, Components):
         self.outer_width = outer_width
         self.image = None
         self.rect = None
+        self.profile_list = pygame.sprite.Group()
         self._list = []
         self._render()
 
@@ -46,37 +47,31 @@ class ProfileList(pygame.sprite.Sprite, Components):
         self.rect.x = self.x
         self.rect.y = self.y
 
-        profile_list = None
-        if self.can_remove:
-            profile_list = pygame.sprite.Group
+    def draw(self, surface: pygame.Surface):
+        surface.blit(self.image, self.rect)
+        self.profile_list.draw(surface)
+
+    def add(self, name: str):
+        if self.can_add:
+            print(f"added {name}")
             # margin between two buttons
             margin = 10
             index = len(self._list)
             width = (self.width / self._limit) - margin
             height = self.height - 40
-            origin_x = self.x
-            origin_y = self.y
-
-            for name in self._list:
-                # draw the profile button for each profile
-                x = origin_x + ((width + margin) * index) + (margin/2)
-                y = origin_y + 20
-
-                btn = RectButton(x, y, width, height, (0, 0, 0), 0,
-                                 Text(pygame.font.SysFont('Arial', 20), name, color.BLACK))
-                btn.add(profile_list)
-
-    def draw(self, surface: pygame.Surface):
-        surface.blit(self.image, self.rect)
-
-    def add(self, name: str):
-        if self.can_add:
             self._list.append(name)
+            # draw the profile button for each profile
+            x = self.x + ((width + margin) * index) + (margin / 2)
+            y = self.y + 20
+
+            btn = RectButton(x, y, width, height, (0, 0, 0), 0,
+                             Text(pygame.font.SysFont('Arial', 20), name, color.BLACK))
+            self.profile_list.add(btn)
         else:
             raise OverflowError("Limit exceeded")
 
-    def change_color(self, color: Tuple[int, int, int]):
-        self.background = color
+    def change_color(self, clr: Tuple[int, int, int]):
+        self.background = clr
         self._render()
 
     def change_bg_image(self, file_path: str):

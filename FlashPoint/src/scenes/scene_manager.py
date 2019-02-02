@@ -25,8 +25,9 @@ class SceneManager(object):
         """
         self.screen = screen
         self._active_scene = StartScene(self.screen)
-        self._active_scene.buttonLogin.on_click(self.next, HostJoinScene)
         self._active_scene.buttonRegister.on_click(self.next, HostJoinScene)
+        # self._active_scene.buttonLogin.on_click(self.next, HostJoinScene)
+        # self._active_scene.buttonRegister.on_click(self.next, HostJoinScene)
 
     def next(self, next_scene: callable, *args):
         """Switch to the next logical scene. args is assumed to be: [SceneClass]
@@ -44,7 +45,8 @@ class SceneManager(object):
 
         # Step two: Set the buttons.
         if isinstance(self._active_scene, StartScene):
-            self._active_scene.buttonLogin.on_click(self.next, HostJoinScene)
+            # self._active_scene.buttonLogin.on_click(self.next, HostJoinScene)
+            # self._active_scene.buttonRegister.on_click(self.next, HostJoinScene)
             self._active_scene.buttonRegister.on_click(self.next, HostJoinScene)
 
         if isinstance(self._active_scene, HostJoinScene):
