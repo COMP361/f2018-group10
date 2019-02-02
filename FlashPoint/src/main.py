@@ -6,8 +6,8 @@ import pygame
 
 import src.constants.Color as Color
 import src.constants.MainConstants as MainConst
-from src.UIComponents.FileImporter import FileImporter
-from src.scenes.SceneManager import SceneManager
+from src.UIComponents.file_importer import FileImporter
+from src.scenes.scene_manager import SceneManager
 from src.core.EventQueue import EventQueue
 from src.core.Networking import Networking
 
