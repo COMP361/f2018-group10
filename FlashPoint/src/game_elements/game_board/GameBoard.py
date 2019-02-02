@@ -2,6 +2,7 @@ import pygame
 
 import src.constants.Color as Color
 import src.constants.MainConstants as MainConst
+from src.UIComponents.FileImporter import FileImporter
 from src.game_elements.game_board.CharacterSprite import CharacterSprite
 from src.game_elements.game_board.Grid import Grid
 from src.core.EventQueue import EventQueue
@@ -16,9 +17,11 @@ class GameBoard(pygame.sprite.Group):
         self.rect = self.image.get_rect()
         self.grid = Grid(x_coord=self.rect.left, y_coord=self.rect.top)
         self.add(self.grid)
+        self.background = FileImporter.import_image("media/WoodBack.jpg")
 
     def draw(self, screen: pygame.Surface):
-        self.image.fill(Color.BLACK)
+        #self.image.fill(Color.BLACK)
+        self.image.blit(self.background, (0, 0))
         self.grid.draw(self.image)
         screen.blit(self.image, self.rect)
 
