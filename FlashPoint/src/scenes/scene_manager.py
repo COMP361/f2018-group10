@@ -1,9 +1,11 @@
 from typing import Optional
 
 import pygame
+import json
 
 import src.constants.CustomEvents as CustomEvents
 from src.UIComponents.file_importer import FileImporter
+from src.UIComponents.input_box import InputBox
 from src.scenes.game_board_scene import GameBoardScene
 from src.scenes.host_join_scene import HostJoinScene
 from src.scenes.host_menu_scene import HostMenuScene
@@ -13,7 +15,6 @@ from src.scenes.game_initial_menu import CreateGameMenu
 from src.core.event_queue import EventQueue
 from src.scenes.character_scene import CharacterScene
 from src.scenes.lobby_scene import LobbyScene
-
 from src.core.networking import Networking
 
 
@@ -22,10 +23,12 @@ class SceneManager(object):
         """
         Scene Manager. Initialize this before the game loop
         :param screen: should be the main display
-        """
+       """
+        self.profiles = "media/profiles.json"
         self.screen = screen
         self._active_scene = StartScene(self.screen)
-        self._active_scene.buttonRegister.on_click(self.next, HostJoinScene)
+        self._active_scene.buttonRegister.on_click(self.create_profile, self._active_scene.text_bar1)
+        # self._active_scene.buttonRegister.on_click(self.next, HostJoinScene)
         self._active_scene.profile.set_profile(0, "Test", self.next, HostJoinScene)
         # self._active_scene.buttonLogin.on_click(self.next, HostJoinScene)
         # self._active_scene.buttonRegister.on_click(self.next, HostJoinScene)
@@ -48,7 +51,8 @@ class SceneManager(object):
         if isinstance(self._active_scene, StartScene):
             # self._active_scene.buttonLogin.on_click(self.next, HostJoinScene)
             # self._active_scene.buttonRegister.on_click(self.next, HostJoinScene)
-            self._active_scene.buttonRegister.on_click(self.next, HostJoinScene)
+            #self._active_scene.buttonRegister.on_click(self.next, HostJoinScene)
+            self._active_scene.buttonRegister.on_click(self.create_profile, self._active_scene.text_bar1)
             self._active_scene.profile.set_profile(0, "Test", self.next, HostJoinScene)
 
         if isinstance(self._active_scene, HostJoinScene):
@@ -150,3 +154,27 @@ class SceneManager(object):
 
         if next_scene is not None:
             self.next(next_scene, *args)
+
+
+    def create_profile(self, text_bar: InputBox):
+
+        temp = {}
+        with open(self.profiles, mode='r+') as myFile:
+
+            temp = json.load(myFile)
+            size = len(temp['nickname'])
+            if size >= 3:
+                return
+
+            nickname = text_bar.text
+            temp['nickname'].append(nickname)
+
+        with open(self.profiles,mode='w',encoding='utf-8') as myFile:
+
+            json.dump(temp, myFile)
+            self.next(HostJoinScene)
+
+
+
+
+
