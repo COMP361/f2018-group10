@@ -1,18 +1,18 @@
 import pygame
 
-<<<<<<< HEAD:FlashPoint/src/sprites/GameBoard.py
+
 import src.constants.color as Color
 import src.constants.main_constants as MainConst
 from src.sprites.GridSprite import GridSprite
 from src.sprites.CharacterSprite import CharacterSprite
 from src.core.event_queue import EventQueue
-=======
+
 import src.constants.Color as Color
 import src.constants.MainConstants as MainConst
 from src.sprites.grid_sprite import GridSprite
 from src.sprites.player_sprite import CharacterSprite
 from src.core.EventQueue import EventQueue
->>>>>>> GSD-Alek:FlashPoint/src/sprites/game_board.py
+
 
 
 class GameBoard(pygame.sprite.Group):
