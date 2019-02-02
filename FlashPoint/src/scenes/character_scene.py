@@ -2,7 +2,7 @@ import pygame
 
 import src.constants.Color as Color
 
-from src.UIComponents.RectButton import RectButton
+from src.UIComponents.rect_button import RectButton
 from src.UIComponents.rect_label import RectLabel
 
 from src.UIComponents.scene import Scene

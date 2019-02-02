@@ -3,8 +3,8 @@ from typing import Optional
 import pygame
 
 from src.UIComponents.file_importer import FileImporter
-from src.scenes.GameBoardScene import GameBoardScene
-from src.scenes.HostJoinScene import HostJoinScene
+from src.scenes.game_board_scene import GameBoardScene
+from src.scenes.host_join_scene import HostJoinScene
 from src.scenes.host_menu_scene import HostMenuScene
 from src.scenes.join_scene import JoinScene
 from src.scenes.start_scene import StartScene
