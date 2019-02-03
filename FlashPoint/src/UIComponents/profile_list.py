@@ -89,7 +89,8 @@ class ProfileList(pygame.sprite.Sprite, Components):
         if 0 <= index <= self._limit:
             height = self.height - 80
             btn = self._btn_list[index]
-            btn.height = height
+            rect = pygame.rect.Rect(btn.x, btn.y, btn.width, height)
+            btn.change_rect(rect)
             btn.txt_obj = Text(pygame.font.SysFont('Arial', 20), name, color.BLACK)
             btn.on_click(click_action, *args, **kwargs)
             btn.enable()
@@ -107,7 +108,8 @@ class ProfileList(pygame.sprite.Sprite, Components):
         if 0 <= index < len(self._btn_list):
             height = self.height - 40
             btn = self._btn_list[index]
-            btn.height = height
+            rect = pygame.rect.Rect(btn.x, btn.y, btn.width, height)
+            btn.change_rect(rect)
             btn.txt_obj = Text(pygame.font.SysFont('Arial', 20), "Empty", color.BLACK)
             btn.disable()
             self._profile_list.remove(self._remove_btn_list[index])

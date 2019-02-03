@@ -149,6 +149,9 @@ class Interactable(pygame.sprite.Sprite):
         print(f"Disabling: {self}")
         self._is_enabled = False
 
+    def resize_rect(self, rect: pygame.rect.Rect):
+        self._rect = rect
+
     # why is this so hard
     @property
     def click_action(self):
