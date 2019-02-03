@@ -18,7 +18,7 @@ class GameBoard(pygame.sprite.Group):
         self.rect = self.image.get_rect()
         self.grid = GridSprite(x_coord=self.rect.left, y_coord=self.rect.top)
         self.add(self.grid)
-        self.background = FileImporter.import_image("media/WoodBack.jpeg")
+        self.background = FileImporter.import_image("media/backgrounds/WoodBack.jpeg")
 
     def draw(self, screen: pygame.Surface):
 

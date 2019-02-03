@@ -17,7 +17,7 @@ class HostJoinScene(Scene):
 
     def _init_background(self):
         box_size = (self.resolution[0], self.resolution[1])
-        background_box = RectLabel(0, 0, box_size[0], box_size[1], "media/flashpoint_background.png")
+        background_box = RectLabel(0, 0, box_size[0], box_size[1], "media/backgrounds/flashpoint_background.png")
         self.sprite_grp.add(background_box)
 
     def _init_log_box(self):
