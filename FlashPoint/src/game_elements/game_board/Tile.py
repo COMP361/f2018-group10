@@ -8,21 +8,18 @@ from src.core.EventQueue import EventQueue
 
 class Tile(Interactable):
 
-    def __init__(self, x: int, y: int, x_offset: int, y_offset: int, size: int = 128):
+    def __init__(self, image: pygame.Surface, x: int, y: int, x_offset: int, y_offset: int):
         """Create a tile, not sure what the sprite size should be..."""
+        self.index = 0
         self.sprite_grp = pygame.sprite.Group()
-        self.image = pygame.Surface([size, size])
+        self.image = image
+        self._backup_image = image.copy()
         super().__init__(self.image.get_rect())
         self.rect = self.image.get_rect().move(x_offset, y_offset)
         self.mouse_rect = pygame.Rect(self.rect).move(x, y)
         self.is_hovered = False
-        self._render()
         self._mouse_pos = (0, 0)  # For keeping track of previous location.
         self.is_scrolling = False
-
-    def _render(self):
-        """Eventually this might have some randomization logic? Dunno how we'll generate boards :( """
-        self.image.fill(Color.GREY, self.rect)  # eventually this will be an actual tile image.
 
     def hover(self):
         if self._is_enabled:
@@ -50,22 +47,14 @@ class Tile(Interactable):
         """
         self._is_enabled = False
 
-    # def _check_mouse_over(self):
-    #     mouse = pygame.mouse.get_pos()
-    #     rect = self.mouse_rect
-    #     x_max = rect.x + rect.w
-    #     x_min = rect.x
-    #     y_max = rect.y + rect.h
-    #     y_min = rect.y
-    #     return x_max > mouse[0] > x_min and y_max > mouse[1] > y_min
-
     def _highlight(self):
         if self.hover() and self._is_enabled:
             if not self.is_hovered:
                 self.is_hovered = True
+                self.image = self._backup_image.copy()
                 self.image.fill(Color.YELLOW)
         else:
-            self.image.fill(Color.GREY)
+            self.image = self._backup_image
             self.is_hovered = False
 
     def _scroll(self):
