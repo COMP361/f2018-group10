@@ -29,7 +29,15 @@ class SceneManager(object):
         self._active_scene = StartScene(self.screen)
         self._active_scene.buttonRegister.on_click(self.create_profile, self._active_scene.text_bar1)
         # self._active_scene.buttonRegister.on_click(self.next, HostJoinScene)
-        self._active_scene.profile.set_profile(0, "Test", self.next, HostJoinScene)
+        with open(self.profiles, mode='r') as myFile:
+            temp = json.load(myFile)
+            i = 0
+            for user in temp:
+                self._active_scene.profile.set_profile(i, user['nickname'], self.next, HostJoinScene)
+                i = i + 1
+
+
+
         # self._active_scene.buttonLogin.on_click(self.next, HostJoinScene)
         # self._active_scene.buttonRegister.on_click(self.next, HostJoinScene)
 
@@ -53,7 +61,7 @@ class SceneManager(object):
             # self._active_scene.buttonRegister.on_click(self.next, HostJoinScene)
             #self._active_scene.buttonRegister.on_click(self.next, HostJoinScene)
             self._active_scene.buttonRegister.on_click(self.create_profile, self._active_scene.text_bar1)
-            self._active_scene.profile.set_profile(0, "Test", self.next, HostJoinScene)
+            #self._active_scene.profile.set_profile(0, "Test", self.next, HostJoinScene)
 
         if isinstance(self._active_scene, HostJoinScene):
             self._active_scene.buttonJoin.on_click(self.next, JoinScene)
@@ -162,17 +170,19 @@ class SceneManager(object):
         with open(self.profiles, mode='r+') as myFile:
 
             temp = json.load(myFile)
-            size = len(temp['nickname'])
+            size = len(temp)
             if size >= 3:
                 return
 
-            nickname = text_bar.text
-            temp['nickname'].append(nickname)
+            player = {'nickname':text_bar.text }
+            temp.append(player)
 
         with open(self.profiles,mode='w',encoding='utf-8') as myFile:
 
             json.dump(temp, myFile)
             self.next(HostJoinScene)
+
+
 
 
 
