@@ -19,6 +19,7 @@ from src.core.networking import Networking
 
 
 class SceneManager(object):
+
     def __init__(self, screen: pygame.Surface):
         """
         Scene Manager. Initialize this before the game loop
@@ -27,15 +28,16 @@ class SceneManager(object):
         self.profiles = "media/profiles.json"
         self.screen = screen
         self._active_scene = StartScene(self.screen)
-        self._active_scene.buttonRegister.on_click(self.create_profile, self._active_scene.text_bar1)
         #self._active_scene.buttonRegister.on_click(self.next, HostJoinScene)
-        with open(self.profiles, mode='r') as myFile:
-            temp = json.load(myFile)
-            i = 0
-            for user in temp:
-                self._active_scene.profile.set_profile(i, user['nickname'], self.next, HostJoinScene)
-                i = i + 1
 
+        self.update_profiles()
+        self._active_scene.buttonRegister.on_click(self.create_profile, self._active_scene.text_bar1)
+        # self._active_scene.profile.remove_profile_callback(1, self.remove_profile)
+        # self._active_scene.profile.remove_profile_callback(2, self.remove_profile)
+
+
+
+        
 
 
         # self._active_scene.buttonLogin.on_click(self.next, HostJoinScene)
@@ -60,7 +62,10 @@ class SceneManager(object):
             # self._active_scene.buttonLogin.on_click(self.next, HostJoinScene)
             # self._active_scene.buttonRegister.on_click(self.next, HostJoinScene)
             #self._active_scene.buttonRegister.on_click(self.next, HostJoinScene)
+
             self._active_scene.buttonRegister.on_click(self.create_profile, self._active_scene.text_bar1)
+            self.update_profiles()
+
             #self._active_scene.profile.set_profile(0, "Test", self.next, HostJoinScene)
 
         if isinstance(self._active_scene, HostJoinScene):
@@ -164,10 +169,20 @@ class SceneManager(object):
             self.next(next_scene, *args)
 
 
+    def update_profiles(self):
+
+        with open(self.profiles, mode='r', encoding='utf-8') as myFile:
+            temp = json.load(myFile)
+            i = 0
+            for user in temp:
+                self._active_scene.profile.set_profile(i, str(user['nickname']), self.next, HostJoinScene)
+                self._active_scene.profile.remove_profile_callback(i, self.remove_profile, user['nickname'])
+                i = i + 1
+
     def create_profile(self, text_bar: InputBox):
 
         temp = {}
-        with open(self.profiles, mode='r+') as myFile:
+        with open(self.profiles, mode='r+', encoding='utf-8') as myFile:
 
             temp = json.load(myFile)
             size = len(temp)
@@ -180,15 +195,25 @@ class SceneManager(object):
         with open(self.profiles,mode='w',encoding='utf-8') as myFile:
 
             json.dump(temp, myFile)
-            self.next(HostJoinScene)
+            #self.next(HostJoinScene)
+        self.update_profiles()
 
-    # def remove_profile(self):
-    #
-    #     temp = {}
+    def remove_profile(self,removename:str):
 
+        temp = {}
+        with open(self.profiles, mode='r+', encoding='utf-8') as myFile:
 
+            temp = json.load(myFile)
+            for perm in temp:
+                for name in perm.values():
+                    if  name == removename:
+                        temp.remove(perm)
+                    else:
+                        continue
 
+        with open(self.profiles, mode='w', encoding='utf-8') as myFile:
 
+            json.dump(temp, myFile)
 
-
-
+        self.update_profiles()
+            #self.next(StartScene)

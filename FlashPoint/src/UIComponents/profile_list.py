@@ -132,8 +132,9 @@ class ProfileList(pygame.sprite.Sprite, Components):
             raise IndexError("Index out of range")
 
     def remove_profile_action(self, index: int, callback: callable, *args, **kwargs):
-        self.remove_profile(index)
+        #self.remove_profile(index)
         callback(*args, **kwargs)
+        self.remove_profile(index)
 
     def draw(self, surface: pygame.Surface):
         surface.blit(self.image, self.rect)
