@@ -10,19 +10,19 @@ from src.UIComponents.profile_list import ProfileList
 
 
 class StartScene(object):
+
     def __init__(self, screen):
         self.resolution = (1280, 700)
         self.sprite_grp = pygame.sprite.Group()
         self._init_background()
 
-        # self._init_text_box(342, 350, "Username:", color.STANDARDBTN, color.BLACK)
-        # self._init_text_box(342, 434, "Password:", color.STANDARDBTN, color.BLACK)
-        # self._init_btn_login(594, 600, "Login", color.STANDARDBTN, color.BLACK)
-        # self._init_btn_register(791, 600, "Register", color.STANDARDBTN, color.BLACK)
         self._init_profile_selector(((self.resolution[0]/2)-(500/2)), 330, color.GREY)
-        self._text_bar1 = self._init_text_bar(((self.resolution[0]/2)-(500/2))-20, 600, 400, 32)
+        self.text_bar1 = self._init_text_bar(((self.resolution[0]/2)-(500/2))-20, 600, 400, 32)
+        #self.sometext =
         self._init_btn_register(((self.resolution[0]/2)-(500/2))+400, 592, "Create Profile",
                                 color.STANDARDBTN, color.BLACK)
+
+
 
         # self._text_bar1 = self._init_text_bar(500, 350, 400, 32)
         # self._text_bar2 = self._init_text_bar(500, 434, 400, 32)
@@ -70,11 +70,11 @@ class StartScene(object):
     def draw(self, screen):
         self.sprite_grp.draw(screen)
         # self._text_bar2.draw(screen)
-        self._text_bar1.draw(screen)
+        self.text_bar1.draw(screen)
         self.profile.draw(screen)
 
     def update(self, event_queue):
         self.sprite_grp.update(event_queue)
-        self._text_bar1.update(event_queue)
+        self.text_bar1.update(event_queue)
         self.profile.update(event_queue)
         # self._text_bar2.update(event_queue)
