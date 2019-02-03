@@ -182,6 +182,10 @@ class SceneManager(object):
             json.dump(temp, myFile)
             self.next(HostJoinScene)
 
+    # def remove_profile(self):
+    #
+    #     temp = {}
+
 
 
 
