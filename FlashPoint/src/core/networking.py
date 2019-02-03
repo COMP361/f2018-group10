@@ -5,7 +5,6 @@ import threading
 import logging
 
 import src.constants.CustomEvents as CustomEvents
-from src.core.event_queue import EventQueue
 from src.action_events.action_event import ActionEvent
 from src.external.Mastermind import *
 
