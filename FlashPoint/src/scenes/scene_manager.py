@@ -28,7 +28,7 @@ class SceneManager(object):
         self.screen = screen
         self._active_scene = StartScene(self.screen)
         self._active_scene.buttonRegister.on_click(self.create_profile, self._active_scene.text_bar1)
-        # self._active_scene.buttonRegister.on_click(self.next, HostJoinScene)
+        #self._active_scene.buttonRegister.on_click(self.next, HostJoinScene)
         with open(self.profiles, mode='r') as myFile:
             temp = json.load(myFile)
             i = 0
