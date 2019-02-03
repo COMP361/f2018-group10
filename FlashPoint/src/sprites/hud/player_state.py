@@ -11,7 +11,9 @@ class PlayerState(Interactable):
 
     def __init__(self, x: int, y: int, name: str,color: Color):
         self.image = pygame.Surface([64 , 64])
-        self.bg = pygame.image.load('media/wood2.png')
+        self.bg = pygame.image.load('media/GameHud/wood2-150x64.png')
+        self.frame = pygame.image.load('media/GameHud/frame150x64.png')
+        self.player_icon = pygame.image.load('media/GameHud/bleu-70x70.png')
         super().__init__(self.image.get_rect())
         self.font_name = pygame.font.SysFont('Agency FB', 30)
         self.font_other = pygame.font.SysFont('Agency FB', 13)
@@ -66,21 +68,21 @@ class PlayerState(Interactable):
     def update(self, event_queue: EventQueue):
 
         self.image = pygame.Surface([150, 64])
-        self.bg = pygame.transform.scale(self.bg, (150, 64))
+        #self.bg = pygame.transform.scale(self.bg, (150, 64))
         self.image.blit(self.bg, self.image.get_rect())
-        self.frame = pygame.image.load('media/frame.png')
-        self.frame = pygame.transform.scale(self.frame,(150,64))
+
+        #self.frame = pygame.transform.scale(self.frame,(150,64))
 
         #TODO Add switch statement for each player color!!!
 
 
 
-        player_icon = pygame.image.load('media/Bleu.png')
-        player_icon = pygame.transform.scale(player_icon, (70, 70))
-        player_icon_rect = player_icon.get_rect()
+
+        #player_icon = pygame.transform.scale(player_icon, (70, 70))
+        player_icon_rect = self.player_icon.get_rect()
         player_icon_rect.move_ip(75,0)
 
-        self.image.blit(player_icon, player_icon_rect)
+        self.image.blit(self.player_icon, player_icon_rect)
         self.image.blit(self.text, self.NAME_rect)
         self.image.blit(self.text_AP, self.AP_rect)
         self.image.blit(self.text_SAP, self.SAP_rect)
