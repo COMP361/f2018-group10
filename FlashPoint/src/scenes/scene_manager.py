@@ -30,7 +30,7 @@ class SceneManager(object):
         self.profiles = "media/profiles.json"
         self.screen = screen
         self._active_scene = StartScene(self.screen)
-
+        self._current_player = None
         self.update_profiles()
         self._active_scene.buttonRegister.on_click(self.create_profile, self._active_scene.text_bar1)
 
@@ -46,6 +46,8 @@ class SceneManager(object):
             the one in args (next_scene). Then, attach all your buttons for that scene.
         """
         # Step one: Create the next scene.
+        if args and isinstance(args[0], PlayerModel):
+            self._current_player = args[0]
         self._active_scene = next_scene(self.screen, *args)
 
         # Step two: Set the buttons.
@@ -54,8 +56,8 @@ class SceneManager(object):
             self.update_profiles()
 
         if isinstance(self._active_scene, HostJoinScene):
-            self._active_scene.buttonJoin.on_click(self.next, JoinScene)
-            self._active_scene.buttonHost.on_click(self.host, HostMenuScene)
+            self._active_scene.buttonJoin.on_click(self.next, JoinScene, self._current_player)
+            self._active_scene.buttonHost.on_click(self.host, HostMenuScene, self._current_player)
             self._active_scene.buttonBack.on_click(self.next, StartScene)
 
         if isinstance(self._active_scene, JoinScene):
@@ -68,8 +70,8 @@ class SceneManager(object):
 
         if isinstance(self._active_scene, CreateGameMenu):
             self._active_scene.buttonBack.on_click(self.disconnect, HostJoinScene)
-            self._active_scene.buttonExp.on_click(self.next, LobbyScene, True)
-            self._active_scene.buttonFamily.on_click(self.next, LobbyScene, False)
+            self._active_scene.buttonExp.on_click(self.next, LobbyScene, True, self._current_player)
+            self._active_scene.buttonFamily.on_click(self.next, LobbyScene, False, self._current_player)
 
         if isinstance(self._active_scene, CharacterScene):
             self._active_scene.buttonBack.on_click(self.next, LobbyScene, True)
@@ -156,11 +158,10 @@ class SceneManager(object):
     def update_profiles(self):
         with open(self.profiles, mode='r', encoding='utf-8') as myFile:
             temp = json.load(myFile)
-            i = 0
-            for user in temp:
-                self._active_scene.profile.set_profile(i, str(user['nickname']['_nickname']), self.next, HostJoinScene)
-                self._active_scene.profile.remove_profile_callback(i, self.remove_profile, user['nickname'])
-                i = i + 1
+            for i, user in enumerate(temp):
+                player: PlayerModel = JSONSerializer.deserialize(user)
+                self._active_scene.profile.set_profile(i, player.nickname, self.next, HostJoinScene, player)
+                self._active_scene.profile.remove_profile_callback(i, self.remove_profile, player.nickname)
 
     def create_profile(self, text_bar: InputBox):
         temp = {}
@@ -179,16 +180,15 @@ class SceneManager(object):
                 ip=Networking.get_instance().get_ip(),
                 nickname=text_bar.text.strip()
             )
-            player = {'nickname': JSONSerializer.serialize(player_model)}
+            player = JSONSerializer.serialize(player_model)
             temp.append(player)
 
-        with open(self.profiles,mode='w', encoding='utf-8') as myFile:
+        with open(self.profiles, mode='w', encoding='utf-8') as myFile:
             json.dump(temp, myFile)
-        text_bar.text = ""
+
         self.update_profiles()
 
     def remove_profile(self, removename: str):
-
         temp = {}
         with open(self.profiles, mode='r+', encoding='utf-8') as myFile:
 

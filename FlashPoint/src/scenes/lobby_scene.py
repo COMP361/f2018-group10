@@ -1,6 +1,7 @@
 import pygame
 
 import src.constants.color as Color
+from models.game_units.player_model import PlayerModel
 from src.UIComponents.rect_button import RectButton
 from src.UIComponents.rect_label import RectLabel
 from src.UIComponents.text import Text
@@ -9,7 +10,9 @@ from src.core.networking import Networking
 
 
 class LobbyScene(object):
-    def __init__(self, screen, game_type: bool):
+    def __init__(self, screen, game_type: bool, current_player: PlayerModel):
+        self._current_player = current_player
+        
         self.resolution = (1280, 700)
         self.sprite_grp = pygame.sprite.Group()
         self._init_background()
