@@ -1,38 +1,59 @@
 import pygame
 
 from src.UIComponents.interactable import Interactable
-import src.constants.color as color
+import src.constants.color as Color
 from src.core.event_queue import EventQueue
-from src.models.game_board import tile_model
+from src.models.game_board.tile_model import TileModel
 
 
 class TileSprite(Interactable):
     """Graphical representation of a Tile and controls."""
-    def __init__(self, grid_x_pos: int, grid_y_pos: int, x_offset, y_offset, tile_model: tile_model, size: int = 128):
-        self.tile_model = tile_model
-
-        self.image = pygame.Surface([size, size])
+    def __init__(self, image: pygame.Surface, x, y, x_offset, y_offset, tile_model: TileModel):
+        self.index = 0
+        self.sprite_grp = pygame.sprite.Group()
+        self.image = image
+        self._backup_image = image.copy()
         super().__init__(self.image.get_rect())
         self.rect = self.image.get_rect().move(x_offset, y_offset)
-        self.mouse_rect = pygame.Rect(self.rect).move(grid_x_pos, grid_y_pos)
-
-        self._mouse_pos = (0, 0)  # For keeping track of previous location.
+        self.mouse_rect = pygame.Rect(self.rect).move(x, y)
         self.is_hovered = False
+        self._mouse_pos = (0, 0)  # For keeping track of previous location.
         self.is_scrolling = False
 
-        self._render()
+    def hover(self):
+        if self._is_enabled:
+            mouse = pygame.mouse.get_pos()
+            rect = self.rect
+            x_max = rect.x + rect.w
+            x_min = rect.x
+            y_max = rect.y + rect.h
+            y_min = rect.y
+            return x_max > mouse[0] > x_min and y_max > mouse[1] > y_min
+        else:
+            return False
 
-    def _render(self):
-        """Eventually this might have some randomization logic? Dunno how we'll generate boards :( """
-        self.image.fill(color.GREY, self.rect)  # eventually this will be an actual tile image.
+    def enable(self):
+        """
+        Enables the event hook
+        :return:
+        """
+        self._is_enabled = True
+
+    def disable(self):
+        """
+        Disables the event hook
+        :return:
+        """
+        self._is_enabled = False
 
     def _highlight(self):
         if self.hover() and self._is_enabled:
             if not self.is_hovered:
                 self.is_hovered = True
-                self.image.fill(color.YELLOW)
+                self.image = self._backup_image.copy()
+                self.image.fill(Color.YELLOW)
         else:
-            self.image.fill(color.GREY)
+            self.image = self._backup_image
             self.is_hovered = False
 
     def _scroll(self):
@@ -48,35 +69,22 @@ class TileSprite(Interactable):
                 self.mouse_rect.move_ip(movement)
         self._mouse_pos = current_mouse_pos
 
-    # TODO Alek please make this functionality a permanent solution
-    # def remove_sprite_character(self, some_character):
-    #     for sprite in self.tile_model.game_unit_sprites:
-    #         if isinstance(sprite, CharacterSprite) and sprite == some_character:
-    #             # Takes care of not taking out other characters as well
-    #             self.tile_model.game_unit_sprites.remove(some_character)
-    #
-    # def find_character(self):
-    #     for sprite in self.tile_model.game_unit_sprites:
-    #         if isinstance(sprite, CharacterSprite):
-    #             return sprite
+    def remove_sprite_character(self, some_character):
+        for sprite in self.sprite_grp:
+            if isinstance(sprite, PlayerSprite) and sprite == some_character:
+                # Takes care of not taking out other characters as well
+                self.sprite_grp.remove(some_character)
 
-    def hover(self):
-        if self._is_enabled:
-            mouse = pygame.mouse.get_pos()
-            rect = self.rect
-            x_max = rect.x + rect.w
-            x_min = rect.x
-            y_max = rect.y + rect.h
-            y_min = rect.y
-            return x_max > mouse[0] > x_min and y_max > mouse[1] > y_min
-        else:
-            return False
+    def find_character(self):
+        for sprite in self.sprite_grp:
+            if isinstance(sprite, PlayerSprite):
+                return sprite
 
     def draw(self, screen: pygame.Surface):
         self._highlight()
-        # self.sprite_grp.draw(self.image)
+        self.sprite_grp.draw(self.image)
         screen.blit(self.image, self.rect)
 
     def update(self, event_queue: EventQueue):
-        # self.sprite_grp.update(event_queue)
+        self.sprite_grp.update(event_queue)
         self._scroll()

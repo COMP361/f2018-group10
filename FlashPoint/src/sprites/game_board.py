@@ -3,8 +3,9 @@ import pygame
 
 import src.constants.color as Color
 import src.constants.main_constants as MainConst
+from src.UIComponents.file_importer import FileImporter
 from src.sprites.grid_sprite import GridSprite
-from src.sprites.player_sprite import CharacterSprite
+from src.sprites.player_sprite import PlayerSprite
 from src.core.event_queue import EventQueue
 
 
@@ -17,20 +18,21 @@ class GameBoard(pygame.sprite.Group):
         self.rect = self.image.get_rect()
         self.grid = GridSprite(x_coord=self.rect.left, y_coord=self.rect.top)
         self.add(self.grid)
+        self.background = FileImporter.import_image("media/WoodBack.jpg")
 
     def draw(self, screen: pygame.Surface):
 
-        self.image.fill(Color.BLACK)
+        self.image.blit(self.background, (0, 0))
         self.grid.draw(self.image)
         screen.blit(self.image, self.rect)
 
     def update(self, event_q: EventQueue):
-        for event in event_q:
-            if event.type == pygame.MOUSEBUTTONUP:
-                for tile_sprite in self.grid:
-
-                    if tile_sprite.hover():
-                        tile_sprite.tile_model.game_unit_sprites.add(CharacterSprite())
+        # for event in event_q:
+        #     if event.type == pygame.MOUSEBUTTONUP:
+        #         for tile_sprite in self.grid:
+        #
+        #             if tile_sprite.hover():
+        #                 tile_sprite.tile_model.game_unit_sprites.add(CharacterSprite())
 
                    # else:
                         # some_sprite = tile_sprite.tile_model.find_character()
