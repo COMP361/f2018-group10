@@ -8,9 +8,9 @@ class CurrentPlayerState(pygame.sprite.Sprite):
 
     def __init__(self, x: int, y: int, name: str):
         super().__init__()
-        bg = pygame.image.load('media/wood2.png')
+        bg = pygame.image.load('media/GameHud/wood2.png')
         self.bg = pygame.transform.scale(bg, (150, 150))
-        frame = pygame.image.load('media/frame.png')
+        frame = pygame.image.load('media/GameHud/frame.png')
         self.frame = pygame.transform.scale(frame, (150, 150))
         self.image = pygame.Surface([150, 150])
         self.font_name = pygame.font.SysFont('Agency FB', 30)
