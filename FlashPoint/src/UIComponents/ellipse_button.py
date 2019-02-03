@@ -1,5 +1,7 @@
 from typing import Tuple, Optional, Union
 
+import pygame
+
 from src.UIComponents.text import Text
 from src.UIComponents.ellipse_label import EllipseLabel
 from src.UIComponents.interactable import Interactable
@@ -23,3 +25,9 @@ class EllipseButton(EllipseLabel, Interactable):
         super(EllipseButton, self).__init__(x, y, width, height, background, outer_width, txt_obj, txt_pos)
         self.isHover = False
         self.isEnabled = True
+
+    def change_rect(self, rect: pygame.Rect, outer_width: int = 0):
+        self.rect = rect
+        self.outer_width = outer_width
+        self.resize_rect(self.rect)
+        self._render()
