@@ -1,5 +1,4 @@
 import sys
-import logging
 
 # If PyCharm is issuing warnings on pygame methods, suppress it. it's a bug with PyCharm
 import pygame
@@ -9,7 +8,6 @@ import src.constants.main_constants as MainConst
 from src.UIComponents.file_importer import FileImporter
 from src.scenes.scene_manager import SceneManager
 from src.core.event_queue import EventQueue
-from src.core.networking import Networking
 
 
 class Main(object):
