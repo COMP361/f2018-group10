@@ -1,13 +1,15 @@
 import sys
+import logging
 
 # If PyCharm is issuing warnings on pygame methods, suppress it. it's a bug with PyCharm
 import pygame
 
-import src.constants.Color as Color
-import src.constants.MainConstants as MainConst
-from src.UIComponents.FileImporter import FileImporter
-from src.UIComponents.SceneManager import SceneManager
-from src.core.EventQueue import EventQueue
+import src.constants.color as Color
+import src.constants.main_constants as MainConst
+from src.UIComponents.file_importer import FileImporter
+from src.scenes.scene_manager import SceneManager
+from src.core.event_queue import EventQueue
+from src.core.networking import Networking
 
 
 class Main(object):
@@ -20,28 +22,23 @@ class Main(object):
         self.clock = pygame.time.Clock()
         self.scene_manager = SceneManager(self.screen)
         self.event_queue = EventQueue()
-        self.background = FileImporter.import_image("media/WoodBack.jpg")
-
 
     def main(self):
         # Run main loop
-        #FileImporter.play_music("media/music/jorge_music/nightbells.mp3", -1)
-
+        FileImporter.play_music("media/music/jorge_music/nightbells.mp3", -1)
         while True:
             # Lock frame rate at 60 FPS. Should only be called once per loop.
             self.clock.tick(60)
             self.event_queue.fill_queue()
-           # self.screen.fill(Color.BLACK)
-
-
+            self.screen.fill(Color.BLACK)
 
             for event in self.event_queue:
                 if event.type == pygame.QUIT:
+                    self.scene_manager.disconnect()
                     sys.exit()
 
             # Clear the screen to black
-            #self.screen.fill(Color.BLACK)
-            self.screen.blit(self.background, (0,0))
+            self.screen.fill(Color.BLACK)
 
             self.scene_manager.draw()
             self.scene_manager.update(self.event_queue)
