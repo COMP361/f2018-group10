@@ -72,7 +72,6 @@ class ProfileList(pygame.sprite.Sprite, Components):
                              Text(pygame.font.SysFont('Arial', 20), "Empty", color.BLACK))
             remove_btn = RectButton(btn.x, (btn.y + self.height-80)+10, btn.width, 30, color.STANDARDBTN, 0,
                                     Text(pygame.font.SysFont('Arial', 16), "Remove", color.BLACK))
-            remove_btn.on_click(self.remove_profile, i)
             self._remove_btn_list.append(remove_btn)
             self._btn_list.append(btn)
             self._profile_list.add(btn)
@@ -87,22 +86,22 @@ class ProfileList(pygame.sprite.Sprite, Components):
         :param kwargs:
         :return:
         """
-        height = self.height - 80
-        btn = self._btn_list[index]
-        btn.height = height
-        btn.txt_obj = Text(pygame.font.SysFont('Arial', 20), name, color.BLACK)
-        btn.on_click(click_action, *args, **kwargs)
-        btn.enable()
-        self._profile_list.add(self._remove_btn_list[index])
-        self._render()
+        if 0 <= index <= self._limit:
+            height = self.height - 80
+            btn = self._btn_list[index]
+            btn.height = height
+            btn.txt_obj = Text(pygame.font.SysFont('Arial', 20), name, color.BLACK)
+            btn.on_click(click_action, *args, **kwargs)
+            btn.enable()
+            self._profile_list.add(self._remove_btn_list[index])
+            self._render()
+        else:
+            raise IndexError("Index out of range")
 
-    def remove_profile(self, index: int, remove_profile_action: callable, *args, **kwargs):
+    def remove_profile(self, index: int):
         """
         Remove the player profile
         :param index: Index of the profile slot (0-2)
-        :param remove_profile_action: Callback for this action
-        :param args:
-        :param kwargs:
         :return:
         """
         if 0 <= index < len(self._btn_list):
@@ -113,7 +112,20 @@ class ProfileList(pygame.sprite.Sprite, Components):
             btn.disable()
             self._profile_list.remove(self._remove_btn_list[index])
             self._render()
-            remove_profile_action(*args, **kwargs)
+        else:
+            raise IndexError("Index out of range")
+
+    def remove_profile_callback(self, index: int, remove_profile_action: callable, *args, **kwargs):
+        """
+        Set the callback when removing profile
+        :param index: Index of the profile slot (0-2)
+        :param remove_profile_action: Callback for this action
+        :param args:
+        :param kwargs:
+        :return:
+        """
+        if 0 <= index < len(self._btn_list):
+            self._remove_btn_list[index].on_click(remove_profile_action, *args, **kwargs)
         else:
             raise IndexError("Index out of range")
 
