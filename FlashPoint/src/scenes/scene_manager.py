@@ -13,7 +13,7 @@ from src.scenes.host_join_scene import HostJoinScene
 from src.scenes.host_menu_scene import HostMenuScene
 from src.scenes.join_scene import JoinScene
 from src.scenes.start_scene import StartScene
-from src.scenes.game_initial_menu import CreateGameMenu
+from src.scenes.create_game_menu import CreateGameMenu
 from src.core.event_queue import EventQueue
 from src.scenes.character_scene import CharacterScene
 from src.scenes.lobby_scene import LobbyScene
@@ -61,12 +61,12 @@ class SceneManager(object):
             self._active_scene.buttonBack.on_click(self.next, StartScene)
 
         if isinstance(self._active_scene, JoinScene):
-            self._active_scene.buttonBack.on_click(self.next, HostJoinScene)
+            self._active_scene.buttonBack.on_click(self.next, HostJoinScene, self._current_player)
             self._active_scene.buttonConnect.on_click(self.join, self._active_scene.text_bar_msg, LobbyScene, True)
 
         if isinstance(self._active_scene, HostMenuScene):
-            self._active_scene.buttonBack.on_click(self.disconnect, HostJoinScene)
-            self._active_scene.buttonNewGame.on_click(self.next, CreateGameMenu)
+            self._active_scene.buttonBack.on_click(self.disconnect, HostJoinScene, self._current_player)
+            self._active_scene.buttonNewGame.on_click(self.next, CreateGameMenu, self._current_player)
 
         if isinstance(self._active_scene, CreateGameMenu):
             self._active_scene.buttonBack.on_click(self.disconnect, HostJoinScene)
@@ -74,14 +74,14 @@ class SceneManager(object):
             self._active_scene.buttonFamily.on_click(self.next, LobbyScene, False, self._current_player)
 
         if isinstance(self._active_scene, CharacterScene):
-            self._active_scene.buttonBack.on_click(self.next, LobbyScene, True)
-            self._active_scene.buttonConfirm.on_click(self.next, LobbyScene, True)
+            self._active_scene.buttonBack.on_click(self.next, LobbyScene, True, self._current_player)
+            self._active_scene.buttonConfirm.on_click(self.next, LobbyScene, True, self._current_player)
 
         if isinstance(self._active_scene, LobbyScene):
             if self._active_scene.is_experienced:
-                self._active_scene.buttonSelChar.on_click(self.next, CharacterScene)
+                self._active_scene.buttonSelChar.on_click(self.next, CharacterScene, self._current_player)
 
-            self._active_scene.buttonBack.on_click(self.disconnect, HostJoinScene)
+            self._active_scene.buttonBack.on_click(self.disconnect, HostJoinScene, self._current_player)
             self._active_scene.buttonReady.on_click(self.next, GameBoardScene)
 
         if isinstance(self._active_scene, GameBoardScene):
