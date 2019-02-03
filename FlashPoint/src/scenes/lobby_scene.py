@@ -1,7 +1,6 @@
 import pygame
 
 import src.constants.color as Color
-
 from src.UIComponents.rect_button import RectButton
 from src.UIComponents.rect_label import RectLabel
 from src.UIComponents.text import Text
@@ -19,11 +18,11 @@ class LobbyScene(object):
         self._init_text_box(780, 239, 100, 32, "Player3", Color.BLUE)
         self._init_text_box(1080, 314, 100, 32, "Player4", Color.BLUE)
         self._init_text_box(565, 575, 150, 32, "You", Color.BLUE)
-        self._init_text_box(100, 164, 100, 150, "", Color.GREY)
-        self._init_text_box(400, 89, 100, 150, "", Color.GREY)
-        self._init_text_box(780, 89, 100, 150, "", Color.GREY)
-        self._init_text_box(1080, 164, 100, 150, "", Color.GREY)
-        self._init_text_box(565, 375, 150, 200, "", Color.GREY)
+        self._init_background_player(100, 164, 150, 200)
+        self._init_background_player(400, 89, 150, 200)
+        self._init_background_player(780, 89, 150, 200)
+        self._init_background_player(1080, 164, 150, 200)
+        self._init_background_player(565, 375, 200, 250)
         self._init_ip_addr()
         self.chat_box = ChatBox()
         self.is_experienced = game_type
@@ -44,6 +43,13 @@ class LobbyScene(object):
         self.this_img = RectButton(x, y, box_size[0], box_size[1], path)
 
         self.sprite_grp.add(self.this_img)
+
+    def _init_background_player(self, x_pos, y_pos, w, h):
+
+        box_size = (w, h)
+
+        user_box = RectLabel(x_pos, y_pos, box_size[0], box_size[1], "media/specialist_cards/generalist.png")
+        self.sprite_grp.add(user_box)
 
     def _init_text_box(self, x_pos, y_pos, w, h, text, color):
         box_size = (w, h)

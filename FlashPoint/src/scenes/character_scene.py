@@ -23,22 +23,22 @@ class CharacterScene(Scene):
                              "media/specialist_cards/driver_operator.png")
 
         self.create_butn_img(650, 150, 100, 150,
-                             "media/fire_captain.png")
+                             "media/specialist_cards/fire_captain.png")
 
         self.create_butn_img(850, 150, 99, 150,
                              "media/specialist_cards/generalist.png")
 
         self.create_butn_img(250, 450, 100, 150,
-                             "media/specialist_cards/hazmat_tech.png")
+                             "media/specialist_cards/hazmat_technician.png")
 
         self.create_butn_img(450, 450, 99, 150,
-                             "media/specialist_cards/imaging_tech.png")
+                             "media/specialist_cards/imaging_technician.png")
 
         self.create_butn_img(650, 450, 99, 150,
                              "media/specialist_cards/paramedic.png")
 
         self.create_butn_img(850, 450, 98, 150,
-                             "media/specialist_cards/rescue.png")
+                             "media/specialist_cards/rescue_specialist.png")
 
         self._init_btn_back(20, 20, "Back", Color.STANDARDBTN, Color.BLACK)
 
