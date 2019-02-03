@@ -70,7 +70,7 @@ class ProfileList(pygame.sprite.Sprite, Components):
 
             btn = RectButton(x, y, width, height, color.STANDARDBTN, 0,
                              Text(pygame.font.SysFont('Arial', 20), "Empty", color.BLACK))
-            remove_btn = RectButton(btn.x, (btn.y + self.height-80)+10, btn.width, 30, color.STANDARDBTN, 0,
+            remove_btn = RectButton(btn.x, (btn.y + self.height-80)+10, btn.width, 30, color.YELLOW, 0,
                                     Text(pygame.font.SysFont('Arial', 16), "Remove", color.BLACK))
             self._remove_btn_list.append(remove_btn)
             self._btn_list.append(btn)
@@ -117,19 +117,24 @@ class ProfileList(pygame.sprite.Sprite, Components):
         else:
             raise IndexError("Index out of range")
 
-    def remove_profile_callback(self, index: int, remove_profile_action: callable, *args, **kwargs):
+    def remove_profile_callback(self, index: int, callback: callable, *args, **kwargs):
         """
         Set the callback when removing profile
         :param index: Index of the profile slot (0-2)
-        :param remove_profile_action: Callback for this action
+        :param callback: Callback for this action
         :param args:
         :param kwargs:
         :return:
         """
         if 0 <= index < len(self._btn_list):
-            self._remove_btn_list[index].on_click(remove_profile_action, *args, **kwargs)
+            self._remove_btn_list[index].on_click(self.remove_profile_action, index, callback, *args, **kwargs)
         else:
             raise IndexError("Index out of range")
+
+    def remove_profile_action(self, index: int, callback: callable, *args, **kwargs):
+        #self.remove_profile(index)
+        callback(*args, **kwargs)
+        self.remove_profile(index)
 
     def draw(self, surface: pygame.Surface):
         surface.blit(self.image, self.rect)

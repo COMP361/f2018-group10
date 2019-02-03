@@ -189,13 +189,18 @@ class SceneManager(object):
             if size >= 3:
                 return
 
+            if not text_bar.text.strip():
+                return
+
             player = {'nickname':text_bar.text }
             temp.append(player)
+
 
         with open(self.profiles,mode='w',encoding='utf-8') as myFile:
 
             json.dump(temp, myFile)
             #self.next(HostJoinScene)
+        text_bar.text = ""
         self.update_profiles()
 
     def remove_profile(self,removename:str):
