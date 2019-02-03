@@ -10,6 +10,7 @@ from src.sprites.hud.time_bar import TimeBar
 from src.sprites.hud.damage_state import DamageState
 from src.sprites.hud.victim_saved import VictimSaved
 from src.sprites.hud.victim_dead import VictimDead
+from src.sprites.hud.ingame_states import InGameStates
 import src.constants.color as Color
 from src.UIComponents.rect_button import RectButton
 from src.UIComponents.text import Text
@@ -29,22 +30,24 @@ class GameBoardScene(object):
         self._init_sprites()
 
     def _init_sprites(self):
-        self.active_sprites.add(PlayerState(0, 50, "Tim", Color.CYAN))
-        self.active_sprites.add(PlayerState(0, 114, "Nuri", Color.GREEN))
-        self.active_sprites.add(PlayerState(0, 178, "Francis", Color.WHITE))
-        self.active_sprites.add(PlayerState(0, 242, "Haw", Color.YELLOW))
-        self.active_sprites.add(PlayerState(0, 306, "Alek", Color.MAGENTA))
-        self.active_sprites.add(CurrentPlayerState(1080, 500, "Tim"))
+        self.active_sprites.add(PlayerState(0, 30, "Tim", Color.CYAN))
+        self.active_sprites.add(PlayerState(0, 94, "Nuri", Color.GREEN))
+        self.active_sprites.add(PlayerState(0, 158, "Francis", Color.WHITE))
+        self.active_sprites.add(PlayerState(0, 222, "Haw", Color.YELLOW))
+        self.active_sprites.add(PlayerState(0, 286, "Alek", Color.MAGENTA))
+        self.active_sprites.add(CurrentPlayerState(1130, 550, "Tim"))
         self.active_sprites.add(TimeBar(0, 0))
-        self.active_sprites.add(DamageState(399, 612))
-        self.active_sprites.add(VictimSaved(626, 612))
-        self.active_sprites.add(VictimDead(853, 612))
+        self.active_sprites.add(InGameStates(250,650,5,5,5))
+        #self.active_sprites.add(DamageState(399, 612))
+        #self.active_sprites.add(VictimSaved(626, 612))
+        #self.active_sprites.add(VictimDead(853, 612))
         self.active_sprites.add(self._init_menu_button())
 
     # Example of how to use the MenuClass YOU NEED TO MAKE ALL YOUR BUTTONS EXTEND INTERACTABLE!!!!!!!!!!!!!!!!!
     def _init_menu_button(self):
-        btn = RectButton(0, 0, 100, 50, background=Color.GREEN, txt_obj=Text(pygame.font.SysFont('Arial', 23), "Menu"))
+        btn = RectButton(0, 0, 30, 30, background=Color.GREEN, txt_obj=Text(pygame.font.SysFont('Arial', 23), ""))
         btn.on_click(self._click_action)
+        btn.set_transparent_background(True)
         return btn
 
     def _click_action(self):

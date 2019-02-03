@@ -22,7 +22,7 @@ class GridSprite(pygame.sprite.Group):
         self.grid = self._generate_grid(tile_size)
 
     def _generate_grid(self, tile_size: int) -> List[List[TileSprite]]:
-        """Initialize an grid of Tiles, add to self Sprite Group."""
+        """Initialize a grid of Tiles, add to self Sprite Group."""
         grid = []
         x_offset = 0
         tile_images = Spritesheet("media/Updated.png", 10, 8).cell_images

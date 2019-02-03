@@ -12,6 +12,14 @@ logger = logging.getLogger("networking")
 logger.setLevel(logging.INFO)
 
 
+class TestObject(object):
+
+    class_thing = 69
+
+    def __init__(self):
+        self.something = "Francis is gay"
+        self.something_else = "Holy"
+
 class Networking:
     """
     Class that stores networking info like host and client. This class follows a Singleton design pattern.
@@ -58,6 +66,8 @@ class Networking:
             """
             # We use UDP to broadcast the host
             self.host = Networking.Host()
+
+            self.host = MastermindServerUDP()
 
             """
             # find unused ip address
@@ -106,6 +116,7 @@ class Networking:
             :return:
             """
             self.client = Networking.Client(self.TIMEOUT_CONNECT, self.TIMEOUT_RECEIVE)
+            self.client = MastermindClientUDP(self.TIMEOUT_CONNECT, self.TIMEOUT_RECEIVE)
             try:
                 print(f"Attempting to connect to host at {ip}:{port}")
                 logger.info(f"Attempting to connect to host at {ip}:{port}")
