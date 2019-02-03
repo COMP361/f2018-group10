@@ -4,6 +4,8 @@ import pygame
 import json
 
 import src.constants.CustomEvents as CustomEvents
+from core.serializer import JSONSerializer
+from src.models.game_units.player_model import PlayerModel
 from src.UIComponents.file_importer import FileImporter
 from src.UIComponents.input_box import InputBox
 from src.scenes.game_board_scene import GameBoardScene
@@ -28,20 +30,9 @@ class SceneManager(object):
         self.profiles = "media/profiles.json"
         self.screen = screen
         self._active_scene = StartScene(self.screen)
-        #self._active_scene.buttonRegister.on_click(self.next, HostJoinScene)
 
         self.update_profiles()
         self._active_scene.buttonRegister.on_click(self.create_profile, self._active_scene.text_bar1)
-        # self._active_scene.profile.remove_profile_callback(1, self.remove_profile)
-        # self._active_scene.profile.remove_profile_callback(2, self.remove_profile)
-
-
-
-        
-
-
-        # self._active_scene.buttonLogin.on_click(self.next, HostJoinScene)
-        # self._active_scene.buttonRegister.on_click(self.next, HostJoinScene)
 
     def next(self, next_scene: callable, *args):
         """Switch to the next logical scene. args is assumed to be: [SceneClass]
@@ -59,14 +50,8 @@ class SceneManager(object):
 
         # Step two: Set the buttons.
         if isinstance(self._active_scene, StartScene):
-            # self._active_scene.buttonLogin.on_click(self.next, HostJoinScene)
-            # self._active_scene.buttonRegister.on_click(self.next, HostJoinScene)
-            #self._active_scene.buttonRegister.on_click(self.next, HostJoinScene)
-
             self._active_scene.buttonRegister.on_click(self.create_profile, self._active_scene.text_bar1)
             self.update_profiles()
-
-            #self._active_scene.profile.set_profile(0, "Test", self.next, HostJoinScene)
 
         if isinstance(self._active_scene, HostJoinScene):
             self._active_scene.buttonJoin.on_click(self.next, JoinScene)
@@ -168,19 +153,16 @@ class SceneManager(object):
         if next_scene is not None:
             self.next(next_scene, *args)
 
-
     def update_profiles(self):
-
         with open(self.profiles, mode='r', encoding='utf-8') as myFile:
             temp = json.load(myFile)
             i = 0
             for user in temp:
-                self._active_scene.profile.set_profile(i, str(user['nickname']), self.next, HostJoinScene)
+                self._active_scene.profile.set_profile(i, str(user['nickname']['_nickname']), self.next, HostJoinScene)
                 self._active_scene.profile.remove_profile_callback(i, self.remove_profile, user['nickname'])
                 i = i + 1
 
     def create_profile(self, text_bar: InputBox):
-
         temp = {}
         with open(self.profiles, mode='r+', encoding='utf-8') as myFile:
 
@@ -192,18 +174,20 @@ class SceneManager(object):
             if not text_bar.text.strip():
                 return
 
-            player = {'nickname':text_bar.text }
+            # Create a player model
+            player_model = PlayerModel(
+                ip=Networking.get_instance().get_ip(),
+                nickname=text_bar.text.strip()
+            )
+            player = {'nickname': JSONSerializer.serialize(player_model)}
             temp.append(player)
 
-
-        with open(self.profiles,mode='w',encoding='utf-8') as myFile:
-
+        with open(self.profiles,mode='w', encoding='utf-8') as myFile:
             json.dump(temp, myFile)
-            #self.next(HostJoinScene)
         text_bar.text = ""
         self.update_profiles()
 
-    def remove_profile(self,removename:str):
+    def remove_profile(self, removename: str):
 
         temp = {}
         with open(self.profiles, mode='r+', encoding='utf-8') as myFile:
@@ -211,14 +195,12 @@ class SceneManager(object):
             temp = json.load(myFile)
             for perm in temp:
                 for name in perm.values():
-                    if  name == removename:
+                    if name == removename:
                         temp.remove(perm)
                     else:
                         continue
 
         with open(self.profiles, mode='w', encoding='utf-8') as myFile:
-
             json.dump(temp, myFile)
 
         self.update_profiles()
-            #self.next(StartScene)
