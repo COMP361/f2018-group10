@@ -22,8 +22,6 @@ class PlayerModel(GameUnit, Serializable):
         self._wins = 0
         self._losses = 0
 
-        self._saved_games_ids = []
-
         if player_info:
             self._deserialize(player_info)
 
@@ -40,8 +38,6 @@ class PlayerModel(GameUnit, Serializable):
         self._special_ap = player_info.get("_special_ap") if player_info.get("_special_ap") else self._special_ap
         self._wins = player_info.get("_wins") if player_info.get("_wins") else self._wins
         self._losses = player_info.get("_losses") if player_info.get("_losses") else self._losses
-        self._saved_games_ids = player_info.get("_saved_games_ids") \
-            if player_info.get("_saved_games_ids") else self._saved_games_ids
 
     @property
     def ip(self) -> str:

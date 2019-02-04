@@ -2,16 +2,12 @@ from typing import Tuple, List
 
 import pygame
 
-from src.UIComponents.interactable import Interactable
-from src.core.event_queue import EventQueue
 
 from src.UIComponents.interactable import Interactable
 from src.core.event_queue import EventQueue
-
 
 
 class MenuWindow(object):
-
     """
     Popup Menu class. Simply pass in a List of Groups you wish to disable. They must be composed of Interactable objects.
     They will be disabled upon the instantiation of this object. They will be reenabled when either:
