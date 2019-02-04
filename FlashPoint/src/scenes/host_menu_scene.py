@@ -1,6 +1,7 @@
 import pygame
 
 import src.constants.color as Color
+from src.models.game_units.player_model import PlayerModel
 from src.UIComponents.rect_button import RectButton
 from src.UIComponents.rect_label import RectLabel
 from src.UIComponents.text import Text
@@ -8,10 +9,11 @@ from src.UIComponents.scene import Scene
 
 
 class HostMenuScene(Scene):
-    def __init__(self, screen):
+    def __init__(self, screen: pygame.Surface, host_player: PlayerModel):
         Scene.__init__(self, screen)
-        self._init_background()
+        self._host = host_player
 
+        self._init_background()
         self._init_btn_new_game(575, 481, "New Game", Color.STANDARDBTN, Color.BLACK)
         self._init_btn_leg(575, 371, "Load Game", Color.STANDARDBTN, Color.BLACK)
         self._init_btn_back(20, 20, "Back", Color.STANDARDBTN, Color.BLACK)

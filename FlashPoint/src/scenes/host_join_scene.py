@@ -1,6 +1,7 @@
 import pygame
 
 import src.constants.color as Color
+from src.models.game_units.player_model import PlayerModel
 from src.UIComponents.rect_button import RectButton
 from src.UIComponents.rect_label import RectLabel
 from src.UIComponents.text import Text
@@ -8,8 +9,9 @@ from src.UIComponents.scene import Scene
 
 
 class HostJoinScene(Scene):
-    def __init__(self, screen):
+    def __init__(self, screen: pygame.Surface, current_player: PlayerModel):
         Scene.__init__(self, screen)
+        self._current_player = current_player
         self._init_background()
         self._init_btn_host(575, 481, "Host", Color.STANDARDBTN, Color.BLACK)
         self._init_btn_join(575, 371, "Join", Color.STANDARDBTN, Color.BLACK)

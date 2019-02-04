@@ -20,6 +20,7 @@ class TestObject(object):
         self.something = "Francis is gay"
         self.something_else = "Holy"
 
+
 class Networking:
     """
     Class that stores networking info like host and client. This class follows a Singleton design pattern.
