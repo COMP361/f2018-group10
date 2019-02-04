@@ -8,6 +8,10 @@ class CurrentPlayerState(pygame.sprite.Sprite):
 
     def __init__(self, x: int, y: int, name: str):
         super().__init__()
+        bg = pygame.image.load('media/GameHud/wood2.png')
+        self.bg = pygame.transform.scale(bg, (150, 150))
+        frame = pygame.image.load('media/GameHud/frame.png')
+        self.frame = pygame.transform.scale(frame, (150, 150))
         self.image = pygame.Surface([150, 150])
         self.font_name = pygame.font.SysFont('Agency FB', 30)
         self.font_other = pygame.font.SysFont('Agency FB', 20)
@@ -41,12 +45,10 @@ class CurrentPlayerState(pygame.sprite.Sprite):
     #     return x_max > mouse[0] > x_min and y_max > mouse[1] > y_min
 
     def update(self, event_queue: EventQueue):
-        bg = pygame.image.load('media/wood2.png')
-        bg = pygame.transform.scale(bg, (150, 150))
-        self.image.blit(bg, self.image.get_rect())
-        frame = pygame.image.load('media/frame.png')
-        frame = pygame.transform.scale(frame,(150,150))
-        self.image.blit(frame,self.image.get_rect())
+
+        self.image.blit(self.bg, self.image.get_rect())
+
+        self.image.blit(self.frame,self.image.get_rect())
         self.image.blit(self.text, self.P_rect)
         self.image.blit(self.text_AP, self.AP_rect)
         self.image.blit(self.text_SAP, self.SAP_rect)
