@@ -1,8 +1,12 @@
+import json
+from datetime import datetime
+
 import pygame
 
 from src.UIComponents.chat_box import ChatBox
 from src.UIComponents.menu_window import MenuWindow
 from src.core.event_queue import EventQueue
+from src.core.serializer import JSONSerializer
 from src.models.game_state_model import GameStateModel
 from src.sprites.game_board import GameBoard
 from src.sprites.hud.player_state import PlayerState
@@ -18,6 +22,7 @@ class GameBoardScene(object):
     """Scene for displaying the main game view"""
     def __init__(self, screen: pygame.display, game: GameStateModel):
         """:param screen : The display passed from main on which to draw the Scene."""
+        self._save_games_file = "media/save_games.json"
         self.screen = screen
         self._game = game
 
@@ -37,8 +42,21 @@ class GameBoardScene(object):
         self.active_sprites.add(PlayerState(0, 286, "Alek", Color.MAGENTA))
         self.active_sprites.add(CurrentPlayerState(1130, 550, "Tim"))
         self.active_sprites.add(TimeBar(0, 0))
-        self.active_sprites.add(InGameStates(250,650,5,5,5))
+        self.active_sprites.add(InGameStates(250, 650, 5, 5, 5))
         self.active_sprites.add(self._init_menu_button())
+
+    def _save(self):
+        """Save the current game state to the hosts machine"""
+        with open(self._save_games_file, mode='r+', encoding='utf-8') as myFile:
+            temp = json.load(myFile)
+            game_data = JSONSerializer.serialize(self._game)
+            game_data["time"] = datetime.now().strftime("%d/%m/%y-%H:%M:%S")
+            temp.append(game_data)
+
+        with open(self._save_games_file, mode='w', encoding='utf-8') as myFile:
+            json.dump(temp, myFile)
+
+        self.menu.close()
 
     # Example of how to use the MenuClass YOU NEED TO MAKE ALL YOUR BUTTONS EXTEND INTERACTABLE!!!!!!!!!!!!!!!!!
     def _init_menu_button(self):
@@ -56,7 +74,7 @@ class GameBoardScene(object):
 
         back_btn.on_click(menu.close)
 
-        # save_btn.on_click()   # Nothing yet
+        save_btn.on_click(self._save)
 
         menu.add_component(back_btn)
         menu.add_component(save_btn)
