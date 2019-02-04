@@ -1,16 +1,121 @@
+import random
+
+from typing import Dict, List, Optional
+
+from src.constants.state_enums import GameKindEnum, DifficultyLevelEnum
+from src.core.flashpoint_exceptions import TooManyPlayersException, InvalidGameKindException
+from src.core.serializable import Serializable
+from src.models.game_units.player_model import PlayerModel
 
 
-class GameStateModel(object):
+class GameStateModel(Serializable):
     """Class for maintaing the current Game state."""
 
-    def __init__(self):
-        self._seconds_since_start = 0
-        self._players = []   # Might be dict of {ip : PlayerModel} but not sure yet
-        self._current_player_turn = None  # Will be a PlayerModel object
-        self._difficulty_level = None  # Some gametype enum
-        self._rules = None  # Game mode
-        self._red_dice = 0  # Some random number genetator between 1 and 6
-        self._black_dice = 0  # Some random number generator between 1 and 8
+    def __init__(self, host: PlayerModel, game_kind: GameKindEnum = None, game_state_info: Dict = None):
+        self._host = host
+        self._max_desired_players = 6
+        self._players = [self._host]
+        self._players_turn_index = 0
+        self._difficulty_level = None
+        self._rules = game_kind
+        self._red_dice = 0
+        self._black_dice = 0
 
+        self._victims_saved = 0
+        self._victims_lost = 0
+        self._damage = 0
 
+        self._max_damage = 24
 
+        if game_state_info:
+            self._deserialize(game_state_info)
+
+    def _deserialize(self, json_payload: Dict):
+        """
+        Instructions for deserializing this object.
+        WARNING: Not for the feint of heart.
+        """
+        # TODO: Implement this
+
+    @property
+    def host(self) -> PlayerModel:
+        """Get the PlayerModel assigned to the host of the current game."""
+        return self._host
+
+    @property
+    def max_players(self) -> int:
+        return self._max_desired_players
+
+    @max_players.setter
+    def max_players(self, max_players: int):
+        self._max_desired_players = max_players
+
+    @property
+    def players(self)-> List[PlayerModel]:
+        return self._players
+
+    def add_player(self, player: PlayerModel):
+        """Add a player to the current game."""
+        if len(self._players) == self._max_desired_players:
+            raise TooManyPlayersException(player)
+        self._players.append(player)
+
+    def remove_player(self, player: PlayerModel):
+        """Remove a player from the current game."""
+        self._players.remove(player)
+
+    @property
+    def players_turn(self) -> PlayerModel:
+        """The player who's turn it currently is."""
+        return self._players[self._players_turn_index]
+
+    def next_player(self):
+        """Rotate to the next player in the players list, round robin style."""
+        self._players_turn_index = (self._players_turn_index + 1) % len(self._players)
+
+    @property
+    def difficulty_level(self) -> Optional[DifficultyLevelEnum]:
+        """Difficulty level of an experienced game. A Family game should not have a difficulty level."""
+        if self._rules != GameKindEnum.FAMILY or None:
+            print("WARNING: GameKind is FAMILY, you should not be accessing Difficulty Level.")
+            return
+        return self._difficulty_level
+
+    @difficulty_level.setter
+    def difficulty_level(self, level: DifficultyLevelEnum):
+        """Set the difficulty level of the game. Game must be of type EXPERIENCED"""
+        if self._rules != GameKindEnum.EXPERIENCED or None:
+            raise InvalidGameKindException("set difficulty level", self._rules)
+        self._difficulty_level = level
+
+    @property
+    def rules(self) -> GameKindEnum:
+        """The Game rules, one of GameKindEnum.FAMILY or GameKindEnum.EXPERIENCED"""
+        return self._rules
+
+    @rules.setter
+    def rules(self, rules: GameKindEnum):
+        """Set the rules for this game. one of GameKindEnum.FAMILY or GameKindEnum.EXPERIENCED"""
+        self._rules = rules
+
+    @property
+    def roll_black_dice(self) -> int:
+        """Roll the black dice to get a random number between 1-8"""
+        return random.randint(1, 8)
+
+    @property
+    def roll_red_dice(self) -> int:
+        """Roll the black dice to get a random number between 1-6"""
+        return random.randint(1, 6)
+
+    @property
+    def victims_saved(self) -> int:
+        return self._victims_saved
+
+    @property
+    def victims_lost(self) -> int:
+        return self._victims_lost
+
+    @property
+    def damage(self) -> int:
+        return self._max_damage

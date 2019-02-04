@@ -3,13 +3,11 @@ import pygame
 from src.UIComponents.chat_box import ChatBox
 from src.UIComponents.menu_window import MenuWindow
 from src.core.event_queue import EventQueue
+from src.models.game_state_model import GameStateModel
 from src.sprites.game_board import GameBoard
 from src.sprites.hud.player_state import PlayerState
 from src.sprites.hud.current_player_state import CurrentPlayerState
 from src.sprites.hud.time_bar import TimeBar
-from src.sprites.hud.damage_state import DamageState
-from src.sprites.hud.victim_saved import VictimSaved
-from src.sprites.hud.victim_dead import VictimDead
 from src.sprites.hud.ingame_states import InGameStates
 import src.constants.color as Color
 from src.UIComponents.rect_button import RectButton
@@ -18,9 +16,11 @@ from src.UIComponents.text import Text
 
 class GameBoardScene(object):
     """Scene for displaying the main game view"""
-    def __init__(self, screen: pygame.display):
+    def __init__(self, screen: pygame.display, game: GameStateModel):
         """:param screen : The display passed from main on which to draw the Scene."""
         self.screen = screen
+        self._game = game
+
         self.quit_btn = RectButton(200, 250, 100, 50, Color.STANDARDBTN, 0,
                                    Text(pygame.font.SysFont('Arial', 20), "Quit", Color.BLACK))
         self.active_sprites = pygame.sprite.Group()   # Maybe add separate groups for different things later
@@ -38,9 +38,6 @@ class GameBoardScene(object):
         self.active_sprites.add(CurrentPlayerState(1130, 550, "Tim"))
         self.active_sprites.add(TimeBar(0, 0))
         self.active_sprites.add(InGameStates(250,650,5,5,5))
-        #self.active_sprites.add(DamageState(399, 612))
-        #self.active_sprites.add(VictimSaved(626, 612))
-        #self.active_sprites.add(VictimDead(853, 612))
         self.active_sprites.add(self._init_menu_button())
 
     # Example of how to use the MenuClass YOU NEED TO MAKE ALL YOUR BUTTONS EXTEND INTERACTABLE!!!!!!!!!!!!!!!!!

@@ -1,7 +1,9 @@
 import pygame
 
 import src.constants.color as Color
-from models.game_units.player_model import PlayerModel
+from src.constants.state_enums import GameKindEnum
+from src.models.game_state_model import GameStateModel
+from src.models.game_units.player_model import PlayerModel
 from src.UIComponents.rect_button import RectButton
 from src.UIComponents.rect_label import RectLabel
 from src.UIComponents.text import Text
@@ -10,9 +12,10 @@ from src.core.networking import Networking
 
 
 class LobbyScene(object):
-    def __init__(self, screen, game_type: bool, current_player: PlayerModel):
+    def __init__(self, screen, current_player: PlayerModel, game: GameStateModel):
         self._current_player = current_player
-        
+        self._game = game
+
         self.resolution = (1280, 700)
         self.sprite_grp = pygame.sprite.Group()
         self._init_background()
@@ -28,9 +31,8 @@ class LobbyScene(object):
         self._init_background_player(565, 375, 200, 250)
         self._init_ip_addr()
         self.chat_box = ChatBox()
-        self.is_experienced = game_type
 
-        if game_type:
+        if self._game.rules == GameKindEnum.EXPERIENCED:
             self._init_selec_char(1050, 475, "Select Character", Color.STANDARDBTN, Color.BLACK)
 
         self._init_btn_back(20, 20, "Exit", Color.STANDARDBTN, Color.BLACK)

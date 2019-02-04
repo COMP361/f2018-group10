@@ -7,12 +7,14 @@ from src.UIComponents.rect_label import RectLabel
 
 from src.UIComponents.scene import Scene
 from src.UIComponents.text import Text
+from src.models.game_units.player_model import PlayerModel
 
 
 class CharacterScene(Scene):
-    def __init__(self, screen):
+    def __init__(self, screen, current_player: PlayerModel):
         self.label_grp = pygame.sprite.Group()
-
+        self._current_player = current_player
+        
         Scene.__init__(self, screen)
         self._init_background()
         self.create_label(0, 0, 100, 150)
