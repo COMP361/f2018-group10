@@ -6,7 +6,6 @@ import pygame
 
 import src.constants.color as Color
 import src.constants.main_constants as MainConst
-from core.serializer import JSONSerializer
 from src.UIComponents.file_importer import FileImporter
 from src.scenes.scene_manager import SceneManager
 from src.core.event_queue import EventQueue
