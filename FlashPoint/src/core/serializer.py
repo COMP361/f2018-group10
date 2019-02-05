@@ -4,6 +4,7 @@ import inspect
 import json
 from typing import Dict
 
+from src.core.serializable import Serializable
 from src.models.game_units.player_model import PlayerModel
 
 
@@ -26,16 +27,11 @@ class JSONSerializer(object):
         print("WARNING: Could not deserialize object, not of recognized type.")
 
     @staticmethod
+    def _safe_dict(obj):
+        obj.__setattr__("class", type(obj).__name__)
+        return obj.__dict__ if not isinstance(obj, enum.Enum) else {"name": type(obj).__name__, "value": obj.value}
+
+    @staticmethod
     def serialize(input_obj: object) -> dict:
         """Perform a deep serialize to a dict, then can be dumped into json file."""
-        attributes = inspect.getmembers(input_obj)
-        copied = copy.deepcopy(input_obj)
-        payload = input_obj
-
-        for attr in attributes:
-            if isinstance(attr[1], enum.Enum):
-                copied.__setattr__(attr[0], {"name": type(attr[1]).__name__, "value": attr[1].value})
-                payload = copied
-
-        payload.__setattr__("class", type(payload).__name__)
-        return json.loads(json.dumps(payload, default=lambda x: x.__dict__))
+        return json.loads(json.dumps(input_obj, default=lambda x: JSONSerializer._safe_dict(x)))

@@ -1,5 +1,1 @@
-<<<<<<< HEAD
-[{"nickname": "asdfghjkl;'"}, {"nickname": "bnvbvnbbnv"}]
-=======
-[{"_ip": "10.93.10.6", "_x_pos": 0, "_y_pos": 0, "_nickname": "Poto", "_color": [255, 255, 255], "_status": {"name": "PlayerStatusEnum", "value": 1}, "_ap": 0, "_special_ap": 0, "_wins": 0, "_losses": 0, "_saved_games_ids": [], "class": "PlayerModel"}]
->>>>>>> connect-to-host
+[{"_ip": "142.157.180.233", "_x_pos": 0, "_y_pos": 0, "_nickname": "tim", "_color": [255, 255, 255], "_status": {"name": "PlayerStatusEnum", "value": 1}, "_ap": 0, "_special_ap": 0, "_wins": 0, "_losses": 0, "class": "PlayerModel"}]
