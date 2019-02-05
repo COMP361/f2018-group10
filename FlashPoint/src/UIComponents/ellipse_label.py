@@ -51,8 +51,7 @@ class EllipseLabel(pygame.sprite.Sprite, Components):
         if isinstance(self.background, Tuple):
             pygame.draw.ellipse(self.image, self.background, self.rect, self.outer_width)
         else:
-            self.image = self.image.convert_alpha(pygame.display.get_surface())
-            self.image.fill((0, 0, 0, 0), None, pygame.BLEND_RGBA_MULT)
+            pygame.draw.ellipse(self.image, (0, 0, 0), self.rect, self.outer_width)
             image_file = FileImporter.import_image(self.background)
             self.image.blit(image_file, self.image)
 
