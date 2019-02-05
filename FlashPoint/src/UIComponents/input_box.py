@@ -14,6 +14,7 @@ class InputBox(pg.sprite.Sprite):
         self.FONT = pg.font.Font(None, TEXT_BOX_FONT_SIZE)
         self.color = self.COLOR_INACTIVE
         self.text = text
+        self.text_20 = text
         self.txt_surface = self.FONT.render(text, True, self.color)
         self.image = pg.Surface((w, h))
         self.rect = self.image.get_rect()

@@ -13,7 +13,8 @@ class PlayerState(Interactable):
         self.image = pygame.Surface([64 , 64])
         self.bg = pygame.image.load('media/GameHud/wood2-150x64.png')
         self.frame = pygame.image.load('media/GameHud/frame150x64.png')
-        self.player_icon = pygame.image.load('media/GameHud/bleu-70x70.png')
+        self.player_icon = self.color_picker(color)
+        self.player_icon= pygame.transform.scale(self.player_icon,(70,70))
         super().__init__(self.image.get_rect())
         self.font_name = pygame.font.SysFont('Agency FB', 30)
         self.font_other = pygame.font.SysFont('Agency FB', 13)
@@ -50,6 +51,17 @@ class PlayerState(Interactable):
     #         return x_max > mouse[0] > x_min and y_max > mouse[1] > y_min
     #     else:
     #         return False
+
+    def color_picker(self,color:Color):
+        return {
+            Color.WHITE : pygame.image.load('media/GameHud/PWHITE.png'),
+            Color.BLUE : pygame.image.load('media/GameHud/Bleu.png'),
+            Color.RED : pygame.image.load('media/GameHud/PRED.png'),
+            Color.ORANGE : pygame.image.load('media/GameHud/PORANGE.png'),
+            Color.YELLOW : pygame.image.load('media/GameHud/PYELLOW.png'),
+            Color.GREEN : pygame.image.load('media/GameHud/PGREEN.png'),
+        }[color]
+
 
     def enable(self):
         """

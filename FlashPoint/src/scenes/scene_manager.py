@@ -88,10 +88,8 @@ class SceneManager(object):
                 self._active_scene.buttonSelChar.on_click(self.next, CharacterScene, self._current_player)
 
             self._active_scene.buttonBack.on_click(self.disconnect, HostJoinScene, self._current_player)
-            self._active_scene.buttonReady.on_click(self.next, GameBoardScene, self._game)
+            self._active_scene.buttonReady.on_click(self.next, GameBoardScene, self._game, self._current_player)
 
-        if isinstance(self._active_scene, GameBoardScene):
-            self._active_scene.quit_btn.on_click(self.disconnect, StartScene)
 
         FileImporter.play_audio("media/soundeffects/ButtonClick.wav", fade_ms=10)
 
@@ -100,6 +98,8 @@ class SceneManager(object):
 
     def update(self, event_queue: EventQueue):
         self._active_scene.update(event_queue)
+        if isinstance(self._active_scene, GameBoardScene):
+            self._active_scene.quit_btn.on_click(self.disconnect, StartScene)
         for event in event_queue:
             self.handle_event(event)
 
@@ -112,7 +112,7 @@ class SceneManager(object):
 
     def create_new_game(self, game_kind: GameKindEnum):
         """Instantiate a new family game and move to the lobby scene."""
-        self._game = GameStateModel(self._current_player, game_kind)
+        self._game = GameStateModel(self._current_player, 6, game_kind)
         self.next(LobbyScene, self._current_player, self._game)
 
     # ------------- NETWORKING STUFF ----------------#

@@ -1,17 +1,16 @@
 import random
 
-from typing import Dict, List, Optional
+from typing import List, Optional
 
 from src.constants.state_enums import GameKindEnum, DifficultyLevelEnum
 from src.core.flashpoint_exceptions import TooManyPlayersException, InvalidGameKindException
-from src.core.serializable import Serializable
 from src.models.game_units.player_model import PlayerModel
 
 
-class GameStateModel(Serializable):
-    """Class for maintaing the current Game state."""
+class GameStateModel(object):
+    """Class for maintaining the current Game state."""
 
-    def __init__(self, host: PlayerModel, game_kind: GameKindEnum = None, game_state_info: Dict = None):
+    def __init__(self, host: PlayerModel, num_players: int, game_kind: GameKindEnum):
         self._host = host
         self._max_desired_players = 6
         self._players = [self._host]
@@ -26,16 +25,6 @@ class GameStateModel(Serializable):
         self._damage = 0
 
         self._max_damage = 24
-
-        if game_state_info:
-            self._deserialize(game_state_info)
-
-    def _deserialize(self, json_payload: Dict):
-        """
-        Instructions for deserializing this object.
-        WARNING: Not for the feint of heart.
-        """
-        # TODO: Implement this
 
     @property
     def host(self) -> PlayerModel:
@@ -68,6 +57,10 @@ class GameStateModel(Serializable):
     def players_turn(self) -> PlayerModel:
         """The player who's turn it currently is."""
         return self._players[self._players_turn_index]
+
+    @players_turn.setter
+    def players_turn(self, turn: int):
+        self._players_turn_index = turn
 
     def next_player(self):
         """Rotate to the next player in the players list, round robin style."""
@@ -112,10 +105,30 @@ class GameStateModel(Serializable):
     def victims_saved(self) -> int:
         return self._victims_saved
 
+    @victims_saved.setter
+    def victims_saved(self, victims_saved: int):
+        self._victims_saved = victims_saved
+
     @property
     def victims_lost(self) -> int:
         return self._victims_lost
 
+    @victims_lost.setter
+    def victims_lost(self, victims_lost: int):
+        self._victims_lost = victims_lost
+
     @property
     def damage(self) -> int:
+        return self._damage
+
+    @damage.setter
+    def damage(self, damage: int):
+        self._damage = damage
+
+    @property
+    def max_damage(self) -> int:
         return self._max_damage
+
+    @max_damage.setter
+    def max_damage(self, damage: int):
+        self._max_damage = damage

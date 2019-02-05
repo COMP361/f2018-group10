@@ -75,6 +75,7 @@ class RectLabel(pygame.sprite.Sprite, Components):
         self.background = color
         self._render()
 
+
     def change_bg_image(self, file_path: str):
         if FileImporter.file_exists(file_path):
             self.background = file_path
