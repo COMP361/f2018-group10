@@ -118,4 +118,4 @@ class GameStateModel(Serializable):
 
     @property
     def damage(self) -> int:
-        return self._max_damage
+        return self._damage

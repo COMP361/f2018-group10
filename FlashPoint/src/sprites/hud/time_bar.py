@@ -1,6 +1,6 @@
 import pygame
 import time
-import datetime
+from datetime import datetime
 import src.constants.color as Color
 from src.core.event_queue import EventQueue
 
@@ -18,7 +18,7 @@ class TimeBar(pygame.sprite.Sprite):
         self.image = pygame.Surface([1280, 30])
         self.rect = self.image.get_rect()
         self.rect.move_ip(x, y)
-        self._start_time = time.time()
+        self._start_time = datetime.now()
         wood = pygame.image.load('media/GameHud/wood1.png')
         self.wood = pygame.transform.scale(wood, (1280, 30))
         menu = pygame.image.load('media/GameHud/menu.png')
@@ -46,11 +46,10 @@ class TimeBar(pygame.sprite.Sprite):
         # show_time = pygame.font.SysFont('Arial', 30)
         # text = show_time.render(date_str, True, (0, 0, 0))
 
-
-        time_str = str(time.time() - self._start_time)
-        #date_str = time_str.strftime("%M:%S")
-        show_time = pygame.font.SysFont('Arial', 30)
-        text = show_time.render(time_str, True, (0, 0, 0))
+        time_int = int(abs((datetime.now() - self._start_time).total_seconds()))
+        time_str = "TOTAL TIME: "+f"{int(time_int/60):02d}:{(time_int % 60):02d}"
+        show_time = pygame.font.SysFont('Agency FB', 28)
+        text = show_time.render(time_str, True, Color.WHITE)
         text_rect = text.get_rect()
-        text_rect.move_ip(500,0)
+        text_rect.move_ip(1135,-3)
         self.image.blit(text,text_rect)
