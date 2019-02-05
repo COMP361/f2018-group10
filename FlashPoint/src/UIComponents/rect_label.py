@@ -56,7 +56,8 @@ class RectLabel(pygame.sprite.Sprite, Components):
         if isinstance(self.background, Tuple):
             self.rect = pygame.draw.rect(self.image, self.background, self.rect, self.outer_width)
         else:
-            self.rect = pygame.draw.rect(self.image, (0, 0, 0), self.rect, self.outer_width)
+            self.image = self.image.convert_alpha(pygame.display.get_surface())
+            self.image.fill((0, 0, 0, 0), None, pygame.BLEND_RGBA_MULT)
             image_file = FileImporter.import_image(self.background)
             image_file = pygame.transform.scale(image_file, (self.width, self.height))
             self.image.blit(image_file, (0, 0))
@@ -75,7 +76,6 @@ class RectLabel(pygame.sprite.Sprite, Components):
         self.background = color
         self._render()
 
-
     def change_bg_image(self, file_path: str):
         if FileImporter.file_exists(file_path):
             self.background = file_path
@@ -83,7 +83,7 @@ class RectLabel(pygame.sprite.Sprite, Components):
         else:
             raise Exception("File not found!")
 
-    def change_rect(self, rect: pygame.Rect, outer_width: int=0):
+    def change_rect(self, rect: pygame.Rect, outer_width: int = 0):
         self.rect = rect
         self.outer_width = outer_width
         self._render()

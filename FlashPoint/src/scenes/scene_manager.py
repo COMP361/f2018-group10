@@ -14,6 +14,7 @@ from src.scenes.game_board_scene import GameBoardScene
 from src.scenes.host_join_scene import HostJoinScene
 from src.scenes.host_menu_scene import HostMenuScene
 from src.scenes.join_scene import JoinScene
+from src.scenes.load_game_scene import LoadGame
 from src.scenes.start_scene import StartScene
 from src.scenes.create_game_menu import CreateGameMenu
 from src.core.event_queue import EventQueue
@@ -73,15 +74,19 @@ class SceneManager(object):
         if isinstance(self._active_scene, HostMenuScene):
             self._active_scene.buttonBack.on_click(self.disconnect, HostJoinScene, self._current_player)
             self._active_scene.buttonNewGame.on_click(self.next, CreateGameMenu, self._current_player)
+            self._active_scene.buttonLogin.on_click(self.next, LoadGame)
 
         if isinstance(self._active_scene, CreateGameMenu):
-            self._active_scene.buttonBack.on_click(self.disconnect, HostJoinScene)
+            self._active_scene.buttonBack.on_click(self.disconnect, HostJoinScene, self._current_player)
             self._active_scene.buttonExp.on_click(self.create_new_game, GameKindEnum.EXPERIENCED)
             self._active_scene.buttonFamily.on_click(self.create_new_game, GameKindEnum.FAMILY)
 
         if isinstance(self._active_scene, CharacterScene):
             self._active_scene.buttonBack.on_click(self.next, LobbyScene, self._current_player, self._game)
             self._active_scene.buttonConfirm.on_click(self.next, LobbyScene, self._current_player, self._game)
+
+        if isinstance(self._active_scene, LoadGame):
+            self._active_scene.buttonBack.on_click(self.next, HostMenuScene, self._current_player)
 
         if isinstance(self._active_scene, LobbyScene):
             if self._game.rules == GameKindEnum.EXPERIENCED:
