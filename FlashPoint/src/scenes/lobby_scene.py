@@ -9,6 +9,7 @@ from src.UIComponents.rect_label import RectLabel
 from src.UIComponents.text import Text
 from src.UIComponents.chat_box import ChatBox
 from src.core.networking import Networking
+from src.sprites.hud.player_state import PlayerState
 
 
 class LobbyScene(object):
@@ -19,18 +20,9 @@ class LobbyScene(object):
         self.resolution = (1280, 700)
         self.sprite_grp = pygame.sprite.Group()
         self._init_background()
-        self._init_text_box(100, 364, 150, 32, "Player1", Color.GREY)
-        self._init_text_box(400, 289, 150, 32, "Player2", Color.GREY)
-        self._init_text_box(780, 289, 150, 32, "Player3", Color.GREY)
-        self._init_text_box(1080, 364, 150, 32, "Player4", Color.GREY)
-        self._init_text_box(565, 625, 200, 32, "You", Color.GREY)
-        self._init_background_player(100, 164, 150, 200)
-        self._init_background_player(400, 89, 150, 200)
-        self._init_background_player(780, 89, 150, 200)
-        self._init_background_player(1080, 164, 150, 200)
-        self._init_background_player(565, 375, 200, 250)
         self._init_ip_addr()
         self.chat_box = ChatBox()
+        self._init_sprites()
 
         if self._game.rules == GameKindEnum.EXPERIENCED:
             self._init_selec_char(1050, 475, "Select Character", Color.STANDARDBTN, Color.BLACK)
@@ -49,19 +41,16 @@ class LobbyScene(object):
 
         self.sprite_grp.add(self.this_img)
 
-    def _init_background_player(self, x_pos, y_pos, w, h):
+    def _init_background_player(self, rect):
+        user_box = RectLabel(rect[0], rect[1], rect[2], rect[3], "media/specialist_cards/generalist.png")
+        return user_box
 
-        box_size = (w, h)
+    def _init_text_box(self, position, text, color):
+        box_size = (position[2], position[3])
 
-        user_box = RectLabel(x_pos, y_pos, box_size[0], box_size[1], "media/specialist_cards/generalist.png")
-        self.sprite_grp.add(user_box)
-
-    def _init_text_box(self, x_pos, y_pos, w, h, text, color):
-        box_size = (w, h)
-
-        user_box = RectLabel(x_pos, y_pos, box_size[0], box_size[1], color, 0,
+        user_box = RectLabel(position[0], position[1], box_size[0], box_size[1], color, 0,
                              Text(pygame.font.SysFont('Arial', 20), text, (0, 255, 0, 0)))
-        self.sprite_grp.add(user_box)
+        return user_box
 
     def _init_selec_char(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
         box_size = (130, 48)
@@ -90,6 +79,16 @@ class LobbyScene(object):
                                       txt_obj=(Text(pygame.font.SysFont('Arial', 24), ip_addr)))
             ip_addr_label.set_transparent_background(True)
             self.sprite_grp.add(ip_addr_label)
+
+    def _init_sprites(self):
+        text_pos = [(565, 625, 200, 32), (100, 364, 150, 32),
+                    (400, 289, 150, 32), (780, 289, 150, 32), (1080, 364, 150, 32)]
+        background_pos = [(565, 375, 200, 250), (100, 164, 150, 200), (400, 89, 150, 200),
+                          (780, 89, 150, 200), (1080, 164, 150, 200)]
+
+        for i, player in enumerate(self._game.players):
+            self.sprite_grp.add(self._init_text_box(text_pos[i], player.nickname, player.color))
+            self.sprite_grp.add(self._init_background_player(background_pos[i]))
 
     def draw(self, screen):
         self.sprite_grp.draw(screen)
