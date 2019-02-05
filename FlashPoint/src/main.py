@@ -1,3 +1,4 @@
+import json
 import sys
 
 # If PyCharm is issuing warnings on pygame methods, suppress it. it's a bug with PyCharm
@@ -5,6 +6,7 @@ import pygame
 
 import src.constants.color as Color
 import src.constants.main_constants as MainConst
+from core.serializer import JSONSerializer
 from src.UIComponents.file_importer import FileImporter
 from src.scenes.scene_manager import SceneManager
 from src.core.event_queue import EventQueue
@@ -24,6 +26,7 @@ class Main(object):
     def main(self):
         # Run main loop
         # FileImporter.play_music("media/music/intro_music/Kontrabandz-Get Down-kissvk.com.mp3", -1)
+
         while True:
             # Lock frame rate at 60 FPS. Should only be called once per loop.
             self.clock.tick(60)
