@@ -8,7 +8,6 @@ from src.core.event_queue import EventQueue
 
 #Add switches statement for expirienced mode
 class PlayerState(Interactable):
-
     def __init__(self, x: int, y: int, name: str,color: Color):
         self.image = pygame.Surface([64 , 64])
         self.bg = pygame.image.load('media/GameHud/wood2-150x64.png')

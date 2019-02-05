@@ -95,7 +95,6 @@ class SceneManager(object):
             self._active_scene.buttonBack.on_click(self.disconnect, HostJoinScene, self._current_player)
             self._active_scene.buttonReady.on_click(self.next, GameBoardScene, self._game, self._current_player)
 
-
         FileImporter.play_audio("media/soundeffects/ButtonClick.wav", fade_ms=10)
 
     def draw(self):

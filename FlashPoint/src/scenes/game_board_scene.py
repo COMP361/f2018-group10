@@ -70,8 +70,6 @@ class GameBoardScene(object):
 
     def _click_action(self):
 
-
-
         menu = MenuWindow([self.active_sprites, self.game_board], 500, 500, (400, 150))
 
         save_btn = RectButton(200, 150, 100, 50, Color.STANDARDBTN, 0,
@@ -84,11 +82,6 @@ class GameBoardScene(object):
 
 
         #cross = pygame.image.load("media/GameHud/cross.png")
-
-
-
-
-
 
         back_btn.on_click(menu.close)
         save_btn.on_click(self._save)
