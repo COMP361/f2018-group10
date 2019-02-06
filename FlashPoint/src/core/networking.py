@@ -298,11 +298,11 @@ class Networking:
             :param data: Data received from the connection
             :return:
             """
+            data = JSONSerializer.deserialize(data)
             print(f"Client at {connection_object.address} sent a message: {data}")
             if isinstance(data, ActionEvent):
                 if isinstance(data, JoinEvent):
-                    data = JSONSerializer.serialize(Networking.get_instance().game)
-                    self.callback_client_send(connection_object, data, True)
+                    self.callback_client_send(connection_object, Networking.get_instance().game, True)
                 data.execute()
             return super(MastermindServerUDP, self).callback_client_handle(connection_object, data)
 
@@ -319,6 +319,7 @@ class Networking:
             :return:
             """
             # define override here
+            data = JSONSerializer.serialize(data)
             return super(MastermindServerUDP, self).callback_client_send(connection_object, data, compression)
 
         class ClientNotFoundException(Exception):
@@ -342,7 +343,7 @@ class Networking:
             :return:
             """
             self._pause_receive.set()
-            super(MastermindClientUDP, self).send(data, compression)
+            super(MastermindClientUDP, self).send(JSONSerializer.serialize(data), compression)
             self._pause_receive.clear()
 
         def receive_data_from_server(self):
