@@ -74,8 +74,6 @@ class Networking:
             # We use UDP to broadcast the host
             self.host = Networking.Host()
 
-            self.host = MastermindServerUDP()
-
             """
             # find unused ip address
             for i in range(255, 0, -1):
@@ -93,7 +91,7 @@ class Networking:
                     break
             """
 
-            #port = self.get_open_port()
+            # port = self.get_open_port()
             # listen to all address
             server_ip = "0.0.0.0"
             client_ip = "localhost"
@@ -123,11 +121,12 @@ class Networking:
             :return:
             """
             self.client = Networking.Client(self.TIMEOUT_CONNECT, self.TIMEOUT_RECEIVE)
-            self.client = MastermindClientUDP(self.TIMEOUT_CONNECT, self.TIMEOUT_RECEIVE)
+
             try:
                 print(f"Attempting to connect to host at {ip}:{port}")
                 logger.info(f"Attempting to connect to host at {ip}:{port}")
                 self.client.connect(ip, port)
+                return True
             except MastermindErrorClient as e:
                 logger.error(f"Error connecting to server at: {ip}:{port}")
                 raise MastermindErrorClient(e)
@@ -216,6 +215,7 @@ class Networking:
             """
             # Kill the broadcast
             self.stop_broadcast.set()
+            print("Broadcast killed")
 
             if self.host is not None:
                 self.host.accepting_disallow()
@@ -276,7 +276,7 @@ class Networking:
             :param connection_object: Represents the appropriate connection
             :return:
             """
-            # print(f"Client at {connection_object.address} is connected")
+            print(f"Client at {connection_object.address} is connected")
             # Assign a new connection object to the address (as a key value pair)
             self.client_list[connection_object.address] = connection_object
 
@@ -284,6 +284,7 @@ class Networking:
             # event = pygame.event.Event(CustomEvents.CLIENT_CONNECTED, {'client_id': client_id})
             # pygame.event.post(event)
             data = JSONSerializer.serialize(Networking.__instance.game)
+            print(data)
             self.callback_client_send(connection_object, data, True)
 
             return super(MastermindServerUDP, self).callback_connect_client(connection_object)

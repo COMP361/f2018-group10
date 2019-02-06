@@ -135,7 +135,7 @@ class SceneManager(object):
         if next_scene is not None:
             self.next(next_scene, *args)
 
-    def join(self, ip_addr, next_scene: Optional[callable] = None, *args):
+    def join(self, ip_addr: str, next_scene: Optional[callable] = None, *args):
         """
         Start the join host process in Networking
         :param ip_addr: ip address to connect
