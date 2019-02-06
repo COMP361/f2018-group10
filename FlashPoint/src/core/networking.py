@@ -235,20 +235,36 @@ class Networking:
             else:
                 raise MastermindErrorClient("Client is not available")
 
-        def send_to_client(self, client_id: int, data, compress=True):
+        def send_to_client(self, ip_addr: str, data, compress=True):
             """
             Send data to client
-            :param client_id: client id
+            :param ip_addr: client id
             :param data: data to be sent
             :param compress: compression, enabled by default
             :return:
             """
             if self.host is not None:
                 try:
-                    client_conn_obj = self.host.lookup_client(client_id)
+                    client_conn_obj = self.host.lookup_client(ip_addr)
                     self.host.callback_client_send(client_conn_obj, data, compress)
                 except MastermindErrorSocket as e:
                     raise MastermindErrorSocket(e)
+            else:
+                raise MastermindErrorServer("Server is not available")
+
+        def send_to_all_client(self, data, compress=True):
+            """
+            Similar to send_to_client, but sends to every client connected to host
+            :param data:
+            :param compress:
+            :return:
+            """
+            if self.host:
+                for client in self.host.client_list.values():
+                    try:
+                        self.host.callback_client_send(client, data, compress)
+                    except MastermindErrorSocket as e:
+                        raise MastermindErrorSocket(e)
             else:
                 raise MastermindErrorServer("Server is not available")
 
@@ -278,7 +294,7 @@ class Networking:
             """
             print(f"Client at {connection_object.address} is connected")
             # Assign a new connection object to the address (as a key value pair)
-            self.client_list[connection_object.address] = connection_object
+            self.client_list[connection_object.address[0]] = connection_object
 
             # inform the event queue that a client is connected, with the respective client id
             # event = pygame.event.Event(CustomEvents.CLIENT_CONNECTED, {'client_id': client_id})
@@ -301,7 +317,9 @@ class Networking:
             print(f"Client at {connection_object.address} sent a message: {data}")
             if isinstance(data, ActionEvent):
                 if isinstance(data, JoinEvent):
-                    Networking.get_instance().send_to_client(connection_object, Networking.get_instance().game, True)
+                    Networking.get_instance().send_to_client(
+                        connection_object.address[0], Networking.get_instance().game
+                    )
                 data.execute()
             return super(MastermindServerUDP, self).callback_client_handle(connection_object, data)
 
@@ -327,7 +345,7 @@ class Networking:
     class Client(MastermindClientUDP):
         _pause_receive = threading.Event()
         _stop_receive = threading.Event()
-        _server_reply = None
+        _reply_queue = []
 
         def connect(self, ip, port):
             super(MastermindClientUDP, self).connect(ip, port)
@@ -353,8 +371,9 @@ class Networking:
             while not self._stop_receive.is_set():
                 if not self._pause_receive.is_set():
                     try:
-                        self._server_reply = self.receive(False)
-                        if self._server_reply:
+                        _server_reply = self.receive(False)
+                        if _server_reply:
+                            self._reply_queue.append(_server_reply)
                             print("Received.")
                     except OSError as e:
                         print(f"Error receiving data: {e}")
@@ -368,4 +387,5 @@ class Networking:
             Retrieves the last message sent by the server
             :return:
             """
-            return self._server_reply
+            if len(self._reply_queue) > 0:
+                return self._reply_queue.pop(0)
