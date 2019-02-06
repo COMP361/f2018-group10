@@ -86,7 +86,11 @@ class LobbyScene(object):
         background_pos = [(565, 375, 200, 250), (100, 164, 150, 200), (400, 89, 150, 200),
                           (780, 89, 150, 200), (1080, 164, 150, 200)]
 
-        for i, player in enumerate(self._game.players):
+        self.sprite_grp.add(self._init_text_box(text_pos[0], self._current_player.nickname, self._current_player.color))
+        self.sprite_grp.add(self._init_background_player(background_pos[0]))
+
+        players = [x for x in self._game.players if x != self._current_player]
+        for i, player in enumerate(players):
             self.sprite_grp.add(self._init_text_box(text_pos[i], player.nickname, player.color))
             self.sprite_grp.add(self._init_background_player(background_pos[i]))
 

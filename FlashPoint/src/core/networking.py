@@ -317,6 +317,7 @@ class Networking:
             print(f"Client at {connection_object.address} sent a message: {data}")
             if isinstance(data, ActionEvent):
                 if isinstance(data, JoinEvent):
+                    Networking.get_instance().game.add_player(data.player)
                     Networking.get_instance().send_to_client(
                         connection_object.address[0], Networking.get_instance().game
                     )
