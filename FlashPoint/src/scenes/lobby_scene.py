@@ -16,19 +16,23 @@ class LobbyScene(object):
     def __init__(self, screen, current_player: PlayerModel, game: GameStateModel):
         self._current_player = current_player
         self._game = game
+        self._previous_players = self._game.players
 
         self.resolution = (1280, 700)
         self.sprite_grp = pygame.sprite.Group()
+        self._init_all()
+
+    def _init_all(self):
         self._init_background()
         self._init_ip_addr()
         self.chat_box = ChatBox()
-        self._init_sprites()
 
         if self._game.rules == GameKindEnum.EXPERIENCED:
             self._init_selec_char(1050, 475, "Select Character", Color.STANDARDBTN, Color.BLACK)
 
         self._init_btn_back(20, 20, "Exit", Color.STANDARDBTN, Color.BLACK)
         self._init_ready(1050, 575, "Ready", Color.STANDARDBTN, Color.BLACK)
+        self._init_sprites()
 
     def _init_background(self):
         box_size = (self.resolution[0], self.resolution[1])
@@ -98,6 +102,9 @@ class LobbyScene(object):
         self.sprite_grp.draw(screen)
         self.chat_box.draw(screen)
 
+        # self.sprite_grp.clear(screen, pygame.Surface((0, 0)))
+        # self._init_all()
+
     def update(self, event_queue):
         self.sprite_grp.update(event_queue)
         self.chat_box.update(event_queue)
@@ -105,3 +112,4 @@ class LobbyScene(object):
         game = Networking.get_instance().game
         if game:
             self._game = game
+
