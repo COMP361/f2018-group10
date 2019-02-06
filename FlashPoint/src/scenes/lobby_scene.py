@@ -101,3 +101,7 @@ class LobbyScene(object):
     def update(self, event_queue):
         self.sprite_grp.update(event_queue)
         self.chat_box.update(event_queue)
+
+        game = Networking.get_instance().game
+        if game:
+            self._game = game
