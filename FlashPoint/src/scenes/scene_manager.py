@@ -108,8 +108,9 @@ class SceneManager(object):
             self.handle_event(event)
 
         if Networking.get_instance().client:
-            if Networking.get_instance().client.get_server_reply():
-                server_response = JSONSerializer.deserialize()
+            reply = Networking.get_instance().client.get_server_reply()
+            if reply:
+                server_response = JSONSerializer.deserialize(reply)
                 if isinstance(server_response, GameStateModel):
                     self._game = server_response
 
