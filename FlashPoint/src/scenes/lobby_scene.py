@@ -9,7 +9,6 @@ from src.UIComponents.rect_label import RectLabel
 from src.UIComponents.text import Text
 from src.UIComponents.chat_box import ChatBox
 from src.core.networking import Networking
-from src.sprites.hud.player_state import PlayerState
 
 
 class LobbyScene(object):

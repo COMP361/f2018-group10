@@ -152,10 +152,14 @@ class SceneManager(object):
             Networking.get_instance().join_host(ip_addr, player=self._current_player)
             timeout = 0
             reply = Networking.get_instance().client.get_server_reply()
-            while not reply and not timeout > 400:
+
+            while not reply and not timeout > 5:
                 reply = Networking.get_instance().client.get_server_reply()
-                time.sleep(0.1)
+                time.sleep(1)
                 timeout += 1
+
+            if timeout > 5:
+                return # couldn't connect, TODO Add a message to the user.
 
             server_response = JSONSerializer.deserialize(reply)
             if isinstance(server_response, GameStateModel):
