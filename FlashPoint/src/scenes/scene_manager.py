@@ -107,10 +107,11 @@ class SceneManager(object):
         for event in event_queue:
             self.handle_event(event)
 
-        server_response = JSONSerializer.deserialize(Networking.get_instance().client.get_server_reply())
-        if isinstance(server_response, GameStateModel):
-            self._game = server_response
-        
+        if Networking.get_instance().client:
+            server_response = JSONSerializer.deserialize(Networking.get_instance().client.get_server_reply())
+            if isinstance(server_response, GameStateModel):
+                self._game = server_response
+
     def handle_event(self, event):
         # join event
         if event.type == CustomEvents.JOIN:
