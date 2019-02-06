@@ -126,6 +126,7 @@ class Networking:
                 print(f"Attempting to connect to host at {ip}:{port}")
                 logger.info(f"Attempting to connect to host at {ip}:{port}")
                 self.client.connect(ip, port)
+                self.client.send("Hello")
                 return True
             except MastermindErrorClient as e:
                 logger.error(f"Error connecting to server at: {ip}:{port}")
@@ -283,7 +284,7 @@ class Networking:
             # inform the event queue that a client is connected, with the respective client id
             # event = pygame.event.Event(CustomEvents.CLIENT_CONNECTED, {'client_id': client_id})
             # pygame.event.post(event)
-            data = JSONSerializer.serialize(Networking.__instance.game)
+            data = JSONSerializer.serialize(Networking.get_instance().game)
             print(data)
             self.callback_client_send(connection_object, data, True)
 
