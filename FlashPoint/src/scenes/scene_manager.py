@@ -156,9 +156,8 @@ class SceneManager(object):
 
         try:
             Networking.get_instance().join_host(ip_addr, player=self._current_player)
-
-            # if next_scene is not None:
-            #     self.next(next_scene, *args)
+            if next_scene is not None:
+                self.next(next_scene, *args)
         except ConnectionError:
             msg = "Unable to connect"
             print(msg)
