@@ -152,8 +152,9 @@ class SceneManager(object):
             Networking.get_instance().join_host(ip_addr, player=self._current_player)
             timeout = 0
             reply = Networking.get_instance().client.get_server_reply()
-            while not reply or not timeout > 10:
-                time.sleep(1)
+            while not reply and not timeout > 100:
+                reply = Networking.get_instance().client.get_server_reply()
+                time.sleep(0.1)
                 timeout += 1
 
             server_response = JSONSerializer.deserialize(reply)
