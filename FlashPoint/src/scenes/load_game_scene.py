@@ -22,13 +22,9 @@ class LoadGame(object):
         self.resolution = (1280, 700)
         self.sprite_grp = pygame.sprite.Group()
         self._init_background()
-
-
-        #self._init_profile_selector(((self.resolution[0]/2)-(500/2)), 330, color.GREY)
-        #self._init_load_menu(390,100, "", color.GREY, color.GREEN)
+        self._init_load_menu(390,100, "", color.GREY, color.GREEN)
         self.update_profiles()
-       # self.text_bar1 = self._init_text_bar(((self.resolution[0]/2)-(500/2))-20, 600, 400, 32)
-        #self.sometext =
+
         self._init_btn_register(((self.resolution[0] / 2) - (500 / 2)) + 400, 592, "Create Profile",
                                 color.STANDARDBTN, color.BLACK)
         self._init_btn_back(20, 20, "Back", color.STANDARDBTN, color.BLACK)
@@ -76,15 +72,12 @@ class LoadGame(object):
     def _init_text_bar(x_pos, y_pos, width, height):
         return InputBox(x=x_pos, y=y_pos, w=width, h=height)
 
-    def _init_profile_selector(self, x_pos, y_pos, clr):
-        box_size = (500, 250)
-        self.profile = ProfileList(x_pos, y_pos, box_size[0], box_size[1], 3, clr)
+
 
     def update_profiles(self):
         with open(self.saves, mode='r', encoding='utf-8') as myFile:
             temp = json.load(myFile)
             for i, user in enumerate(temp):
-                #player: PlayerModel = JSONSerializer.deserialize(user)
                 print("ASS")
                 x = user["time"]
                 temp_str : str = "Game " + str(i+1) +" "+ x

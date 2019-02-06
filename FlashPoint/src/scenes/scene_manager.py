@@ -117,7 +117,7 @@ class SceneManager(object):
 
     def create_new_game(self, game_kind: GameKindEnum):
         """Instantiate a new family game and move to the lobby scene."""
-        self._game = GameStateModel(self._current_player, game_kind)
+        self._game = GameStateModel(self._current_player, 6, game_kind)
         self.next(LobbyScene, self._current_player, self._game)
 
     # ------------- NETWORKING STUFF ----------------#

@@ -20,3 +20,7 @@
 
 # Ignore docs
 **/docs/**
+
+#ignore profiles.json
+FlashPoint/src/media/profiles.json
+FlashPoint/src/media/save_games.json
