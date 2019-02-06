@@ -149,7 +149,7 @@ class SceneManager(object):
             is_join_scene = False
 
         try:
-            Networking.get_instance().join_host(ip_addr)
+            Networking.get_instance().join_host(ip_addr, player=self._current_player)
 
             # if next_scene is not None:
             #     self.next(next_scene, *args)

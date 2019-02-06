@@ -7,6 +7,7 @@ import logging
 import src.constants.CustomEvents as CustomEvents
 from core.serializer import JSONSerializer
 from src.action_events.action_event import ActionEvent
+from src.action_events.join_event import JoinEvent
 from src.external.Mastermind import *
 
 logger = logging.getLogger("networking")
@@ -113,7 +114,7 @@ class Networking:
             except MastermindErrorSocket:
                 logger.error("Failed to create a host")
 
-        def join_host(self, ip, port=20298):
+        def join_host(self, ip, port=20298, player = None):
             """
             Attempt to join host at the specified ip address
             :param ip: IP address
@@ -126,7 +127,7 @@ class Networking:
                 print(f"Attempting to connect to host at {ip}:{port}")
                 logger.info(f"Attempting to connect to host at {ip}:{port}")
                 self.client.connect(ip, port)
-                self.client.send("Hello")
+                self.client.send(JoinEvent(player))
                 return True
             except MastermindErrorClient as e:
                 logger.error(f"Error connecting to server at: {ip}:{port}")
@@ -284,9 +285,6 @@ class Networking:
             # inform the event queue that a client is connected, with the respective client id
             # event = pygame.event.Event(CustomEvents.CLIENT_CONNECTED, {'client_id': client_id})
             # pygame.event.post(event)
-            data = JSONSerializer.serialize(Networking.get_instance().game)
-            print(data)
-            self.callback_client_send(connection_object, data, True)
 
             return super(MastermindServerUDP, self).callback_connect_client(connection_object)
 
@@ -302,6 +300,9 @@ class Networking:
             """
             print(f"Client at {connection_object.address} sent a message: {data}")
             if isinstance(data, ActionEvent):
+                if isinstance(data, JoinEvent):
+                    data = JSONSerializer.serialize(Networking.get_instance().game)
+                    self.callback_client_send(connection_object, data, True)
                 data.execute()
             return super(MastermindServerUDP, self).callback_client_handle(connection_object, data)
 
