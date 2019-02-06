@@ -1,3 +1,4 @@
+import time
 from typing import Optional
 
 import pygame
@@ -107,17 +108,10 @@ class SceneManager(object):
         for event in event_queue:
             self.handle_event(event)
 
-        if Networking.get_instance().client:
-            reply = Networking.get_instance().client.get_server_reply()
-            if reply:
-                server_response = JSONSerializer.deserialize(reply)
-                if isinstance(server_response, GameStateModel):
-                    self._game = server_response
-
     def handle_event(self, event):
         # join event
         if event.type == CustomEvents.JOIN:
-            self.join(event.ip, LobbyScene, self._current_player, self._game)
+            self.join(event.ip,)
 
     # ------------- GAME CREATE/LOAD STUFF ----------#
 
@@ -141,7 +135,7 @@ class SceneManager(object):
         if next_scene is not None:
             self.next(next_scene, *args)
 
-    def join(self, ip_addr: str, next_scene: Optional[callable] = None, *args):
+    def join(self, ip_addr: str):
         """
         Start the join host process in Networking
         :param ip_addr: ip address to connect
@@ -156,8 +150,17 @@ class SceneManager(object):
 
         try:
             Networking.get_instance().join_host(ip_addr, player=self._current_player)
-            if next_scene is not None:
-                self.next(next_scene, *args)
+            timeout = 0
+            reply = Networking.get_instance().client.get_server_reply()
+            while not reply or not timeout > 10:
+                time.sleep(1)
+                timeout += 1
+
+            server_response = JSONSerializer.deserialize(reply)
+            if isinstance(server_response, GameStateModel):
+                self._game = server_response
+                self.next(LobbyScene, self._current_player, self._game)
+
         except ConnectionError:
             msg = "Unable to connect"
             print(msg)
