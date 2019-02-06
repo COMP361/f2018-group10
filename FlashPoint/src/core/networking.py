@@ -294,7 +294,7 @@ class Networking:
             """
             print(f"Client at {connection_object.address} is connected")
             # Assign a new connection object to the address (as a key value pair)
-            self.client_list[connection_object.address] = connection_object
+            self.client_list[connection_object.address[0]] = connection_object
 
             # inform the event queue that a client is connected, with the respective client id
             # event = pygame.event.Event(CustomEvents.CLIENT_CONNECTED, {'client_id': client_id})
