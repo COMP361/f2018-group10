@@ -152,7 +152,7 @@ class SceneManager(object):
             Networking.get_instance().join_host(ip_addr, player=self._current_player)
             timeout = 0
             reply = Networking.get_instance().client.get_server_reply()
-            while not reply and not timeout > 100:
+            while not reply and not timeout > 400:
                 reply = Networking.get_instance().client.get_server_reply()
                 time.sleep(0.1)
                 timeout += 1
