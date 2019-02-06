@@ -345,7 +345,7 @@ class Networking:
     class Client(MastermindClientUDP):
         _pause_receive = threading.Event()
         _stop_receive = threading.Event()
-        _server_reply = None
+        _reply_queue = []
 
         def connect(self, ip, port):
             super(MastermindClientUDP, self).connect(ip, port)
@@ -371,8 +371,9 @@ class Networking:
             while not self._stop_receive.is_set():
                 if not self._pause_receive.is_set():
                     try:
-                        self._server_reply = self.receive(False)
-                        if self._server_reply:
+                        _server_reply = self.receive(False)
+                        if _server_reply:
+                            self._reply_queue.append(_server_reply)
                             print("Received.")
                     except OSError as e:
                         print(f"Error receiving data: {e}")
@@ -386,4 +387,5 @@ class Networking:
             Retrieves the last message sent by the server
             :return:
             """
-            return self._server_reply
+            if len(self._reply_queue) > 0:
+                return self._reply_queue.pop(0)
