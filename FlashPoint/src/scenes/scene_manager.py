@@ -95,7 +95,6 @@ class SceneManager(object):
             self._active_scene.buttonBack.on_click(self.disconnect, HostJoinScene, self._current_player)
             self._active_scene.buttonReady.on_click(self.next, GameBoardScene, self._game, self._current_player)
 
-
         FileImporter.play_audio("media/soundeffects/ButtonClick.wav", fade_ms=10)
 
     def draw(self):
@@ -108,6 +107,10 @@ class SceneManager(object):
         for event in event_queue:
             self.handle_event(event)
 
+        server_response = JSONSerializer.deserialize(Networking.get_instance().client.get_server_reply())
+        if isinstance(server_response, GameStateModel):
+            self._game = server_response
+        
     def handle_event(self, event):
         # join event
         if event.type == CustomEvents.JOIN:
