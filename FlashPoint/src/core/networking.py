@@ -283,8 +283,7 @@ class Networking:
             # inform the event queue that a client is connected, with the respective client id
             # event = pygame.event.Event(CustomEvents.CLIENT_CONNECTED, {'client_id': client_id})
             # pygame.event.post(event)
-            data = JSONSerializer.serialize(Networking.__instance.game)
-            print(data)
+            data = JSONSerializer.serialize(Networking.get_instance().game)
             self.callback_client_send(connection_object, data, True)
 
             return super(MastermindServerUDP, self).callback_connect_client(connection_object)
