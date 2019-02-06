@@ -1,11 +1,9 @@
-import pygame
 import ipaddress
 import socket
 import threading
 import logging
 
-import src.constants.CustomEvents as CustomEvents
-from core.serializer import JSONSerializer
+from src.core.serializer import JSONSerializer
 from src.action_events.action_event import ActionEvent
 from src.action_events.join_event import JoinEvent
 from src.external.Mastermind import *
@@ -298,11 +296,12 @@ class Networking:
             :param data: Data received from the connection
             :return:
             """
-            data = JSONSerializer.deserialize(data)
+            if connection_object.address[0] != "127.0.0.1":
+                data = JSONSerializer.deserialize(data)
             print(f"Client at {connection_object.address} sent a message: {data}")
             if isinstance(data, ActionEvent):
                 if isinstance(data, JoinEvent):
-                    self.callback_client_send(connection_object, Networking.get_instance().game, True)
+                    Networking.get_instance().send_to_client(connection_object, Networking.get_instance().game, True)
                 data.execute()
             return super(MastermindServerUDP, self).callback_client_handle(connection_object, data)
 
