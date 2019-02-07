@@ -162,6 +162,7 @@ class SceneManager(object):
                 return # couldn't connect, TODO Add a message to the user.
 
             server_response = JSONSerializer.deserialize(reply)
+
             if isinstance(server_response, GameStateModel):
                 self._game = server_response
                 self.next(LobbyScene, self._current_player, self._game)

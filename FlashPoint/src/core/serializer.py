@@ -19,7 +19,7 @@ class JSONSerializer(object):
         rules = GameKindEnum(payload['_rules']["value"])
         game = GameStateModel(host, num_players, rules)
 
-        for player in payload['_players']:
+        for player in [x for x in payload['_players'] if x['_ip'] != host.ip]:
             player_obj: PlayerModel = JSONSerializer.deserialize(player)
             game.add_player(player_obj)
 
