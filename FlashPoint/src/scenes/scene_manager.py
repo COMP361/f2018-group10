@@ -3,6 +3,7 @@ from typing import Optional
 
 import pygame
 import json
+import threading
 
 import src.constants.CustomEvents as CustomEvents
 from src.constants.state_enums import GameKindEnum
@@ -38,9 +39,27 @@ class SceneManager(object):
         self._active_scene = StartScene(self.screen)
         self._current_player = None
         self._game = None
-
+        self._network_poller = threading.Thread(target=self._poll_network)
+        self._network_poller.start()
         self._active_scene.buttonRegister.on_click(self.create_profile, self._active_scene.text_bar1)
         self.update_profiles()
+
+    def _poll_network(self, looping=True):
+        while True:
+            while not Networking.get_instance().client:
+                time.sleep(0.0001)
+
+            reply = Networking.get_instance().client.get_server_reply()
+
+            while not reply:
+                reply = Networking.get_instance().client.get_server_reply()
+                time.sleep(0.0001)
+            server_response = JSONSerializer.deserialize(reply)
+
+            if isinstance(server_response, GameStateModel):
+                self._game = server_response
+            if not looping:
+                break
 
     def next(self, next_scene: callable, *args):
         """Switch to the next logical scene. args is assumed to be: [SceneClass]
@@ -108,6 +127,8 @@ class SceneManager(object):
         for event in event_queue:
             self.handle_event(event)
 
+
+
     def handle_event(self, event):
         # join event
         if event.type == CustomEvents.JOIN:
@@ -150,22 +171,8 @@ class SceneManager(object):
 
         try:
             Networking.get_instance().join_host(ip_addr, player=self._current_player)
-            timeout = 0
-            reply = Networking.get_instance().client.get_server_reply()
-
-            while not reply and not timeout > 5:
-                reply = Networking.get_instance().client.get_server_reply()
-                time.sleep(1)
-                timeout += 1
-
-            if timeout > 5:
-                return # couldn't connect, TODO Add a message to the user.
-
-            server_response = JSONSerializer.deserialize(reply)
-
-            if isinstance(server_response, GameStateModel):
-                self._game = server_response
-                self.next(LobbyScene, self._current_player, self._game)
+            self._poll_network(looping=False)
+            self.next(LobbyScene, self._current_player, self._game)
 
         except ConnectionError:
             msg = "Unable to connect"
