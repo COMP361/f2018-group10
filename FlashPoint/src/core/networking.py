@@ -261,6 +261,7 @@ class Networking:
             """
             if self.host:
                 for client in self.host.client_list.values():
+                    print(f"Sending to client at {client.address}\n")
                     try:
                         self.host.callback_client_send(client, data, compress)
                     except MastermindErrorSocket as e:
