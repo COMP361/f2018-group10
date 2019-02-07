@@ -92,10 +92,15 @@ class LobbyScene(object):
         self.sprite_grp.add(self._init_text_box(text_pos[0], self._current_player.nickname, self._current_player.color))
         self.sprite_grp.add(self._init_background_player(background_pos[0]))
 
-        players = [x for x in self._game.players if x != self._current_player]
-        for i, player in enumerate(players, start=1):
+        players = [x for x in self._game.players if x.nickname != self._current_player.nickname]
+        i = 1
+        print(players)
+        for player in players:
+            print(player)
+            print(player.nickname)
             self.sprite_grp.add(self._init_text_box(text_pos[i], player.nickname, player.color))
             self.sprite_grp.add(self._init_background_player(background_pos[i]))
+            i += 1
 
     def draw(self, screen):
         self.sprite_grp.draw(screen)

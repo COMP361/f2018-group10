@@ -312,8 +312,10 @@ class Networking:
             :param data: Data received from the connection
             :return:
             """
-            if connection_object.address[0] != "127.0.0.1":
-                data = JSONSerializer.deserialize(data)
+            if connection_object.address[0] == "127.0.0.1":
+                return
+
+            data = JSONSerializer.deserialize(data)
             print(f"Client at {connection_object.address} sent a message: {data}")
             if isinstance(data, ActionEvent):
                 if isinstance(data, JoinEvent):
@@ -375,7 +377,7 @@ class Networking:
                         _server_reply = self.receive(False)
                         if _server_reply:
                             self._reply_queue.append(_server_reply)
-                            print("Received.")
+                            print(f"Received: {_server_reply}")
                     except OSError as e:
                         print(f"Error receiving data: {e}")
 
