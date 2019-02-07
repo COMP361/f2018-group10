@@ -315,8 +315,9 @@ class Networking:
             # Pops the client's connection object
             self.client_list.pop(connection_object.address[0])
             game = Networking.get_instance().game
-            player = [x for x in game.players if x.ip == connection_object.address[0]][0]
-            game.remove_player(player)
+            player = [x for x in game.players if x.ip == connection_object.address[0]]
+            if player:
+                game.remove_player(player[0])
             return super(MastermindServerUDP, self).callback_disconnect_client(connection_object)
 
         def callback_client_handle(self, connection_object, data):

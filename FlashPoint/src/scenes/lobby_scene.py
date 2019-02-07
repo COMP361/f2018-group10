@@ -94,10 +94,7 @@ class LobbyScene(object):
 
         players = [x for x in self._game.players if x.ip != self._current_player.ip]
         i = 1
-        print(players)
         for player in players:
-            print(player)
-            print(player.nickname)
             self.sprite_grp.add(self._init_text_box(text_pos[i], player.nickname, player.color))
             self.sprite_grp.add(self._init_background_player(background_pos[i]))
             i += 1
