@@ -318,9 +318,7 @@ class Networking:
             if isinstance(data, ActionEvent):
                 if isinstance(data, JoinEvent):
                     Networking.get_instance().game.add_player(data.player)
-                    Networking.get_instance().send_to_client(
-                        connection_object.address[0], Networking.get_instance().game
-                    )
+                    Networking.get_instance().send_to_all_client(Networking.get_instance().game)
                 data.execute()
             return super(MastermindServerUDP, self).callback_client_handle(connection_object, data)
 
