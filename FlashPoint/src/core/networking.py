@@ -315,7 +315,7 @@ class Networking:
             players = [x for x in game.players]
             if players:
                 for player in players:
-                    game.remove_player(player[0])
+                    game.remove_player(player)
             return super(MastermindServerUDP, self).callback_disconnect()
 
         def callback_client_handle(self, connection_object, data):
@@ -407,3 +407,10 @@ class Networking:
             """
             if len(self._reply_queue) > 0:
                 return self._reply_queue.pop(0)
+
+        def send_blocking_signal(self):
+            """
+            Informs the host of the client's existence, so that it doesn't get disconnected automatically
+            :return:
+            """
+            pass
