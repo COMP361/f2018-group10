@@ -302,6 +302,16 @@ class Networking:
 
             return super(MastermindServerUDP, self).callback_connect_client(connection_object)
 
+        def callback_disconnect_client(self, connection_object):
+            """
+            Called when a client disconnects.  This method can be overridden to provide useful information. It's good
+            practice to call "return super(MastermindServerTCP,self).callback_disconnect_client(connection_object)" at
+            the end of your override.
+            :param connection_object:
+            :return:
+            """
+            return super(MastermindServerUDP, self).callback_disconnect_client(connection_object)
+
         def callback_client_handle(self, connection_object, data):
             """
             Called to handle data received from a connection. This method is often overridden to provide custom server
