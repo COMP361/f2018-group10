@@ -15,7 +15,7 @@ class LobbyScene(object):
     def __init__(self, screen, current_player: PlayerModel, game: GameStateModel):
         self._current_player = current_player
         self._game = game
-        self._previous_players = self._game.players
+        self._player_count = len(self._game.players)
 
         self.resolution = (1280, 700)
         self.sprite_grp = pygame.sprite.Group()
@@ -93,7 +93,7 @@ class LobbyScene(object):
         self.sprite_grp.add(self._init_background_player(background_pos[0]))
 
         players = [x for x in self._game.players if x != self._current_player]
-        for i, player in enumerate(players):
+        for i, player in enumerate(players, start=1):
             self.sprite_grp.add(self._init_text_box(text_pos[i], player.nickname, player.color))
             self.sprite_grp.add(self._init_background_player(background_pos[i]))
 
@@ -101,14 +101,13 @@ class LobbyScene(object):
         self.sprite_grp.draw(screen)
         self.chat_box.draw(screen)
 
-        # self.sprite_grp.clear(screen, pygame.Surface((0, 0)))
-        # self._init_all()
-
     def update(self, event_queue):
         self.sprite_grp.update(event_queue)
         self.chat_box.update(event_queue)
 
-        game = Networking.get_instance().game
-        if game:
-            self._game = game
+        # game is mutated by reference, BE CAREFUL!!!
+        if len(self._game.players) != self._player_count:
+            self._player_count = len(self._game.players)
+            self.sprite_grp.empty()
+            self._init_all()
 
