@@ -458,7 +458,9 @@ class Networking:
             data = JSONSerializer.deserialize(event)
 
             if isinstance(data, ActionEvent):
-                data.execute()
+                if isinstance(data, JoinEvent):
+                    data.execute(Networking.get_instance().game)
+                
             else:
                 print("Not an action event")
 
