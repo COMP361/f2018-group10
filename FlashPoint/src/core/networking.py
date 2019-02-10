@@ -4,6 +4,7 @@ import threading
 import logging
 import time
 
+from action_events.dummy_event import DummyEvent
 from src.core.serializer import JSONSerializer
 from src.action_events.action_event import ActionEvent
 from src.action_events.join_event import JoinEvent
@@ -441,9 +442,9 @@ class Networking:
             Informs the host of the client's existence, so that it doesn't get disconnected automatically
             :return:
             """
-            while True:
+            while not self._stop_receive.is_set():
                 if not self._pause_blk_signal.is_set():
-                    self.send(None)
+                    self.send(DummyEvent())
 
         def toggle_block_signal(self, toggle: bool):
             if toggle:
