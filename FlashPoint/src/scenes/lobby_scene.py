@@ -21,7 +21,7 @@ class LobbyScene(object):
         self.sprite_grp = pygame.sprite.Group()
         self._init_all()
 
-    def _init_all(self, reuse=False):
+    def _init_all(self):
         self._init_background()
         self._init_ip_addr()
         self.chat_box = ChatBox()
@@ -29,13 +29,8 @@ class LobbyScene(object):
         if self._game.rules == GameKindEnum.EXPERIENCED:
             self._init_selec_char(1050, 475, "Select Character", Color.STANDARDBTN, Color.BLACK)
 
-        if not reuse:
-            self._init_btn_back(20, 20, "Exit", Color.STANDARDBTN, Color.BLACK)
-            self._init_ready(1050, 575, "Ready", Color.STANDARDBTN, Color.BLACK)
-        else:
-            self.sprite_grp.add(self.buttonBack, self.buttonReady)
-            if self._game.rules == GameKindEnum.EXPERIENCED:
-                self.sprite_grp.add(self.buttonSelChar)
+        self._init_btn_back(20, 20, "Exit", Color.STANDARDBTN, Color.BLACK)
+        self._init_ready(1050, 575, "Ready", Color.STANDARDBTN, Color.BLACK)
         self._init_sprites()
 
     def _init_background(self):
@@ -116,5 +111,5 @@ class LobbyScene(object):
         if len(self._game.players) != self._player_count:
             self._player_count = len(self._game.players)
             self.sprite_grp.empty()
-            self._init_all(reuse=True)
+            self._init_all()
 

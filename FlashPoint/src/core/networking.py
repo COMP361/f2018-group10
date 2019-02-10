@@ -5,9 +5,9 @@ import logging
 import time
 
 from action_events.dummy_event import DummyEvent
-from action_events.join_event import JoinEvent
 from src.core.serializer import JSONSerializer
 from src.action_events.action_event import ActionEvent
+from src.action_events.join_event import JoinEvent
 from src.external.Mastermind import *
 
 logger = logging.getLogger("networking")
@@ -130,7 +130,7 @@ class Networking:
             except MastermindErrorSocket:
                 logger.error("Failed to create a host")
 
-        def join_host(self, ip, port=20298, event = None):
+        def join_host(self, ip, port=20298, player = None):
             """
             Attempt to join host at the specified ip address
             :param ip: IP address
@@ -142,7 +142,7 @@ class Networking:
             try:
                 print(f"Attempting to connect to host at {ip}:{port}")
                 self.client.connect(ip, port)
-                self.client.send(event)
+                self.client.send(JoinEvent(player))
                 return True
             except MastermindErrorClient as e:
                 logger.error(f"Error connecting to server at: {ip}:{port}")
@@ -207,13 +207,12 @@ class Networking:
             :return:
             """
             if self.client is not None:
-                print("Disconnecting client")
+                logger.info("Disconnecting client")
                 self.client.disconnect()
                 self.client.__del__()
-                self.client = None
-
+                # self.client = None
             if self.host is not None:
-                print("Disconnecting host")
+                logger.info("Disconnecting host")
                 # Kill the broadcast
                 self.stop_broadcast.set()
 
@@ -322,6 +321,10 @@ class Networking:
             # Assign a new connection object to the address (as a key value pair)
             self.client_list[connection_object.address[0]] = connection_object
 
+            # inform the event queue that a client is connected, with the respective client id
+            # event = pygame.event.Event(CustomEvents.CLIENT_CONNECTED, {'client_id': client_id})
+            # pygame.event.post(event)
+
             # Check if connected client exceeds limit
             if len(self.client_list) >= 6:
                 print("Limit reached, stop accepting connections")
@@ -365,8 +368,9 @@ class Networking:
             print(f"Client at {connection_object.address} sent a message: {data}")
             if isinstance(data, ActionEvent):
                 if isinstance(data, JoinEvent):
-                    data.execute(Networking.get_instance().game)
-                Networking.get_instance().send_to_all_client(data)
+                    Networking.get_instance().game.add_player(data.player)
+                    Networking.get_instance().send_to_all_client(Networking.get_instance().game)
+                data.execute()
             return super(MastermindServerUDP, self).callback_client_handle(connection_object, data)
 
         def callback_client_send(self, connection_object, data, compression=None):
@@ -427,9 +431,8 @@ class Networking:
                     try:
                         _server_reply = self.receive(False)
                         if _server_reply:
-                            print(f"Received: {_server_reply['class']} data.")
-                            self.callback_client_receive(_server_reply)
                             self._reply_queue.append(_server_reply)
+                            print(f"Received: {_server_reply}")
                     except OSError as e:
                         print(f"Error receiving data: {e}")
 
@@ -464,6 +467,7 @@ class Networking:
             else:
                 self._pause_blk_signal.clear()
 
+<<<<<<< HEAD
         def callback_client_receive(self, event):
             """Handle messages from server."""
             data = JSONSerializer.deserialize(event)
@@ -476,6 +480,8 @@ class Networking:
             else:
                 print("Not an action event")
 
+=======
+>>>>>>> parent of dd53b52... join event
         def callback_disconnect(self):
             """
             Define callback here when client's connection to host is interrupted.
