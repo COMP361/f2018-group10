@@ -153,7 +153,7 @@ class SceneManager(object):
 
         try:
             Networking.get_instance().join_host(ip_addr, event=JoinEvent(self._current_player))
-            reply = Networking.wait_for_reply(timeout=10)
+            reply = Networking.wait_for_reply()
             if reply:
                 self._game = Networking.get_instance().game
                 self.next(LobbyScene, self._current_player, self._game)
