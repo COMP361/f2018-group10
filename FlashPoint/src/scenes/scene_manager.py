@@ -1,4 +1,5 @@
 import time
+import os
 from typing import Optional
 
 import pygame
@@ -200,6 +201,9 @@ class SceneManager(object):
     # ------------ Stuff for profiles and start scene ------------ #
 
     def update_profiles(self):
+        if not os.path.exists(self.profiles):
+            with open(self.profiles, mode="w+", encoding='utf-8') as myFile:
+                myFile.write("[]")
         with open(self.profiles, mode='r', encoding='utf-8') as myFile:
             temp = json.load(myFile)
             for i, user in enumerate(temp):

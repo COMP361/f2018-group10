@@ -229,7 +229,9 @@ class Networking:
             """
             if self.client is not None:
                 try:
+                    self.client.toggle_block_signal(True)
                     self.client.send(data, compress)
+                    self.client.toggle_block_signal(False)
                 except MastermindErrorSocket as e:
                     raise MastermindErrorSocket(e)
             else:
@@ -363,11 +365,14 @@ class Networking:
     class Client(MastermindClientUDP):
         _pause_receive = threading.Event()
         _stop_receive = threading.Event()
+        _pause_blk_signal = threading.Event()
         _reply_queue = []
 
         def connect(self, ip, port):
             super(MastermindClientUDP, self).connect(ip, port)
+            signaler = threading.Thread(target=self.send_blocking_signal)
             receiver = threading.Thread(target=self.receive_data_from_server)
+            signaler.start()
             receiver.start()
 
         def send(self, data: ActionEvent, compression=None):
@@ -413,4 +418,12 @@ class Networking:
             Informs the host of the client's existence, so that it doesn't get disconnected automatically
             :return:
             """
-            pass
+            while True:
+                if not self._pause_blk_signal.is_set():
+                    self.send(None)
+
+        def toggle_block_signal(self, toggle: bool):
+            if toggle:
+                self._pause_blk_signal.set()
+            else:
+                self._pause_blk_signal.clear()
