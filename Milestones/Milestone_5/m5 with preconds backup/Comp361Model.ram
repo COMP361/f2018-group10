@@ -561,6 +561,45 @@
     </compositions>
     <reuse href="Comp361Model.core#_enketi1cEemmrLhzu9MNAA"/>
   </modelReuses>
+  <modelReuses xmi:id="_I4rpMC2EEemYLe4JBaJ7Rg">
+    <compositions xsi:type="ram:Instantiation" xmi:id="_I4rpMS2EEemYLe4JBaJ7Rg">
+      <source xsi:type="ram:Aspect" href="Reused_Association/Woven_Association_ArrayList_Association_Many_Ordered_Plain.ram#_I4likC2EEemYLe4JBaJ7Rg"/>
+      <mappings xsi:type="ram:ClassifierMapping" xmi:id="_I4rpMi2EEemYLe4JBaJ7Rg" to="_O6LtECisEemv96XjJ-jb1g">
+        <from xsi:type="ram:Class" href="Reused_Association/Woven_Association_ArrayList_Association_Many_Ordered_Plain.ram#_I4liky2EEemYLe4JBaJ7Rg"/>
+      </mappings>
+      <mappings xsi:type="ram:ClassifierMapping" xmi:id="_I4rpMy2EEemYLe4JBaJ7Rg" to="_MWOnOB5nEemeM9N8T5uUdA">
+        <from xsi:type="ram:Class" href="Reused_Association/Woven_Association_ArrayList_Association_Many_Ordered_Plain.ram#_I4liqS2EEemYLe4JBaJ7Rg"/>
+        <operationMappings xmi:id="_I4rpNC2EEemYLe4JBaJ7Rg" to="_I4whsC2EEemYLe4JBaJ7Rg">
+          <from xsi:type="ram:Operation" href="Reused_Association/Woven_Association_ArrayList_Association_Many_Ordered_Plain.ram#_I4liqi2EEemYLe4JBaJ7Rg"/>
+        </operationMappings>
+        <operationMappings xmi:id="_I4rpNS2EEemYLe4JBaJ7Rg" to="_I40MEC2EEemYLe4JBaJ7Rg">
+          <from xsi:type="ram:Operation" href="Reused_Association/Woven_Association_ArrayList_Association_Many_Ordered_Plain.ram#_I4lirS2EEemYLe4JBaJ7Rg"/>
+        </operationMappings>
+        <operationMappings xmi:id="_I4rpNi2EEemYLe4JBaJ7Rg" to="_I42oUC2EEemYLe4JBaJ7Rg">
+          <from xsi:type="ram:Operation" href="Reused_Association/Woven_Association_ArrayList_Association_Many_Ordered_Plain.ram#_I4liry2EEemYLe4JBaJ7Rg"/>
+        </operationMappings>
+        <operationMappings xmi:id="_I4rpNy2EEemYLe4JBaJ7Rg" to="_I46SsC2EEemYLe4JBaJ7Rg">
+          <from xsi:type="ram:Operation" href="Reused_Association/Woven_Association_ArrayList_Association_Many_Ordered_Plain.ram#_I4lisS2EEemYLe4JBaJ7Rg"/>
+        </operationMappings>
+        <operationMappings xmi:id="_I4rpOC2EEemYLe4JBaJ7Rg" to="_I499EC2EEemYLe4JBaJ7Rg">
+          <from xsi:type="ram:Operation" href="Reused_Association/Woven_Association_ArrayList_Association_Many_Ordered_Plain.ram#_I4lisy2EEemYLe4JBaJ7Rg"/>
+        </operationMappings>
+        <operationMappings xmi:id="_I4rpOS2EEemYLe4JBaJ7Rg" to="_I5BAYC2EEemYLe4JBaJ7Rg">
+          <from xsi:type="ram:Operation" href="Reused_Association/Woven_Association_ArrayList_Association_Many_Ordered_Plain.ram#_I4litS2EEemYLe4JBaJ7Rg"/>
+        </operationMappings>
+        <operationMappings xmi:id="_I4rpOi2EEemYLe4JBaJ7Rg" to="_I5EDsC2EEemYLe4JBaJ7Rg">
+          <from xsi:type="ram:Operation" href="Reused_Association/Woven_Association_ArrayList_Association_Many_Ordered_Plain.ram#_I4liti2EEemYLe4JBaJ7Rg"/>
+        </operationMappings>
+        <operationMappings xmi:id="_I4rpOy2EEemYLe4JBaJ7Rg" to="_I5HHAC2EEemYLe4JBaJ7Rg">
+          <from xsi:type="ram:Operation" href="Reused_Association/Woven_Association_ArrayList_Association_Many_Ordered_Plain.ram#_I4liuC2EEemYLe4JBaJ7Rg"/>
+        </operationMappings>
+        <operationMappings xmi:id="_I4rpPC2EEemYLe4JBaJ7Rg" to="_I5I8MC2EEemYLe4JBaJ7Rg">
+          <from xsi:type="ram:Operation" href="Reused_Association/Woven_Association_ArrayList_Association_Many_Ordered_Plain.ram#_I4liuS2EEemYLe4JBaJ7Rg"/>
+        </operationMappings>
+      </mappings>
+    </compositions>
+    <reuse href="Comp361Model.core#_I4rpPS2EEemYLe4JBaJ7Rg"/>
+  </modelReuses>
   <realizes href="Comp361Model.core#_QfnwYB5lEemeM9N8T5uUdA"/>
   <coreConcern href="Comp361Model.core#_QfnJUB5lEemeM9N8T5uUdA"/>
   <structuralView xmi:id="_MWOnNx5nEemeM9N8T5uUdA">
@@ -688,13 +727,38 @@
       <operations xmi:id="_MmB_UC1xEemiUZqc_Em2JA" name="getMyWallAt" visibility="public" returnType="_Q9HyMCjNEem84tPEJGtMMw">
         <parameters xmi:id="_MmB_US1xEemiUZqc_Em2JA" name="direction" type="_QdtHwCjMEem84tPEJGtMMw"/>
       </operations>
+      <operations xmi:id="_I4whsC2EEemYLe4JBaJ7Rg" name="addMyPOIsAt" extendedVisibility="package" returnType="_MWOnSB5nEemeM9N8T5uUdA">
+        <parameters xmi:id="_I4whsS2EEemYLe4JBaJ7Rg" name="index" type="_MWOnSR5nEemeM9N8T5uUdA"/>
+        <parameters xmi:id="_I4whsi2EEemYLe4JBaJ7Rg" name="a" type="_O6LtECisEemv96XjJ-jb1g"/>
+      </operations>
+      <operations xmi:id="_I40MEC2EEemYLe4JBaJ7Rg" name="removeMyPOIsAt" extendedVisibility="package" returnType="_MWOnSB5nEemeM9N8T5uUdA">
+        <parameters xmi:id="_I40MES2EEemYLe4JBaJ7Rg" name="index" type="_MWOnSR5nEemeM9N8T5uUdA"/>
+      </operations>
+      <operations xmi:id="_I42oUC2EEemYLe4JBaJ7Rg" name="getMyPOIsAt" extendedVisibility="package" returnType="_O6LtECisEemv96XjJ-jb1g">
+        <parameters xmi:id="_I42oUS2EEemYLe4JBaJ7Rg" name="index" type="_MWOnSR5nEemeM9N8T5uUdA"/>
+      </operations>
+      <operations xmi:id="_I46SsC2EEemYLe4JBaJ7Rg" name="addMyPOIs" extendedVisibility="package" returnType="_MWOnSB5nEemeM9N8T5uUdA">
+        <parameters xmi:id="_I46SsS2EEemYLe4JBaJ7Rg" name="a" type="_O6LtECisEemv96XjJ-jb1g"/>
+      </operations>
+      <operations xmi:id="_I499EC2EEemYLe4JBaJ7Rg" name="removeMyPOIs" extendedVisibility="package" returnType="_MWOnSB5nEemeM9N8T5uUdA">
+        <parameters xmi:id="_I499ES2EEemYLe4JBaJ7Rg" name="a" type="_O6LtECisEemv96XjJ-jb1g"/>
+      </operations>
+      <operations xmi:id="_I5BAYC2EEemYLe4JBaJ7Rg" name="createMyPOIs" extendedVisibility="package" returnType="_MWOnOB5nEemeM9N8T5uUdA" operationType="Constructor"/>
+      <operations xmi:id="_I5EDsC2EEemYLe4JBaJ7Rg" name="containsMyPOIs" extendedVisibility="package" returnType="_MWOnSB5nEemeM9N8T5uUdA">
+        <parameters xmi:id="_I5EDsS2EEemYLe4JBaJ7Rg" name="a" type="_O6LtECisEemv96XjJ-jb1g"/>
+      </operations>
+      <operations xmi:id="_I5HHAC2EEemYLe4JBaJ7Rg" name="sizeOfMyPOIs" extendedVisibility="package" returnType="_MWOnSR5nEemeM9N8T5uUdA"/>
+      <operations xmi:id="_I5I8MC2EEemYLe4JBaJ7Rg" name="getMyPOIs" extendedVisibility="package">
+        <returnType xsi:type="ram:ImplementationClass" href="Reused_Association/Woven_Association_ArrayList_Association_Many_Ordered_Plain.ram#_I4lilS2EEemYLe4JBaJ7Rg"/>
+      </operations>
       <associationEnds xmi:id="_H7mf4CNSEemCAtWRG5rP9Q" name="occupiedBy" upperBound="-1" assoc="_H7nG8CNSEemCAtWRG5rP9Q" featureSelection="_jTclUCNTEemCAtWRG5rP9Q"/>
-      <associationEnds xmi:id="_NNHc0CNSEemCAtWRG5rP9Q" name="partOfGame" lowerBound="1" assoc="_NNHc0SNSEemCAtWRG5rP9Q" featureSelection="_I-JFgCNTEemCAtWRG5rP9Q"/>
+      <associationEnds xmi:id="_NNHc0CNSEemCAtWRG5rP9Q" name="partOfGame" lowerBound="1" referenceType="Aggregation" assoc="_NNHc0SNSEemCAtWRG5rP9Q" featureSelection="_I-JFgCNTEemCAtWRG5rP9Q"/>
       <associationEnds xmi:id="_AD-HsSllEemPIspg911f1Q" name="myEdgeObstacle" lowerBound="1" navigable="false" assoc="_AD-uwCllEemPIspg911f1Q"/>
       <associationEnds xmi:id="_a8NOESloEemFVNgMy9kVOg" name="ParkingSpots" lowerBound="4" upperBound="4" assoc="_a8N1ICloEemFVNgMy9kVOg" featureSelection="_3BoDkCx8EemQGaBpXYdn3A"/>
       <associationEnds xmi:id="_V2MO4Cx7EemQGaBpXYdn3A" name="myVictim" lowerBound="1" navigable="false" assoc="_V2NdACx7EemQGaBpXYdn3A"/>
       <associationEnds xmi:id="_RHLTUCyBEemA2_L8Yo8xgA" name="myDoors" lowerBound="1" upperBound="-1" assoc="_RHLTUiyBEemA2_L8Yo8xgA" featureSelection="_gv1DMCyBEemA2_L8Yo8xgA"/>
       <associationEnds xmi:id="_V2OcYCyBEemA2_L8Yo8xgA" name="myWalls" lowerBound="1" upperBound="-1" assoc="_V2OcYiyBEemA2_L8Yo8xgA" featureSelection="_iV1-xiyBEemA2_L8Yo8xgA"/>
+      <associationEnds xmi:id="_FemvAC2EEemYLe4JBaJ7Rg" name="myPOIs" upperBound="-1" assoc="_Fen9IS2EEemYLe4JBaJ7Rg" featureSelection="_I4rpMC2EEemYLe4JBaJ7Rg"/>
       <attributes xmi:id="_MWOnPR5nEemeM9N8T5uUdA" name="state" type="_aEB3ICNNEemCAtWRG5rP9Q"/>
       <attributes xmi:id="_gvIq8CNSEemCAtWRG5rP9Q" name="kind" type="_ao-lACNSEemCAtWRG5rP9Q"/>
       <attributes xmi:id="_qJWioCNSEemCAtWRG5rP9Q" name="xPos" type="_MWOnSR5nEemeM9N8T5uUdA"/>
@@ -959,6 +1023,9 @@
       <operations xmi:id="_latmcC1cEemmrLhzu9MNAA" name="isCarryingVictim" visibility="public" returnType="_MWOnSB5nEemeM9N8T5uUdA"/>
       <operations xmi:id="_iHiJAC1dEemmrLhzu9MNAA" name="getVIctim" visibility="public" returnType="_WJ7OAClsEemUR9vKY_VSOQ"/>
       <operations xmi:id="_WmBiwC1fEem6sbXLGnVMJQ" name="getLocatedAt" visibility="public" returnType="_MWOnOB5nEemeM9N8T5uUdA"/>
+      <operations xmi:id="_CdKXQC2EEemYLe4JBaJ7Rg" name="setLocation" visibility="public" returnType="_MWOnRh5nEemeM9N8T5uUdA">
+        <parameters xmi:id="_CdKXQS2EEemYLe4JBaJ7Rg" name="s" type="_MWOnOB5nEemeM9N8T5uUdA"/>
+      </operations>
       <associationEnds xmi:id="_MNTcACjsEemYHtkLMHSkLw" name="myTurnEvent" lowerBound="1" navigable="false" assoc="_MNTcASjsEemYHtkLMHSkLw"/>
       <associationEnds xmi:id="_T200oCx6EemSH9MuIxM8Mw" name="myGame" lowerBound="1" navigable="false" assoc="_T21bsCx6EemSH9MuIxM8Mw"/>
       <associationEnds xmi:id="_bsoXkC1cEemmrLhzu9MNAA" name="carryingVictim" assoc="_bsoXki1cEemmrLhzu9MNAA" featureSelection="_enkesC1cEemmrLhzu9MNAA"/>
@@ -993,6 +1060,7 @@
       <operations xmi:id="_Eu5LgCixEemv96XjJ-jb1g" name="getStatus" visibility="public" returnType="_5cdN8CiwEemv96XjJ-jb1g"/>
       <associationEnds xmi:id="_-0RHgCitEemv96XjJ-jb1g" name="myGameUnit" lowerBound="1" assoc="_-0RHgiitEemv96XjJ-jb1g" featureSelection="_-0VY8CitEemv96XjJ-jb1g"/>
       <associationEnds xmi:id="_PPjcoSx8EemQGaBpXYdn3A" name="myGame" lowerBound="1" navigable="false" assoc="_PPkDsCx8EemQGaBpXYdn3A"/>
+      <associationEnds xmi:id="_Fen9IC2EEemYLe4JBaJ7Rg" name="mySpace" lowerBound="1" navigable="false" assoc="_Fen9IS2EEemYLe4JBaJ7Rg"/>
       <attributes xmi:id="_DaeWQCixEemv96XjJ-jb1g" name="status" type="_5cdN8CiwEemv96XjJ-jb1g"/>
     </classes>
     <classes xsi:type="ram:Class" xmi:id="_BtGD4CiwEemv96XjJ-jb1g" name="Time" dataType="true"/>
@@ -1191,6 +1259,7 @@
     <associations xmi:id="_RHLTUiyBEemA2_L8Yo8xgA" name="Space_Door" ends="_RHLTUCyBEemA2_L8Yo8xgA _RHLTUSyBEemA2_L8Yo8xgA"/>
     <associations xmi:id="_V2OcYiyBEemA2_L8Yo8xgA" name="Space_Wall" ends="_V2OcYCyBEemA2_L8Yo8xgA _V2OcYSyBEemA2_L8Yo8xgA"/>
     <associations xmi:id="_bsoXki1cEemmrLhzu9MNAA" name="Fireman_Victim" ends="_bsoXkC1cEemmrLhzu9MNAA _bsoXkS1cEemmrLhzu9MNAA"/>
+    <associations xmi:id="_Fen9IS2EEemYLe4JBaJ7Rg" name="Space_POI" ends="_FemvAC2EEemYLe4JBaJ7Rg _Fen9IC2EEemYLe4JBaJ7Rg"/>
     <types xsi:type="ram:RVoid" xmi:id="_MWOnRh5nEemeM9N8T5uUdA"/>
     <types xsi:type="ram:RAny" xmi:id="_MWOnRx5nEemeM9N8T5uUdA"/>
     <types xsi:type="ram:RBoolean" xmi:id="_MWOnSB5nEemeM9N8T5uUdA"/>
@@ -2478,9 +2547,18 @@
           <interactionConstraint xsi:type="ram:OpaqueExpression" xmi:id="_D4FH0i1dEemmrLhzu9MNAA" body="if state == SpaceStatus.Fire" language="java"/>
         </operands>
       </fragments>
+      <fragments xsi:type="ram:MessageOccurrenceSpecification" xmi:id="_QWUfcC2EEemYLe4JBaJ7Rg" covered="_ghBwJy1bEemmrLhzu9MNAA" message="_QWamEC2EEemYLe4JBaJ7Rg"/>
+      <fragments xsi:type="ram:MessageOccurrenceSpecification" xmi:id="_QWUfcS2EEemYLe4JBaJ7Rg" covered="_o7SxQC1cEemmrLhzu9MNAA" message="_QWamEC2EEemYLe4JBaJ7Rg"/>
+      <fragments xsi:type="ram:MessageOccurrenceSpecification" xmi:id="_XZJB8C2EEemYLe4JBaJ7Rg" covered="_ghBwJy1bEemmrLhzu9MNAA" message="_XZRk0C2EEemYLe4JBaJ7Rg"/>
+      <fragments xsi:type="ram:MessageOccurrenceSpecification" xmi:id="_XZJB8S2EEemYLe4JBaJ7Rg" covered="_ghBwJy1bEemmrLhzu9MNAA" message="_XZRk0C2EEemYLe4JBaJ7Rg"/>
+      <fragments xsi:type="ram:AssignmentStatement" xmi:id="_ZFLF8C2EEemYLe4JBaJ7Rg" covered="_ghBwJy1bEemmrLhzu9MNAA" assignTo="_NFyNgC1dEemmrLhzu9MNAA">
+        <value xsi:type="ram:OpaqueExpression" xmi:id="_ZFLF8S2EEemYLe4JBaJ7Rg" body="actionPoints - totalAPCost" language="java"/>
+      </fragments>
+      <fragments xsi:type="ram:MessageOccurrenceSpecification" xmi:id="_bhc7IC2EEemYLe4JBaJ7Rg" covered="_ghBwJy1bEemmrLhzu9MNAA" message="_bhglgC2EEemYLe4JBaJ7Rg"/>
+      <fragments xsi:type="ram:MessageOccurrenceSpecification" xmi:id="_bhc7IS2EEemYLe4JBaJ7Rg" covered="_o7SxQC1cEemmrLhzu9MNAA" message="_bhglgC2EEemYLe4JBaJ7Rg"/>
       <fragments xsi:type="ram:MessageOccurrenceSpecification" xmi:id="_ghBwJi1bEemmrLhzu9MNAA" covered="_ghBwJy1bEemmrLhzu9MNAA" message="_ghBwKS1bEemmrLhzu9MNAA"/>
-      <lifelines xmi:id="_ghBwJy1bEemmrLhzu9MNAA" represents="_ghBwKi1bEemmrLhzu9MNAA" coveredBy="_ghBwJS1bEemmrLhzu9MNAA _ghBwJi1bEemmrLhzu9MNAA _o7SxQy1cEemmrLhzu9MNAA _q7tw4C1cEemmrLhzu9MNAA _CURLsy1dEemmrLhzu9MNAA _D4FH0C1dEemmrLhzu9MNAA _MqeKgC1dEemmrLhzu9MNAA _N_990C1dEemmrLhzu9MNAA _QM028C1dEemmrLhzu9MNAA _k78xYC1dEemmrLhzu9MNAA _zoAWIy1dEemmrLhzu9MNAA _lK0eYC1eEemmrLhzu9MNAA _lK0eYS1eEemmrLhzu9MNAA _5H2YEC1fEem6sbXLGnVMJQ _-LfREC1fEem6sbXLGnVMJQ _-LfRES1fEem6sbXLGnVMJQ _IR2dEC1gEem6sbXLGnVMJQ _QMSkEC1gEem6sbXLGnVMJQ _X3DvAC1uEemiUZqc_Em2JA _qwONYC1uEemiUZqc_Em2JA _5H2aQC1uEemiUZqc_Em2JA _JGF_oC1vEemiUZqc_Em2JA _WvNgsC1vEemiUZqc_Em2JA _leexgC1vEemiUZqc_Em2JA _s1NugC1vEemiUZqc_Em2JA _6vT_8C1xEem_PpH3HPlw_w _Fi5eUC1yEem_PpH3HPlw_w _iVHFcC1yEem_PpH3HPlw_w _k4Ib0C1yEem_PpH3HPlw_w _sILiAC1yEem_PpH3HPlw_w _yYm-QC1yEem_PpH3HPlw_w _62tzAC1yEem_PpH3HPlw_w _Fg_kYC1zEem_PpH3HPlw_w _IcOmcC1zEem_PpH3HPlw_w _Pmd_kC1zEem_PpH3HPlw_w _Hn_3sC10Eem_PpH3HPlw_w _LJPJ0C10Eem_PpH3HPlw_w"/>
-      <lifelines xmi:id="_o7SxQC1cEemmrLhzu9MNAA" represents="_erP6QC1bEemmrLhzu9MNAA" coveredBy="_o7SxRC1cEemmrLhzu9MNAA _MqeKgS1dEemmrLhzu9MNAA _q7tw4C1cEemmrLhzu9MNAA _k78xYS1dEemmrLhzu9MNAA _5H2YES1fEem6sbXLGnVMJQ"/>
+      <lifelines xmi:id="_ghBwJy1bEemmrLhzu9MNAA" represents="_ghBwKi1bEemmrLhzu9MNAA" coveredBy="_ghBwJS1bEemmrLhzu9MNAA _ghBwJi1bEemmrLhzu9MNAA _o7SxQy1cEemmrLhzu9MNAA _q7tw4C1cEemmrLhzu9MNAA _CURLsy1dEemmrLhzu9MNAA _D4FH0C1dEemmrLhzu9MNAA _MqeKgC1dEemmrLhzu9MNAA _N_990C1dEemmrLhzu9MNAA _QM028C1dEemmrLhzu9MNAA _k78xYC1dEemmrLhzu9MNAA _zoAWIy1dEemmrLhzu9MNAA _lK0eYC1eEemmrLhzu9MNAA _lK0eYS1eEemmrLhzu9MNAA _5H2YEC1fEem6sbXLGnVMJQ _-LfREC1fEem6sbXLGnVMJQ _-LfRES1fEem6sbXLGnVMJQ _IR2dEC1gEem6sbXLGnVMJQ _QMSkEC1gEem6sbXLGnVMJQ _X3DvAC1uEemiUZqc_Em2JA _qwONYC1uEemiUZqc_Em2JA _5H2aQC1uEemiUZqc_Em2JA _JGF_oC1vEemiUZqc_Em2JA _WvNgsC1vEemiUZqc_Em2JA _leexgC1vEemiUZqc_Em2JA _s1NugC1vEemiUZqc_Em2JA _6vT_8C1xEem_PpH3HPlw_w _Fi5eUC1yEem_PpH3HPlw_w _iVHFcC1yEem_PpH3HPlw_w _k4Ib0C1yEem_PpH3HPlw_w _sILiAC1yEem_PpH3HPlw_w _yYm-QC1yEem_PpH3HPlw_w _62tzAC1yEem_PpH3HPlw_w _Fg_kYC1zEem_PpH3HPlw_w _IcOmcC1zEem_PpH3HPlw_w _Pmd_kC1zEem_PpH3HPlw_w _Hn_3sC10Eem_PpH3HPlw_w _LJPJ0C10Eem_PpH3HPlw_w _QWUfcC2EEemYLe4JBaJ7Rg _XZJB8C2EEemYLe4JBaJ7Rg _XZJB8S2EEemYLe4JBaJ7Rg _ZFLF8C2EEemYLe4JBaJ7Rg _bhc7IC2EEemYLe4JBaJ7Rg"/>
+      <lifelines xmi:id="_o7SxQC1cEemmrLhzu9MNAA" represents="_erP6QC1bEemmrLhzu9MNAA" coveredBy="_o7SxRC1cEemmrLhzu9MNAA _MqeKgS1dEemmrLhzu9MNAA _q7tw4C1cEemmrLhzu9MNAA _k78xYS1dEemmrLhzu9MNAA _5H2YES1fEem6sbXLGnVMJQ _QWUfcS2EEemYLe4JBaJ7Rg _bhc7IS2EEemYLe4JBaJ7Rg"/>
       <lifelines xmi:id="_CURLsC1dEemmrLhzu9MNAA" represents="_yvdnISjUEemF8fZ66Ie-7g" coveredBy="_CURLtC1dEemmrLhzu9MNAA _IR2dES1gEem6sbXLGnVMJQ _QMSkES1gEem6sbXLGnVMJQ"/>
       <lifelines xmi:id="_zoAWIC1dEemmrLhzu9MNAA" represents="_ll67cC1dEemmrLhzu9MNAA" coveredBy="_q7tw4C1cEemmrLhzu9MNAA _zoAWJC1dEemmrLhzu9MNAA"/>
       <lifelines xmi:id="_Fiw7cC1yEem_PpH3HPlw_w" represents="_7BpyUC1fEem6sbXLGnVMJQ" coveredBy="_6vT_8C1xEem_PpH3HPlw_w _Fi5eUS1yEem_PpH3HPlw_w _yYm-QC1yEem_PpH3HPlw_w _62tzAS1yEem_PpH3HPlw_w"/>
@@ -2501,6 +2579,7 @@
         <localProperties xsi:type="ram:Attribute" xmi:id="_i4Hr4C1yEem_PpH3HPlw_w" name="doorStatus" type="_K0WIACjLEem84tPEJGtMMw"/>
         <localProperties xsi:type="ram:Reference" xmi:id="_8c4fkC1yEem_PpH3HPlw_w" name="adjacentWall" lowerBound="1" type="_Q9HyMCjNEem84tPEJGtMMw"/>
         <localProperties xsi:type="ram:Attribute" xmi:id="_F7oR8C1zEem_PpH3HPlw_w" name="wallStatus" type="_UiWeYCjLEem84tPEJGtMMw"/>
+        <localProperties xsi:type="ram:Attribute" xmi:id="_X8UngC2EEemYLe4JBaJ7Rg" name="totalAPCost" type="_MWOnSR5nEemeM9N8T5uUdA"/>
       </messages>
       <messages xmi:id="_ghBwKS1bEemmrLhzu9MNAA" sendEvent="_ghBwJi1bEemmrLhzu9MNAA" receiveEvent="_ghBwLC1bEemmrLhzu9MNAA" signature="_yvdnICjUEemF8fZ66Ie-7g" messageSort="reply"/>
       <messages xmi:id="_o7SxRS1cEemmrLhzu9MNAA" sendEvent="_o7SxQy1cEemmrLhzu9MNAA" receiveEvent="_o7SxRC1cEemmrLhzu9MNAA" signature="_latmcC1cEemmrLhzu9MNAA" assignTo="_pSLAMC1cEemmrLhzu9MNAA"/>
@@ -2547,6 +2626,19 @@
         </arguments>
       </messages>
       <messages xmi:id="_FhAygC1zEem_PpH3HPlw_w" sendEvent="_Fg_kYC1zEem_PpH3HPlw_w" receiveEvent="_Fg_kYS1zEem_PpH3HPlw_w" signature="_3FzBwC1UEem_c5hIeweFXA" assignTo="_F7oR8C1zEem_PpH3HPlw_w"/>
+      <messages xmi:id="_QWamEC2EEemYLe4JBaJ7Rg" sendEvent="_QWUfcC2EEemYLe4JBaJ7Rg" receiveEvent="_QWUfcS2EEemYLe4JBaJ7Rg" signature="_CdKXQC2EEemYLe4JBaJ7Rg">
+        <arguments xmi:id="_QWamES2EEemYLe4JBaJ7Rg" parameter="_CdKXQS2EEemYLe4JBaJ7Rg">
+          <value xsi:type="ram:ParameterValue" xmi:id="_RK5-EC2EEemYLe4JBaJ7Rg" parameter="_yvdnISjUEemF8fZ66Ie-7g"/>
+        </arguments>
+      </messages>
+      <messages xmi:id="_XZRk0C2EEemYLe4JBaJ7Rg" sendEvent="_XZJB8C2EEemYLe4JBaJ7Rg" receiveEvent="_XZJB8S2EEemYLe4JBaJ7Rg" signature="_7r8Z8CjUEemF8fZ66Ie-7g" assignTo="_X8UngC2EEemYLe4JBaJ7Rg">
+        <arguments xmi:id="_XZRk0S2EEemYLe4JBaJ7Rg" parameter="_7r8Z8SjUEemF8fZ66Ie-7g"/>
+      </messages>
+      <messages xmi:id="_bhglgC2EEemYLe4JBaJ7Rg" sendEvent="_bhc7IC2EEemYLe4JBaJ7Rg" receiveEvent="_bhc7IS2EEemYLe4JBaJ7Rg" signature="_gopFUCjMEem84tPEJGtMMw">
+        <arguments xmi:id="_bhglgS2EEemYLe4JBaJ7Rg" parameter="_gopFUSjMEem84tPEJGtMMw">
+          <value xsi:type="ram:StructuralFeatureValue" xmi:id="_b02YQC2EEemYLe4JBaJ7Rg" value="_NFyNgC1dEemmrLhzu9MNAA"/>
+        </arguments>
+      </messages>
       <properties xmi:id="_ghBwKi1bEemmrLhzu9MNAA" name="target" lowerBound="1" type="_ncPUUCixEemv96XjJ-jb1g"/>
       <formalGates xmi:id="_ghBwKy1bEemmrLhzu9MNAA" message="_ghBwKC1bEemmrLhzu9MNAA" name="in_move"/>
       <formalGates xmi:id="_ghBwLC1bEemmrLhzu9MNAA" message="_ghBwKS1bEemmrLhzu9MNAA" name="out_move"/>
