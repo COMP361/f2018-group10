@@ -223,7 +223,7 @@ class Networking:
                 self.host.disconnect_clients()
                 self.host.disconnect()
                 self.host.__del__()
-                # self.host = None
+                self.host = None
 
         # If game is started, stops new client from connecting
         def start_game(self):
@@ -383,10 +383,12 @@ class Networking:
             pass
 
     class Client(MastermindClientUDP):
-        _pause_receive = threading.Event()
-        _stop_receive = threading.Event()
-        _pause_blk_signal = threading.Event()
-        _reply_queue = []
+        def __init__(self, timeout_connect=None, timeout_receive=None):
+            super(MastermindClientUDP, self).__init__(MM_UDP, timeout_connect, timeout_receive)
+            self._pause_receive = threading.Event()
+            self._stop_receive = threading.Event()
+            self._pause_blk_signal = threading.Event()
+            self._reply_queue = []
 
         def connect(self, ip, port):
             super(MastermindClientUDP, self).connect(ip, port)
@@ -426,7 +428,10 @@ class Networking:
                         print(f"Error receiving data: {e}")
 
         def disconnect(self):
+            self._pause_blk_signal.set()
+            self._pause_receive.set()
             self._stop_receive.set()
+            time.sleep(0.5)
             return super(MastermindClientUDP, self).disconnect()
 
         def get_server_reply(self):
@@ -445,7 +450,7 @@ class Networking:
             while not self._stop_receive.is_set():
                 if not self._pause_blk_signal.is_set():
                     self.send(DummyEvent())
-                    time.sleep(1)
+                    time.sleep(2)
 
         def toggle_block_signal(self, toggle: bool):
             if toggle:
