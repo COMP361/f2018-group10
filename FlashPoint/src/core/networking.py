@@ -352,6 +352,9 @@ class Networking:
             :param data: Data received from the connection
             :return:
             """
+            if isinstance(data, DummyEvent):
+                return
+
             if connection_object.address[0] == "127.0.0.1":
                 return
 
@@ -445,6 +448,7 @@ class Networking:
             while not self._stop_receive.is_set():
                 if not self._pause_blk_signal.is_set():
                     self.send(DummyEvent())
+                    time.sleep(1)
 
         def toggle_block_signal(self, toggle: bool):
             if toggle:
