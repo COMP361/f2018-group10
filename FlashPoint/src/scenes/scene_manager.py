@@ -4,10 +4,9 @@ from typing import Optional
 
 import pygame
 import json
-import threading
 
 import src.constants.CustomEvents as CustomEvents
-from action_events.join_event import JoinEvent
+from src.action_events.join_event import JoinEvent
 from src.constants.state_enums import GameKindEnum
 from src.core.serializer import JSONSerializer
 from src.models.game_state_model import GameStateModel
@@ -153,7 +152,7 @@ class SceneManager(object):
 
         try:
             Networking.get_instance().join_host(ip_addr, event=JoinEvent(self._current_player))
-            reply = Networking.wait_for_reply(timeout=10)
+            reply = Networking.wait_for_reply(timeout=2)
             if reply:
                 game = Networking.get_instance().game
                 i = 0
@@ -161,6 +160,7 @@ class SceneManager(object):
                     game = Networking.get_instance().game
                     time.sleep(0.01)
                     i += 0.01
+                self._game = game
                 self.next(LobbyScene, self._current_player, self._game)
             else:
                 raise ConnectionError
