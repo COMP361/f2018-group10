@@ -352,13 +352,13 @@ class Networking:
             :param data: Data received from the connection
             :return:
             """
-            if isinstance(data, DummyEvent):
-                return
-
             if connection_object.address[0] == "127.0.0.1":
                 return
 
             data = JSONSerializer.deserialize(data)
+            # If it's a dummy event, don't do anything
+            if isinstance(data, DummyEvent):
+                return
             print(f"Client at {connection_object.address} sent a message: {data}")
             if isinstance(data, ActionEvent):
                 if isinstance(data, JoinEvent):
