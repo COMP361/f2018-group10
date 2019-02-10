@@ -305,19 +305,19 @@ class Networking:
 
             return super(MastermindServerUDP, self).callback_connect_client(connection_object)
 
-        def callback_disconnect(self):
+        def callback_disconnect_client(self, connection_object):
             """
-            Called when the server disconnects (i.e., when .disconnect(...) is called). This method can be overridden
-            to provide useful information. It's good practice to call
-            "return super(MastermindServerTCP,self).callback_disconnect()" at the end of your override.
+            Called when a client disconnects. This method can be overridden to provide useful information. It's good
+            practice to call "return super(MastermindServerTCP,self).callback_disconnect_client(connection_object)" at
+            the end of your override.
+            :param connection_object: Represents the appropriate connection
             :return:
             """
             # Pops the client's connection object
             game = Networking.get_instance().game
-            players = [x for x in game.players]
-            if players:
-                for player in players:
-                    game.remove_player(player)
+            player = [x for x in game.players if x.ip == connection_object.address[0]]
+            if player:
+                game.remove_player(player)
             return super(MastermindServerUDP, self).callback_disconnect()
 
         def callback_client_handle(self, connection_object, data):
