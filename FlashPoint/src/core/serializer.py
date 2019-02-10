@@ -2,6 +2,7 @@ import enum
 import json
 from typing import Dict
 
+from action_events.dummy_event import DummyEvent
 from src.action_events.join_event import JoinEvent
 from src.constants.state_enums import DifficultyLevelEnum, GameKindEnum, PlayerStatusEnum
 from src.models.game_state_model import GameStateModel
@@ -72,6 +73,8 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_game_state(payload)
         elif object_type == JoinEvent.__name__:
             return JSONSerializer._deserialize_join_event(payload)
+        elif object_type == DummyEvent.__name__:
+            return DummyEvent()
 
         print("WARNING: Could not deserialize object, not of recognized type.")
 
