@@ -211,10 +211,7 @@ class Networking:
                 self.client.disconnect()
                 self.client.__del__()
                 self.client = None
-<<<<<<< HEAD
 
-=======
->>>>>>> parent of cb09751... Update networking.py
             if self.host is not None:
                 print("Disconnecting host")
                 # Kill the broadcast
@@ -342,16 +339,10 @@ class Networking:
             # Pops the client's connection object
             game = Networking.get_instance().game
             if game:
-<<<<<<< HEAD
                 players = [x for x in game.players if x.ip == connection_object.address[0]]
                 if players:
                     game.remove_player(players[0])
                     self.client_list.pop(connection_object.address[0])
-=======
-                player = [x for x in game.players if x.ip == connection_object.address[0]]
-                if player:
-                    game.remove_player(player)
->>>>>>> parent of cb09751... Update networking.py
             return super(MastermindServerUDP, self).callback_disconnect()
 
         def callback_client_handle(self, connection_object, data):
