@@ -170,7 +170,7 @@ class SceneManager(object):
             reply = Networking.wait_for_reply()
             if reply:
                 self._game = JSONSerializer.deserialize(reply)
-                self._network_poller.start()
+                # self._network_poller.start()
                 self.next(LobbyScene, self._current_player, self._game)
             else:
                 raise ConnectionError
