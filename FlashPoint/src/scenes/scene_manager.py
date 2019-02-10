@@ -7,6 +7,7 @@ import json
 import threading
 
 import src.constants.CustomEvents as CustomEvents
+from action_events.join_event import JoinEvent
 from src.constants.state_enums import GameKindEnum
 from src.core.serializer import JSONSerializer
 from src.models.game_state_model import GameStateModel
@@ -40,24 +41,9 @@ class SceneManager(object):
         self._active_scene = StartScene(self.screen)
         self._current_player = None
         self._game = None
-        self._network_poller = threading.Thread(target=self._poll_network)
+        # self._network_poller = threading.Thread(target=self._poll_network)
         self._active_scene.buttonRegister.on_click(self.create_profile, self._active_scene.text_bar1)
         self.update_profiles()
-
-    def _poll_network(self, timeout=0) -> bool:
-        while True:
-            while not Networking.get_instance().client:
-                time.sleep(0.0001)
-
-            reply = Networking.get_instance().client.get_server_reply()
-            if not reply:
-                time.sleep(0.0001)
-                continue
-
-            server_response = JSONSerializer.deserialize(reply)
-
-            if isinstance(server_response, GameStateModel):
-                self._game = server_response
 
     def next(self, next_scene: callable, *args):
         """Switch to the next logical scene. args is assumed to be: [SceneClass]
@@ -166,11 +152,10 @@ class SceneManager(object):
             is_join_scene = False
 
         try:
-            Networking.get_instance().join_host(ip_addr, player=self._current_player)
-            reply = Networking.wait_for_reply()
+            Networking.get_instance().join_host(ip_addr, event=JoinEvent(self._current_player))
+            reply = Networking.wait_for_reply(timeout=10)
             if reply:
-                self._game = JSONSerializer.deserialize(reply)
-                # self._network_poller.start()
+                self._game = Networking.get_instance().game
                 self.next(LobbyScene, self._current_player, self._game)
             else:
                 raise ConnectionError

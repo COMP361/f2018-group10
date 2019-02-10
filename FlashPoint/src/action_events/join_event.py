@@ -8,5 +8,5 @@ class JoinEvent(ActionEvent):
         super().__init__()
         self.player = player
 
-    def execute(self):
-        pass
+    def execute(self, game):
+        game.add_player(self.player)
