@@ -305,6 +305,11 @@ class Networking:
             else:
                 raise Networking.Host.ClientNotFoundException
 
+        def kick_client(self, ip_addr: str):
+            key = self.lookup_client(ip_addr)
+            if key:
+                self.client_list.pop(key)
+
         def callback_connect_client(self, connection_object):
             """
             Called when a new client connects. This method can be overridden to provide useful information. It's good
@@ -337,6 +342,7 @@ class Networking:
                 players = [x for x in game.players if x.ip == connection_object.address[0]]
                 if players:
                     game.remove_player(players[0])
+                    self.client_list.pop(connection_object.address[0])
             return super(MastermindServerUDP, self).callback_disconnect()
 
         def callback_client_handle(self, connection_object, data):
@@ -461,9 +467,10 @@ class Networking:
         def callback_client_receive(self, event):
             """Handle messages from server."""
             data = JSONSerializer.deserialize(event)
-
+            print("Received")
             if isinstance(data, ActionEvent):
                 if isinstance(data, JoinEvent):
+                    print("execute")
                     data.execute(Networking.get_instance().game)
 
             else:
