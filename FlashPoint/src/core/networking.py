@@ -465,7 +465,7 @@ class Networking:
             if isinstance(data, ActionEvent):
                 if isinstance(data, JoinEvent):
                     data.execute(Networking.get_instance().game)
-                
+
             else:
                 print("Not an action event")
 
