@@ -166,23 +166,11 @@ class SceneManager(object):
             is_join_scene = False
 
         try:
-<<<<<<< HEAD
-            Networking.get_instance().join_host(ip_addr, event=JoinEvent(self._current_player))
-            reply = Networking.wait_for_reply()
-            if reply:
-                game = Networking.get_instance().game
-                i = 0
-                while not game and i < 5:
-                    game = Networking.get_instance().game
-                    time.sleep(0.01)
-                    i += 0.01
-=======
             Networking.get_instance().join_host(ip_addr, player=self._current_player)
             reply = Networking.wait_for_reply()
             if reply:
                 self._game = JSONSerializer.deserialize(reply)
-                self._network_poller.start()
->>>>>>> parent of dd53b52... join event
+                # self._network_poller.start()
                 self.next(LobbyScene, self._current_player, self._game)
             else:
                 raise ConnectionError

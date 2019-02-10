@@ -467,21 +467,6 @@ class Networking:
             else:
                 self._pause_blk_signal.clear()
 
-<<<<<<< HEAD
-        def callback_client_receive(self, event):
-            """Handle messages from server."""
-            data = JSONSerializer.deserialize(event)
-            print("Received")
-            if isinstance(data, ActionEvent):
-                if isinstance(data, JoinEvent):
-                    print("execute")
-                    data.execute(Networking.get_instance().game)
-
-            else:
-                print("Not an action event")
-
-=======
->>>>>>> parent of dd53b52... join event
         def callback_disconnect(self):
             """
             Define callback here when client's connection to host is interrupted.
