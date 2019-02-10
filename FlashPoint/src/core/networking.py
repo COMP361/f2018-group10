@@ -2,6 +2,7 @@ import ipaddress
 import socket
 import threading
 import logging
+import time
 
 from src.core.serializer import JSONSerializer
 from src.action_events.action_event import ActionEvent
@@ -26,6 +27,22 @@ class Networking:
     Class that stores networking info like host and client. This class follows a Singleton design pattern.
     """
     __instance = None
+
+    @staticmethod
+    def wait_for_reply(timeout=5):
+        """
+        Wait for a reply from the host before continuing with a timeout (in seconds).
+        Returns false for failed attempt, true for success.
+        """
+        i = 0
+        reply = Networking.get_instance().client.get_server_reply()
+        while not reply:
+            reply = Networking.get_instance().client.get_server_reply()
+            time.sleep(1)
+            i += 1
+            if i > timeout:
+                raise ConnectionError
+        return reply
 
     @staticmethod
     def get_instance():
@@ -123,7 +140,6 @@ class Networking:
 
             try:
                 print(f"Attempting to connect to host at {ip}:{port}")
-                logger.info(f"Attempting to connect to host at {ip}:{port}")
                 self.client.connect(ip, port)
                 self.client.send(JoinEvent(player))
                 return True
@@ -297,10 +313,6 @@ class Networking:
             # Assign a new connection object to the address (as a key value pair)
             self.client_list[connection_object.address[0]] = connection_object
 
-            # inform the event queue that a client is connected, with the respective client id
-            # event = pygame.event.Event(CustomEvents.CLIENT_CONNECTED, {'client_id': client_id})
-            # pygame.event.post(event)
-
             return super(MastermindServerUDP, self).callback_connect_client(connection_object)
 
         def callback_disconnect(self):
@@ -312,10 +324,11 @@ class Networking:
             """
             # Pops the client's connection object
             game = Networking.get_instance().game
-            players = [x for x in game.players]
-            if players:
-                for player in players:
-                    game.remove_player(player)
+            if game:
+                players = [x for x in game.players]
+                if players:
+                    for player in players:
+                        game.remove_player(player)
             return super(MastermindServerUDP, self).callback_disconnect()
 
         def callback_client_handle(self, connection_object, data):
@@ -335,7 +348,6 @@ class Networking:
             print(f"Client at {connection_object.address} sent a message: {data}")
             if isinstance(data, ActionEvent):
                 if isinstance(data, JoinEvent):
-                    print(Networking.get_instance().game.players)
                     Networking.get_instance().game.add_player(data.player)
                     Networking.get_instance().send_to_all_client(Networking.get_instance().game)
                 data.execute()
