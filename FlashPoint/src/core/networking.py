@@ -302,6 +302,8 @@ class Networking:
             # inform the event queue that a client is connected, with the respective client id
             # event = pygame.event.Event(CustomEvents.CLIENT_CONNECTED, {'client_id': client_id})
             # pygame.event.post(event)
+
+            # Check if connected client exceeds limit
             if len(self.client_list) >= 6:
                 print("Limit reached, stop accepting connections")
                 self.accepting_disallow()
@@ -385,7 +387,10 @@ class Networking:
             :return:
             """
             self._pause_receive.set()
-            super(MastermindClientUDP, self).send(JSONSerializer.serialize(data), compression)
+            try:
+                super(MastermindClientUDP, self).send(JSONSerializer.serialize(data), compression)
+            except MastermindErrorSocket:
+                self.callback_disconnect()
             self._pause_receive.clear()
 
         def receive_data_from_server(self):
@@ -429,3 +434,10 @@ class Networking:
                 self._pause_blk_signal.set()
             else:
                 self._pause_blk_signal.clear()
+
+        def callback_disconnect(self):
+            """
+            Define callback here when client's connection to host is interrupted.
+            :return:
+            """
+            pass
