@@ -2,6 +2,7 @@ import ipaddress
 import socket
 import threading
 import logging
+import time
 
 from src.core.serializer import JSONSerializer
 from src.action_events.action_event import ActionEvent
@@ -26,6 +27,22 @@ class Networking:
     Class that stores networking info like host and client. This class follows a Singleton design pattern.
     """
     __instance = None
+
+    @staticmethod
+    def wait_for_reply(timeout=5):
+        """
+        Wait for a reply from the host before continuing with a timeout (in seconds).
+        Returns false for failed attempt, true for success.
+        """
+        i = 0
+        reply = Networking.get_instance().client.get_server_reply()
+        while not reply:
+            reply = Networking.get_instance().client.get_server_reply()
+            time.sleep(1)
+            i += 1
+            if i > timeout:
+                raise ConnectionError
+        return reply
 
     @staticmethod
     def get_instance():
@@ -123,7 +140,6 @@ class Networking:
 
             try:
                 print(f"Attempting to connect to host at {ip}:{port}")
-                logger.info(f"Attempting to connect to host at {ip}:{port}")
                 self.client.connect(ip, port)
                 self.client.send(JoinEvent(player))
                 return True
@@ -341,7 +357,6 @@ class Networking:
             print(f"Client at {connection_object.address} sent a message: {data}")
             if isinstance(data, ActionEvent):
                 if isinstance(data, JoinEvent):
-                    print(Networking.get_instance().game.players)
                     Networking.get_instance().game.add_player(data.player)
                     Networking.get_instance().send_to_all_client(Networking.get_instance().game)
                 data.execute()
