@@ -155,7 +155,12 @@ class SceneManager(object):
             Networking.get_instance().join_host(ip_addr, event=JoinEvent(self._current_player))
             reply = Networking.wait_for_reply(timeout=10)
             if reply:
-                self._game = Networking.get_instance().game
+                game = Networking.get_instance().game
+                i = 0
+                while not game and i < 5:
+                    game = Networking.get_instance().game
+                    time.sleep(0.01)
+                    i += 0.01
                 self.next(LobbyScene, self._current_player, self._game)
             else:
                 raise ConnectionError
