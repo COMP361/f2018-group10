@@ -4,8 +4,8 @@ import threading
 import logging
 import time
 
-from action_events.dummy_event import DummyEvent
-from action_events.join_event import JoinEvent
+from src.action_events.dummy_event import DummyEvent
+from src.action_events.join_event import JoinEvent
 from src.core.serializer import JSONSerializer
 from src.action_events.action_event import ActionEvent
 from src.external.Mastermind import *
@@ -366,6 +366,7 @@ class Networking:
             if isinstance(data, ActionEvent):
                 if isinstance(data, JoinEvent):
                     data.execute(Networking.get_instance().game)
+                    data.game = Networking.get_instance().game
                 Networking.get_instance().send_to_all_client(data)
             return super(MastermindServerUDP, self).callback_client_handle(connection_object, data)
 
@@ -423,15 +424,15 @@ class Networking:
             :return:
             """
             while not self._stop_receive.is_set():
-                if not self._pause_receive.is_set():
-                    try:
-                        _server_reply = self.receive(False)
-                        if _server_reply:
-                            print(f"Received: {_server_reply['class']} data.")
-                            self.callback_client_receive(_server_reply)
-                            self._reply_queue.append(_server_reply)
-                    except OSError as e:
-                        print(f"Error receiving data: {e}")
+                #if not self._pause_receive.is_set():
+                try:
+                    _server_reply = self.receive(False)
+                    if _server_reply:
+                        print(f"Received: {_server_reply['class']} data.")
+                        self.callback_client_receive(_server_reply)
+                        self._reply_queue.append(_server_reply)
+                except OSError as e:
+                    print(f"Error receiving data: {e}")
 
         def disconnect(self):
             self._pause_blk_signal.set()
@@ -467,12 +468,11 @@ class Networking:
         def callback_client_receive(self, event):
             """Handle messages from server."""
             data = JSONSerializer.deserialize(event)
-            print("Received")
             if isinstance(data, ActionEvent):
                 if isinstance(data, JoinEvent):
-                    print("execute")
+                    if not Networking.get_instance().game:
+                        Networking.set_game(data.game)
                     data.execute(Networking.get_instance().game)
-
             else:
                 print("Not an action event")
 
