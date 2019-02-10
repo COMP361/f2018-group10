@@ -1,11 +1,11 @@
-import pygame
 import ipaddress
 import socket
 import threading
 import logging
 
-import src.constants.CustomEvents as CustomEvents
+from src.core.serializer import JSONSerializer
 from src.action_events.action_event import ActionEvent
+from src.action_events.join_event import JoinEvent
 from src.external.Mastermind import *
 
 logger = logging.getLogger("networking")
@@ -43,6 +43,10 @@ class Networking:
     def __getattr__(self, name):
         return getattr(self.__instance, name)
 
+    @staticmethod
+    def set_game(game):
+        Networking.__instance.game = game
+
     class NetworkingInner:
         host = None
         client = None
@@ -55,6 +59,7 @@ class Networking:
         server_reply = None
 
         def __init__(self):
+            self.game = None
             self.stop_broadcast.set()
 
         def create_host(self, port=20298):
@@ -67,8 +72,6 @@ class Networking:
             """
             # We use UDP to broadcast the host
             self.host = Networking.Host()
-
-            self.host = MastermindServerUDP()
 
             """
             # find unused ip address
@@ -87,7 +90,7 @@ class Networking:
                     break
             """
 
-            #port = self.get_open_port()
+            # port = self.get_open_port()
             # listen to all address
             server_ip = "0.0.0.0"
             client_ip = "localhost"
@@ -109,7 +112,7 @@ class Networking:
             except MastermindErrorSocket:
                 logger.error("Failed to create a host")
 
-        def join_host(self, ip, port=20298):
+        def join_host(self, ip, port=20298, player = None):
             """
             Attempt to join host at the specified ip address
             :param ip: IP address
@@ -117,11 +120,13 @@ class Networking:
             :return:
             """
             self.client = Networking.Client(self.TIMEOUT_CONNECT, self.TIMEOUT_RECEIVE)
-            self.client = MastermindClientUDP(self.TIMEOUT_CONNECT, self.TIMEOUT_RECEIVE)
+
             try:
                 print(f"Attempting to connect to host at {ip}:{port}")
                 logger.info(f"Attempting to connect to host at {ip}:{port}")
                 self.client.connect(ip, port)
+                self.client.send(JoinEvent(player))
+                return True
             except MastermindErrorClient as e:
                 logger.error(f"Error connecting to server at: {ip}:{port}")
                 raise MastermindErrorClient(e)
@@ -210,6 +215,7 @@ class Networking:
             """
             # Kill the broadcast
             self.stop_broadcast.set()
+            print("Broadcast killed")
 
             if self.host is not None:
                 self.host.accepting_disallow()
@@ -229,34 +235,51 @@ class Networking:
             else:
                 raise MastermindErrorClient("Client is not available")
 
-        def send_to_client(self, client_id: int, data, compress=True):
+        def send_to_client(self, ip_addr: str, data, compress=True):
             """
             Send data to client
-            :param client_id: client id
+            :param ip_addr: client id
             :param data: data to be sent
             :param compress: compression, enabled by default
             :return:
             """
             if self.host is not None:
                 try:
-                    client_conn_obj = self.host.lookup_client(client_id)
+                    client_conn_obj = self.host.lookup_client(ip_addr)
                     self.host.callback_client_send(client_conn_obj, data, compress)
                 except MastermindErrorSocket as e:
                     raise MastermindErrorSocket(e)
             else:
                 raise MastermindErrorServer("Server is not available")
 
-    # Overridden classes
-    class Host(MastermindServerUDP):
-        client_list = []
-
-        def lookup_client(self, client_id):
+        def send_to_all_client(self, data, compress=True):
             """
-            Look up the client list (array) and return the connection object
-            :param client_id: client id
+            Similar to send_to_client, but sends to every client connected to host
+            :param data:
+            :param compress:
             :return:
             """
-            conn_obj = self.client_list[client_id]
+            if self.host:
+                for client in self.host.client_list.values():
+                    print(f"Sending to client at {client.address}\n")
+                    try:
+                        self.host.callback_client_send(client, data, compress)
+                    except MastermindErrorSocket as e:
+                        raise MastermindErrorSocket(e)
+            else:
+                raise MastermindErrorServer("Server is not available")
+
+    # Overridden classes
+    class Host(MastermindServerUDP):
+        client_list = {}
+
+        def lookup_client(self, ip_addr: str):
+            """
+            Look up the client list (array) and return the connection object
+            :param ip_addr: client's ip address
+            :return:
+            """
+            conn_obj = self.client_list[ip_addr]
             if conn_obj is not None:
                 return conn_obj
             else:
@@ -270,16 +293,30 @@ class Networking:
             :param connection_object: Represents the appropriate connection
             :return:
             """
-            # print(f"Client at {connection_object.address} is connected")
+            print(f"Client at {connection_object.address} is connected")
             # Assign a new connection object to the address (as a key value pair)
-            self.client_list.append(connection_object)
-            client_id = len(self.client_list)-1
+            self.client_list[connection_object.address[0]] = connection_object
 
             # inform the event queue that a client is connected, with the respective client id
-            event = pygame.event.Event(CustomEvents.CLIENT_CONNECTED, {'client_id': client_id})
-            pygame.event.post(event)
+            # event = pygame.event.Event(CustomEvents.CLIENT_CONNECTED, {'client_id': client_id})
+            # pygame.event.post(event)
 
             return super(MastermindServerUDP, self).callback_connect_client(connection_object)
+
+        def callback_disconnect(self):
+            """
+            Called when the server disconnects (i.e., when .disconnect(...) is called). This method can be overridden
+            to provide useful information. It's good practice to call
+            "return super(MastermindServerTCP,self).callback_disconnect()" at the end of your override.
+            :return:
+            """
+            # Pops the client's connection object
+            game = Networking.get_instance().game
+            players = [x for x in game.players]
+            if players:
+                for player in players:
+                    game.remove_player(player)
+            return super(MastermindServerUDP, self).callback_disconnect()
 
         def callback_client_handle(self, connection_object, data):
             """
@@ -291,8 +328,16 @@ class Networking:
             :param data: Data received from the connection
             :return:
             """
+            if connection_object.address[0] == "127.0.0.1":
+                return
+
+            data = JSONSerializer.deserialize(data)
             print(f"Client at {connection_object.address} sent a message: {data}")
             if isinstance(data, ActionEvent):
+                if isinstance(data, JoinEvent):
+                    print(Networking.get_instance().game.players)
+                    Networking.get_instance().game.add_player(data.player)
+                    Networking.get_instance().send_to_all_client(Networking.get_instance().game)
                 data.execute()
             return super(MastermindServerUDP, self).callback_client_handle(connection_object, data)
 
@@ -309,6 +354,7 @@ class Networking:
             :return:
             """
             # define override here
+            data = JSONSerializer.serialize(data)
             return super(MastermindServerUDP, self).callback_client_send(connection_object, data, compression)
 
         class ClientNotFoundException(Exception):
@@ -317,7 +363,7 @@ class Networking:
     class Client(MastermindClientUDP):
         _pause_receive = threading.Event()
         _stop_receive = threading.Event()
-        _server_reply = None
+        _reply_queue = []
 
         def connect(self, ip, port):
             super(MastermindClientUDP, self).connect(ip, port)
@@ -332,7 +378,7 @@ class Networking:
             :return:
             """
             self._pause_receive.set()
-            super(MastermindClientUDP, self).send(data, compression)
+            super(MastermindClientUDP, self).send(JSONSerializer.serialize(data), compression)
             self._pause_receive.clear()
 
         def receive_data_from_server(self):
@@ -343,7 +389,10 @@ class Networking:
             while not self._stop_receive.is_set():
                 if not self._pause_receive.is_set():
                     try:
-                        self._server_reply = self.receive(False)
+                        _server_reply = self.receive(False)
+                        if _server_reply:
+                            self._reply_queue.append(_server_reply)
+                            print(f"Received: {_server_reply}")
                     except OSError as e:
                         print(f"Error receiving data: {e}")
 
@@ -356,4 +405,12 @@ class Networking:
             Retrieves the last message sent by the server
             :return:
             """
-            return self._server_reply
+            if len(self._reply_queue) > 0:
+                return self._reply_queue.pop(0)
+
+        def send_blocking_signal(self):
+            """
+            Informs the host of the client's existence, so that it doesn't get disconnected automatically
+            :return:
+            """
+            pass
