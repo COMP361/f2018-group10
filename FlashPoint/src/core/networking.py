@@ -303,6 +303,7 @@ class Networking:
             # event = pygame.event.Event(CustomEvents.CLIENT_CONNECTED, {'client_id': client_id})
             # pygame.event.post(event)
             if len(self.client_list) >= 6:
+                print("Limit reached, stop accepting connections")
                 self.accepting_disallow()
             return super(MastermindServerUDP, self).callback_connect_client(connection_object)
 
