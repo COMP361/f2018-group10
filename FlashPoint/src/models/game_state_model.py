@@ -3,7 +3,7 @@ import random
 from typing import List, Optional, Tuple
 
 from src.constants.state_enums import GameKindEnum, DifficultyLevelEnum
-from src.core.flashpoint_exceptions import TooManyPlayersException, InvalidGameKindException
+from src.core.flashpoint_exceptions import TooManyPlayersException, InvalidGameKindException, PlayerNotFoundException
 from src.models.game_units.player_model import PlayerModel
 
 
@@ -62,7 +62,8 @@ class GameStateModel(object):
         matching_players = [player for player in self._players if player.ip == ip]
         if not matching_players:
             raise PlayerNotFoundException
-        return
+        return matching_players[0]
+
     def remove_player(self, player: PlayerModel):
         """Remove a player from the current game."""
         self._players.remove(player)

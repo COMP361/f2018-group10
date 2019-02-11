@@ -137,7 +137,7 @@ class SceneManager(object):
         event = ReadyEvent(self._current_player)
         if self._current_player.ip == Networking.get_instance().game.host.ip:
             event.execute(Networking.get_instance().game)
-            Networking.send_to_all_client(event)
+            Networking.get_instance().send_to_all_client(event)
         else:
             Networking.get_instance().client.send(event)
     # ------------- GAME CREATE/LOAD STUFF ----------#
