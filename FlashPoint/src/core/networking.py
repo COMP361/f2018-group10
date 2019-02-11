@@ -4,7 +4,8 @@ import threading
 import logging
 import time
 
-from action_events.dummy_event import DummyEvent
+from src.action_events.dummy_event import DummyEvent
+from src.models.game_state_model import GameStateModel
 from src.core.serializer import JSONSerializer
 from src.action_events.action_event import ActionEvent
 from src.action_events.join_event import JoinEvent
@@ -432,6 +433,7 @@ class Networking:
                         _server_reply = self.receive(False)
                         if _server_reply:
                             self._reply_queue.append(_server_reply)
+                            self.callback_client_receive(_server_reply)
                             print(f"Received: {_server_reply}")
                     except OSError as e:
                         print(f"Error receiving data: {e}")
@@ -442,6 +444,11 @@ class Networking:
             self._stop_receive.set()
             time.sleep(0.5)
             return super(MastermindClientUDP, self).disconnect()
+
+        def callback_client_receive(self, data):
+            data = JSONSerializer.deserialize(data)
+            if isinstance(data, GameStateModel):
+                Networking.get_instance().game = data
 
         def get_server_reply(self):
             """
