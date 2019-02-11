@@ -169,7 +169,7 @@ class SceneManager(object):
             Networking.get_instance().join_host(ip_addr, player=self._current_player)
             reply = Networking.wait_for_reply()
             if reply:
-                Networking.get_instance().set_game(JSONSerializer.deserialize(reply))
+                Networking.set_game(JSONSerializer.deserialize(reply))
                 self._game = Networking.get_instance().game
                 self.next(LobbyScene, self._current_player, self._game)
             else:
