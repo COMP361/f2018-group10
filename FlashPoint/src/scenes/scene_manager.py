@@ -6,7 +6,8 @@ import pygame
 import json
 import threading
 
-from src.constants.state_enums import GameKindEnum
+from src.action_events.ready_event import ReadyEvent
+from src.constants.state_enums import GameKindEnum, PlayerStatusEnum
 from src.core.serializer import JSONSerializer
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
@@ -110,7 +111,7 @@ class SceneManager(object):
                 self._active_scene.buttonSelChar.on_click(self.next, CharacterScene, self._current_player)
 
             self._active_scene.buttonBack.on_click(self.disconnect, HostJoinScene, self._current_player)
-            self._active_scene.buttonReady.on_click(self.next, GameBoardScene, self._game, self._current_player)
+            self._active_scene.buttonReady.on_click(self.set_ready)
 
         FileImporter.play_audio("media/soundeffects/ButtonClick.wav", fade_ms=10)
 
@@ -130,6 +131,15 @@ class SceneManager(object):
         #     self.join(event.ip,)
         pass
 
+    def set_ready(self):
+        """Set the status of the current player to ready."""
+        self._current_player.status = PlayerStatusEnum.READY
+        event = ReadyEvent(self._current_player)
+        if self._current_player.ip == Networking.get_instance().game.host.ip:
+            event.execute(Networking.get_instance().game)
+            Networking.send_to_all_client(event)
+        else:
+            Networking.get_instance().client.send(event)
     # ------------- GAME CREATE/LOAD STUFF ----------#
 
     def create_new_game(self, game_kind: GameKindEnum):
