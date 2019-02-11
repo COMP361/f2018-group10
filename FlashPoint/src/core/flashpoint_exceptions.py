@@ -34,3 +34,11 @@ class InvalidGameKindException(FlashPointBaseException):
     def __init__(self, action: str, game_type: GameKindEnum):
         message = f"Invalid game type: {game_type} for action: {action}"
         super().__init__(message)
+
+
+class PlayerNotFoundException(FlashPointBaseException):
+    """Player was not found in the game state"""
+
+    def __init__(self, player_ip: str):
+        message = f"Player with ip: {player_ip} was not found in the Game State."
+        super().__init__(message)
