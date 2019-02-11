@@ -92,7 +92,7 @@ class SceneManager(object):
         if isinstance(self._active_scene, HostMenuScene):
             self._active_scene.buttonBack.on_click(self.disconnect, HostJoinScene, self._current_player)
             self._active_scene.buttonNewGame.on_click(self.next, CreateGameMenu, self._current_player)
-            self._active_scene.buttonLogin.on_click(self.next, LoadGame)
+            self._active_scene.buttonLogin.on_click(self.next, LoadGame, self._current_player)
 
         if isinstance(self._active_scene, CreateGameMenu):
             self._active_scene.buttonBack.on_click(self.disconnect, HostJoinScene, self._current_player)
