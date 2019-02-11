@@ -5,7 +5,6 @@ import pygame
 import json
 import threading
 
-import src.constants.CustomEvents as CustomEvents
 from src.constants.state_enums import GameKindEnum
 from src.core.serializer import JSONSerializer
 from src.models.game_state_model import GameStateModel
@@ -89,7 +88,7 @@ class SceneManager(object):
 
         if isinstance(self._active_scene, JoinScene):
             self._active_scene.buttonBack.on_click(self.next, HostJoinScene, self._current_player)
-            self._active_scene.buttonConnect.on_click(self.join, self._active_scene.text_bar_msg, LobbyScene)
+            self._active_scene.buttonConnect.on_click(self.join)
 
         if isinstance(self._active_scene, HostMenuScene):
             self._active_scene.buttonBack.on_click(self.disconnect, HostJoinScene, self._current_player)
@@ -130,9 +129,10 @@ class SceneManager(object):
 
 
     def handle_event(self, event):
-        # join event
-        if event.type == CustomEvents.JOIN:
-            self.join(event.ip,)
+        # # join event
+        # if event.type == CustomEvents.JOIN:
+        #     self.join(event.ip,)
+        pass
 
     # ------------- GAME CREATE/LOAD STUFF ----------#
 
@@ -156,7 +156,7 @@ class SceneManager(object):
         if next_scene is not None:
             self.next(next_scene, *args)
 
-    def join(self, ip_addr: str):
+    def join(self):
         """
         Start the join host process in Networking
         :param ip_addr: ip address to connect
@@ -164,6 +164,7 @@ class SceneManager(object):
         :param args: extra arguments for the next scene
         :return:
         """
+        ip_addr = self._active_scene.text_bar_msg
         if isinstance(self._active_scene, JoinScene):
             is_join_scene = True
         else:

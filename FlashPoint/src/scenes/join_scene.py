@@ -1,8 +1,8 @@
 import pygame
 
 import src.constants.color as Color
-import src.constants.CustomEvents as CustomEvents
-from models.game_units.player_model import PlayerModel
+import src.constants.fonts as Font
+from src.models.game_units.player_model import PlayerModel
 from src.UIComponents.rect_button import RectButton
 from src.UIComponents.rect_label import RectLabel
 from src.UIComponents.text import Text
@@ -25,7 +25,8 @@ class JoinScene(object):
         box_size = (136, 32)
 
         user_box = RectLabel(x_pos, y_pos, box_size[0], box_size[1], color, 0,
-                             Text(pygame.font.SysFont('Arial', 20), text, color_text))
+                             Text(pygame.font.SysFont(Font.MAIN_FONT, 20), text, color_text))
+
         self.sprite_grp.add(user_box)
 
     def _init_background(self):
@@ -36,12 +37,15 @@ class JoinScene(object):
     def _init_btn(self, x_pos, y_pos, text, color: Color, color_text: Color):
         box_size = (130, 48)
         self.buttonConnect = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
-                                        Text(pygame.font.SysFont('Arial', 20), text, color_text))
+                                        Text(pygame.font.SysFont(Font.MAIN_FONT, 20), text, color_text))
+
 
         self.sprite_grp.add(self.buttonConnect)
 
     def _init_text_bar(self, x_pos, y_pos, width, height):
-        return InputBox(x=x_pos, y=y_pos, w=width, h=height)
+        inputbox = InputBox(x=x_pos, y=y_pos, w=width, h=height)
+        inputbox.disable_enter()
+        return inputbox
 
     def _init_btn_back(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
         box_size = (130, 48)
@@ -66,13 +70,14 @@ class JoinScene(object):
         self.sprite_grp.update(event_queue)
         self._text_bar.update(event_queue)
 
-        message = self._text_bar.message
-        if message:
-            data = {'ip': self._text_bar.message}
-            join_event = pygame.event.Event(CustomEvents.JOIN, **data)
-            pygame.event.post(join_event)
-            self._text_bar.message = ''
+        # message = self._text_bar.text
+        # if message:
+        #     data = {'ip': self._text_bar.message}
+        #     join_event = pygame.event.Event(CustomEvents.JOIN, **data)
+        #     pygame.event.post(join_event)
+        #     self._text_bar.text = ''
 
     @property
     def text_bar_msg(self):
-        return self._text_bar.message
+        #return self._text_bar.message
+        return self._text_bar.text
