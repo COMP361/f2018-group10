@@ -88,6 +88,8 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_join_event(payload)
         elif object_type == ChatEvent.__name__:
             return JSONSerializer._deserialize_chat_event(payload)
+        elif object_type == ReadyEvent.__name__:
+            return JSONSerializer._deserialize_ready_event(payload)
         elif object_type == DummyEvent.__name__:
             return DummyEvent()
 
