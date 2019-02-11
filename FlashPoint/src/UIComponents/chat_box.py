@@ -64,7 +64,12 @@ class ChatBox:
             # Commenting this line prevents message from being shown twice
             # self.game.add_chat_message(self.chat_textbox.message, self.current_player.nickname)
             chat_event = ChatEvent(self.chat_textbox.message, self.current_player.nickname)
-            Networking.get_instance().client.send(chat_event)
+
+            # TODO MAKE THIS A UTILITY IN NETWORKING
+            if self.current_player.ip == Networking.get_instance().game.host.ip:
+                Networking.get_instance().host.callback_client_send(chat_event)
+            else:
+                Networking.get_instance().client.send(chat_event)
 
             self.chat_textbox.message = ''
 
