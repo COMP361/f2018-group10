@@ -1,6 +1,6 @@
 import random
 
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 from src.constants.state_enums import GameKindEnum, DifficultyLevelEnum
 from src.core.flashpoint_exceptions import TooManyPlayersException, InvalidGameKindException
@@ -25,6 +25,15 @@ class GameStateModel(object):
         self._damage = 0
 
         self._max_damage = 24
+        self._chat_history = []
+
+    @property
+    def chat_history(self) -> List[Tuple[str, str]]:
+        return self._chat_history
+
+    def add_chat_message(self, message: str, sender_nickname: str):
+        """Add a chat message to the history."""
+        self._chat_history.append((message, sender_nickname))
 
     @property
     def host(self) -> PlayerModel:

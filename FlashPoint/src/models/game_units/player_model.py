@@ -20,6 +20,10 @@ class PlayerModel(GameUnit):
         self._wins = 0
         self._losses = 0
 
+    def __eq__(self, other):
+        x = [other.ip == self.ip, other.nickname == self.nickname, other.x_pos == self.x_pos, other.y_pos == self.y_pos]
+        return all(x)
+
     @property
     def x_pos(self) -> int:
         return self._x_pos

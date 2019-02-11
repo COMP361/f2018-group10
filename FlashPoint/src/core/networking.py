@@ -2,7 +2,11 @@ import ipaddress
 import socket
 import threading
 import logging
+import time
 
+from src.action_events.chat_event import ChatEvent
+from src.action_events.dummy_event import DummyEvent
+from src.models.game_state_model import GameStateModel
 from src.core.serializer import JSONSerializer
 from src.action_events.action_event import ActionEvent
 from src.action_events.join_event import JoinEvent
@@ -26,6 +30,22 @@ class Networking:
     Class that stores networking info like host and client. This class follows a Singleton design pattern.
     """
     __instance = None
+
+    @staticmethod
+    def wait_for_reply(timeout=5):
+        """
+        Wait for a reply from the host before continuing with a timeout (in seconds).
+        Returns false for failed attempt, true for success.
+        """
+        i = 0
+        reply = Networking.get_instance().client.get_server_reply()
+        while not reply:
+            reply = Networking.get_instance().client.get_server_reply()
+            time.sleep(1)
+            i += 1
+            if i > timeout:
+                raise ConnectionError
+        return reply
 
     @staticmethod
     def get_instance():
@@ -123,7 +143,6 @@ class Networking:
 
             try:
                 print(f"Attempting to connect to host at {ip}:{port}")
-                logger.info(f"Attempting to connect to host at {ip}:{port}")
                 self.client.connect(ip, port)
                 self.client.send(JoinEvent(player))
                 return True
@@ -193,7 +212,7 @@ class Networking:
                 logger.info("Disconnecting client")
                 self.client.disconnect()
                 self.client.__del__()
-                self.client = None
+                # self.client = None
             if self.host is not None:
                 logger.info("Disconnecting host")
                 # Kill the broadcast
@@ -229,7 +248,9 @@ class Networking:
             """
             if self.client is not None:
                 try:
+                    self.client.toggle_block_signal(True)
                     self.client.send(data, compress)
+                    self.client.toggle_block_signal(False)
                 except MastermindErrorSocket as e:
                     raise MastermindErrorSocket(e)
             else:
@@ -261,7 +282,7 @@ class Networking:
             """
             if self.host:
                 for client in self.host.client_list.values():
-                    print(f"Sending to client at {client.address}\n")
+                    print(f"Sending {data.__class__} to client at {client.address}\n")
                     try:
                         self.host.callback_client_send(client, data, compress)
                     except MastermindErrorSocket as e:
@@ -285,6 +306,11 @@ class Networking:
             else:
                 raise Networking.Host.ClientNotFoundException
 
+        def kick_client(self, ip_addr: str):
+            key = self.lookup_client(ip_addr)
+            if key:
+                self.client_list.pop(key)
+
         def callback_connect_client(self, connection_object):
             """
             Called when a new client connects. This method can be overridden to provide useful information. It's good
@@ -301,21 +327,27 @@ class Networking:
             # event = pygame.event.Event(CustomEvents.CLIENT_CONNECTED, {'client_id': client_id})
             # pygame.event.post(event)
 
+            # Check if connected client exceeds limit
+            if len(self.client_list) >= 6:
+                print("Limit reached, stop accepting connections")
+                self.accepting_disallow()
             return super(MastermindServerUDP, self).callback_connect_client(connection_object)
 
-        def callback_disconnect(self):
+        def callback_disconnect_client(self, connection_object):
             """
-            Called when the server disconnects (i.e., when .disconnect(...) is called). This method can be overridden
-            to provide useful information. It's good practice to call
-            "return super(MastermindServerTCP,self).callback_disconnect()" at the end of your override.
+            Called when a client disconnects. This method can be overridden to provide useful information. It's good
+            practice to call "return super(MastermindServerTCP,self).callback_disconnect_client(connection_object)" at
+            the end of your override.
+            :param connection_object: Represents the appropriate connection
             :return:
             """
             # Pops the client's connection object
             game = Networking.get_instance().game
-            players = [x for x in game.players]
-            if players:
-                for player in players:
-                    game.remove_player(player)
+            if game:
+                players = [x for x in game.players if x.ip == connection_object.address[0]]
+                if players:
+                    game.remove_player(players[0])
+                    self.client_list.pop(connection_object.address[0])
             return super(MastermindServerUDP, self).callback_disconnect()
 
         def callback_client_handle(self, connection_object, data):
@@ -332,13 +364,18 @@ class Networking:
                 return
 
             data = JSONSerializer.deserialize(data)
-            print(f"Client at {connection_object.address} sent a message: {data}")
+            # If it's a dummy event, don't do anything
+            if isinstance(data, DummyEvent):
+                return
+
+            print(f"Client at {connection_object.address} sent a message: {data.__class__}")
             if isinstance(data, ActionEvent):
                 if isinstance(data, JoinEvent):
-                    print(Networking.get_instance().game.players)
                     Networking.get_instance().game.add_player(data.player)
                     Networking.get_instance().send_to_all_client(Networking.get_instance().game)
-                data.execute()
+                if isinstance(data, ChatEvent):
+                    data.execute(Networking.get_instance().game)
+                    Networking.get_instance().send_to_all_client(data)
             return super(MastermindServerUDP, self).callback_client_handle(connection_object, data)
 
         def callback_client_send(self, connection_object, data, compression=None):
@@ -361,13 +398,18 @@ class Networking:
             pass
 
     class Client(MastermindClientUDP):
-        _pause_receive = threading.Event()
-        _stop_receive = threading.Event()
-        _reply_queue = []
+        def __init__(self, timeout_connect=None, timeout_receive=None):
+            super(MastermindClientUDP, self).__init__(MM_UDP, timeout_connect, timeout_receive)
+            self._pause_receive = threading.Event()
+            self._stop_receive = threading.Event()
+            self._pause_blk_signal = threading.Event()
+            self._reply_queue = []
 
         def connect(self, ip, port):
             super(MastermindClientUDP, self).connect(ip, port)
+            signaler = threading.Thread(target=self.send_blocking_signal)
             receiver = threading.Thread(target=self.receive_data_from_server)
+            signaler.start()
             receiver.start()
 
         def send(self, data: ActionEvent, compression=None):
@@ -378,7 +420,10 @@ class Networking:
             :return:
             """
             self._pause_receive.set()
-            super(MastermindClientUDP, self).send(JSONSerializer.serialize(data), compression)
+            try:
+                super(MastermindClientUDP, self).send(JSONSerializer.serialize(data), compression)
+            except MastermindErrorSocket:
+                self.callback_disconnect()
             self._pause_receive.clear()
 
         def receive_data_from_server(self):
@@ -392,13 +437,28 @@ class Networking:
                         _server_reply = self.receive(False)
                         if _server_reply:
                             self._reply_queue.append(_server_reply)
-                            print(f"Received: {_server_reply}")
+                            if not Networking.get_instance().is_host:
+                                self.callback_client_receive(_server_reply)
                     except OSError as e:
                         print(f"Error receiving data: {e}")
 
         def disconnect(self):
+            self._pause_blk_signal.set()
+            self._pause_receive.set()
             self._stop_receive.set()
+            time.sleep(0.5)
             return super(MastermindClientUDP, self).disconnect()
+
+        def callback_client_receive(self, data):
+            """Handle receiving data from host."""
+            data: GameStateModel = JSONSerializer.deserialize(data)
+            print(f"Received {data.__class__} object from host.")
+            if isinstance(data, GameStateModel):
+                print(f"Updating game object, there are now: {len(data.players)} players.")
+                Networking.set_game(data)
+            if isinstance(data, ActionEvent):
+                if isinstance(data, ChatEvent):
+                    data.execute(Networking.get_instance().game)
 
         def get_server_reply(self):
             """
@@ -411,6 +471,22 @@ class Networking:
         def send_blocking_signal(self):
             """
             Informs the host of the client's existence, so that it doesn't get disconnected automatically
+            :return:
+            """
+            while not self._stop_receive.is_set():
+                if not self._pause_blk_signal.is_set():
+                    self.send(DummyEvent())
+                    time.sleep(2)
+
+        def toggle_block_signal(self, toggle: bool):
+            if toggle:
+                self._pause_blk_signal.set()
+            else:
+                self._pause_blk_signal.clear()
+
+        def callback_disconnect(self):
+            """
+            Define callback here when client's connection to host is interrupted.
             :return:
             """
             pass
