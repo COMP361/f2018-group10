@@ -34,7 +34,7 @@ class GameBoard(pygame.sprite.Group):
         #             if tile_sprite.hover():
         #                 tile_sprite.tile_model.game_unit_sprites.add(CharacterSprite())
 
-                   # else:
+                    # else:
                         # some_sprite = tile_sprite.tile_model.find_character()
                         # tile_sprite.tile_model.remove_sprite_character(some_sprite)
 

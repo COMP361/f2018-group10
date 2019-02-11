@@ -2,8 +2,11 @@ import enum
 import json
 from typing import Dict
 
-from constants.state_enums import DifficultyLevelEnum, GameKindEnum, PlayerStatusEnum
-from models.game_state_model import GameStateModel
+from src.action_events.chat_event import ChatEvent
+from src.action_events.dummy_event import DummyEvent
+from src.action_events.join_event import JoinEvent
+from src.constants.state_enums import DifficultyLevelEnum, GameKindEnum, PlayerStatusEnum
+from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 
 
@@ -18,7 +21,7 @@ class JSONSerializer(object):
         rules = GameKindEnum(payload['_rules']["value"])
         game = GameStateModel(host, num_players, rules)
 
-        for player in payload['_players']:
+        for player in [x for x in payload['_players'] if x['_ip'] != host.ip]:
             player_obj: PlayerModel = JSONSerializer.deserialize(player)
             game.add_player(player_obj)
 
@@ -51,6 +54,17 @@ class JSONSerializer(object):
         return player
 
     @staticmethod
+    def _deserialize_chat_event(payload: Dict) -> ChatEvent:
+        message = payload['_message']
+        sender = payload['_sender']
+        return ChatEvent(message, sender)
+
+    @staticmethod
+    def _deserialize_join_event(payload: Dict) -> JoinEvent:
+        player = JSONSerializer._deserialize_player(payload['player'])
+        return JoinEvent(player)
+
+    @staticmethod
     def deserialize(payload: Dict) -> object:
         """
         Grab an object and deserialize it.
@@ -64,6 +78,12 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_player(payload)
         elif object_type == GameStateModel.__name__:
             return JSONSerializer._deserialize_game_state(payload)
+        elif object_type == JoinEvent.__name__:
+            return JSONSerializer._deserialize_join_event(payload)
+        elif object_type == ChatEvent.__name__:
+            return JSONSerializer._deserialize_chat_event(payload)
+        elif object_type == DummyEvent.__name__:
+            return DummyEvent()
 
         print("WARNING: Could not deserialize object, not of recognized type.")
 
@@ -76,3 +96,4 @@ class JSONSerializer(object):
     def serialize(input_obj: object) -> dict:
         """Perform a deep serialize to a dict, then can be dumped into json file."""
         return json.loads(json.dumps(input_obj, default=lambda x: JSONSerializer._safe_dict(x)))
+

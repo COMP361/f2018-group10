@@ -7,6 +7,10 @@
 # Ignore any .egg stuff
 **/FlashPoint.egg*
 
+
+**/profiles.json
+**/save_games.json
+
 # Ignore any .pyc files
 **/.pyc/**
 
