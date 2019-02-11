@@ -4,6 +4,7 @@ import threading
 import logging
 import time
 
+from src.action_events.chat_event import ChatEvent
 from src.action_events.dummy_event import DummyEvent
 from src.models.game_state_model import GameStateModel
 from src.core.serializer import JSONSerializer
@@ -372,7 +373,9 @@ class Networking:
                 if isinstance(data, JoinEvent):
                     Networking.get_instance().game.add_player(data.player)
                     Networking.get_instance().send_to_all_client(Networking.get_instance().game)
-                data.execute()
+                if isinstance(data, ChatEvent):
+                    data.execute(Networking.get_instance().game)
+                    Networking.get_instance().send_to_all_client(data)
             return super(MastermindServerUDP, self).callback_client_handle(connection_object, data)
 
         def callback_client_send(self, connection_object, data, compression=None):
@@ -453,6 +456,9 @@ class Networking:
             if isinstance(data, GameStateModel):
                 print(f"Updating game object, there are now: {len(data.players)} players.")
                 Networking.set_game(data)
+            if isinstance(data, ActionEvent):
+                if isinstance(data, ChatEvent):
+                    data.execute(Networking.get_instance().game)
 
         def get_server_reply(self):
             """

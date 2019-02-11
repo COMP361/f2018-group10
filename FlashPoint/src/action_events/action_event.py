@@ -9,5 +9,5 @@ class ActionEvent(ABC):
         super().__init__()
 
     @abstractmethod
-    def execute(self):
+    def execute(self, *args, **kwargs):
         pass
