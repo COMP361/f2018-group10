@@ -281,7 +281,7 @@ class Networking:
             """
             if self.host:
                 for client in self.host.client_list.values():
-                    print(f"Sending to client at {client.address}\n")
+                    print(f"Sending {data.__class__} to client at {client.address}\n")
                     try:
                         self.host.callback_client_send(client, data, compress)
                     except MastermindErrorSocket as e:
@@ -367,7 +367,7 @@ class Networking:
             if isinstance(data, DummyEvent):
                 return
 
-            print(f"Client at {connection_object.address} sent a message: {data}")
+            print(f"Client at {connection_object.address} sent a message: {data.__class__}")
             if isinstance(data, ActionEvent):
                 if isinstance(data, JoinEvent):
                     Networking.get_instance().game.add_player(data.player)
@@ -434,8 +434,8 @@ class Networking:
                         _server_reply = self.receive(False)
                         if _server_reply:
                             self._reply_queue.append(_server_reply)
-                            self.callback_client_receive(_server_reply)
-                            print(f"Received: {_server_reply}")
+                            if not Networking.get_instance().is_host:
+                                self.callback_client_receive(_server_reply)
                     except OSError as e:
                         print(f"Error receiving data: {e}")
 
