@@ -58,6 +58,11 @@ class GameStateModel(object):
             raise TooManyPlayersException(player)
         self._players.append(player)
 
+    def get_player_by_ip(self, ip: str) -> PlayerModel:
+        matching_players = [player for player in self._players if player.ip == ip]
+        if not matching_players:
+            raise PlayerNotFoundException
+        return
     def remove_player(self, player: PlayerModel):
         """Remove a player from the current game."""
         self._players.remove(player)

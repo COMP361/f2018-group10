@@ -4,6 +4,7 @@ import threading
 import logging
 import time
 
+from src.action_events.ready_event import ReadyEvent
 from src.action_events.chat_event import ChatEvent
 from src.action_events.dummy_event import DummyEvent
 from src.models.game_state_model import GameStateModel
@@ -323,10 +324,6 @@ class Networking:
             # Assign a new connection object to the address (as a key value pair)
             self.client_list[connection_object.address[0]] = connection_object
 
-            # inform the event queue that a client is connected, with the respective client id
-            # event = pygame.event.Event(CustomEvents.CLIENT_CONNECTED, {'client_id': client_id})
-            # pygame.event.post(event)
-
             # Check if connected client exceeds limit
             if len(self.client_list) >= 6:
                 print("Limit reached, stop accepting connections")
@@ -376,6 +373,10 @@ class Networking:
                 if isinstance(data, ChatEvent):
                     data.execute(Networking.get_instance().game)
                     Networking.get_instance().send_to_all_client(data)
+                if isinstance(data, ReadyEvent):
+                    data.execute(Networking.get_instance().game)
+                    Networking.get_instance().send_to_all_client(data)
+
             return super(MastermindServerUDP, self).callback_client_handle(connection_object, data)
 
         def callback_client_send(self, connection_object, data, compression=None):
@@ -458,6 +459,8 @@ class Networking:
                 Networking.set_game(data)
             if isinstance(data, ActionEvent):
                 if isinstance(data, ChatEvent):
+                    data.execute(Networking.get_instance().game)
+                if isinstance(data, ReadyEvent):
                     data.execute(Networking.get_instance().game)
 
         def get_server_reply(self):
