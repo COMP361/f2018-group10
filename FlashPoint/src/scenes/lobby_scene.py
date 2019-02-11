@@ -113,7 +113,6 @@ class LobbyScene(object):
 
         # game is mutated by reference, BE CAREFUL!!!
         if len(self._game.players) != self._player_count:
-            print("Redrawing sprites")
             self._player_count = len(self._game.players)
             self.sprite_grp.empty()
             self._init_all(reuse=True)

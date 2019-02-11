@@ -452,7 +452,7 @@ class Networking:
             print(f"Received {data.__class__} object from host.")
             if isinstance(data, GameStateModel):
                 print(f"Updating game object, there are now: {len(data.players)} players.")
-                Networking.get_instance().game = data
+                Networking.set_game(data)
 
         def get_server_reply(self):
             """
