@@ -67,7 +67,8 @@ class ChatBox:
 
             # TODO MAKE THIS A UTILITY IN NETWORKING
             if self.current_player.ip == Networking.get_instance().game.host.ip:
-                Networking.get_instance().host.callback_client_send(chat_event)
+                Networking.get_instance().send_to_all_client(chat_event)
+                chat_event.execute(Networking.get_instance().game)
             else:
                 Networking.get_instance().client.send(chat_event)
 
