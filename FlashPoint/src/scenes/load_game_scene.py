@@ -78,7 +78,7 @@ class LoadGame(object):
         with open(self.saves, mode='r', encoding='utf-8') as myFile:
             temp = json.load(myFile)
             for i, user in enumerate(temp):
-                print("ASS")
+               
                 x = user["time"]
                 temp_str : str = "Game " + str(i+1) +" "+ x
                 self.sprite_grp.add(self._init_save_elem(420, 130+34*i, temp_str,color.GREY,color.YELLOW))
