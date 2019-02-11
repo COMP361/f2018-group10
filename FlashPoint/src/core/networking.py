@@ -446,8 +446,11 @@ class Networking:
             return super(MastermindClientUDP, self).disconnect()
 
         def callback_client_receive(self, data):
-            data = JSONSerializer.deserialize(data)
+            """Handle receiving data from host."""
+            data: GameStateModel = JSONSerializer.deserialize(data)
+            print(f"Received {data.__class__} object from host.")
             if isinstance(data, GameStateModel):
+                print(f"Updating game object, there are now: {len(data.players)} players.")
                 Networking.get_instance().game = data
 
         def get_server_reply(self):
