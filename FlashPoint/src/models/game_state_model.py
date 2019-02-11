@@ -25,7 +25,6 @@ class GameStateModel(object):
         self._damage = 0
 
         self._max_damage = 24
-
         self._chat_history = []
 
     @property
