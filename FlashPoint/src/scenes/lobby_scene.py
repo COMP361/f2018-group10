@@ -21,16 +21,20 @@ class LobbyScene(object):
         self.sprite_grp = pygame.sprite.Group()
         self._init_all()
 
-    def _init_all(self):
+    def _init_all(self, reuse=False):
         self._init_background()
         self._init_ip_addr()
-        self.chat_box = ChatBox()
+        self.chat_box = ChatBox(Networking.get_instance().game, self._current_player)
 
-        if self._game.rules == GameKindEnum.EXPERIENCED:
-            self._init_selec_char(1050, 475, "Select Character", Color.STANDARDBTN, Color.BLACK)
-
-        self._init_btn_back(20, 20, "Exit", Color.STANDARDBTN, Color.BLACK)
-        self._init_ready(1050, 575, "Ready", Color.STANDARDBTN, Color.BLACK)
+        if not reuse:
+            self._init_btn_back(20, 20, "Exit", Color.STANDARDBTN, Color.BLACK)
+            self._init_ready(1050, 575, "Ready", Color.STANDARDBTN, Color.BLACK)
+            if self._game.rules == GameKindEnum.EXPERIENCED:
+                self._init_selec_char(1050, 475, "Select Character", Color.STANDARDBTN, Color.BLACK)
+        else:
+            if self._game.rules == GameKindEnum.EXPERIENCED:
+                self.sprite_grp.add(self.buttonSelChar)
+            self.sprite_grp.add(self.buttonReady, self.buttonBack)
         self._init_sprites()
 
     def _init_background(self):
@@ -92,7 +96,7 @@ class LobbyScene(object):
         self.sprite_grp.add(self._init_text_box(text_pos[0], self._current_player.nickname, self._current_player.color))
         self.sprite_grp.add(self._init_background_player(background_pos[0]))
 
-        players = [x for x in self._game.players if x.ip != self._current_player.ip]
+        players = [x for x in Networking.get_instance().game.players if x.ip != self._current_player.ip]
         i = 1
         for player in players:
             self.sprite_grp.add(self._init_text_box(text_pos[i], player.nickname, player.color))
@@ -108,8 +112,8 @@ class LobbyScene(object):
         self.chat_box.update(event_queue)
 
         # game is mutated by reference, BE CAREFUL!!!
-        if len(self._game.players) != self._player_count:
-            self._player_count = len(self._game.players)
+        if len(Networking.get_instance().game.players) != self._player_count:
+            self._player_count = len(Networking.get_instance().game.players)
             self.sprite_grp.empty()
-            self._init_all()
+            self._init_all(reuse=True)
 

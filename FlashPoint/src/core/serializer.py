@@ -2,6 +2,8 @@ import enum
 import json
 from typing import Dict
 
+from src.action_events.chat_event import ChatEvent
+from src.action_events.dummy_event import DummyEvent
 from src.action_events.join_event import JoinEvent
 from src.constants.state_enums import DifficultyLevelEnum, GameKindEnum, PlayerStatusEnum
 from src.models.game_state_model import GameStateModel
@@ -52,6 +54,12 @@ class JSONSerializer(object):
         return player
 
     @staticmethod
+    def _deserialize_chat_event(payload: Dict) -> ChatEvent:
+        message = payload['_message']
+        sender = payload['_sender']
+        return ChatEvent(message, sender)
+
+    @staticmethod
     def _deserialize_join_event(payload: Dict) -> JoinEvent:
         player = JSONSerializer._deserialize_player(payload['player'])
         return JoinEvent(player)
@@ -72,6 +80,10 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_game_state(payload)
         elif object_type == JoinEvent.__name__:
             return JSONSerializer._deserialize_join_event(payload)
+        elif object_type == ChatEvent.__name__:
+            return JSONSerializer._deserialize_chat_event(payload)
+        elif object_type == DummyEvent.__name__:
+            return DummyEvent()
 
         print("WARNING: Could not deserialize object, not of recognized type.")
 
@@ -84,3 +96,4 @@ class JSONSerializer(object):
     def serialize(input_obj: object) -> dict:
         """Perform a deep serialize to a dict, then can be dumped into json file."""
         return json.loads(json.dumps(input_obj, default=lambda x: JSONSerializer._safe_dict(x)))
+

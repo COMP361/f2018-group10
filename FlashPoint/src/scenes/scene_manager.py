@@ -1,4 +1,5 @@
 import time
+import os
 from typing import Optional
 
 import pygame
@@ -39,26 +40,23 @@ class SceneManager(object):
         self._current_player = None
         self._game = None
         self._network_poller = threading.Thread(target=self._poll_network)
-        self._network_poller.start()
         self._active_scene.buttonRegister.on_click(self.create_profile, self._active_scene.text_bar1)
         self.update_profiles()
 
-    def _poll_network(self, looping=True):
+    def _poll_network(self, timeout=0) -> bool:
         while True:
             while not Networking.get_instance().client:
                 time.sleep(0.0001)
 
             reply = Networking.get_instance().client.get_server_reply()
-
-            while not reply:
-                reply = Networking.get_instance().client.get_server_reply()
+            if not reply:
                 time.sleep(0.0001)
+                continue
+
             server_response = JSONSerializer.deserialize(reply)
 
             if isinstance(server_response, GameStateModel):
                 self._game = server_response
-            if not looping:
-                break
 
     def next(self, next_scene: callable, *args):
         """Switch to the next logical scene. args is assumed to be: [SceneClass]
@@ -126,8 +124,6 @@ class SceneManager(object):
         for event in event_queue:
             self.handle_event(event)
 
-
-
     def handle_event(self, event):
         # # join event
         # if event.type == CustomEvents.JOIN:
@@ -172,9 +168,13 @@ class SceneManager(object):
 
         try:
             Networking.get_instance().join_host(ip_addr, player=self._current_player)
-            self._poll_network(looping=False)
-            self.next(LobbyScene, self._current_player, self._game)
-
+            reply = Networking.wait_for_reply()
+            if reply:
+                Networking.set_game(JSONSerializer.deserialize(reply))
+                self._game = Networking.get_instance().game
+                self.next(LobbyScene, self._current_player, self._game)
+            else:
+                raise ConnectionError
         except ConnectionError:
             msg = "Unable to connect"
             print(msg)
@@ -201,6 +201,9 @@ class SceneManager(object):
     # ------------ Stuff for profiles and start scene ------------ #
 
     def update_profiles(self):
+        if not os.path.exists(self.profiles):
+            with open(self.profiles, mode="w+", encoding='utf-8') as myFile:
+                myFile.write("[]")
         with open(self.profiles, mode='r', encoding='utf-8') as myFile:
             temp = json.load(myFile)
             for i, user in enumerate(temp):
