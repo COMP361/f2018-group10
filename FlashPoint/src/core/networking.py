@@ -366,6 +366,7 @@ class Networking:
             # If it's a dummy event, don't do anything
             if isinstance(data, DummyEvent):
                 return
+
             print(f"Client at {connection_object.address} sent a message: {data}")
             if isinstance(data, ActionEvent):
                 if isinstance(data, JoinEvent):

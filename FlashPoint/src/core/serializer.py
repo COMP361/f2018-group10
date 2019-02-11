@@ -2,7 +2,7 @@ import enum
 import json
 from typing import Dict
 
-from action_events.dummy_event import DummyEvent
+from src.action_events.dummy_event import DummyEvent
 from src.action_events.join_event import JoinEvent
 from src.constants.state_enums import DifficultyLevelEnum, GameKindEnum, PlayerStatusEnum
 from src.models.game_state_model import GameStateModel
