@@ -61,7 +61,7 @@ class ChatBox:
         message = self.chat_textbox.message
         if message:
             # self.chat_history.append(self.chat_textbox.message)
-            self.game.add_chat_message(self.chat_textbox.message, self.current_player.nickname)
+            # self.game.add_chat_message(self.chat_textbox.message, self.current_player.nickname)
             chat_event = ChatEvent(self.chat_textbox.message, self.current_player.nickname)
             Networking.get_instance().client.send(chat_event)
 
