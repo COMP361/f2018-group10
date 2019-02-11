@@ -96,7 +96,7 @@ class LobbyScene(object):
         self.sprite_grp.add(self._init_text_box(text_pos[0], self._current_player.nickname, self._current_player.color))
         self.sprite_grp.add(self._init_background_player(background_pos[0]))
 
-        players = [x for x in self._game.players if x.ip != self._current_player.ip]
+        players = [x for x in Networking.get_instance().game.players if x.ip != self._current_player.ip]
         i = 1
         for player in players:
             self.sprite_grp.add(self._init_text_box(text_pos[i], player.nickname, player.color))
@@ -112,8 +112,8 @@ class LobbyScene(object):
         self.chat_box.update(event_queue)
 
         # game is mutated by reference, BE CAREFUL!!!
-        if len(self._game.players) != self._player_count:
-            self._player_count = len(self._game.players)
+        if len(Networking.get_instance().game.players) != self._player_count:
+            self._player_count = len(Networking.get_instance().game.players)
             self.sprite_grp.empty()
             self._init_all(reuse=True)
 
