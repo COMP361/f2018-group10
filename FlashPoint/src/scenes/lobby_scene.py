@@ -19,6 +19,7 @@ class LobbyScene(object):
 
         self.resolution = (1280, 700)
         self.sprite_grp = pygame.sprite.Group()
+        self.players_not_ready_prompt = None
         self._init_all()
 
     def _init_all(self, reuse=False):
@@ -28,14 +29,29 @@ class LobbyScene(object):
 
         if not reuse:
             self._init_btn_back(20, 20, "Exit", Color.STANDARDBTN, Color.BLACK)
-            self._init_ready(1050, 575, "Ready", Color.STANDARDBTN, Color.BLACK)
+
+            if self._current_player.ip == Networking.get_instance().game.host.ip:
+                self._init_start_game_button()
+            else:
+                self._init_ready(1050, 575, "Ready", Color.STANDARDBTN, Color.BLACK)
+
             if self._game.rules == GameKindEnum.EXPERIENCED:
                 self._init_selec_char(1050, 475, "Select Character", Color.STANDARDBTN, Color.BLACK)
         else:
             if self._game.rules == GameKindEnum.EXPERIENCED:
                 self.sprite_grp.add(self.buttonSelChar)
+            if self._current_player.ip == Networking.get_instance().game.host.ip:
+                self.sprite_grp.add(self.start_button)
             self.sprite_grp.add(self.buttonReady, self.buttonBack)
+
         self._init_sprites()
+
+    def _init_start_game_button(self):
+        """Button for starting the game once all players have clicked ready."""
+        box_size = (130, 48)
+        self.start_button = RectButton(1050, 575, box_size[0], box_size[1], Color.STANDARDBTN, 0,
+                                      Text(pygame.font.SysFont('Arial', 20), "Start", Color.BLACK))
+        self.sprite_grp.add(self.start_button)
 
     def _init_background(self):
         box_size = (self.resolution[0], self.resolution[1])
@@ -103,9 +119,24 @@ class LobbyScene(object):
             self.sprite_grp.add(self._init_background_player(background_pos[i]))
             i += 1
 
+    def not_enough_players_ready_prompt(self):
+        """Prompt to the host that there are not enough players to join the game."""
+        label_width = 400
+        label_height = 30
+        label_left = 1050 - 100
+        label_top = (pygame.display.get_surface().get_size()[1] - 50) - (label_height/2)
+        message = f"Not all players are ready!"
+        prompt_label = RectLabel(label_left, label_top, label_width, label_height, Color.WHITE,
+                                 txt_obj=Text(pygame.font.SysFont('Arial', 24), message))
+        prompt_label.set_transparent_background(True)
+        self.players_not_ready_prompt = prompt_label
+
     def draw(self, screen):
         self.sprite_grp.draw(screen)
         self.chat_box.draw(screen)
+
+        if self.players_not_ready_prompt:
+            self.players_not_ready_prompt.draw(screen)
 
     def update(self, event_queue):
         self.sprite_grp.update(event_queue)
@@ -116,4 +147,6 @@ class LobbyScene(object):
             self._player_count = len(Networking.get_instance().game.players)
             self.sprite_grp.empty()
             self._init_all(reuse=True)
+
+
 

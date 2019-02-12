@@ -109,9 +109,11 @@ class SceneManager(object):
         if isinstance(self._active_scene, LobbyScene):
             if self._game.rules == GameKindEnum.EXPERIENCED:
                 self._active_scene.buttonSelChar.on_click(self.next, CharacterScene, self._current_player)
-
+            if Networking.get_instance().game.host.ip == self._current_player.ip:
+                self._active_scene.start_button.on_click(self.start_game)
+            else:
+                self._active_scene.buttonReady.on_click(self.set_ready)
             self._active_scene.buttonBack.on_click(self.disconnect, HostJoinScene, self._current_player)
-            self._active_scene.buttonReady.on_click(self.set_ready)
 
         FileImporter.play_audio("media/soundeffects/ButtonClick.wav", fade_ms=10)
 
@@ -130,6 +132,15 @@ class SceneManager(object):
         # if event.type == CustomEvents.JOIN:
         #     self.join(event.ip,)
         pass
+
+    def start_game(self):
+        """Callback for when the host tries to start the game."""
+        game = Networking.get_instance().game
+        players_ready = len([player.status == PlayerStatusEnum.READY for player in game.players])
+        if not players_ready == game.max_players:
+            self._active_scene.not_enough_players_ready_prompt()
+            return
+        # TODO: HAW START THE GAME
 
     def set_ready(self):
         """Set the status of the current player to ready."""
