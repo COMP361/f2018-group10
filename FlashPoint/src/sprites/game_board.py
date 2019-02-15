@@ -1,11 +1,9 @@
 import pygame
 
 
-import src.constants.color as Color
 import src.constants.main_constants as MainConst
 from src.UIComponents.file_importer import FileImporter
 from src.sprites.grid_sprite import GridSprite
-from src.sprites.player_sprite import PlayerSprite
 from src.core.event_queue import EventQueue
 
 

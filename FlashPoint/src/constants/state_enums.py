@@ -44,6 +44,11 @@ class POIStatusEnum(Enum):
     REVEALED = auto()
 
 
+class POITypeEnum(Enum):
+    VICTIM = auto()
+    FALSE_ALARM = auto()
+
+
 class SpaceKindEnum(Enum):
     INDOOR = auto()
     OUTDOOR = auto()

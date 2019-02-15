@@ -1,8 +1,8 @@
 import json
-import copy
 from datetime import datetime
 
 import pygame
+from src.core.networking import Networking
 
 from src.UIComponents.chat_box import ChatBox
 from src.UIComponents.menu_window import MenuWindow
@@ -34,12 +34,11 @@ class GameBoardScene(object):
 
         self.active_sprites = pygame.sprite.Group()   # Maybe add separate groups for different things later
         self.game_board = GameBoard()
-        self.chat_box = ChatBox()
+        self.chat_box = ChatBox(Networking.get_instance().game, self._current_player)
         self.menu = None
         self._init_sprites()
 
     def _init_sprites(self):
-
         for i, player in enumerate(self._game.players):
             self.active_sprites.add(PlayerState(0, 30 + 64*i, player.nickname, player.color))
 

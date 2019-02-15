@@ -2,6 +2,7 @@ import random
 
 from typing import List, Optional, Tuple
 
+from src.models.game_board.game_board_model import GameBoardModel
 from src.constants.state_enums import GameKindEnum, DifficultyLevelEnum
 from src.core.flashpoint_exceptions import TooManyPlayersException, InvalidGameKindException, PlayerNotFoundException
 from src.models.game_units.player_model import PlayerModel
@@ -20,12 +21,18 @@ class GameStateModel(object):
         self._red_dice = 0
         self._black_dice = 0
 
+        self._game_board = GameBoardModel(self._rules)
+
         self._victims_saved = 0
         self._victims_lost = 0
         self._damage = 0
 
         self._max_damage = 24
         self._chat_history = []
+
+    @property
+    def game_board(self) -> GameBoardModel:
+        return self._game_board
 
     @property
     def chat_history(self) -> List[Tuple[str, str]]:
