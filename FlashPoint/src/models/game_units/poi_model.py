@@ -1,8 +1,8 @@
 from src.constants.state_enums import POIStatusEnum
-from src.models.game_units.game_unit import GameUnit
+from models.model import Model
 
 
-class POIModel(GameUnit):
+class POIModel(Model):
 
     def __init__(self, tile, status: POIStatusEnum):
         super().__init__(tile)

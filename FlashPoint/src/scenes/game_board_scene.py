@@ -39,7 +39,6 @@ class GameBoardScene(object):
         self._init_sprites()
 
     def _init_sprites(self):
-
         for i, player in enumerate(self._game.players):
             self.active_sprites.add(PlayerState(0, 30 + 64*i, player.nickname, player.color))
 

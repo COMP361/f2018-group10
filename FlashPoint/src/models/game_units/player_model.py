@@ -1,11 +1,12 @@
-from typing import Tuple
+from typing import Tuple, List
 
 import src.constants.color as Color
+from src.observers.player_observer import PlayerObserver
 from src.constants.state_enums import PlayerStatusEnum
-from src.models.game_units.game_unit import GameUnit
+from src.models.model import Model
 
 
-class PlayerModel(GameUnit):
+class PlayerModel(Model):
 
     def __init__(self, ip: str, nickname: str):
         super().__init__()
@@ -23,6 +24,26 @@ class PlayerModel(GameUnit):
     def __eq__(self, other):
         x = [other.ip == self.ip, other.nickname == self.nickname, other.x_pos == self.x_pos, other.y_pos == self.y_pos]
         return all(x)
+
+    def _notify_position(self, x_pos: int, y_pos: int):
+        for obs in self.observers:
+            obs.player_position_changed(x_pos, y_pos)
+
+    def _notify_ap(self, ap: int):
+        for obs in self.observers:
+            obs.player_ap_changed(ap)
+
+    def _notify_special_ap(self, ap: int):
+        for obs in self.observers:
+            obs.player_special_ap_changed(ap)
+
+    def _notify_status(self, status: PlayerStatusEnum):
+        for obs in self.observers:
+            obs.player_status_changed(status)
+
+    @property
+    def observers(self) -> List[PlayerObserver]:
+        return self._observers
 
     @property
     def x_pos(self) -> int:

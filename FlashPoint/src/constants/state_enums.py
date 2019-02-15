@@ -34,9 +34,7 @@ class GameStateEnum(Enum):
 
 
 class PlayerStatusEnum(Enum):
-    OFFLINE = auto()
     READY = auto()
-    ONLINE = auto()
     IN_GAME = auto()
 
 

@@ -2,15 +2,17 @@ import random
 
 from typing import List, Optional, Tuple
 
+from src.models.model import Model
 from src.constants.state_enums import GameKindEnum, DifficultyLevelEnum
 from src.core.flashpoint_exceptions import TooManyPlayersException, InvalidGameKindException
 from src.models.game_units.player_model import PlayerModel
 
 
-class GameStateModel(object):
+class GameStateModel(Model):
     """Class for maintaining the current Game state."""
 
     def __init__(self, host: PlayerModel, num_players: int, game_kind: GameKindEnum):
+        super().__init__()
         self._host = host
         self._max_desired_players = 6
         self._players = [self._host]
