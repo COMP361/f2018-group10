@@ -34,7 +34,7 @@ class GameBoardScene(object):
 
         self.active_sprites = pygame.sprite.Group()   # Maybe add separate groups for different things later
         self.game_board = GameBoard()
-        self.chat_box = ChatBox()
+        self.chat_box = ChatBox(game, self._current_player)
         self.menu = None
         self._init_sprites()
 
