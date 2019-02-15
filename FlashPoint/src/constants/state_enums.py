@@ -34,7 +34,6 @@ class GameStateEnum(Enum):
 
 
 class PlayerStatusEnum(Enum):
-    OFFLINE = auto()
     READY = auto()
     IN_GAME = auto()
 
@@ -44,7 +43,7 @@ class POIStatusEnum(Enum):
     REVEALED = auto()
 
 
-class POITypeEnum(Enum):
+class POIIdentityEnum(Enum):
     VICTIM = auto()
     FALSE_ALARM = auto()
 

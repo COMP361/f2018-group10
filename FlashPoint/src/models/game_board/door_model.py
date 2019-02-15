@@ -1,10 +1,5 @@
-<<<<<<< HEAD:FlashPoint/src/models/game_board/DoorModel.py
-from src.constants.enums.door_status_enum import DoorStatusEnum
-from src.models.game_board.EdgeObstacleModel import EdgeObstacleModel
-=======
-from src.constants.enums.DoorStatusEnum import DoorStatusEnum
+from src.constants.state_enums import DoorStatusEnum
 from src.models.game_board.edge_obstacle_model import EdgeObstacleModel
->>>>>>> GSD-Alek:FlashPoint/src/models/game_board/door_model.py
 
 
 class DoorModel(EdgeObstacleModel):

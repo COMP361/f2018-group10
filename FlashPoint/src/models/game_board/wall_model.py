@@ -1,10 +1,6 @@
-<<<<<<< HEAD:FlashPoint/src/models/game_board/WallModel.py
-from src.models.game_board.EdgeObstacleModel import EdgeObstacleModel
-from src.constants.enums.wall_status_enum import WallStatusEnum
-=======
+
 from src.models.game_board.edge_obstacle_model import EdgeObstacleModel
-from src.constants.enums.WallStatusEnum import WallStatusEnum
->>>>>>> GSD-Alek:FlashPoint/src/models/game_board/wall_model.py
+from src.constants.state_enums import WallStatusEnum
 
 
 class WallModel(EdgeObstacleModel):
