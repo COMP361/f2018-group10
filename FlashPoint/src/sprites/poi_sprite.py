@@ -1,12 +1,16 @@
 import pygame
+from constants.state_enums import POIStatusEnum
+from src.observers.poi_observer import POIObserver
 
-from src.models.game_board import tile_model
-from src.models.game_units import poi_model
 
+class POISprite(pygame.sprite.Sprite, POIObserver):
+    """Visual representation of a POI."""
 
-class POISprite(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
 
-    def __init__(self, tile: tile_model, poi: poi_model):
-        super.__init__()
-        self.tile_reference = tile
-        self.poi_model = poi
+    def poi_status_changed(self, status: POIStatusEnum):
+        pass
+
+    def poi_position_changed(self, x_pos: int, y_pos: int):
+        pass
