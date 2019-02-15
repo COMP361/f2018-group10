@@ -25,21 +25,29 @@ class PlayerModel(Model):
         x = [other.ip == self.ip, other.nickname == self.nickname, other.x_pos == self.x_pos, other.y_pos == self.y_pos]
         return all(x)
 
-    def _notify_position(self, x_pos: int, y_pos: int):
+    def _notify_position(self):
         for obs in self.observers:
-            obs.player_position_changed(x_pos, y_pos)
+            obs.player_position_changed(self.x_pos, self.y_pos)
 
-    def _notify_ap(self, ap: int):
+    def _notify_ap(self):
         for obs in self.observers:
-            obs.player_ap_changed(ap)
+            obs.player_ap_changed(self.ap)
 
-    def _notify_special_ap(self, ap: int):
+    def _notify_special_ap(self):
         for obs in self.observers:
-            obs.player_special_ap_changed(ap)
+            obs.player_special_ap_changed(self.special_ap)
 
-    def _notify_status(self, status: PlayerStatusEnum):
+    def _notify_status(self):
         for obs in self.observers:
-            obs.player_status_changed(status)
+            obs.player_status_changed(self.status)
+
+    def _notify_wins(self):
+        for obs in self.observers:
+            obs.player_wins_changed(self.wins)
+
+    def _notify_losses(self):
+        for obs in self.observers:
+            obs.player_losses_changed(self.losses)
 
     @property
     def observers(self) -> List[PlayerObserver]:
@@ -52,6 +60,7 @@ class PlayerModel(Model):
     @x_pos.setter
     def x_pos(self, x_pos: int):
         self._x_pos = x_pos
+        self._notify_position()
 
     @property
     def y_pos(self) -> int:
@@ -60,6 +69,7 @@ class PlayerModel(Model):
     @y_pos.setter
     def y_pos(self, y_pos: int):
         self._y_pos = y_pos
+        self._notify_position()
 
     @property
     def ip(self) -> str:
@@ -92,6 +102,7 @@ class PlayerModel(Model):
     @wins.setter
     def wins(self, wins: int):
         self._wins = wins
+        self._notify_wins()
 
     @property
     def losses(self) -> int:
@@ -100,6 +111,7 @@ class PlayerModel(Model):
     @losses.setter
     def losses(self, losses: int):
         self._losses = losses
+        self._notify_losses()
 
     @property
     def ap(self) -> int:
@@ -108,6 +120,7 @@ class PlayerModel(Model):
     @ap.setter
     def ap(self, ap: int):
         self._ap = ap
+        self._notify_ap()
 
     @property
     def special_ap(self) -> int:
@@ -116,6 +129,7 @@ class PlayerModel(Model):
     @special_ap.setter
     def special_ap(self, special_ap: int):
         self._special_ap = special_ap
+        self._notify_special_ap()
 
     @property
     def status(self) -> PlayerStatusEnum:
@@ -124,3 +138,4 @@ class PlayerModel(Model):
     @status.setter
     def status(self, status: PlayerStatusEnum):
         self._status = status
+        self._notify_status()
