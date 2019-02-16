@@ -1,10 +1,12 @@
 import json
 import random
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 
+from src.models.game_board.edge_obstacle_model import EdgeObstacleModel
 from src.models.game_units.poi_model import POIModel
 from src.models.game_board.tile_model import TileModel
-from src.constants.state_enums import GameKindEnum, SpaceKindEnum, SpaceStatusEnum, POIIdentityEnum, DirectionEnum
+from src.constants.state_enums import GameKindEnum, SpaceKindEnum, SpaceStatusEnum, POIIdentityEnum, DirectionEnum, \
+    DoorStatusEnum
 from src.models.game_board.wall_model import WallModel
 from src.models.game_board.door_model import DoorModel
 
@@ -53,33 +55,58 @@ class GameBoardModel(object):
             tiles.append(tile)
 
         # TODO: Abhijay: setting adjacency and creating walls/doors.
-        # setting the inner adjacencies
+        # setting the top and bottom walls on the outside of the house
+        for top, bottom in [(0, 1), (6, 7)]:
+            for i in range(1, 9):
+                wall = WallModel()
+                self.get_tile_at(top, i).set_adjacent_edge_obstacle(DirectionEnum.SOUTH, wall)
+                self.get_tile_at(bottom, i).set_adjacent_edge_obstacle(DirectionEnum.NORTH, wall)
+
+        # setting the left and right walls on the outside of the house
+        for left, right in [(0, 1), (8, 9)]:
+            for i in range(1, 7):
+                wall = WallModel()
+                self.get_tile_at(left, i).set_adjacent_edge_obstacle(DirectionEnum.EAST, wall)
+                self.get_tile_at(right, i).set_adjacent_edge_obstacle(DirectionEnum.WEST, wall)
+
+
+        # setting the doors present on the outside of the house EXPLICITLY
+        with open("media/board_layouts/outside_door_locations.json", "r") as f:
+            outside_doors = json.load(f)
+
+        for out_door_adjacency in outside_doors:
+            door = DoorModel(DoorStatusEnum.OPEN)
+            self.set_single_obstacle(out_door_adjacency, door)
+
+        # setting the walls and doors present inside the house
         with open("media/board_layouts/tiles_adjacencies.json", "r") as f:
             inner_adjacencies = json.load(f)
 
-        for adjaceny in inner_adjacencies:
-            first_pair, second_pair = adjaceny['first_pair'], adjaceny['second_pair']
-            first_dirn, second_dirn = adjaceny['first_dirn'], adjaceny['second_dirn']
-
-            if adjaceny['obstacle_type'] == 'wall':
+        for adjacency in inner_adjacencies:
+            if adjacency['obstacle_type'] == 'wall':
                 obstacle = WallModel()
             else:
                 obstacle = DoorModel()
 
-            for coord, direction in [(first_pair, first_dirn), (second_pair, second_dirn)]:
-                if direction == 'NORTH':
-                    direction = DirectionEnum.NORTH
-                elif direction == 'EAST':
-                    direction = DirectionEnum.EAST
-                elif direction == 'WEST':
-                    direction = DirectionEnum.WEST
-                else:
-                    direction = DirectionEnum.SOUTH
-
-                self.get_tile_at(coord[0], coord[1]).set_adjacent_edge_obstacle(direction, obstacle)
-
+            self.set_single_obstacle(adjacency, obstacle)
 
         return tiles
+
+    def set_single_obstacle(self, adjacency: Dict, obstacle: EdgeObstacleModel):
+        first_pair, second_pair = adjacency['first_pair'], adjacency['second_pair']
+        first_dirn, second_dirn = adjacency['first_dirn'], adjacency['second_dirn']
+        for coord, direction in [(first_pair, first_dirn), (second_pair, second_dirn)]:
+            if direction == 'NORTH':
+                direction = DirectionEnum.NORTH
+            elif direction == 'EAST':
+                direction = DirectionEnum.EAST
+            elif direction == 'WEST':
+                direction = DirectionEnum.WEST
+            else:
+                direction = DirectionEnum.SOUTH
+
+            self.get_tile_at(coord[0], coord[1]).set_adjacent_edge_obstacle(direction, obstacle)
+
 
     def _init_all_tiles_experienced_classic(self):
         pass
