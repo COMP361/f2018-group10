@@ -145,7 +145,7 @@ class GameBoardModel(object):
         locations = GameBoardModel._load_family_fire_locations()
 
         for location in locations:
-            self.get_tile_at(location[1], location[0]).space_status = SpaceStatusEnum.FIRE
+            self.get_tile_at(location[0], location[1]).space_status = SpaceStatusEnum.FIRE
 
     def set_initial_poi_family(self):
         """
@@ -160,7 +160,7 @@ class GameBoardModel(object):
             number = random.randint(0, len(self._poi_bank))
             poi = self._poi_bank.pop(number)
             # Location indices are inverted cause i wrote the list wrong lel
-            poi.x_pos = locations[i][1]
-            poi.y_pos = locations[i][0]
+            poi.x_pos = locations[i][0]
+            poi.y_pos = locations[i][1]
             self._active_pois.append(poi)
             self.get_tile_at(poi.x_pos, poi.y_pos).add_associated_model(poi)
