@@ -3,6 +3,7 @@ import random
 from typing import List, Tuple, Dict
 
 from src.models.game_board.edge_obstacle_model import EdgeObstacleModel
+from src.models.game_board.null_tile_model import NullTileModel
 from src.models.game_units.poi_model import POIModel
 from src.models.game_board.tile_model import TileModel
 from src.constants.state_enums import GameKindEnum, SpaceKindEnum, SpaceStatusEnum, POIIdentityEnum, DirectionEnum, \
@@ -18,7 +19,7 @@ class GameBoardModel(object):
     """
 
     def __init__(self, game_type: GameKindEnum):
-        self._dimensions = (10, 8)
+        self._dimensions = (8, 10)
         self._tiles = self._init_all_tiles_family_classic() if game_type == GameKindEnum.FAMILY else None
         self._poi_bank = GameBoardModel._init_pois()
         self._active_pois = []
@@ -47,14 +48,38 @@ class GameBoardModel(object):
         """Create all tiles and set their adjacency. """
         tiles = []
 
-        for i in range(self._dimensions[0]*self._dimensions[1]):
-            row = i % self._dimensions[0]
-            column = int(i / self._dimensions[0])
-            tile_kind = self._determine_tile_kind(row, column)
-            tile = TileModel(row, column, tile_kind)
-            tiles.append(tile)
+        # for i in range(self._dimensions[0]*self._dimensions[1]):
+        #     row = i % self._dimensions[0]
+        #     column = int(i / self._dimensions[0])
+        #     tile_kind = self._determine_tile_kind(row, column)
+        #     tile = TileModel(row, column, tile_kind)
+        #     tiles.append(tile)
+
+        for i in range(self._dimensions[0]):
+            tiles.append([])
+            for j in range(self._dimensions[1]):
+                tile_kind = self._determine_tile_kind(i, j)
+                tile = TileModel(i, j, tile_kind)
+                tiles[i].append(tile)
 
         # TODO: Abhijay: setting adjacency and creating walls/doors.
+        # setting tile adjacencies
+        extended_grid = []
+        for row in tiles:
+            extended_grid.append([NullTileModel()] + row + [NullTileModel()])
+
+        row_length = len(tiles[0])
+        extra_top_row = [NullTileModel() for x in range(row_length + 2)]
+        extra_bottom_row = [NullTileModel() for x in range(row_length + 2)]
+        extended_grid = [extra_top_row] + extended_grid + [extra_bottom_row]
+
+        for i in range(1, len(extended_grid) - 1):
+            for j in range(1, len(extended_grid[0]) - 1):
+                extended_grid[i][j].north_tile = extended_grid[i - 1][j]
+                extended_grid[i][j].east_tile = extended_grid[i][j + 1]
+                extended_grid[i][j].west_tile = extended_grid[i][j - 1]
+                extended_grid[i][j].south_tile = extended_grid[i + 1][j]
+
         # setting the top and bottom walls on the outside of the house
         for top, bottom in [(0, 1), (6, 7)]:
             for i in range(1, 9):
@@ -112,9 +137,8 @@ class GameBoardModel(object):
         pass
 
     def get_tile_at(self, row: int, column: int) -> TileModel:
-        """Grab the tilemodel at a given position"""
-        index = row*self._dimensions[0] + column
-        return self._tiles[index]
+        """Grab the TileModel at a given position"""
+        return self._tiles[row][column]
 
     def set_fires_family(self):
         """Set all necessary tiles to on fire when starting a classic family game."""
