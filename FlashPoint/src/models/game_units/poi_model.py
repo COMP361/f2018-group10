@@ -7,12 +7,12 @@ from src.models.model import Model
 
 class POIModel(Model):
 
-    def __init__(self, identity: POIIdentityEnum, x_pos: int, y_pos: int):
+    def __init__(self, identity: POIIdentityEnum):
         super().__init__()
         self._identity = identity
         self._status = POIStatusEnum.HIDDEN
-        self._x_pos = x_pos
-        self._y_pos = y_pos
+        self._x_pos = 0
+        self._y_pos = 0
 
     def _notify_status(self):
         for obs in self.observers:

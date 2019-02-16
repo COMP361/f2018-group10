@@ -4,7 +4,7 @@ from typing import List, Tuple
 
 from src.models.game_units.poi_model import POIModel
 from src.models.game_board.tile_model import TileModel
-from src.constants.state_enums import GameKindEnum, SpaceKindEnum, SpaceStatusEnum, POITypeEnum
+from src.constants.state_enums import GameKindEnum, SpaceKindEnum, SpaceStatusEnum, POIIdentityEnum
 
 
 class GameBoardModel(object):
@@ -14,8 +14,19 @@ class GameBoardModel(object):
     """
 
     def __init__(self, game_type: GameKindEnum):
-        self._tiles = self._init_all_tiles_family_classic() if game_type == GameKindEnum.FAMILY else None
         self._dimensions = (10, 8)
+        self._tiles = self._init_all_tiles_family_classic() if game_type == GameKindEnum.FAMILY else None
+        self._poi_bank = GameBoardModel._init_pois()
+        self._active_pois = []
+
+    @staticmethod
+    def _init_pois():
+        pois = []
+        for i in range(5):
+            pois.append(POIModel(POIIdentityEnum.VICTIM))
+        for i in range(5):
+            pois.append(POIModel(POIIdentityEnum.FALSE_ALARM))
+        return pois
 
     @staticmethod
     def _load_family_fire_locations() -> List[Tuple[int, int]]:
@@ -55,19 +66,22 @@ class GameBoardModel(object):
         locations = GameBoardModel._load_family_fire_locations()
 
         for location in locations:
-            self.get_tile_at(location[0], location[1]).space_status = SpaceStatusEnum.FIRE
+            self.get_tile_at(location[1], location[0]).space_status = SpaceStatusEnum.FIRE
 
-    def set_poi_family(self) -> List[Tuple[int, int]]:
+    def set_initial_poi_family(self):
         """
-        Set all poi locations for a family game.
+        Set active POI's and their positions for a family game.
+        Set all initial POIlocations for a family game.
         Returns the locations that were randomly chosen for reuse in the PlacePOIEvent
-        Chooses 3 POI's with probability 1/3 of being a false alarm and 2/3 of being a victim
         """
-        pois = []
+
+        locations = [[2, 4], [5, 1], [5, 8]]
+
         for i in range(3):
-            number = random.randint(1, 3)
-            poi_type = POITypeEnum.FALSE_ALARM if number == 1 else POITypeEnum.VICTIM
-            pois.append(POIModel(poi_type))
-
-        # TODO: Would add the POI to the tiles here, but not sure how we're dealing with composition in Tile yet.
-
+            number = random.randint(0, len(self._poi_bank))
+            poi = self._poi_bank.pop(number)
+            # Location indices are inverted cause i wrote the list wrong lel
+            poi.x_pos = locations[i][1]
+            poi.y_pos = locations[i][0]
+            self._active_pois.append(poi)
+            self.get_tile_at(poi.x_pos, poi.y_pos).add_associated_model(poi)

@@ -1,31 +1,25 @@
-import pygame
-
 from typing import Optional
 
-from core.flashpoint_exceptions import TilePositionOutOfBoundsException
-from src.models.game_units.game_unit import GameUnit
+from src.models.model import Model
+from src.core.flashpoint_exceptions import TilePositionOutOfBoundsException
 from src.models.game_board.edge_obstacle_model import EdgeObstacleModel
 from src.models.game_board.null_tile_model import NullTileModel
-
-from src.sprites.game_unit_sprite import GameUnitSprite
-
 from src.constants.state_enums import DirectionEnum
 from src.constants.state_enums import SpaceKindEnum
 from src.constants.state_enums import SpaceStatusEnum
 
 
-class TileModel(object):
+class TileModel(Model):
     """Logical state of a Tile object."""
 
     def __init__(self, x_coord: int, y_coord: int, space_kind: SpaceKindEnum):
+        super().__init__()
         self._x_coord = x_coord
         self._y_coord = y_coord
         self._space_kind = space_kind
         self._space_status = SpaceStatusEnum.SAFE
         self._is_hotspot = False
-        self._game_units = []
-
-        self._game_unit_sprites = pygame.sprite.Group()
+        self._associated_models = []
 
         self._adjacent_tiles = {
             DirectionEnum.NORTH: NullTileModel(),
@@ -67,10 +61,6 @@ class TileModel(object):
     @property
     def is_hotspot(self):
         return self._is_hotspot
-
-    @property
-    def game_unit_sprites(self):
-        return self._game_unit_sprites
 
     @property
     def adjacent_tiles(self):
@@ -160,13 +150,13 @@ class TileModel(object):
         """
         return self._adjacent_edge_objects.get(direction, None)
 
-    # def add_game_unit_sprite(self, game_unit_sprite: GameUnitSprite):
-    #     """TODO: Should check if valid sprite type."""
-    #     self._game_unit_sprites.add(game_unit_sprite)
-    def add_game_unit(self, game_unit: GameUnit):
-        """Add to the list of game unit models associated on this tile."""
-        self._game_units.append(game_unit)
+    @property
+    def associated_models(self):
+        return self._associated_models
 
-    def add_game_unit_sprite(self, game_unit_sprite: GameUnitSprite):
-        """TODO: Make sure to add raising exceptions if the added game sprite is illegal"""
-        type = game_unit_sprite.get_sprite()
+    def add_associated_model(self, model: Model):
+        self._associated_models.append(model)
+
+    def remove_associated_model(self, model: Model):
+        """CAUTION: YOUR MODEL MUST HAVE AN __EQ__ METHOD DEFINED FOR THIS TO WORK AS EXPECTED"""
+        self._associated_models.remove(model)

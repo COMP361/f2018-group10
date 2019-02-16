@@ -35,6 +35,7 @@ class GameStateEnum(Enum):
 
 class PlayerStatusEnum(Enum):
     READY = auto()
+    NOT_READY = auto()
     IN_GAME = auto()
 
 
