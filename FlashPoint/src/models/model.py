@@ -1,7 +1,7 @@
 from abc import ABC
 from typing import List
 
-from observers.observer import Observer
+from src.observers.observer import Observer
 
 
 class Model(ABC):

@@ -4,7 +4,9 @@ from typing import List, Tuple
 
 from src.models.game_units.poi_model import POIModel
 from src.models.game_board.tile_model import TileModel
-from src.constants.state_enums import GameKindEnum, SpaceKindEnum, SpaceStatusEnum, POIIdentityEnum
+from src.constants.state_enums import GameKindEnum, SpaceKindEnum, SpaceStatusEnum, POIIdentityEnum, DirectionEnum
+from src.models.game_board.wall_model import WallModel
+from src.models.game_board.door_model import DoorModel
 
 
 class GameBoardModel(object):
@@ -51,6 +53,32 @@ class GameBoardModel(object):
             tiles.append(tile)
 
         # TODO: Abhijay: setting adjacency and creating walls/doors.
+        # setting the inner adjacencies
+        with open("media/board_layouts/tiles_adjacencies.json", "r") as f:
+            inner_adjacencies = json.load(f)
+
+        for adjaceny in inner_adjacencies:
+            first_pair, second_pair = adjaceny['first_pair'], adjaceny['second_pair']
+            first_dirn, second_dirn = adjaceny['first_dirn'], adjaceny['second_dirn']
+
+            if adjaceny['obstacle_type'] == 'wall':
+                obstacle = WallModel()
+            else:
+                obstacle = DoorModel()
+
+            for coord, direction in [(first_pair, first_dirn), (second_pair, second_dirn)]:
+                if direction == 'NORTH':
+                    direction = DirectionEnum.NORTH
+                elif direction == 'EAST':
+                    direction = DirectionEnum.EAST
+                elif direction == 'WEST':
+                    direction = DirectionEnum.WEST
+                else:
+                    direction = DirectionEnum.SOUTH
+
+                self.get_tile_at(coord[0], coord[1]).set_adjacent_edge_obstacle(direction, obstacle)
+
+
         return tiles
 
     def _init_all_tiles_experienced_classic(self):
