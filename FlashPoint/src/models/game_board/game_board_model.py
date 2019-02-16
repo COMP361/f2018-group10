@@ -91,8 +91,8 @@ class GameBoardModel(object):
         for left, right in [(0, 1), (8, 9)]:
             for i in range(1, 7):
                 wall = WallModel()
-                tiles[left][i].set_adjacent_edge_obstacle(DirectionEnum.EAST, wall)
-                tiles[right][i].set_adjacent_edge_obstacle(DirectionEnum.WEST, wall)
+                tiles[i][left].set_adjacent_edge_obstacle(DirectionEnum.EAST, wall)
+                tiles[i][right].set_adjacent_edge_obstacle(DirectionEnum.WEST, wall)
 
 
         # setting the doors present on the outside of the house EXPLICITLY
