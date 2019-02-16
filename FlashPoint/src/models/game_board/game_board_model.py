@@ -84,15 +84,15 @@ class GameBoardModel(object):
         for top, bottom in [(0, 1), (6, 7)]:
             for i in range(1, 9):
                 wall = WallModel()
-                self.get_tile_at(top, i).set_adjacent_edge_obstacle(DirectionEnum.SOUTH, wall)
-                self.get_tile_at(bottom, i).set_adjacent_edge_obstacle(DirectionEnum.NORTH, wall)
+                tiles[top][i].set_adjacent_edge_obstacle(DirectionEnum.SOUTH, wall)
+                tiles[bottom][i].set_adjacent_edge_obstacle(DirectionEnum.NORTH, wall)
 
         # setting the left and right walls on the outside of the house
         for left, right in [(0, 1), (8, 9)]:
             for i in range(1, 7):
                 wall = WallModel()
-                self.get_tile_at(left, i).set_adjacent_edge_obstacle(DirectionEnum.EAST, wall)
-                self.get_tile_at(right, i).set_adjacent_edge_obstacle(DirectionEnum.WEST, wall)
+                tiles[left][i].set_adjacent_edge_obstacle(DirectionEnum.EAST, wall)
+                tiles[right][i].set_adjacent_edge_obstacle(DirectionEnum.WEST, wall)
 
 
         # setting the doors present on the outside of the house EXPLICITLY
@@ -101,7 +101,7 @@ class GameBoardModel(object):
 
         for out_door_adjacency in outside_doors:
             door = DoorModel(DoorStatusEnum.OPEN)
-            self.set_single_obstacle(out_door_adjacency, door)
+            self.set_single_obstacle(tiles, out_door_adjacency, door)
 
         # setting the walls and doors present inside the house
         with open("media/board_layouts/tiles_adjacencies.json", "r") as f:
@@ -113,11 +113,11 @@ class GameBoardModel(object):
             else:
                 obstacle = DoorModel()
 
-            self.set_single_obstacle(adjacency, obstacle)
+            self.set_single_obstacle(tiles, adjacency, obstacle)
 
         return tiles
 
-    def set_single_obstacle(self, adjacency: Dict, obstacle: EdgeObstacleModel):
+    def set_single_obstacle(self, tiles: List[List[TileModel]], adjacency: Dict, obstacle: EdgeObstacleModel):
         first_pair, second_pair = adjacency['first_pair'], adjacency['second_pair']
         first_dirn, second_dirn = adjacency['first_dirn'], adjacency['second_dirn']
         for coord, direction in [(first_pair, first_dirn), (second_pair, second_dirn)]:
@@ -130,7 +130,7 @@ class GameBoardModel(object):
             else:
                 direction = DirectionEnum.SOUTH
 
-            self.get_tile_at(coord[0], coord[1]).set_adjacent_edge_obstacle(direction, obstacle)
+            tiles[coord[0]][coord[1]].set_adjacent_edge_obstacle(direction, obstacle)
 
 
     def _init_all_tiles_experienced_classic(self):
