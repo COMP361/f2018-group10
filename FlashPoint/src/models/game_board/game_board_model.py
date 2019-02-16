@@ -44,7 +44,7 @@ class GameBoardModel(object):
         outdoor = any([row == 0, row == self._dimensions[0], column == 0, column == self._dimensions[1]])
         return SpaceKindEnum.OUTDOOR if outdoor else SpaceKindEnum.INDOOR
 
-    def _init_all_tiles_family_classic(self) -> List[TileModel]:
+    def _init_all_tiles_family_classic(self) -> List[List[TileModel]]:
         """Create all tiles and set their adjacency. """
         tiles = []
 
