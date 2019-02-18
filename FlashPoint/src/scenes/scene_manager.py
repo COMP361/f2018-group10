@@ -137,6 +137,7 @@ class SceneManager(object):
         """Callback for when the host tries to start the game."""
         game = Networking.get_instance().game
         players_ready = len([player.status == PlayerStatusEnum.READY for player in game.players])
+        # TODO: change it back (==)
         if not players_ready <= game.max_players:
             self._active_scene.not_enough_players_ready_prompt()
             return
@@ -163,11 +164,7 @@ class SceneManager(object):
             self._active_scene.buttonReady.change_color(Color.GREY)
             self._current_player.status = PlayerStatusEnum.OFFLINE
 
-
     # ------------- GAME CREATE/LOAD STUFF ----------#
-
-
-
 
     def create_new_game(self, game_kind: GameKindEnum):
         """Instantiate a new family game and move to the lobby scene."""

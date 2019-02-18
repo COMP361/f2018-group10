@@ -81,8 +81,6 @@ class GameBoardScene(object):
 
         # cross = pygame.image.load("media/GameHud/cross.png")
 
-        #cross = pygame.image.load("media/GameHud/cross.png")
-
         back_btn.on_click(menu.close)
         save_btn.on_click(self._save)
 
