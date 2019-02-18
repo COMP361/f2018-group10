@@ -5,7 +5,7 @@ from typing import Optional
 import pygame
 import json
 import threading
-
+import src.constants.color as Color
 from src.action_events.ready_event import ReadyEvent
 from src.constants.state_enums import GameKindEnum, PlayerStatusEnum
 from src.core.serializer import JSONSerializer
@@ -147,14 +147,27 @@ class SceneManager(object):
 
     def set_ready(self):
         """Set the status of the current player to ready."""
-        self._current_player.status = PlayerStatusEnum.READY
-        event = ReadyEvent(self._current_player)
-        if self._current_player.ip == Networking.get_instance().game.host.ip:
-            event.execute(Networking.get_instance().game)
-            Networking.get_instance().send_to_all_client(event)
+        if not self._active_scene.isReady:
+            self._active_scene.isReady = True
+            self._active_scene.buttonReady.change_color(Color.STANDARDBTN)
+            self._current_player.status = PlayerStatusEnum.READY
+            event = ReadyEvent(self._current_player)
+            #TODO Tim or Francis implement waiting ready for all the other players and unreadying the players
+            if self._current_player.ip == Networking.get_instance().game.host.ip:
+                event.execute(Networking.get_instance().game)
+                Networking.get_instance().send_to_all_client(event)
+            else:
+                Networking.get_instance().client.send(event)
         else:
-            Networking.get_instance().client.send(event)
+            self._active_scene.isReady = False
+            self._active_scene.buttonReady.change_color(Color.GREY)
+            self._current_player.status = PlayerStatusEnum.OFFLINE
+
+
     # ------------- GAME CREATE/LOAD STUFF ----------#
+
+
+
 
     def create_new_game(self, game_kind: GameKindEnum):
         """Instantiate a new family game and move to the lobby scene."""
@@ -184,6 +197,7 @@ class SceneManager(object):
         :param args: extra arguments for the next scene
         :return:
         """
+
         ip_addr = self._active_scene.text_bar_msg
         if isinstance(self._active_scene, JoinScene):
             is_join_scene = True

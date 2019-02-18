@@ -12,11 +12,16 @@ from src.core.networking import Networking
 
 
 class LobbyScene(object):
+
     def __init__(self, screen, current_player: PlayerModel, game: GameStateModel):
         self._current_player = current_player
+        if Networking.get_instance().game.host.ip == self._current_player.ip:
+            self._current_player.color = Color.BLUE
+            Networking.get_instance().game.host.color = Color.BLUE
+
         self._game = game
         self._player_count = len(self._game.players)
-
+        self.isReady = False
         self.resolution = (1280, 700)
         self.sprite_grp = pygame.sprite.Group()
         self.players_not_ready_prompt = None
@@ -42,7 +47,8 @@ class LobbyScene(object):
                 self.sprite_grp.add(self.buttonSelChar)
             if self._current_player.ip == Networking.get_instance().game.host.ip:
                 self.sprite_grp.add(self.start_button)
-            self.sprite_grp.add(self.buttonReady, self.buttonBack)
+            else:
+                self.sprite_grp.add(self.buttonReady, self.buttonBack)
 
         self._init_sprites()
 
@@ -50,7 +56,7 @@ class LobbyScene(object):
         """Button for starting the game once all players have clicked ready."""
         box_size = (130, 48)
         self.start_button = RectButton(1050, 575, box_size[0], box_size[1], Color.STANDARDBTN, 0,
-                                      Text(pygame.font.SysFont('Arial', 20), "Start", Color.BLACK))
+                                       Text(pygame.font.SysFont('Arial', 20), "Start", Color.BLACK))
         self.sprite_grp.add(self.start_button)
 
     def _init_background(self):
@@ -78,13 +84,15 @@ class LobbyScene(object):
     def _init_selec_char(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
         box_size = (130, 48)
         self.buttonSelChar = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
-                                     Text(pygame.font.SysFont('Arial', 20), text, color_text))
+                                        Text(pygame.font.SysFont('Arial', 20), text, color_text))
         self.sprite_grp.add(self.buttonSelChar)
 
     def _init_ready(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
         box_size = (130, 48)
+
+        self.isReady = False
         self.buttonReady = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
-                                     Text(pygame.font.SysFont('Arial', 20), text, color_text))
+                                      Text(pygame.font.SysFont('Arial', 20), text, color_text))
         self.sprite_grp.add(self.buttonReady)
 
     def _init_btn_back(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
@@ -97,7 +105,7 @@ class LobbyScene(object):
         if Networking.get_instance().is_host:
             ip_addr = f"Your IP address: {Networking.get_instance().get_ip()}"
             label_width = 400
-            label_left = (pygame.display.get_surface().get_size()[0]/2) - (label_width/2)
+            label_left = (pygame.display.get_surface().get_size()[0] / 2) - (label_width / 2)
             ip_addr_label = RectLabel(label_left, 20, label_width, 50, (255, 255, 255),
                                       txt_obj=(Text(pygame.font.SysFont('Arial', 24), ip_addr)))
             ip_addr_label.set_transparent_background(True)
@@ -124,7 +132,7 @@ class LobbyScene(object):
         label_width = 400
         label_height = 30
         label_left = 1050 - 100
-        label_top = (pygame.display.get_surface().get_size()[1] - 50) - (label_height/2)
+        label_top = (pygame.display.get_surface().get_size()[1] - 50) - (label_height / 2)
         message = f"Not all players are ready!"
         prompt_label = RectLabel(label_left, label_top, label_width, label_height, Color.WHITE,
                                  txt_obj=Text(pygame.font.SysFont('Arial', 24), message))
@@ -147,6 +155,3 @@ class LobbyScene(object):
             self._player_count = len(Networking.get_instance().game.players)
             self.sprite_grp.empty()
             self._init_all(reuse=True)
-
-
-
