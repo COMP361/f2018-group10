@@ -33,7 +33,4 @@ class JoinEvent(ActionEvent):
                 else:
                     continue
             if color_available:
-                return colors[color]
-
-        game.add_player(self.player)
-
+                self.player.color = colors[color]
