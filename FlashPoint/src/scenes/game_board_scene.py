@@ -7,6 +7,7 @@ import pygame
 from src.UIComponents.chat_box import ChatBox
 from src.UIComponents.menu_window import MenuWindow
 from src.core.event_queue import EventQueue
+from src.core.networking import Networking
 from src.core.serializer import JSONSerializer
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
@@ -34,7 +35,7 @@ class GameBoardScene(object):
 
         self.active_sprites = pygame.sprite.Group()   # Maybe add separate groups for different things later
         self.game_board = GameBoard()
-        self.chat_box = ChatBox()
+        self.chat_box = ChatBox(Networking.get_instance().game,self._current_player)
         self.menu = None
         self._init_sprites()
 
