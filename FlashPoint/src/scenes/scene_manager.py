@@ -140,7 +140,10 @@ class SceneManager(object):
         if not players_ready == game.max_players:
             self._active_scene.not_enough_players_ready_prompt()
             return
-        # TODO: HAW START THE GAME
+        # Perform the start game hook in Networking (ie. stop accepting new connections and kill broadcast)
+        Networking.get_instance().start_game()
+        self.next(GameBoardScene)
+        # TODO: TEST
 
     def set_ready(self):
         """Set the status of the current player to ready."""

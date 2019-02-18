@@ -11,6 +11,7 @@ from src.models.game_state_model import GameStateModel
 from src.core.serializer import JSONSerializer
 from src.action_events.action_event import ActionEvent
 from src.action_events.join_event import JoinEvent
+from src.action_events.disconnect_event import DisconnectEvent
 from src.external.Mastermind import *
 
 logger = logging.getLogger("networking")
@@ -237,7 +238,7 @@ class Networking:
             self.stop_broadcast.set()
             print("Broadcast killed")
 
-            if self.host is not None:
+            if self.host:
                 self.host.accepting_disallow()
 
         def send_to_server(self, data, compress=True):
@@ -344,7 +345,7 @@ class Networking:
                 players = [x for x in game.players if x.ip == connection_object.address[0]]
                 if players:
                     game.remove_player(players[0])
-                    self.client_list.pop(connection_object.address[0])
+                    self.kick_client(connection_object.address[0])
             return super(MastermindServerUDP, self).callback_disconnect()
 
         def callback_client_handle(self, connection_object, data):
@@ -369,6 +370,11 @@ class Networking:
             if isinstance(data, ActionEvent):
                 if isinstance(data, JoinEvent):
                     Networking.get_instance().game.add_player(data.player)
+                    Networking.get_instance().send_to_all_client(Networking.get_instance().game)
+                if isinstance(data, DisconnectEvent):
+                    # Kick the player that send the DC event and notify all other players.
+                    # Need to have similar polling mechanics like in lobby
+                    self.kick_client(connection_object.address[0])
                     Networking.get_instance().send_to_all_client(Networking.get_instance().game)
                 if isinstance(data, ChatEvent):
                     data.execute(Networking.get_instance().game)
