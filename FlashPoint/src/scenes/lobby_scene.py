@@ -15,7 +15,6 @@ class LobbyScene(object):
 
     def __init__(self, screen, current_player: PlayerModel, game: GameStateModel):
         self._current_player = current_player
-        self._current_player.color = self.assign_color()
         self._game = game
         self._player_count = len(self._game.players)
         self.isReady = False
@@ -23,34 +22,6 @@ class LobbyScene(object):
         self.sprite_grp = pygame.sprite.Group()
         self.players_not_ready_prompt = None
         self._init_all()
-
-    def assign_color(self):
-
-        colors = {
-            "blue": Color.BLUE,
-            "white": Color.WHITE,
-            "red": Color.RED,
-            "orange": Color.ORANGE,
-            "yellow": Color.YELLOW,
-            "green": Color.GREEN,
-        }
-
-        list_players = Networking.get_instance().game.players
-
-        for color in colors:
-
-            color_available = True
-
-            for player in list_players:
-
-                if player.color == colors[color]:
-                    color_available = False
-                    break
-                else:
-                    continue
-
-            if color_available:
-                return colors[color]
 
     def _init_all(self, reuse=False):
         self._init_background()

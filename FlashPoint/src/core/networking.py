@@ -368,7 +368,7 @@ class Networking:
             print(f"Client at {connection_object.address} sent a message: {data.__class__}")
             if isinstance(data, ActionEvent):
                 if isinstance(data, JoinEvent):
-                    Networking.get_instance().game.add_player(data.player)
+                    data.execute(Networking.get_instance().game)
                     Networking.get_instance().send_to_all_client(Networking.get_instance().game)
                 if isinstance(data, ChatEvent):
                     data.execute(Networking.get_instance().game)
