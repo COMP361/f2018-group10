@@ -137,12 +137,12 @@ class SceneManager(object):
         """Callback for when the host tries to start the game."""
         game = Networking.get_instance().game
         players_ready = len([player.status == PlayerStatusEnum.READY for player in game.players])
-        if not players_ready == game.max_players:
+        if not players_ready <= game.max_players:
             self._active_scene.not_enough_players_ready_prompt()
             return
         # Perform the start game hook in Networking (ie. stop accepting new connections and kill broadcast)
         Networking.get_instance().start_game()
-        self.next(GameBoardScene)
+        self.next(GameBoardScene, self._game, self._current_player)
         # TODO: TEST
 
     def set_ready(self):

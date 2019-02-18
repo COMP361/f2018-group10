@@ -32,8 +32,7 @@ class GridSprite(pygame.sprite.Group):
             y_offset = 0
             for j in range(0, self.height):
                 image = tile_images[j][i]
-                grid[i].append(
-                    TileSprite(image, self.rect.x, self.rect.y, x_offset, y_offset, TileModel(i, j, SpaceKindEnum.INDOOR)))
+                grid[i].append(TileSprite(image, self.rect.x, self.rect.y, x_offset, y_offset))
                 self.add(grid[i][j])
 
                 y_offset += tile_size
