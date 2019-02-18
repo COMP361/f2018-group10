@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
 
+from src.models.game_state_model import GameStateModel
+
 
 class ActionEvent(ABC):
     """Abstract base class for all ActionEvent types. Should contain all information needed to
@@ -9,5 +11,5 @@ class ActionEvent(ABC):
         super().__init__()
 
     @abstractmethod
-    def execute(self, *args, **kwargs):
+    def execute(self):
         pass
