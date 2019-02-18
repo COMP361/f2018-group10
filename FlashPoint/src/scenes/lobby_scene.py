@@ -12,14 +12,50 @@ from src.core.networking import Networking
 
 
 class LobbyScene(object):
+
     def __init__(self, screen, current_player: PlayerModel, game: GameStateModel):
         self._current_player = current_player
+        self._current_player.color = self.assign_color()
         self._game = game
         self._player_count = len(self._game.players)
-
+        self.isReady = False
         self.resolution = (1280, 700)
         self.sprite_grp = pygame.sprite.Group()
         self._init_all()
+
+    def assign_color(self):
+
+        colors = {
+            "blue":Color.BLUE,
+            "white":Color.WHITE,
+            "red":Color.RED,
+            "orange":Color.ORANGE,
+            "yellow":Color.YELLOW,
+            "green":Color.GREEN,
+        }
+
+        list_players = Networking.get_instance().game.players
+
+        for color in colors:
+
+            color_available = True
+
+            for player in list_players:
+
+                if player.color == colors[color]:
+                    color_available = False
+                    break
+                else:
+                    continue
+
+            if color_available:
+                return colors[color]
+
+
+
+
+
+
 
     def _init_all(self, reuse=False):
         self._init_background()
@@ -28,7 +64,7 @@ class LobbyScene(object):
 
         if not reuse:
             self._init_btn_back(20, 20, "Exit", Color.STANDARDBTN, Color.BLACK)
-            self._init_ready(1050, 575, "Ready", Color.STANDARDBTN, Color.BLACK)
+            self._init_ready(1050, 575, "Ready", Color.GREY, Color.BLACK)
             if self._game.rules == GameKindEnum.EXPERIENCED:
                 self._init_selec_char(1050, 475, "Select Character", Color.STANDARDBTN, Color.BLACK)
         else:
@@ -67,6 +103,8 @@ class LobbyScene(object):
 
     def _init_ready(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
         box_size = (130, 48)
+
+        self.isReady = False
         self.buttonReady = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
                                      Text(pygame.font.SysFont('Arial', 20), text, color_text))
         self.sprite_grp.add(self.buttonReady)
