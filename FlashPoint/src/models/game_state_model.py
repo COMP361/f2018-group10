@@ -28,7 +28,6 @@ class GameStateModel(Model):
         self._victims_saved = 0
         self._victims_lost = 0
         self._damage = 0
-
         self._max_damage = 24
         self._chat_history = []
 

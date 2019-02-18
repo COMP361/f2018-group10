@@ -97,10 +97,10 @@ class ChatBox:
 
         for old_message in reversed(self.chat_history):
             if count < max_messages:
-                message_box_y = chat_hist_bottom - (message_box_h * (count+1))
+                message_box_y = chat_hist_bottom - (message_box_h * (count + 1))
                 old_message_box = RectLabel(message_box_x, message_box_y, message_box_w, message_box_h,
                                             background=Color.WHITE, txt_pos=Text.Position.LEFT,
-                                            txt_obj=Text(font=pg.font.SysFont("Arial", TEXT_BOX_FONT_SIZE - 2),
+                                            txt_obj=Text(font=pg.font.SysFont("Agency FB", TEXT_BOX_FONT_SIZE - 2),
                                                          text=f"{old_message[1]}: {old_message[0]}"))
 
                 self.to_be_renamed.append(old_message_box)

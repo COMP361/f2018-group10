@@ -45,7 +45,7 @@ class StartScene(object):
         box_size = (136, 32)
 
         user_box = RectLabel(x_pos, y_pos, box_size[0], box_size[1], clr, 0,
-                             Text(pygame.font.SysFont('Arial', 20), text, color_text))
+                             Text(pygame.font.SysFont('Agency FB', 20), text, color_text))
         self.sprite_grp.add(user_box)
 
     # def _init_btn_login(self, x_pos, y_pos, text, color, color_text):
