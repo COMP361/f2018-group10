@@ -1,7 +1,10 @@
+import time
+import os
 from typing import Optional
 
 import pygame
 import json
+import threading
 
 import src.constants.CustomEvents as CustomEvents
 from src.constants.state_enums import GameKindEnum
@@ -14,6 +17,7 @@ from src.scenes.game_board_scene import GameBoardScene
 from src.scenes.host_join_scene import HostJoinScene
 from src.scenes.host_menu_scene import HostMenuScene
 from src.scenes.join_scene import JoinScene
+from src.scenes.load_game_scene import LoadGame
 from src.scenes.start_scene import StartScene
 from src.scenes.create_game_menu import CreateGameMenu
 from src.core.event_queue import EventQueue
@@ -36,9 +40,24 @@ class SceneManager(object):
         self._active_scene = StartScene(self.screen)
         self._current_player = None
         self._game = None
-
+        self._network_poller = threading.Thread(target=self._poll_network)
         self._active_scene.buttonRegister.on_click(self.create_profile, self._active_scene.text_bar1)
         self.update_profiles()
+
+    def _poll_network(self, timeout=0) -> bool:
+        while True:
+            while not Networking.get_instance().client:
+                time.sleep(0.0001)
+
+            reply = Networking.get_instance().client.get_server_reply()
+            if not reply:
+                time.sleep(0.0001)
+                continue
+
+            server_response = JSONSerializer.deserialize(reply)
+
+            if isinstance(server_response, GameStateModel):
+                self._game = server_response
 
     def next(self, next_scene: callable, *args):
         """Switch to the next logical scene. args is assumed to be: [SceneClass]
@@ -73,9 +92,10 @@ class SceneManager(object):
         if isinstance(self._active_scene, HostMenuScene):
             self._active_scene.buttonBack.on_click(self.disconnect, HostJoinScene, self._current_player)
             self._active_scene.buttonNewGame.on_click(self.next, CreateGameMenu, self._current_player)
+            self._active_scene.buttonLogin.on_click(self.next, LoadGame, self._current_player)
 
         if isinstance(self._active_scene, CreateGameMenu):
-            self._active_scene.buttonBack.on_click(self.disconnect, HostJoinScene)
+            self._active_scene.buttonBack.on_click(self.disconnect, HostJoinScene, self._current_player)
             self._active_scene.buttonExp.on_click(self.create_new_game, GameKindEnum.EXPERIENCED)
             self._active_scene.buttonFamily.on_click(self.create_new_game, GameKindEnum.FAMILY)
 
@@ -83,13 +103,15 @@ class SceneManager(object):
             self._active_scene.buttonBack.on_click(self.next, LobbyScene, self._current_player, self._game)
             self._active_scene.buttonConfirm.on_click(self.next, LobbyScene, self._current_player, self._game)
 
+        if isinstance(self._active_scene, LoadGame):
+            self._active_scene.buttonBack.on_click(self.next, HostMenuScene, self._current_player)
+
         if isinstance(self._active_scene, LobbyScene):
             if self._game.rules == GameKindEnum.EXPERIENCED:
                 self._active_scene.buttonSelChar.on_click(self.next, CharacterScene, self._current_player)
 
             self._active_scene.buttonBack.on_click(self.disconnect, HostJoinScene, self._current_player)
             self._active_scene.buttonReady.on_click(self.next, GameBoardScene, self._game, self._current_player)
-
 
         FileImporter.play_audio("media/soundeffects/ButtonClick.wav", fade_ms=10)
 
@@ -106,13 +128,14 @@ class SceneManager(object):
     def handle_event(self, event):
         # join event
         if event.type == CustomEvents.JOIN:
-            self.join(event.ip, LobbyScene, self._current_player, self._game)
+            self.join(event.ip,)
 
     # ------------- GAME CREATE/LOAD STUFF ----------#
 
     def create_new_game(self, game_kind: GameKindEnum):
         """Instantiate a new family game and move to the lobby scene."""
         self._game = GameStateModel(self._current_player, 6, game_kind)
+        Networking.set_game(self._game)
         self.next(LobbyScene, self._current_player, self._game)
 
     # ------------- NETWORKING STUFF ----------------#
@@ -129,7 +152,7 @@ class SceneManager(object):
         if next_scene is not None:
             self.next(next_scene, *args)
 
-    def join(self, ip_addr, next_scene: Optional[callable] = None, *args):
+    def join(self, ip_addr: str):
         """
         Start the join host process in Networking
         :param ip_addr: ip address to connect
@@ -143,10 +166,14 @@ class SceneManager(object):
             is_join_scene = False
 
         try:
-            Networking.get_instance().join_host(ip_addr)
-
-            if next_scene is not None:
-                self.next(next_scene, *args)
+            Networking.get_instance().join_host(ip_addr, player=self._current_player)
+            reply = Networking.wait_for_reply()
+            if reply:
+                Networking.set_game(JSONSerializer.deserialize(reply))
+                self._game = Networking.get_instance().game
+                self.next(LobbyScene, self._current_player, self._game)
+            else:
+                raise ConnectionError
         except ConnectionError:
             msg = "Unable to connect"
             print(msg)
@@ -173,6 +200,9 @@ class SceneManager(object):
     # ------------ Stuff for profiles and start scene ------------ #
 
     def update_profiles(self):
+        if not os.path.exists(self.profiles):
+            with open(self.profiles, mode="w+", encoding='utf-8') as myFile:
+                myFile.write("[]")
         with open(self.profiles, mode='r', encoding='utf-8') as myFile:
             temp = json.load(myFile)
             for i, user in enumerate(temp):
