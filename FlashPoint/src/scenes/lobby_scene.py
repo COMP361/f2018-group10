@@ -15,6 +15,10 @@ class LobbyScene(object):
 
     def __init__(self, screen, current_player: PlayerModel, game: GameStateModel):
         self._current_player = current_player
+        if Networking.get_instance().game.host.ip == self._current_player.ip:
+            self._current_player.color = Color.BLUE
+            Networking.get_instance().game.host.color = Color.BLUE
+
         self._game = game
         self._player_count = len(self._game.players)
         self.isReady = False

@@ -49,10 +49,11 @@ class TileSprite(Interactable):
         if self.hover() and self._is_enabled:
             if not self.is_hovered:
                 self.is_hovered = True
-                self.image = self._backup_image.copy()
-                self.image.fill(Color.YELLOW)
+                hover = pygame.Surface((self._backup_image.get_width(), self._backup_image.get_height()), pygame.SRCALPHA)
+                hover.fill((255, 255, 0, 128))
+                self.image.blit(hover, (0, 0))
         else:
-            self.image = self._backup_image
+            self.image.blit(self._backup_image, (0, 0))
             self.is_hovered = False
 
     def _scroll(self):
