@@ -3,6 +3,7 @@ import pygame
 import src.constants.color as color
 import json
 
+from src.core.event_queue import EventQueue
 from src.UIComponents.rect_button import RectButton
 from src.UIComponents.rect_label import RectLabel
 from src.UIComponents.text import Text
@@ -29,8 +30,7 @@ class LoadGame(object):
         self._init_btn_register(((self.resolution[0] / 2) - (500 / 2)) + 400, 592, "Create Profile",
                                 color.STANDARDBTN, color.BLACK)
         self._init_btn_back(20, 20, "Back", color.STANDARDBTN, color.BLACK)
-        self.buttonBack.on_click(pygame.event.post, pygame.event.Event(ChangeSceneEnum.HOSTMENUSCENE, {}))
-
+        self.buttonBack.on_click(EventQueue.post, ChangeSceneEnum.HOSTMENUSCENE)
 
     def _init_background(self):
         box_size = (self.resolution[0], self.resolution[1])
@@ -74,8 +74,6 @@ class LoadGame(object):
     def _init_text_bar(x_pos, y_pos, width, height):
         return InputBox(x=x_pos, y=y_pos, w=width, h=height)
 
-
-
     def update_profiles(self):
         with open(self.saves, mode='r', encoding='utf-8') as myFile:
             temp = json.load(myFile)
@@ -84,11 +82,6 @@ class LoadGame(object):
                 x = user["time"]
                 temp_str : str = "Game " + str(i+1) +" "+ x
                 self.sprite_grp.add(self._init_save_elem(420, 130+34*i, temp_str,color.GREY,color.YELLOW))
-
-
-
-
-
 
     def draw(self, screen):
         self.sprite_grp.draw(screen)

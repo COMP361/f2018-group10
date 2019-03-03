@@ -4,8 +4,7 @@ import threading
 import logging
 import time
 
-import pygame
-
+from src.core.event_queue import EventQueue
 from src.constants.change_scene_enum import ChangeSceneEnum
 from src.action_events.ready_event import ReadyEvent
 from src.action_events.chat_event import ChatEvent
@@ -152,7 +151,7 @@ class Networking:
             b_caster.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
             msg = f"{socket.gethostname()} {mastermind_get_local_ip()}"
             bip = Networking.get_instance().get_broadcast_ip()
-            print(f"Broadcasting at {bip}:54545")
+            print(f"Broadcasting at {bip}:54545\n")
 
             while not stop_event.is_set():
                 b_caster.sendto(str.encode(msg), (str(bip), 54545))
@@ -217,7 +216,7 @@ class Networking:
                 self.host.disconnect()
                 self.host.__del__()
                 self.host = None
-            pygame.event.post(pygame.event.Event(ChangeSceneEnum.HOSTJOINSCENE, {}))
+            EventQueue.post(ChangeSceneEnum.HOSTJOINSCENE)
 
         # If game is started, stops new client from connecting
         def start_game(self):

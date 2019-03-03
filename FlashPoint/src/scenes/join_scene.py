@@ -2,6 +2,7 @@ import pygame
 
 import src.constants.color as Color
 import src.constants.fonts as Font
+from src.core.event_queue import EventQueue
 from src.models.game_units.player_model import PlayerModel
 from src.UIComponents.rect_button import RectButton
 from src.UIComponents.rect_label import RectLabel
@@ -25,7 +26,7 @@ class JoinScene(object):
         self._init_btn_back(20, 20, "Back", Color.STANDARDBTN, Color.BLACK)
         self._text_bar = self._init_text_bar(500, 350, 400, 32)
         self.error_msg = ""
-        self.buttonBack.on_click(pygame.event.post, pygame.event.Event(ChangeSceneEnum.HOSTJOINSCENE, {}))
+        self.buttonBack.on_click(EventQueue.post, ChangeSceneEnum.HOSTJOINSCENE)
         self.buttonConnect.on_click(self.join)
 
     def join(self):
@@ -44,7 +45,7 @@ class JoinScene(object):
             reply = Networking.wait_for_reply()
             if reply:
                 GameStateModel.set_game(JSONSerializer.deserialize(reply))
-                pygame.event.post(pygame.event.Event(ChangeSceneEnum.LOBBYSCENE, {}))
+                EventQueue.post(ChangeSceneEnum.LOBBYSCENE)
             else:
                 raise ConnectionError
         except ConnectionError:

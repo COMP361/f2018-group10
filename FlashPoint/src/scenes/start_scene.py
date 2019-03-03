@@ -2,6 +2,7 @@ import pygame
 import os.path
 
 import src.constants.color as color
+from src.core.event_queue import EventQueue
 
 from src.UIComponents.rect_button import RectButton
 from src.UIComponents.rect_label import RectLabel
@@ -63,8 +64,7 @@ class StartScene(object):
     @staticmethod
     def register_profile():
         # Gets the text in the text bar and send the create profile event to the event queue (scene manager)
-        event = pygame.event.Event(ChangeSceneEnum.REGISTER, {})
-        pygame.event.post(event)
+        EventQueue.post(ChangeSceneEnum.REGISTER)
 
     @staticmethod
     def _init_text_bar(x_pos, y_pos, width, height):

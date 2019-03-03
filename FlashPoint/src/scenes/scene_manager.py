@@ -106,28 +106,28 @@ class SceneManager(object):
     def update(self, event_queue: EventQueue):
         self._active_scene.update(event_queue)
         for event in event_queue:
-            if event.type == ChangeSceneEnum.REGISTER:
-                self.create_profile(self._active_scene.text_bar1)
-                self.update_profiles()
-            elif event.type == ChangeSceneEnum.STARTSCENE:
-                self.next(StartScene)
-            elif event.type == ChangeSceneEnum.CHARACTERSCENE:
-                self.next(CharacterScene, self._current_player)
-            elif event.type == ChangeSceneEnum.CREATEGAMEMENU:
-                self.next(CreateGameMenu, self._current_player)
-            elif event.type == ChangeSceneEnum.HOSTJOINSCENE:
-                self.next(HostJoinScene, self._current_player)
-            elif event.type == ChangeSceneEnum.HOSTMENUSCENE:
-                self.next(HostMenuScene, self._current_player)
-            elif event.type == ChangeSceneEnum.JOINSCENE:
-                self.next(JoinScene, self._current_player)
-            elif event.type == ChangeSceneEnum.LOADGAME:
-                self.next(LoadGame, self._current_player)
-            elif event.type == ChangeSceneEnum.LOBBYSCENE:
-                print("Lobby")
-                self.next(LobbyScene, self._current_player, GameStateModel.instance())
-            elif event.type == ChangeSceneEnum.GAMEBOARDSCENE:
-                self.next(GameBoardScene, GameStateModel.instance(), self._current_player)
+            if isinstance(event, ChangeSceneEnum):
+                if event == ChangeSceneEnum.REGISTER:
+                    self.create_profile(self._active_scene.text_bar1)
+                    self.update_profiles()
+                elif event == ChangeSceneEnum.STARTSCENE:
+                    self.next(StartScene)
+                elif event == ChangeSceneEnum.CHARACTERSCENE:
+                    self.next(CharacterScene, self._current_player)
+                elif event == ChangeSceneEnum.CREATEGAMEMENU:
+                    self.next(CreateGameMenu, self._current_player)
+                elif event == ChangeSceneEnum.HOSTJOINSCENE:
+                    self.next(HostJoinScene, self._current_player)
+                elif event == ChangeSceneEnum.HOSTMENUSCENE:
+                    self.next(HostMenuScene, self._current_player)
+                elif event == ChangeSceneEnum.JOINSCENE:
+                    self.next(JoinScene, self._current_player)
+                elif event == ChangeSceneEnum.LOADGAME:
+                    self.next(LoadGame, self._current_player)
+                elif event == ChangeSceneEnum.LOBBYSCENE:
+                    self.next(LobbyScene, self._current_player)
+                elif event == ChangeSceneEnum.GAMEBOARDSCENE:
+                    self.next(GameBoardScene, self._current_player)
         # self._active_scene.update(event_queue)
         # if isinstance(self._active_scene, GameBoardScene):
         #     self._active_scene.quit_btn.on_click(self.disconnect, StartScene)
