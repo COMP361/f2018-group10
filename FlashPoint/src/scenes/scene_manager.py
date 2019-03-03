@@ -24,6 +24,7 @@ from src.core.event_queue import EventQueue
 from src.scenes.character_scene import CharacterScene
 from src.scenes.lobby_scene import LobbyScene
 from src.core.networking import Networking
+from src.constants.change_scene_enum import ChangeSceneEnum
 
 
 class SceneManager(object):
@@ -121,17 +122,28 @@ class SceneManager(object):
         self._active_scene.draw(self.screen)
 
     def update(self, event_queue: EventQueue):
-        self._active_scene.update(event_queue)
-        if isinstance(self._active_scene, GameBoardScene):
-            self._active_scene.quit_btn.on_click(self.disconnect, StartScene)
         for event in event_queue:
-            self.handle_event(event)
-
-    def handle_event(self, event):
-        # # join event
-        # if event.type == CustomEvents.JOIN:
-        #     self.join(event.ip,)
-        pass
+            if event.type == ChangeSceneEnum.STARTSCENE:
+                self.next(StartScene)
+            elif event.type == ChangeSceneEnum.CHARACTERSCENE:
+                self.next(CharacterScene, self._current_player)
+            elif event.type == ChangeSceneEnum.CREATEGAMEMENU:
+                self.next(CreateGameMenu, self._current_player)
+            elif event.type == ChangeSceneEnum.HOSTJOINSCENE:
+                self.next(HostJoinScene, self._current_player)
+            elif event.type == ChangeSceneEnum.HOSTMENUSCENE:
+                self.next(HostMenuScene, self._current_player)
+            elif event.type == ChangeSceneEnum.JOINSCENE:
+                self.next(JoinScene, self._current_player)
+            elif event.type == ChangeSceneEnum.LOADGAME:
+                self.next(LoadGame, self._current_player)
+            elif event.type == ChangeSceneEnum.LOBBYSCENE:
+                self.next(LobbyScene, self._current_player, self._game)
+        # self._active_scene.update(event_queue)
+        # if isinstance(self._active_scene, GameBoardScene):
+        #     self._active_scene.quit_btn.on_click(self.disconnect, StartScene)
+        # for event in event_queue:
+        #     self.handle_event(event)
 
     def start_game(self):
         """Callback for when the host tries to start the game."""
