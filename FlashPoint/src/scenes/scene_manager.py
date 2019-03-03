@@ -78,22 +78,22 @@ class SceneManager(object):
 
         # Step two: Set the buttons.
         if isinstance(self._active_scene, StartScene):
-            self._active_scene.buttonRegister.on_click(self.create_profile, self._active_scene.text_bar1)
             self.update_profiles()
+        #    self._active_scene.buttonRegister.on_click(self.create_profile, self._active_scene.text_bar1)
 
-        if isinstance(self._active_scene, HostJoinScene):
-            self._active_scene.buttonJoin.on_click(self.next, JoinScene, self._current_player)
-            self._active_scene.buttonHost.on_click(self.host, HostMenuScene, self._current_player)
-            self._active_scene.buttonBack.on_click(self.next, StartScene)
+        # if isinstance(self._active_scene, HostJoinScene):
+        #     self._active_scene.buttonJoin.on_click(self.next, JoinScene, self._current_player)
+        #     self._active_scene.buttonHost.on_click(self.host, HostMenuScene, self._current_player)
+        #     self._active_scene.buttonBack.on_click(self.next, StartScene)
 
-        if isinstance(self._active_scene, JoinScene):
-            self._active_scene.buttonBack.on_click(self.next, HostJoinScene, self._current_player)
-            self._active_scene.buttonConnect.on_click(self.join)
+        # if isinstance(self._active_scene, JoinScene):
+        #     self._active_scene.buttonBack.on_click(self.next, HostJoinScene, self._current_player)
+        #     self._active_scene.buttonConnect.on_click(self.join)
 
-        if isinstance(self._active_scene, HostMenuScene):
-            self._active_scene.buttonBack.on_click(self.disconnect, HostJoinScene, self._current_player)
-            self._active_scene.buttonNewGame.on_click(self.next, CreateGameMenu, self._current_player)
-            self._active_scene.buttonLogin.on_click(self.next, LoadGame, self._current_player)
+        # if isinstance(self._active_scene, HostMenuScene):
+        #     self._active_scene.buttonBack.on_click(self.disconnect, HostJoinScene, self._current_player)
+        #     self._active_scene.buttonNewGame.on_click(self.next, CreateGameMenu, self._current_player)
+        #     self._active_scene.buttonLogin.on_click(self.next, LoadGame, self._current_player)
 
         if isinstance(self._active_scene, CreateGameMenu):
             self._active_scene.buttonBack.on_click(self.disconnect, HostJoinScene, self._current_player)
@@ -122,8 +122,12 @@ class SceneManager(object):
         self._active_scene.draw(self.screen)
 
     def update(self, event_queue: EventQueue):
+        self._active_scene.update(event_queue)
         for event in event_queue:
-            if event.type == ChangeSceneEnum.STARTSCENE:
+            if event.type == ChangeSceneEnum.REGISTER:
+                self.create_profile(self._active_scene.text_bar1)
+                self.update_profiles()
+            elif event.type == ChangeSceneEnum.STARTSCENE:
                 self.next(StartScene)
             elif event.type == ChangeSceneEnum.CHARACTERSCENE:
                 self.next(CharacterScene, self._current_player)
@@ -137,7 +141,8 @@ class SceneManager(object):
                 self.next(JoinScene, self._current_player)
             elif event.type == ChangeSceneEnum.LOADGAME:
                 self.next(LoadGame, self._current_player)
-            elif event.type == ChangeSceneEnum.LOBBYSCENE:
+            elif event.type == ChangeSceneEnum.JOIN:
+                self._game = Networking.get_instance().game
                 self.next(LobbyScene, self._current_player, self._game)
         # self._active_scene.update(event_queue)
         # if isinstance(self._active_scene, GameBoardScene):
@@ -176,14 +181,6 @@ class SceneManager(object):
             self._active_scene.buttonReady.change_color(Color.GREY)
             self._current_player.status = PlayerStatusEnum.OFFLINE
 
-    # ------------- GAME CREATE/LOAD STUFF ----------#
-
-    def create_new_game(self, game_kind: GameKindEnum):
-        """Instantiate a new family game and move to the lobby scene."""
-        self._game = GameStateModel(self._current_player, 6, game_kind)
-        Networking.set_game(self._game)
-        self.next(LobbyScene, self._current_player, self._game)
-
     # ------------- NETWORKING STUFF ----------------#
 
     def host(self, next_scene: Optional[callable] = None, *args):
@@ -194,53 +191,6 @@ class SceneManager(object):
         :return:
         """
         Networking.get_instance().create_host()
-
-        if next_scene is not None:
-            self.next(next_scene, *args)
-
-    def join(self):
-        """
-        Start the join host process in Networking
-        :param ip_addr: ip address to connect
-        :param next_scene: next scene to be called after the process completes
-        :param args: extra arguments for the next scene
-        :return:
-        """
-
-        ip_addr = self._active_scene.text_bar_msg
-        if isinstance(self._active_scene, JoinScene):
-            is_join_scene = True
-        else:
-            is_join_scene = False
-
-        try:
-            Networking.get_instance().join_host(ip_addr, player=self._current_player)
-            reply = Networking.wait_for_reply()
-            if reply:
-                Networking.set_game(JSONSerializer.deserialize(reply))
-                self._game = Networking.get_instance().game
-                self.next(LobbyScene, self._current_player, self._game)
-            else:
-                raise ConnectionError
-        except ConnectionError:
-            msg = "Unable to connect"
-            print(msg)
-            if is_join_scene:
-                self._active_scene.init_error_message(msg)
-        except OSError:
-            msg = "Invalid IP address"
-            print(msg)
-            if is_join_scene:
-                self._active_scene.init_error_message(msg)
-
-    def disconnect(self, next_scene: Optional[callable] = None, *args):
-        """
-        Start the disconnection process
-        :param next_scene: next scene to be called after the process completes
-        :param args: extra arguments for the next scene
-        :return:
-        """
-        Networking.get_instance().disconnect()
 
         if next_scene is not None:
             self.next(next_scene, *args)

@@ -6,6 +6,8 @@ from src.UIComponents.rect_button import RectButton
 from src.UIComponents.rect_label import RectLabel
 from src.UIComponents.text import Text
 from src.UIComponents.scene import Scene
+from src.constants.change_scene_enum import ChangeSceneEnum
+from src.core.networking import Networking
 
 
 class HostMenuScene(Scene):
@@ -17,6 +19,15 @@ class HostMenuScene(Scene):
         self._init_btn_new_game(575, 481, "New Game", Color.STANDARDBTN, Color.BLACK)
         self._init_btn_login(575, 371, "Load Game", Color.STANDARDBTN, Color.BLACK)
         self._init_btn_back(20, 20, "Back", Color.STANDARDBTN, Color.BLACK)
+
+        self.buttonNewGame.on_click(pygame.event.post, pygame.event.Event(ChangeSceneEnum.CREATEGAMEMENU, {}))
+        self.buttonLogin.on_click(pygame.event.post, pygame.event.Event(ChangeSceneEnum.LOADGAME, {}))
+        self.buttonBack.on_click(self.disconnect)
+
+    @staticmethod
+    def disconnect():
+        Networking.get_instance().disconnect()
+        pygame.event.post(pygame.event.Event(ChangeSceneEnum.HOSTJOINSCENE, {}))
 
     def _init_background(self):
         box_size = (self.resolution[0], self.resolution[1])

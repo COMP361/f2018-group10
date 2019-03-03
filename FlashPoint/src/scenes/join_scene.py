@@ -7,6 +7,9 @@ from src.UIComponents.rect_button import RectButton
 from src.UIComponents.rect_label import RectLabel
 from src.UIComponents.text import Text
 from src.UIComponents.input_box import InputBox
+from src.constants.change_scene_enum import ChangeSceneEnum
+from src.core.networking import Networking
+from src.core.serializer import JSONSerializer
 
 
 class JoinScene(object):
@@ -21,6 +24,36 @@ class JoinScene(object):
         self._init_btn_back(20, 20, "Back", Color.STANDARDBTN, Color.BLACK)
         self._text_bar = self._init_text_bar(500, 350, 400, 32)
         self.error_msg = ""
+        self.buttonBack.on_click(pygame.event.post, pygame.event.Event(ChangeSceneEnum.HOSTJOINSCENE, {}))
+        self.buttonConnect.on_click(self.join)
+
+    def join(self):
+        """
+        Start the join host process in Networking
+        :param ip_addr: ip address to connect
+        :param next_scene: next scene to be called after the process completes
+        :param args: extra arguments for the next scene
+        :return:
+        """
+
+        ip_addr = self.text_bar_msg
+
+        try:
+            Networking.get_instance().join_host(ip_addr, player=self._current_player)
+            reply = Networking.wait_for_reply()
+            if reply:
+                Networking.set_game(JSONSerializer.deserialize(reply))
+                pygame.event.post(pygame.event.Event(ChangeSceneEnum.JOIN, {}))
+            else:
+                raise ConnectionError
+        except ConnectionError:
+            msg = "Unable to connect"
+            print(msg)
+            self.init_error_message(msg)
+        except OSError:
+            msg = "Invalid IP address"
+            print(msg)
+            self.init_error_message(msg)
 
     def _init_text_box(self, x_pos, y_pos, text, color: Color, color_text: Color):
         box_size = (136, 32)
@@ -39,8 +72,6 @@ class JoinScene(object):
         box_size = (130, 48)
         self.buttonConnect = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
                                         Text(pygame.font.SysFont(Font.MAIN_FONT, 20), text, color_text))
-
-
         self.sprite_grp.add(self.buttonConnect)
 
     def _init_text_bar(self, x_pos, y_pos, width, height):

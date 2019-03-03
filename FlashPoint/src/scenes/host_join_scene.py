@@ -6,6 +6,7 @@ from src.UIComponents.rect_button import RectButton
 from src.UIComponents.rect_label import RectLabel
 from src.UIComponents.text import Text
 from src.UIComponents.scene import Scene
+from src.constants.change_scene_enum import ChangeSceneEnum
 
 
 class HostJoinScene(Scene):
@@ -16,6 +17,9 @@ class HostJoinScene(Scene):
         self._init_btn_host(575, 481, "Host", Color.STANDARDBTN, Color.BLACK)
         self._init_btn_join(575, 371, "Join", Color.STANDARDBTN, Color.BLACK)
         self._init_btn_back(20, 20, "Back", Color.STANDARDBTN, Color.BLACK)
+        self.buttonJoin.on_click(pygame.event.post, pygame.event.Event(ChangeSceneEnum.JOINSCENE, {}))
+        self.buttonBack.on_click(pygame.event.post, pygame.event.Event(ChangeSceneEnum.STARTSCENE, {}))
+        self.buttonHost.on_click(pygame.event.post, pygame.event.Event(ChangeSceneEnum.HOSTMENUSCENE, {}))
 
     def _init_background(self):
         box_size = (self.resolution[0], self.resolution[1])
