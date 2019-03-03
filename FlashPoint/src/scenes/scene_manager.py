@@ -97,14 +97,21 @@ class SceneManager(object):
 
         if isinstance(self._active_scene, CreateGameMenu):
             self._active_scene.buttonBack.on_click(self.disconnect, HostJoinScene, self._current_player)
-            self._active_scene.buttonExp.on_click(self.create_new_game, GameKindEnum.EXPERIENCED)
-            self._active_scene.buttonFamily.on_click(self.next, SetMaxPlayers, self._current_player, self._game)
+            self._active_scene.buttonExp.on_click(self.next, SetMaxPlayers, self._current_player, GameKindEnum.EXPERIENCED)
+            self._active_scene.buttonFamily.on_click(self.next, SetMaxPlayers, self._current_player, GameKindEnum.FAMILY)
 
         if isinstance(self._active_scene, SetMaxPlayers):
-            self._active_scene.button_players3.on_click(self.create_new_game, GameKindEnum.FAMILY, 3)
-            self._active_scene.button_players4.on_click(self.create_new_game, GameKindEnum.FAMILY, 4)
-            self._active_scene.button_players5.on_click(self.create_new_game, GameKindEnum.FAMILY, 5)
-            self._active_scene.button_players6.on_click(self.create_new_game, GameKindEnum.FAMILY, 6)
+            self._active_scene.buttonBack.on_click(self.next, CreateGameMenu, self._current_player)
+            if self._active_scene.game_kind == GameKindEnum.FAMILY:
+                self._active_scene.button_players3.on_click(self.create_new_game, GameKindEnum.FAMILY, 3)
+                self._active_scene.button_players4.on_click(self.create_new_game, GameKindEnum.FAMILY, 4)
+                self._active_scene.button_players5.on_click(self.create_new_game, GameKindEnum.FAMILY, 5)
+                self._active_scene.button_players6.on_click(self.create_new_game, GameKindEnum.FAMILY, 6)
+            if self._active_scene.game_kind == GameKindEnum.EXPERIENCED:
+                self._active_scene.button_players3.on_click(self.create_new_game, GameKindEnum.EXPERIENCED, 3)
+                self._active_scene.button_players4.on_click(self.create_new_game, GameKindEnum.EXPERIENCED, 4)
+                self._active_scene.button_players5.on_click(self.create_new_game, GameKindEnum.EXPERIENCED, 5)
+                self._active_scene.button_players6.on_click(self.create_new_game, GameKindEnum.EXPERIENCED, 6)
 
 
         if isinstance(self._active_scene, CharacterScene):
