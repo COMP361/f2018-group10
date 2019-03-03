@@ -18,6 +18,7 @@ from src.scenes.host_join_scene import HostJoinScene
 from src.scenes.host_menu_scene import HostMenuScene
 from src.scenes.join_scene import JoinScene
 from src.scenes.load_game_scene import LoadGame
+from src.scenes.set_max_players_scene import SetMaxPlayers
 from src.scenes.start_scene import StartScene
 from src.scenes.create_game_menu import CreateGameMenu
 from src.core.event_queue import EventQueue
@@ -96,8 +97,22 @@ class SceneManager(object):
 
         if isinstance(self._active_scene, CreateGameMenu):
             self._active_scene.buttonBack.on_click(self.disconnect, HostJoinScene, self._current_player)
-            self._active_scene.buttonExp.on_click(self.create_new_game, GameKindEnum.EXPERIENCED)
-            self._active_scene.buttonFamily.on_click(self.create_new_game, GameKindEnum.FAMILY)
+            self._active_scene.buttonExp.on_click(self.next, SetMaxPlayers, self._current_player, GameKindEnum.EXPERIENCED)
+            self._active_scene.buttonFamily.on_click(self.next, SetMaxPlayers, self._current_player, GameKindEnum.FAMILY)
+
+        if isinstance(self._active_scene, SetMaxPlayers):
+            self._active_scene.buttonBack.on_click(self.next, CreateGameMenu, self._current_player)
+            if self._active_scene.game_kind == GameKindEnum.FAMILY:
+                self._active_scene.button_players3.on_click(self.create_new_game, GameKindEnum.FAMILY, 3)
+                self._active_scene.button_players4.on_click(self.create_new_game, GameKindEnum.FAMILY, 4)
+                self._active_scene.button_players5.on_click(self.create_new_game, GameKindEnum.FAMILY, 5)
+                self._active_scene.button_players6.on_click(self.create_new_game, GameKindEnum.FAMILY, 6)
+            if self._active_scene.game_kind == GameKindEnum.EXPERIENCED:
+                self._active_scene.button_players3.on_click(self.create_new_game, GameKindEnum.EXPERIENCED, 3)
+                self._active_scene.button_players4.on_click(self.create_new_game, GameKindEnum.EXPERIENCED, 4)
+                self._active_scene.button_players5.on_click(self.create_new_game, GameKindEnum.EXPERIENCED, 5)
+                self._active_scene.button_players6.on_click(self.create_new_game, GameKindEnum.EXPERIENCED, 6)
+
 
         if isinstance(self._active_scene, CharacterScene):
             self._active_scene.buttonBack.on_click(self.next, LobbyScene, self._current_player, self._game)
@@ -132,9 +147,9 @@ class SceneManager(object):
 
     # ------------- GAME CREATE/LOAD STUFF ----------#
 
-    def create_new_game(self, game_kind: GameKindEnum):
+    def create_new_game(self, game_kind: GameKindEnum, max_players: int):
         """Instantiate a new family game and move to the lobby scene."""
-        self._game = GameStateModel(self._current_player, 6, game_kind)
+        self._game = GameStateModel(self._current_player, max_players, game_kind)
         Networking.set_game(self._game)
         self.next(LobbyScene, self._current_player, self._game)
 

@@ -12,7 +12,8 @@ class GameStateModel(object):
 
     def __init__(self, host: PlayerModel, num_players: int, game_kind: GameKindEnum):
         self._host = host
-        self._max_desired_players = 6
+        self._max_desired_players = num_players
+
         self._players = [self._host]
         self._players_turn_index = 0
         self._difficulty_level = None
