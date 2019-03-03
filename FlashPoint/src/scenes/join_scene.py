@@ -10,6 +10,7 @@ from src.UIComponents.input_box import InputBox
 from src.constants.change_scene_enum import ChangeSceneEnum
 from src.core.networking import Networking
 from src.core.serializer import JSONSerializer
+from src.models.game_state_model import GameStateModel
 
 
 class JoinScene(object):
@@ -42,7 +43,7 @@ class JoinScene(object):
             Networking.get_instance().join_host(ip_addr, player=self._current_player)
             reply = Networking.wait_for_reply()
             if reply:
-                Networking.set_game(JSONSerializer.deserialize(reply))
+                GameStateModel.set_game(JSONSerializer.deserialize(reply))
                 pygame.event.post(pygame.event.Event(ChangeSceneEnum.JOIN, {}))
             else:
                 raise ConnectionError

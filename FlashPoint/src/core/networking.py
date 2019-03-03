@@ -18,15 +18,6 @@ logger = logging.getLogger("networking")
 logger.setLevel(logging.INFO)
 
 
-class TestObject(object):
-
-    class_thing = 69
-
-    def __init__(self):
-        self.something = "Francis is gay"
-        self.something_else = "Holy"
-
-
 class Networking:
     """
     Class that stores networking info like host and client. This class follows a Singleton design pattern.
@@ -64,10 +55,6 @@ class Networking:
 
     def __getattr__(self, name):
         return getattr(self.__instance, name)
-
-    @staticmethod
-    def set_game(game):
-        Networking.__instance.game = game
 
     class NetworkingInner:
         host = None
@@ -465,13 +452,9 @@ class Networking:
             print(f"Received {data.__class__} object from host.")
             if isinstance(data, GameStateModel):
                 print(f"Updating game object, there are now: {len(data.players)} players.")
-                
-                Networking.set_game(data)
+                GameStateModel.set_game(data)
             if isinstance(data, ActionEvent):
-                if isinstance(data, ChatEvent):
-                    data.execute(Networking.get_instance().game)
-                if isinstance(data, ReadyEvent):
-                    data.execute(Networking.get_instance().game)
+                    data.execute()
 
         def get_server_reply(self):
             """

@@ -30,8 +30,7 @@ class CreateGameMenu(Scene):
 
     def create_new_game(self, game_kind: GameKindEnum):
         """Instantiate a new family game and move to the lobby scene."""
-        self._game = GameStateModel(self._current_player, 6, game_kind)
-        Networking.set_game(self._game)
+        GameStateModel(self._current_player, 6, game_kind)
         pygame.event.post(pygame.event.Event(ChangeSceneEnum))
         self.next(LobbyScene, self._current_player, self._game)
 
