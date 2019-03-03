@@ -48,7 +48,6 @@ class LobbyScene(object):
             return
         # Perform the start game hook in Networking (ie. stop accepting new connections and kill broadcast)
         Networking.get_instance().start_game()
-        pygame.event.post(pygame.event.Event(ChangeSceneEnum.GAMEBOARDSCENE, {}))
         # TODO: TEST
 
     def set_ready(self):
@@ -59,7 +58,7 @@ class LobbyScene(object):
             self._current_player.status = PlayerStatusEnum.READY
             event = ReadyEvent(self._current_player)
             # TODO Tim or Francis implement waiting ready for all the other players and unreadying the players
-            if self._current_player.ip == Networking.get_instance().game.host.ip:
+            if self._current_player.ip == GameStateModel.instance().host.ip:
                 event.execute()
                 Networking.get_instance().send_to_all_client(event)
             else:
