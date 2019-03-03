@@ -1,7 +1,8 @@
 import pygame
 
 import src.constants.color as Color
-from src.constants.state_enums import GameKindEnum
+from src.action_events.ready_event import ReadyEvent
+from src.constants.state_enums import GameKindEnum, PlayerStatusEnum
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 from src.UIComponents.rect_button import RectButton
@@ -27,6 +28,47 @@ class LobbyScene(object):
         self.sprite_grp = pygame.sprite.Group()
         self.players_not_ready_prompt = None
         self._init_all()
+
+        game = GameStateModel.instance()
+
+        if game.rules == GameKindEnum.EXPERIENCED:
+            self.buttonSelChar.on_click(pygame.event.post, pygame.event.Event(ChangeSceneEnum.CHARACTERSCENE, {}))
+        if Networking.get_instance().game.host.ip == self._current_player.ip:
+            self.start_button.on_click(self.start_game)
+        else:
+            self.buttonReady.on_click(self.set_ready)
+        self.buttonBack.on_click(Networking.get_instance().disconnect)
+
+    def start_game(self):
+        """Callback for when the host tries to start the game."""
+        game = Networking.get_instance().game
+        players_ready = len([player.status == PlayerStatusEnum.READY for player in game.players])
+        # TODO: change it back (==)
+        if not players_ready <= game.max_players:
+            self.not_enough_players_ready_prompt()
+            return
+        # Perform the start game hook in Networking (ie. stop accepting new connections and kill broadcast)
+        Networking.get_instance().start_game()
+        pygame.event.post(pygame.event.Event(ChangeSceneEnum.GAMEBOARDSCENE, {}))
+        # TODO: TEST
+
+    def set_ready(self):
+        """Set the status of the current player to ready."""
+        if not self.isReady:
+            self.isReady = True
+            self.buttonReady.change_color(Color.STANDARDBTN)
+            self._current_player.status = PlayerStatusEnum.READY
+            event = ReadyEvent(self._current_player)
+            # TODO Tim or Francis implement waiting ready for all the other players and unreadying the players
+            if self._current_player.ip == Networking.get_instance().game.host.ip:
+                event.execute()
+                Networking.get_instance().send_to_all_client(event)
+            else:
+                Networking.get_instance().client.send(event)
+        else:
+            self.isReady = False
+            self.buttonReady.change_color(Color.GREY)
+            self._current_player.status = PlayerStatusEnum.OFFLINE
 
     def _init_all(self, reuse=False):
         self._init_background()

@@ -22,12 +22,7 @@ class HostMenuScene(Scene):
 
         self.buttonNewGame.on_click(pygame.event.post, pygame.event.Event(ChangeSceneEnum.CREATEGAMEMENU, {}))
         self.buttonLogin.on_click(pygame.event.post, pygame.event.Event(ChangeSceneEnum.LOADGAME, {}))
-        self.buttonBack.on_click(self.disconnect)
-
-    @staticmethod
-    def disconnect():
-        Networking.get_instance().disconnect()
-        pygame.event.post(pygame.event.Event(ChangeSceneEnum.HOSTJOINSCENE, {}))
+        self.buttonBack.on_click(Networking.get_instance().disconnect)
 
     def _init_background(self):
         box_size = (self.resolution[0], self.resolution[1])

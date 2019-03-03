@@ -4,6 +4,9 @@ import threading
 import logging
 import time
 
+import pygame
+
+from src.constants.change_scene_enum import ChangeSceneEnum
 from src.action_events.ready_event import ReadyEvent
 from src.action_events.chat_event import ChatEvent
 from src.action_events.dummy_event import DummyEvent
@@ -214,6 +217,7 @@ class Networking:
                 self.host.disconnect()
                 self.host.__del__()
                 self.host = None
+            pygame.event.post(pygame.event.Event(ChangeSceneEnum.HOSTJOINSCENE, {}))
 
         # If game is started, stops new client from connecting
         def start_game(self):

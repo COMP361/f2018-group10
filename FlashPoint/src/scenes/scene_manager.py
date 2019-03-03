@@ -6,8 +6,6 @@ import pygame
 import json
 import threading
 import src.constants.color as Color
-from src.action_events.ready_event import ReadyEvent
-from src.constants.state_enums import GameKindEnum, PlayerStatusEnum
 from src.core.serializer import JSONSerializer
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
@@ -40,7 +38,7 @@ class SceneManager(object):
         self.screen = screen
         self._active_scene = StartScene(self.screen)
         self._current_player = None
-        self._game = None
+        # self._game = None
         self._active_scene.buttonRegister.on_click(self.create_profile, self._active_scene.text_bar1)
         self.update_profiles()
 
@@ -79,10 +77,10 @@ class SceneManager(object):
         #     self._active_scene.buttonNewGame.on_click(self.next, CreateGameMenu, self._current_player)
         #     self._active_scene.buttonLogin.on_click(self.next, LoadGame, self._current_player)
 
-        if isinstance(self._active_scene, CreateGameMenu):
-            self._active_scene.buttonBack.on_click(self.disconnect, HostJoinScene, self._current_player)
-            self._active_scene.buttonExp.on_click(self.create_new_game, GameKindEnum.EXPERIENCED)
-            self._active_scene.buttonFamily.on_click(self.create_new_game, GameKindEnum.FAMILY)
+        # if isinstance(self._active_scene, CreateGameMenu):
+        #     self._active_scene.buttonBack.on_click(self.disconnect, HostJoinScene, self._current_player)
+        #     self._active_scene.buttonExp.on_click(self.create_new_game, GameKindEnum.EXPERIENCED)
+        #     self._active_scene.buttonFamily.on_click(self.create_new_game, GameKindEnum.FAMILY)
 
         # if isinstance(self._active_scene, CharacterScene):
         #     self._active_scene.buttonBack.on_click(self.next, LobbyScene, self._current_player, self._game)
@@ -91,14 +89,14 @@ class SceneManager(object):
         # if isinstance(self._active_scene, LoadGame):
         #     self._active_scene.buttonBack.on_click(self.next, HostMenuScene, self._current_player)
 
-        if isinstance(self._active_scene, LobbyScene):
-            if self._game.rules == GameKindEnum.EXPERIENCED:
-                self._active_scene.buttonSelChar.on_click(self.next, CharacterScene, self._current_player)
-            if Networking.get_instance().game.host.ip == self._current_player.ip:
-                self._active_scene.start_button.on_click(self.start_game)
-            else:
-                self._active_scene.buttonReady.on_click(self.set_ready)
-            self._active_scene.buttonBack.on_click(self.disconnect, HostJoinScene, self._current_player)
+        # if isinstance(self._active_scene, LobbyScene):
+        #     if self._game.rules == GameKindEnum.EXPERIENCED:
+        #         self._active_scene.buttonSelChar.on_click(self.next, CharacterScene, self._current_player)
+        #     if Networking.get_instance().game.host.ip == self._current_player.ip:
+        #         self._active_scene.start_button.on_click(self.start_game)
+        #     else:
+        #         self._active_scene.buttonReady.on_click(self.set_ready)
+        #     self._active_scene.buttonBack.on_click(self.disconnect, HostJoinScene, self._current_player)
 
         FileImporter.play_audio("media/soundeffects/ButtonClick.wav", fade_ms=10)
 
@@ -126,43 +124,14 @@ class SceneManager(object):
             elif event.type == ChangeSceneEnum.LOADGAME:
                 self.next(LoadGame, self._current_player)
             elif event.type == ChangeSceneEnum.LOBBYSCENE:
-                self.next(LobbyScene, self._current_player, self._game)
+                self.next(LobbyScene, self._current_player, GameStateModel.instance())
+            elif event.type == ChangeSceneEnum.GAMEBOARDSCENE:
+                self.next(GameBoardScene, GameStateModel.instance(), self._current_player)
         # self._active_scene.update(event_queue)
         # if isinstance(self._active_scene, GameBoardScene):
         #     self._active_scene.quit_btn.on_click(self.disconnect, StartScene)
         # for event in event_queue:
         #     self.handle_event(event)
-
-    def start_game(self):
-        """Callback for when the host tries to start the game."""
-        game = Networking.get_instance().game
-        players_ready = len([player.status == PlayerStatusEnum.READY for player in game.players])
-        # TODO: change it back (==)
-        if not players_ready <= game.max_players:
-            self._active_scene.not_enough_players_ready_prompt()
-            return
-        # Perform the start game hook in Networking (ie. stop accepting new connections and kill broadcast)
-        Networking.get_instance().start_game()
-        self.next(GameBoardScene, self._game, self._current_player)
-        # TODO: TEST
-
-    def set_ready(self):
-        """Set the status of the current player to ready."""
-        if not self._active_scene.isReady:
-            self._active_scene.isReady = True
-            self._active_scene.buttonReady.change_color(Color.STANDARDBTN)
-            self._current_player.status = PlayerStatusEnum.READY
-            event = ReadyEvent(self._current_player)
-            #TODO Tim or Francis implement waiting ready for all the other players and unreadying the players
-            if self._current_player.ip == Networking.get_instance().game.host.ip:
-                event.execute()
-                Networking.get_instance().send_to_all_client(event)
-            else:
-                Networking.get_instance().client.send(event)
-        else:
-            self._active_scene.isReady = False
-            self._active_scene.buttonReady.change_color(Color.GREY)
-            self._current_player.status = PlayerStatusEnum.OFFLINE
 
     # ------------- NETWORKING STUFF ----------------#
 

@@ -25,6 +25,8 @@ class CreateGameMenu(Scene):
         self._init_btn_exp(741, 381, "Experienced", Color.STANDARDBTN, Color.BLACK)
 
         self.buttonExp.on_click(self.create_new_game, GameKindEnum.EXPERIENCED)
+        self.buttonFamily.on_click(self.create_new_game, GameKindEnum.FAMILY)
+        self.buttonBack.on_click(Networking.get_instance().disconnect)
 
     # ------------- GAME CREATE/LOAD STUFF ---------- #
 
