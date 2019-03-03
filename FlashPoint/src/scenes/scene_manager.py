@@ -41,24 +41,8 @@ class SceneManager(object):
         self._active_scene = StartScene(self.screen)
         self._current_player = None
         self._game = None
-        self._network_poller = threading.Thread(target=self._poll_network)
         self._active_scene.buttonRegister.on_click(self.create_profile, self._active_scene.text_bar1)
         self.update_profiles()
-
-    def _poll_network(self, timeout=0) -> bool:
-        while True:
-            while not Networking.get_instance().client:
-                time.sleep(0.0001)
-
-            reply = Networking.get_instance().client.get_server_reply()
-            if not reply:
-                time.sleep(0.0001)
-                continue
-
-            server_response = JSONSerializer.deserialize(reply)
-
-            if isinstance(server_response, GameStateModel):
-                self._game = server_response
 
     def next(self, next_scene: callable, *args):
         """Switch to the next logical scene. args is assumed to be: [SceneClass]
@@ -171,7 +155,7 @@ class SceneManager(object):
             event = ReadyEvent(self._current_player)
             #TODO Tim or Francis implement waiting ready for all the other players and unreadying the players
             if self._current_player.ip == Networking.get_instance().game.host.ip:
-                event.execute(Networking.get_instance().game)
+                event.execute()
                 Networking.get_instance().send_to_all_client(event)
             else:
                 Networking.get_instance().client.send(event)
