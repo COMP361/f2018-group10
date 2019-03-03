@@ -100,12 +100,12 @@ class SceneManager(object):
             self._active_scene.buttonExp.on_click(self.create_new_game, GameKindEnum.EXPERIENCED)
             self._active_scene.buttonFamily.on_click(self.create_new_game, GameKindEnum.FAMILY)
 
-        if isinstance(self._active_scene, CharacterScene):
-            self._active_scene.buttonBack.on_click(self.next, LobbyScene, self._current_player, self._game)
-            self._active_scene.buttonConfirm.on_click(self.next, LobbyScene, self._current_player, self._game)
+        # if isinstance(self._active_scene, CharacterScene):
+        #     self._active_scene.buttonBack.on_click(self.next, LobbyScene, self._current_player, self._game)
+        #     self._active_scene.buttonConfirm.on_click(self.next, LobbyScene, self._current_player, self._game)
 
-        if isinstance(self._active_scene, LoadGame):
-            self._active_scene.buttonBack.on_click(self.next, HostMenuScene, self._current_player)
+        # if isinstance(self._active_scene, LoadGame):
+        #     self._active_scene.buttonBack.on_click(self.next, HostMenuScene, self._current_player)
 
         if isinstance(self._active_scene, LobbyScene):
             if self._game.rules == GameKindEnum.EXPERIENCED:
@@ -141,8 +141,7 @@ class SceneManager(object):
                 self.next(JoinScene, self._current_player)
             elif event.type == ChangeSceneEnum.LOADGAME:
                 self.next(LoadGame, self._current_player)
-            elif event.type == ChangeSceneEnum.JOIN:
-                self._game = Networking.get_instance().game
+            elif event.type == ChangeSceneEnum.LOBBYSCENE:
                 self.next(LobbyScene, self._current_player, self._game)
         # self._active_scene.update(event_queue)
         # if isinstance(self._active_scene, GameBoardScene):

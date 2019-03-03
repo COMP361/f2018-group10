@@ -43,7 +43,8 @@ class JoinScene(object):
             reply = Networking.wait_for_reply()
             if reply:
                 Networking.set_game(JSONSerializer.deserialize(reply))
-                pygame.event.post(pygame.event.Event(ChangeSceneEnum.JOIN, {}))
+                self._game = Networking.get_instance().game
+                pygame.event.post(pygame.event.Event(ChangeSceneEnum.LOBBYSCENE, {}))
             else:
                 raise ConnectionError
         except ConnectionError:

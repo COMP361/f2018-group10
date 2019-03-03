@@ -11,6 +11,7 @@ from src.UIComponents.profile_list import ProfileList
 from src.core.serializer import JSONSerializer
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
+from src.constants.change_scene_enum import ChangeSceneEnum
 
 
 class LoadGame(object):
@@ -28,6 +29,7 @@ class LoadGame(object):
         self._init_btn_register(((self.resolution[0] / 2) - (500 / 2)) + 400, 592, "Create Profile",
                                 color.STANDARDBTN, color.BLACK)
         self._init_btn_back(20, 20, "Back", color.STANDARDBTN, color.BLACK)
+        self.buttonBack.on_click(pygame.event.post, pygame.event.Event(ChangeSceneEnum.HOSTMENUSCENE, {}))
 
 
     def _init_background(self):

@@ -9,5 +9,5 @@ class ChangeSceneEnum(object):
     CREATEGAMEMENU = pygame.USEREVENT + 5
     CHARACTERSCENE = pygame.USEREVENT + 6
     LOADGAME = pygame.USEREVENT + 7
-    JOIN = pygame.USEREVENT + 8
+    LOBBYSCENE = pygame.USEREVENT + 8
     REGISTER = pygame.USEREVENT + 9

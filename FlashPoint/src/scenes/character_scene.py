@@ -8,6 +8,7 @@ from src.UIComponents.rect_label import RectLabel
 from src.UIComponents.scene import Scene
 from src.UIComponents.text import Text
 from src.models.game_units.player_model import PlayerModel
+from src.constants.change_scene_enum import ChangeSceneEnum
 
 
 class CharacterScene(Scene):
@@ -47,6 +48,8 @@ class CharacterScene(Scene):
         self._init_btn_confirm(1050, 575, "Confirm", Color.STANDARDBTN, Color.BLACK)
 
         self._init_title_text()
+        self.buttonBack.on_click(pygame.event.post, pygame.event.Event(ChangeSceneEnum.LOBBYSCENE, {}))
+        self.buttonConfirm.on_click(pygame.event.post, pygame.event.Event(ChangeSceneEnum.LOBBYSCENE, {}))
 
     def _init_background(self):
         box_size = (self.resolution[0], self.resolution[1])

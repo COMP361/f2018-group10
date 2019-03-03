@@ -8,6 +8,7 @@ from src.UIComponents.rect_button import RectButton
 from src.UIComponents.rect_label import RectLabel
 from src.UIComponents.text import Text
 from src.UIComponents.chat_box import ChatBox
+from src.constants.change_scene_enum import ChangeSceneEnum
 from src.core.networking import Networking
 
 
