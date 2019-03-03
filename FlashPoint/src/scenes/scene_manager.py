@@ -39,7 +39,7 @@ class SceneManager(object):
         self._active_scene = StartScene(self.screen)
         self._current_player = None
         # self._game = None
-        self._active_scene.buttonRegister.on_click(self.create_profile, self._active_scene.text_bar1)
+        # self._active_scene.buttonRegister.on_click(self.create_profile, self._active_scene.text_bar1)
         self.update_profiles()
 
     def next(self, next_scene: callable, *args):
@@ -124,6 +124,7 @@ class SceneManager(object):
             elif event.type == ChangeSceneEnum.LOADGAME:
                 self.next(LoadGame, self._current_player)
             elif event.type == ChangeSceneEnum.LOBBYSCENE:
+                print("Lobby")
                 self.next(LobbyScene, self._current_player, GameStateModel.instance())
             elif event.type == ChangeSceneEnum.GAMEBOARDSCENE:
                 self.next(GameBoardScene, GameStateModel.instance(), self._current_player)
@@ -132,20 +133,6 @@ class SceneManager(object):
         #     self._active_scene.quit_btn.on_click(self.disconnect, StartScene)
         # for event in event_queue:
         #     self.handle_event(event)
-
-    # ------------- NETWORKING STUFF ----------------#
-
-    def host(self, next_scene: Optional[callable] = None, *args):
-        """
-        Start the host process in Networking
-        :param next_scene: next scene to be called after the process completes
-        :param args: extra arguments for the next scene
-        :return:
-        """
-        Networking.get_instance().create_host()
-
-        if next_scene is not None:
-            self.next(next_scene, *args)
 
     # ------------ Stuff for profiles and start scene ------------ #
 
