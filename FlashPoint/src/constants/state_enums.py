@@ -23,7 +23,8 @@ class GameStateEnum(Enum):
     PLACING = auto()
     MAIN_GAME = auto()
     KNOCKED_DOWN_PLACEMENT = auto()
-    COMPLETED = auto()
+    LOST = auto()
+    WON = auto()
 
 
 class PlayerStatusEnum(Enum):

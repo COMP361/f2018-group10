@@ -3,7 +3,7 @@ import random
 from typing import List, Tuple, Dict
 
 from src.models.game_board.edge_obstacle_model import EdgeObstacleModel
-from src.models.game_board.null_tile_model import NullTileModel
+from src.models.game_board.null_model import NullModel
 from src.models.game_units.poi_model import POIModel
 from src.models.game_board.tile_model import TileModel
 from src.constants.state_enums import GameKindEnum, SpaceKindEnum, SpaceStatusEnum, POIIdentityEnum, \
@@ -48,13 +48,6 @@ class GameBoardModel(object):
         """Create all tiles and set their adjacency. """
         tiles = []
 
-        # for i in range(self._dimensions[0]*self._dimensions[1]):
-        #     row = i % self._dimensions[0]
-        #     column = int(i / self._dimensions[0])
-        #     tile_kind = self._determine_tile_kind(row, column)
-        #     tile = TileModel(row, column, tile_kind)
-        #     tiles.append(tile)
-
         for i in range(self._dimensions[0]):
             tiles.append([])
             for j in range(self._dimensions[1]):
@@ -62,15 +55,14 @@ class GameBoardModel(object):
                 tile = TileModel(i, j, tile_kind)
                 tiles[i].append(tile)
 
-        # TODO: Abhijay: setting adjacency and creating walls/doors.
         # setting tile adjacencies
         extended_grid = []
         for row in tiles:
-            extended_grid.append([NullTileModel()] + row + [NullTileModel()])
+            extended_grid.append([NullModel()] + row + [NullModel()])
 
         row_length = len(tiles[0])
-        extra_top_row = [NullTileModel() for x in range(row_length + 2)]
-        extra_bottom_row = [NullTileModel() for x in range(row_length + 2)]
+        extra_top_row = [NullModel() for x in range(row_length + 2)]
+        extra_bottom_row = [NullModel() for x in range(row_length + 2)]
         extended_grid = [extra_top_row] + extended_grid + [extra_bottom_row]
 
         for i in range(1, len(extended_grid) - 1):

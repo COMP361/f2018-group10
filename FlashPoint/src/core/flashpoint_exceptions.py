@@ -41,3 +41,27 @@ class PlayerNotFoundException(FlashPointBaseException):
     def __init__(self, player_ip: str):
         message = f"Player with ip: {player_ip} was not found in the Game State."
         super().__init__(message)
+
+
+class NotEnoughAPException(FlashPointBaseException):
+    """Class to tell you that the player does not have enough AP to perform a given action."""
+
+    def __init__(self, action: str, minPoints: int):
+        message = f"Player does not have enough AP to {action}. Player needs at least {minPoints} points."
+        super().__init__(message)
+
+
+class WallNotAdjacent(FlashPointBaseException):
+    """Class to tell you that the wall is not adjacent to the player's current space."""
+
+    def __init__(self, player_x: int, player_y: int):
+        message = f"The wall is not adjacent to the player located at ({player_x}, {player_y})."
+        super().__init__(message)
+
+
+class WallAlreadyDestroyed(FlashPointBaseException):
+    """Class to tell you that the wall cannot be chopped because it is already destroyed."""
+
+    def __init__(self, player_x: int, player_y: int):
+        message = f"The wall adjacent to the player located at ({player_x}, {player_y}) cannot be chopped because it is already destroyed."
+        super().__init__(message)

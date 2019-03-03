@@ -3,7 +3,7 @@ from typing import Optional
 from src.models.model import Model
 from src.core.flashpoint_exceptions import TilePositionOutOfBoundsException
 from src.models.game_board.edge_obstacle_model import EdgeObstacleModel
-from src.models.game_board.null_tile_model import NullTileModel
+from src.models.game_board.null_model import NullModel
 from src.constants.state_enums import SpaceKindEnum
 from src.constants.state_enums import SpaceStatusEnum
 
@@ -21,17 +21,17 @@ class TileModel(Model):
         self._associated_models = []
 
         self._adjacent_tiles = {
-            "North": NullTileModel(),
-            "East": NullTileModel(),
-            "West": NullTileModel(),
-            "South": NullTileModel(),
+            "North": NullModel(),
+            "East": NullModel(),
+            "West": NullModel(),
+            "South": NullModel(),
         }
 
         self._adjacent_edge_objects = {
-            "North": NullTileModel(),
-            "East": NullTileModel(),
-            "West": NullTileModel(),
-            "South": NullTileModel(),
+            "North": NullModel(),
+            "East": NullModel(),
+            "West": NullModel(),
+            "South": NullModel(),
         }
 
     def __str__(self):
