@@ -6,7 +6,7 @@ from src.models.game_board.edge_obstacle_model import EdgeObstacleModel
 from src.models.game_board.null_tile_model import NullTileModel
 from src.models.game_units.poi_model import POIModel
 from src.models.game_board.tile_model import TileModel
-from src.constants.state_enums import GameKindEnum, SpaceKindEnum, SpaceStatusEnum, POIIdentityEnum, DirectionEnum, \
+from src.constants.state_enums import GameKindEnum, SpaceKindEnum, SpaceStatusEnum, POIIdentityEnum, \
     DoorStatusEnum
 from src.models.game_board.wall_model import WallModel
 from src.models.game_board.door_model import DoorModel
@@ -84,15 +84,15 @@ class GameBoardModel(object):
         for top, bottom in [(0, 1), (6, 7)]:
             for i in range(1, 9):
                 wall = WallModel()
-                tiles[top][i].set_adjacent_edge_obstacle(DirectionEnum.SOUTH, wall)
-                tiles[bottom][i].set_adjacent_edge_obstacle(DirectionEnum.NORTH, wall)
+                tiles[top][i].set_adjacent_edge_obstacle("South", wall)
+                tiles[bottom][i].set_adjacent_edge_obstacle("North", wall)
 
         # setting the left and right walls on the outside of the house
         for left, right in [(0, 1), (8, 9)]:
             for i in range(1, 7):
                 wall = WallModel()
-                tiles[i][left].set_adjacent_edge_obstacle(DirectionEnum.EAST, wall)
-                tiles[i][right].set_adjacent_edge_obstacle(DirectionEnum.WEST, wall)
+                tiles[i][left].set_adjacent_edge_obstacle("East", wall)
+                tiles[i][right].set_adjacent_edge_obstacle("West", wall)
 
 
         # setting the doors present on the outside of the house EXPLICITLY
@@ -122,13 +122,13 @@ class GameBoardModel(object):
         first_dirn, second_dirn = adjacency['first_dirn'], adjacency['second_dirn']
         for coord, direction in [(first_pair, first_dirn), (second_pair, second_dirn)]:
             if direction == 'NORTH':
-                direction = DirectionEnum.NORTH
+                direction = "North"
             elif direction == 'EAST':
-                direction = DirectionEnum.EAST
+                direction = "East"
             elif direction == 'WEST':
-                direction = DirectionEnum.WEST
+                direction = "West"
             else:
-                direction = DirectionEnum.SOUTH
+                direction = "South"
 
             tiles[coord[0]][coord[1]].set_adjacent_edge_obstacle(direction, obstacle)
 

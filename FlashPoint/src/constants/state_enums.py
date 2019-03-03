@@ -7,13 +7,6 @@ class DifficultyLevelEnum(Enum):
     HEROIC = auto()
 
 
-class DirectionEnum(Enum):
-    NORTH = auto()
-    EAST = auto()
-    WEST = auto()
-    SOUTH = auto()
-
-
 class DoorStatusEnum(Enum):
     OPEN = auto()
     CLOSED = auto()
