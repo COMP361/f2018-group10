@@ -4,6 +4,8 @@ import threading
 import logging
 import time
 
+from src.core.event_queue import EventQueue
+from src.constants.change_scene_enum import ChangeSceneEnum
 from src.action_events.ready_event import ReadyEvent
 from src.action_events.chat_event import ChatEvent
 from src.action_events.dummy_event import DummyEvent
@@ -16,15 +18,6 @@ from src.external.Mastermind import *
 
 logger = logging.getLogger("networking")
 logger.setLevel(logging.INFO)
-
-
-class TestObject(object):
-
-    class_thing = 69
-
-    def __init__(self):
-        self.something = "Francis is gay"
-        self.something_else = "Holy"
 
 
 class Networking:
@@ -64,10 +57,6 @@ class Networking:
 
     def __getattr__(self, name):
         return getattr(self.__instance, name)
-
-    @staticmethod
-    def set_game(game):
-        Networking.__instance.game = game
 
     class NetworkingInner:
         host = None
@@ -162,7 +151,7 @@ class Networking:
             b_caster.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
             msg = f"{socket.gethostname()} {mastermind_get_local_ip()}"
             bip = Networking.get_instance().get_broadcast_ip()
-            print(f"Broadcasting at {bip}:54545")
+            print(f"Broadcasting at {bip}:54545\n")
 
             while not stop_event.is_set():
                 b_caster.sendto(str.encode(msg), (str(bip), 54545))
@@ -227,6 +216,7 @@ class Networking:
                 self.host.disconnect()
                 self.host.__del__()
                 self.host = None
+            EventQueue.post(ChangeSceneEnum.HOSTJOINSCENE)
 
         # If game is started, stops new client from connecting
         def start_game(self):
@@ -465,13 +455,9 @@ class Networking:
             print(f"Received {data.__class__} object from host.")
             if isinstance(data, GameStateModel):
                 print(f"Updating game object, there are now: {len(data.players)} players.")
-                
-                Networking.set_game(data)
+                GameStateModel.set_game(data)
             if isinstance(data, ActionEvent):
-                if isinstance(data, ChatEvent):
-                    data.execute(Networking.get_instance().game)
-                if isinstance(data, ReadyEvent):
-                    data.execute(Networking.get_instance().game)
+                    data.execute()
 
         def get_server_reply(self):
             """

@@ -66,15 +66,15 @@ class ChatBox:
             chat_event = ChatEvent(self.chat_textbox.message, self.current_player.nickname)
 
             # TODO MAKE THIS A UTILITY IN NETWORKING
-            if self.current_player.ip == Networking.get_instance().game.host.ip:
+            if self.current_player.ip == GameStateModel.instance().host.ip:
                 Networking.get_instance().send_to_all_client(chat_event)
-                chat_event.execute(Networking.get_instance().game)
+                chat_event.execute()
             else:
                 Networking.get_instance().client.send(chat_event)
 
             self.chat_textbox.message = ''
 
-        self.chat_history = Networking.get_instance().game.chat_history
+        self.chat_history = GameStateModel.instance().chat_history
         self._init_message_box()
         self.chat_textbox.rect.w = self.chat_history_bg.rect.w
 
