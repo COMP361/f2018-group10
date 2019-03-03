@@ -16,6 +16,7 @@ from src.scenes.host_join_scene import HostJoinScene
 from src.scenes.host_menu_scene import HostMenuScene
 from src.scenes.join_scene import JoinScene
 from src.scenes.load_game_scene import LoadGame
+from src.scenes.set_max_players_scene import SetMaxPlayers
 from src.scenes.start_scene import StartScene
 from src.scenes.create_game_menu import CreateGameMenu
 from src.core.event_queue import EventQueue
@@ -133,7 +134,7 @@ class SceneManager(object):
         #     self._active_scene.quit_btn.on_click(self.disconnect, StartScene)
         # for event in event_queue:
         #     self.handle_event(event)
-
+     
     # ------------ Stuff for profiles and start scene ------------ #
 
     def update_profiles(self):
