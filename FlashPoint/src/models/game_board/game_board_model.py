@@ -3,13 +3,14 @@ import random
 from typing import List, Tuple, Dict
 
 from src.models.game_board.edge_obstacle_model import EdgeObstacleModel
-from src.models.game_board.null_tile_model import NullTileModel
+from src.models.game_board.null_model import NullModel
 from src.models.game_units.poi_model import POIModel
 from src.models.game_board.tile_model import TileModel
 from src.constants.state_enums import GameKindEnum, SpaceKindEnum, SpaceStatusEnum, POIIdentityEnum, \
-    DoorStatusEnum
+    DoorStatusEnum, WallStatusEnum
 from src.models.game_board.wall_model import WallModel
 from src.models.game_board.door_model import DoorModel
+from src.scenes.game_board_scene import GameBoardScene
 
 
 class GameBoardModel(object):
@@ -66,11 +67,11 @@ class GameBoardModel(object):
         # setting tile adjacencies
         extended_grid = []
         for row in tiles:
-            extended_grid.append([NullTileModel()] + row + [NullTileModel()])
+            extended_grid.append([NullModel()] + row + [NullModel()])
 
         row_length = len(tiles[0])
-        extra_top_row = [NullTileModel() for x in range(row_length + 2)]
-        extra_bottom_row = [NullTileModel() for x in range(row_length + 2)]
+        extra_top_row = [NullModel() for x in range(row_length + 2)]
+        extra_bottom_row = [NullModel() for x in range(row_length + 2)]
         extended_grid = [extra_top_row] + extended_grid + [extra_bottom_row]
 
         for i in range(1, len(extended_grid) - 1):
@@ -164,3 +165,29 @@ class GameBoardModel(object):
             poi.y_pos = locations[i][1]
             self._active_pois.append(poi)
             self.get_tile_at(poi.x_pos, poi.y_pos).add_associated_model(poi)
+
+    def get_movable_tiles(self,x:int,y:int,ap:int,movable_tiles= []) -> List[TileModel]:
+
+        #ap = action points
+        currentTile = self.get_tile_at(x,y)
+        if ap >= 1:
+            for key in currentTile.adjacent_edge_objects.keys():
+                tile = currentTile.adjacent_tiles.get(key)
+                obstacle = currentTile.adjacent_edge_objects.get(key)
+
+                if isinstance(obstacle,NullModel):
+                    ap_deduct = 2 if SpaceStatusEnum.FIRE else 1
+
+                    movable_tiles = self.get_movable_tiles(tile.x_coord, tile.y_coord, ap - ap_deduct, movable_tiles)
+
+                elif isinstance(obstacle, WallModel):
+                    if tile.wall_status == WallStatusEnum.DESTROYED:
+                        movable_tiles.append(tile)
+                        movable_tiles = self.get_movable_tiles(tile.x_coord, tile.y_coord, ap - 2, movable_tiles)
+                elif isinstance(obstacle, DoorModel):
+                    if (tile.door_status == DoorStatusEnum.OPEN | tile.door_status == DoorStatusEnum.DESTROYED):
+                        movable_tiles.append(tile)
+                        movable_tiles = self.get_movable_tiles(tile.x_coord, tile.y_coord, ap - 2, movable_tiles)
+
+        output = list(dict.fromkeys(movable_tiles))
+        return output
