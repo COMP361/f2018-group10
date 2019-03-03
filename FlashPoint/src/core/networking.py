@@ -283,6 +283,7 @@ class Networking:
             """
             if self.host:
                 for client in self.host.client_list.values():
+               # for client in self.host.client_list.values():
                     print(f"Sending {data.__class__} to client at {client.address}\n")
                     try:
                         self.host.callback_client_send(client, data, compress)
@@ -399,6 +400,7 @@ class Networking:
             pass
 
     class Client(MastermindClientUDP):
+
         def __init__(self, timeout_connect=None, timeout_receive=None):
             super(MastermindClientUDP, self).__init__(MM_UDP, timeout_connect, timeout_receive)
             self._pause_receive = threading.Event()
