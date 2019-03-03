@@ -1,5 +1,4 @@
 from src.constants.state_enums import DirectionEnum, GameKindEnum
-from src.models.game_board.tile_model import TileModel
 from src.models.game_units.player_model import PlayerModel
 
 
@@ -15,7 +14,7 @@ class FlashPointBaseException(Exception):
 class TilePositionOutOfBoundsException(FlashPointBaseException):
     """Class to tell you that you fucked up."""
 
-    def __init__(self, tile: TileModel, direction: DirectionEnum):
+    def __init__(self, tile, direction: DirectionEnum):
         message = f"{tile} has no adjacent tile in direction: {direction.value}."
         super().__init__(message)
 
@@ -33,4 +32,12 @@ class InvalidGameKindException(FlashPointBaseException):
 
     def __init__(self, action: str, game_type: GameKindEnum):
         message = f"Invalid game type: {game_type} for action: {action}"
+        super().__init__(message)
+
+
+class PlayerNotFoundException(FlashPointBaseException):
+    """Player was not found in the game state"""
+
+    def __init__(self, player_ip: str):
+        message = f"Player with ip: {player_ip} was not found in the Game State."
         super().__init__(message)

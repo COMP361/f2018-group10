@@ -1,14 +1,13 @@
 import pygame
 
-from src.UIComponents.interactable import Interactable
 import src.constants.color as Color
+from src.UIComponents.interactable import Interactable
 from src.core.event_queue import EventQueue
-from src.models.game_board.tile_model import TileModel
 
 
 class TileSprite(Interactable):
     """Graphical representation of a Tile and controls."""
-    def __init__(self, image: pygame.Surface, x, y, x_offset, y_offset, tile_model: TileModel):
+    def __init__(self, image: pygame.Surface, x, y, x_offset, y_offset):
         self.index = 0
         self.sprite_grp = pygame.sprite.Group()
         self.image = image
@@ -50,10 +49,11 @@ class TileSprite(Interactable):
         if self.hover() and self._is_enabled:
             if not self.is_hovered:
                 self.is_hovered = True
-                self.image = self._backup_image.copy()
-                self.image.fill(Color.YELLOW)
+                hover = pygame.Surface((self._backup_image.get_width(), self._backup_image.get_height()), pygame.SRCALPHA)
+                hover.fill((255, 255, 0, 128))
+                self.image.blit(hover, (0, 0))
         else:
-            self.image = self._backup_image
+            self.image.blit(self._backup_image, (0, 0))
             self.is_hovered = False
 
     def _scroll(self):
@@ -68,17 +68,6 @@ class TileSprite(Interactable):
                 self.rect.move_ip(movement)
                 self.mouse_rect.move_ip(movement)
         self._mouse_pos = current_mouse_pos
-
-    def remove_sprite_character(self, some_character):
-        for sprite in self.sprite_grp:
-            if isinstance(sprite, PlayerSprite) and sprite == some_character:
-                # Takes care of not taking out other characters as well
-                self.sprite_grp.remove(some_character)
-
-    def find_character(self):
-        for sprite in self.sprite_grp:
-            if isinstance(sprite, PlayerSprite):
-                return sprite
 
     def draw(self, screen: pygame.Surface):
         self._highlight()

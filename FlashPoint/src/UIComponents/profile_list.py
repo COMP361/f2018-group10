@@ -69,9 +69,9 @@ class ProfileList(pygame.sprite.Sprite, Components):
             y = self.y + 20
 
             btn = RectButton(x, y, width, height, color.STANDARDBTN, 0,
-                             Text(pygame.font.SysFont('Arial', 20), "Empty", color.BLACK))
+                             Text(pygame.font.SysFont('Agency FB', 20), "Empty", color.BLACK))
             remove_btn = RectButton(btn.x, (btn.y + self.height-80)+10, btn.width, 30, color.YELLOW, 0,
-                                    Text(pygame.font.SysFont('Arial', 16), "Remove", color.BLACK))
+                                    Text(pygame.font.SysFont('Agency FB', 16), "Remove", color.BLACK))
             self._remove_btn_list.append(remove_btn)
             self._btn_list.append(btn)
             self._profile_list.add(btn)
@@ -91,7 +91,7 @@ class ProfileList(pygame.sprite.Sprite, Components):
             btn = self._btn_list[index]
             rect = pygame.rect.Rect(btn.x, btn.y, btn.width, height)
             btn.change_rect(rect)
-            btn.txt_obj = Text(pygame.font.SysFont('Arial', 20), name, color.BLACK)
+            btn.txt_obj = Text(pygame.font.SysFont('Agency FB', 20), name, color.BLACK)
             btn.on_click(click_action, *args, **kwargs)
             btn.enable()
             self._profile_list.add(self._remove_btn_list[index])
@@ -110,7 +110,7 @@ class ProfileList(pygame.sprite.Sprite, Components):
             btn = self._btn_list[index]
             rect = pygame.rect.Rect(btn.x, btn.y, btn.width, height)
             btn.change_rect(rect)
-            btn.txt_obj = Text(pygame.font.SysFont('Arial', 20), "Empty", color.BLACK)
+            btn.txt_obj = Text(pygame.font.SysFont('Agency FB', 20), "Empty", color.BLACK)
             btn.disable()
             self._profile_list.remove(self._remove_btn_list[index])
             self._render()

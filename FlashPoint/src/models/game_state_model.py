@@ -2,31 +2,55 @@ import random
 
 from typing import List, Optional, Tuple
 
+from src.models.model import Model
+from src.models.game_board.game_board_model import GameBoardModel
 from src.constants.state_enums import GameKindEnum, DifficultyLevelEnum
-from src.core.flashpoint_exceptions import TooManyPlayersException, InvalidGameKindException
+from src.core.flashpoint_exceptions import TooManyPlayersException, InvalidGameKindException, PlayerNotFoundException
 from src.models.game_units.player_model import PlayerModel
 
 
-class GameStateModel(object):
-    """Class for maintaining the current Game state."""
+class GameStateModel(Model):
+    """Singleton Class for maintaining the current Game state."""
+    _instance = None
 
     def __init__(self, host: PlayerModel, num_players: int, game_kind: GameKindEnum):
-        self._host = host
-        self._max_desired_players = num_players
+        if not GameStateModel._instance:
+            super().__init__()
 
-        self._players = [self._host]
-        self._players_turn_index = 0
-        self._difficulty_level = None
-        self._rules = game_kind
-        self._red_dice = 0
-        self._black_dice = 0
+            self._host = host
+            self._max_desired_players = 6
+            self._players = [self._host]
+            self._players_turn_index = 0
+            self._difficulty_level = None
+            self._rules = game_kind
+            self._red_dice = 0
+            self._black_dice = 0
 
-        self._victims_saved = 0
-        self._victims_lost = 0
-        self._damage = 0
+            # self._game_board = GameBoardModel(self._rules)
 
-        self._max_damage = 24
-        self._chat_history = []
+            self._victims_saved = 0
+            self._victims_lost = 0
+            self._damage = 0
+            self._max_damage = 24
+            self._chat_history = []
+
+            GameStateModel._instance = self
+        else:
+            print("Attempted to instantiate another singleton")
+            raise Exception("Networking is a Singleton")
+
+    @classmethod
+    def instance(cls):
+        """Get the instance of this singleton"""
+        return cls._instance
+
+    @classmethod
+    def set_game(cls, game):
+        cls._instance = game
+
+    @property
+    def game_board(self) -> GameBoardModel:
+        return self._game_board
 
     @property
     def chat_history(self) -> List[Tuple[str, str]]:
@@ -58,6 +82,12 @@ class GameStateModel(object):
         if len(self._players) == self._max_desired_players:
             raise TooManyPlayersException(player)
         self._players.append(player)
+
+    def get_player_by_ip(self, ip: str) -> PlayerModel:
+        matching_players = [player for player in self._players if player.ip == ip]
+        if not matching_players:
+            raise PlayerNotFoundException
+        return matching_players[0]
 
     def remove_player(self, player: PlayerModel):
         """Remove a player from the current game."""

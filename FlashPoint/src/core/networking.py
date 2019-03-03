@@ -4,25 +4,20 @@ import threading
 import logging
 import time
 
+from src.core.event_queue import EventQueue
+from src.constants.change_scene_enum import ChangeSceneEnum
+from src.action_events.ready_event import ReadyEvent
 from src.action_events.chat_event import ChatEvent
 from src.action_events.dummy_event import DummyEvent
 from src.models.game_state_model import GameStateModel
 from src.core.serializer import JSONSerializer
 from src.action_events.action_event import ActionEvent
 from src.action_events.join_event import JoinEvent
+from src.action_events.disconnect_event import DisconnectEvent
 from src.external.Mastermind import *
 
 logger = logging.getLogger("networking")
 logger.setLevel(logging.INFO)
-
-
-class TestObject(object):
-
-    class_thing = 69
-
-    def __init__(self):
-        self.something = "Francis is gay"
-        self.something_else = "Holy"
 
 
 class Networking:
@@ -62,10 +57,6 @@ class Networking:
 
     def __getattr__(self, name):
         return getattr(self.__instance, name)
-
-    @staticmethod
-    def set_game(game):
-        Networking.__instance.game = game
 
     class NetworkingInner:
         host = None
@@ -160,7 +151,7 @@ class Networking:
             b_caster.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
             msg = f"{socket.gethostname()} {mastermind_get_local_ip()}"
             bip = Networking.get_instance().get_broadcast_ip()
-            print(f"Broadcasting at {bip}:54545")
+            print(f"Broadcasting at {bip}:54545\n")
 
             while not stop_event.is_set():
                 b_caster.sendto(str.encode(msg), (str(bip), 54545))
@@ -225,6 +216,7 @@ class Networking:
                 self.host.disconnect()
                 self.host.__del__()
                 self.host = None
+            EventQueue.post(ChangeSceneEnum.HOSTJOINSCENE)
 
         # If game is started, stops new client from connecting
         def start_game(self):
@@ -236,7 +228,7 @@ class Networking:
             self.stop_broadcast.set()
             print("Broadcast killed")
 
-            if self.host is not None:
+            if self.host:
                 self.host.accepting_disallow()
 
         def send_to_server(self, data, compress=True):
@@ -282,6 +274,7 @@ class Networking:
             """
             if self.host:
                 for client in self.host.client_list.values():
+               # for client in self.host.client_list.values():
                     print(f"Sending {data.__class__} to client at {client.address}\n")
                     try:
                         self.host.callback_client_send(client, data, compress)
@@ -323,10 +316,6 @@ class Networking:
             # Assign a new connection object to the address (as a key value pair)
             self.client_list[connection_object.address[0]] = connection_object
 
-            # inform the event queue that a client is connected, with the respective client id
-            # event = pygame.event.Event(CustomEvents.CLIENT_CONNECTED, {'client_id': client_id})
-            # pygame.event.post(event)
-
             # Check if connected client exceeds limit
             if len(self.client_list) >= 6:
                 print("Limit reached, stop accepting connections")
@@ -347,7 +336,7 @@ class Networking:
                 players = [x for x in game.players if x.ip == connection_object.address[0]]
                 if players:
                     game.remove_player(players[0])
-                    self.client_list.pop(connection_object.address[0])
+                    self.kick_client(connection_object.address[0])
             return super(MastermindServerUDP, self).callback_disconnect()
 
         def callback_client_handle(self, connection_object, data):
@@ -371,11 +360,21 @@ class Networking:
             print(f"Client at {connection_object.address} sent a message: {data.__class__}")
             if isinstance(data, ActionEvent):
                 if isinstance(data, JoinEvent):
+                    data.execute(Networking.get_instance().game)
                     Networking.get_instance().game.add_player(data.player)
+                    Networking.get_instance().send_to_all_client(Networking.get_instance().game)
+                if isinstance(data, DisconnectEvent):
+                    # Kick the player that send the DC event and notify all other players.
+                    # Need to have similar polling mechanics like in lobby
+                    self.kick_client(connection_object.address[0])
                     Networking.get_instance().send_to_all_client(Networking.get_instance().game)
                 if isinstance(data, ChatEvent):
                     data.execute(Networking.get_instance().game)
                     Networking.get_instance().send_to_all_client(data)
+                if isinstance(data, ReadyEvent):
+                    data.execute(Networking.get_instance().game)
+                    Networking.get_instance().send_to_all_client(data)
+
             return super(MastermindServerUDP, self).callback_client_handle(connection_object, data)
 
         def callback_client_send(self, connection_object, data, compression=None):
@@ -398,6 +397,7 @@ class Networking:
             pass
 
     class Client(MastermindClientUDP):
+
         def __init__(self, timeout_connect=None, timeout_receive=None):
             super(MastermindClientUDP, self).__init__(MM_UDP, timeout_connect, timeout_receive)
             self._pause_receive = threading.Event()
@@ -455,10 +455,9 @@ class Networking:
             print(f"Received {data.__class__} object from host.")
             if isinstance(data, GameStateModel):
                 print(f"Updating game object, there are now: {len(data.players)} players.")
-                Networking.set_game(data)
+                GameStateModel.set_game(data)
             if isinstance(data, ActionEvent):
-                if isinstance(data, ChatEvent):
-                    data.execute(Networking.get_instance().game)
+                    data.execute()
 
         def get_server_reply(self):
             """

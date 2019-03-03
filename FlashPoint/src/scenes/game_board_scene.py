@@ -1,12 +1,13 @@
 import json
-import copy
 from datetime import datetime
 
 import pygame
+from src.core.networking import Networking
 
 from src.UIComponents.chat_box import ChatBox
 from src.UIComponents.menu_window import MenuWindow
 from src.core.event_queue import EventQueue
+from src.core.networking import Networking
 from src.core.serializer import JSONSerializer
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
@@ -22,11 +23,11 @@ from src.UIComponents.text import Text
 
 class GameBoardScene(object):
     """Scene for displaying the main game view"""
-    def __init__(self, screen: pygame.display, game: GameStateModel, current_player: PlayerModel):
+    def __init__(self, screen: pygame.display, current_player: PlayerModel):
         """:param screen : The display passed from main on which to draw the Scene."""
         self._save_games_file = "media/save_games.json"
         self.screen = screen
-        self._game = game
+        self._game = GameStateModel.instance()
         self._current_player = current_player
 
         self.quit_btn = RectButton(200, 250, 100, 50, Color.STANDARDBTN, 0,
@@ -34,12 +35,11 @@ class GameBoardScene(object):
 
         self.active_sprites = pygame.sprite.Group()   # Maybe add separate groups for different things later
         self.game_board = GameBoard()
-        self.chat_box = ChatBox(game, self._current_player)
+        self.chat_box = ChatBox(GameStateModel.instance(), self._current_player)
         self.menu = None
         self._init_sprites()
 
     def _init_sprites(self):
-
         for i, player in enumerate(self._game.players):
             self.active_sprites.add(PlayerState(0, 30 + 64*i, player.nickname, player.color))
 

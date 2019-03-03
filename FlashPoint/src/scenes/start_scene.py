@@ -1,12 +1,15 @@
 import pygame
+import os.path
 
 import src.constants.color as color
+from src.core.event_queue import EventQueue
 
 from src.UIComponents.rect_button import RectButton
 from src.UIComponents.rect_label import RectLabel
 from src.UIComponents.text import Text
 from src.UIComponents.input_box import InputBox
 from src.UIComponents.profile_list import ProfileList
+from src.constants.change_scene_enum import ChangeSceneEnum
 
 
 class StartScene(object):
@@ -18,12 +21,10 @@ class StartScene(object):
 
         self._init_profile_selector(((self.resolution[0]/2)-(500/2)), 330, color.GREY)
         self.text_bar1 = self._init_text_bar(((self.resolution[0]/2)-(500/2))-20, 600, 400, 32)
+        self.text_bar1.disable_enter()
         #self.sometext =
         self._init_btn_register(((self.resolution[0]/2)-(500/2))+400, 592, "Create Profile",
                                 color.STANDARDBTN, color.BLACK)
-
-
-
         # self._text_bar1 = self._init_text_bar(500, 350, 400, 32)
         # self._text_bar2 = self._init_text_bar(500, 434, 400, 32)
 
@@ -43,7 +44,7 @@ class StartScene(object):
         box_size = (136, 32)
 
         user_box = RectLabel(x_pos, y_pos, box_size[0], box_size[1], clr, 0,
-                             Text(pygame.font.SysFont('Arial', 20), text, color_text))
+                             Text(pygame.font.SysFont('Agency FB', 20), text, color_text))
         self.sprite_grp.add(user_box)
 
     # def _init_btn_login(self, x_pos, y_pos, text, color, color_text):
@@ -56,8 +57,14 @@ class StartScene(object):
     def _init_btn_register(self, x_pos, y_pos, text, clr, color_text):
         box_size = (130, 48)
         self.buttonRegister = RectButton(x_pos, y_pos, box_size[0], box_size[1], clr, 0,
-                                         Text(pygame.font.SysFont('Arial', 20), text, color_text))
+                                         Text(pygame.font.SysFont('Agency FB', 20), text, color_text))
+        self.buttonRegister.on_click(self.register_profile)
         self.sprite_grp.add(self.buttonRegister)
+
+    @staticmethod
+    def register_profile():
+        # Gets the text in the text bar and send the create profile event to the event queue (scene manager)
+        EventQueue.post(ChangeSceneEnum.REGISTER)
 
     @staticmethod
     def _init_text_bar(x_pos, y_pos, width, height):

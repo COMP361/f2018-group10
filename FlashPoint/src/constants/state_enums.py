@@ -34,15 +34,19 @@ class GameStateEnum(Enum):
 
 
 class PlayerStatusEnum(Enum):
-    OFFLINE = auto()
     READY = auto()
-    ONLINE = auto()
+    NOT_READY = auto()
     IN_GAME = auto()
 
 
 class POIStatusEnum(Enum):
     HIDDEN = auto()
     REVEALED = auto()
+
+
+class POIIdentityEnum(Enum):
+    VICTIM = auto()
+    FALSE_ALARM = auto()
 
 
 class SpaceKindEnum(Enum):

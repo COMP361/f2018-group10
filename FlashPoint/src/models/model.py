@@ -4,10 +4,11 @@ from typing import List
 from src.observers.observer import Observer
 
 
-class EdgeObstacleModel(ABC):
+class Model(ABC):
     """
-    Abstract Base Class for WallModel and DoorModel. May be updated later as needed.
+    Abstract base class for Model type objects.
     """
+
     def __init__(self):
         super().__init__()
         self._observers = []
@@ -20,4 +21,8 @@ class EdgeObstacleModel(ABC):
         self._observers.append(obs)
 
     def remove_observer(self, obs: Observer):
+        """
+        CAUTION: remove() uses __eq__ to test equality, and by default is only shallow. (Checks address only).
+        Be sure to implement __eq__ in your Observer class to not have any surprises!
+        """
         self._observers.remove(obs)

@@ -1,17 +1,28 @@
 import pygame
+from constants.state_enums import PlayerStatusEnum
+from src.observers.player_observer import PlayerObserver
 
-from src.models.game_board.tile_model import TileModel
-from src.models.game_units.player_model import PlayerModel
 
+class PlayerSprite(pygame.sprite.Sprite, PlayerObserver):
+    """Visual representation of a Player and/or his fireman."""
 
-class PlayerSprite(pygame.sprite.Sprite):
-
-    def __init__(self, tile: TileModel, player: PlayerModel):
+    def __init__(self):
         super().__init__()
 
-        self.player_model = player
-        # self.image = FileImporter.import_image("media/character.png")
-        self.tile_reference = tile
-        self.image = pygame.Surface((128, 128))
-        self.image.fill((255, 255, 255))
-        self.rect = self.image.get_rect()
+    def player_ap_changed(self, updated_ap: int):
+        pass
+
+    def player_special_ap_changed(self, updated_ap: int):
+        pass
+
+    def player_position_changed(self, x_pos: int, y_pos: int):
+        pass
+
+    def player_wins_changed(self, wins: int):
+        pass
+
+    def player_losses_changed(self, losses: int):
+        pass
+
+    def player_status_changed(self, status: PlayerStatusEnum):
+        pass

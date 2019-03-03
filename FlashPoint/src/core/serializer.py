@@ -2,6 +2,7 @@ import enum
 import json
 from typing import Dict
 
+from src.action_events.ready_event import ReadyEvent
 from src.action_events.chat_event import ChatEvent
 from src.action_events.dummy_event import DummyEvent
 from src.action_events.join_event import JoinEvent
@@ -60,6 +61,11 @@ class JSONSerializer(object):
         return ChatEvent(message, sender)
 
     @staticmethod
+    def _deserialize_ready_event(payload: Dict) -> ReadyEvent:
+        player: PlayerModel = JSONSerializer.deserialize(payload['_player'])
+        return ReadyEvent(player)
+
+    @staticmethod
     def _deserialize_join_event(payload: Dict) -> JoinEvent:
         player = JSONSerializer._deserialize_player(payload['player'])
         return JoinEvent(player)
@@ -82,6 +88,8 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_join_event(payload)
         elif object_type == ChatEvent.__name__:
             return JSONSerializer._deserialize_chat_event(payload)
+        elif object_type == ReadyEvent.__name__:
+            return JSONSerializer._deserialize_ready_event(payload)
         elif object_type == DummyEvent.__name__:
             return DummyEvent()
 
