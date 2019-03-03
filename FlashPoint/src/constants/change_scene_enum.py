@@ -1,13 +1,16 @@
-from enum import Enum
+from enum import Enum, auto
+
 import pygame
 
 
 class ChangeSceneEnum(Enum):
-    STARTSCENE = pygame.event.USEREVENT + 1
-    HOSTJOINSCENE = pygame.event.USEREVENT + 2
-    JOINSCENE = pygame.event.USEREVENT + 3
-    HOSTMENUSCENE = pygame.event.USEREVENT + 4
-    CREATEGAMEMENU = pygame.event.USEREVENT + 5
-    CHARACTERSCENE = pygame.event.USEREVENT + 6
-    LOADGAME = pygame.event.USEREVENT + 7
-    LOBBYSCENE = pygame.event.USEREVENT + 8
+    STARTSCENE = auto()
+    HOSTJOINSCENE = auto()
+    JOINSCENE = auto()
+    HOSTMENUSCENE = auto()
+    CREATEGAMEMENU = auto()
+    CHARACTERSCENE = auto()
+    LOADGAME = auto()
+    LOBBYSCENE = auto()
+    GAMEBOARDSCENE = auto()
+    REGISTER = auto()

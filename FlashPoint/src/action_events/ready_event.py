@@ -11,5 +11,5 @@ class ReadyEvent(ActionEvent):
         super().__init__()
         self._player = player
 
-    def execute(self, game: GameStateModel):
-        game.get_player_by_ip(self._player.ip).status = PlayerStatusEnum.READY
+    def execute(self):
+        GameStateModel.instance().get_player_by_ip(self._player.ip).status = PlayerStatusEnum.READY
