@@ -13,3 +13,10 @@ class ActionEvent(ABC):
     @abstractmethod
     def execute(self):
         pass
+
+    @abstractmethod
+    def has_required_AP(self, playerAP: int, requiredAP: int) -> bool:
+        if playerAP < requiredAP:
+            return False
+
+        return True
