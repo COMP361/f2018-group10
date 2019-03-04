@@ -63,7 +63,7 @@ class Networking:
         host = None
         client = None
         TIMEOUT_CONNECT = 100
-        TIMEOUT_RECEIVE = 200
+        TIMEOUT_RECEIVE = None
 
         stop_broadcast = threading.Event()
         stop_listen = threading.Event()
@@ -431,6 +431,9 @@ class Networking:
                         if _server_reply:
                             self._reply_queue.append(_server_reply)
                             self.callback_client_receive(_server_reply)
+                    except MastermindErrorClient:
+                        print("It seems that client is not connected...")
+                        self.disconnect()
                     except OSError as e:
                         print(f"Error receiving data: {e}")
 
