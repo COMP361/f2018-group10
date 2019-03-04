@@ -4,7 +4,7 @@
 import json
 
 from src.constants.state_enums import SpaceKindEnum
-from src.models.game_board.null_model import NullModel
+from src.models.game_board.null_tile_model import NullTileModel
 from src.models.game_board.tile_model import TileModel
 
 

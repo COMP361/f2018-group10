@@ -3,7 +3,8 @@ from typing import Optional
 from src.models.model import Model
 from src.core.flashpoint_exceptions import TilePositionOutOfBoundsException
 from src.models.game_board.edge_obstacle_model import EdgeObstacleModel
-from src.models.game_board.null_model import NullModel
+from src.models.game_board.null_tile_model import NullTileModel
+from src.constants.state_enums import DirectionEnum
 from src.constants.state_enums import SpaceKindEnum
 from src.constants.state_enums import SpaceStatusEnum
 
@@ -21,25 +22,22 @@ class TileModel(Model):
         self._associated_models = []
 
         self._adjacent_tiles = {
-            "North": NullModel(),
-            "East": NullModel(),
-            "West": NullModel(),
-            "South": NullModel(),
+            DirectionEnum.NORTH: NullTileModel(),
+            DirectionEnum.EAST: NullTileModel(),
+            DirectionEnum.WEST: NullTileModel(),
+            DirectionEnum.SOUTH: NullTileModel(),
         }
 
         self._adjacent_edge_objects = {
-            "North": NullModel(),
-            "East": NullModel(),
-            "West": NullModel(),
-            "South": NullModel(),
+            DirectionEnum.NORTH: NullTileModel(),
+            DirectionEnum.EAST: NullTileModel(),
+            DirectionEnum.WEST: NullTileModel(),
+            DirectionEnum.SOUTH: NullTileModel(),
         }
 
     def __str__(self):
         return f"Tile at: ({self.x_coord}, {self.y_coord})."
 
-    def _notify_status(self,):
-        for obs in self._observers:
-            obs.tile_status_changed(self._space_status)
     @property
     def x_coord(self):
         return self._x_coord
@@ -59,7 +57,6 @@ class TileModel(Model):
     @space_status.setter
     def space_status(self, space_status: SpaceStatusEnum):
         self._space_status = space_status
-        self._notify_obse
 
     @property
     def is_hotspot(self):
@@ -79,14 +76,14 @@ class TileModel(Model):
         Get the TileModel to the North of this one.
         :raise TilePositionOutOfBoundsException: If there is no Tile in that direction.
         """
-        tile = self._adjacent_tiles.get("North", None)
+        tile = self._adjacent_tiles.get(DirectionEnum.NORTH, None)
         if not tile:
-            raise TilePositionOutOfBoundsException(self, "North")
+            raise TilePositionOutOfBoundsException(self, DirectionEnum.NORTH)
         return tile
 
     @north_tile.setter
     def north_tile(self, tile):
-        self._adjacent_tiles["North"] = tile
+        self._adjacent_tiles[DirectionEnum.NORTH] = tile
 
     @property
     def east_tile(self):
@@ -94,14 +91,14 @@ class TileModel(Model):
         Get the TileModel to the North of this one.
         :raise TilePositionOutOfBoundsException: If there is no Tile in that direction.
         """
-        tile = self._adjacent_tiles.get("East", None)
+        tile = self._adjacent_tiles.get(DirectionEnum.EAST, None)
         if not tile:
-            raise TilePositionOutOfBoundsException(self, "East")
+            raise TilePositionOutOfBoundsException(self, DirectionEnum.EAST)
         return tile
 
     @east_tile.setter
     def east_tile(self, tile):
-        self._adjacent_tiles["East"] = tile
+        self._adjacent_tiles[DirectionEnum.EAST] = tile
 
     @property
     def west_tile(self):
@@ -109,14 +106,14 @@ class TileModel(Model):
         Get the TileModel to the  of this one.
         :raise TilePositionOutOfBoundsException: If there is no Tile in that direction.
         """
-        tile = self._adjacent_tiles.get("West", None)
+        tile = self._adjacent_tiles.get(DirectionEnum.WEST, None)
         if not tile:
-            raise TilePositionOutOfBoundsException(self, "West")
+            raise TilePositionOutOfBoundsException(self, DirectionEnum.WEST)
         return tile
 
     @west_tile.setter
     def west_tile(self, tile):
-        self._adjacent_tiles["West"] = tile
+        self._adjacent_tiles[DirectionEnum.WEST] = tile
 
     @property
     def south_tile(self):
@@ -124,19 +121,19 @@ class TileModel(Model):
         Get the TileModel to the South of this one.
         :raise TilePositionOutOfBoundsException: If there is no Tile in that direction.
         """
-        tile = self._adjacent_tiles.get("South", None)
+        tile = self._adjacent_tiles.get(DirectionEnum.SOUTH, None)
         if not tile:
-            raise TilePositionOutOfBoundsException(self, "South")
+            raise TilePositionOutOfBoundsException(self, DirectionEnum.SOUTH)
         return tile
 
     @south_tile.setter
     def south_tile(self, tile):
-        self._adjacent_tiles["South"] = tile
+        self._adjacent_tiles[DirectionEnum.SOUTH] = tile
 
-    def set_adjacent_edge_obstacle(self, direction: str, edge_obstacle: EdgeObstacleModel):
+    def set_adjacent_edge_obstacle(self, direction: DirectionEnum, edge_obstacle: EdgeObstacleModel):
         self._adjacent_edge_objects[direction] = edge_obstacle
 
-    def get_tile_in_direction(self, direction: str):
+    def get_tile_in_direction(self, direction: DirectionEnum):
         """
         Get the TileModel in a specified direction.
         "raise TilePositionOutOfBoundsException: If there is no Tile in that direction.
@@ -146,7 +143,7 @@ class TileModel(Model):
             raise TilePositionOutOfBoundsException(self, direction)
         return tile
 
-    def get_obstacle_in_direction(self, direction: str) -> Optional['EdgeObstacleModel']:
+    def get_obstacle_in_direction(self, direction: DirectionEnum) -> Optional['TileModel']:
         """
         Get the EdgeObstacle model
         :return: EdgeObstacleModel in the direction specified, or None.
