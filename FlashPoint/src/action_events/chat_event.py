@@ -10,5 +10,5 @@ class ChatEvent(ActionEvent):
         self._sender = sender_nickname
         self._message = message
 
-    def execute(self, game: GameStateModel):
-        game.add_chat_message(self._message, self._sender)
+    def execute(self):
+        GameStateModel.instance().add_chat_message(self._message, self._sender)

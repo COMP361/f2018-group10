@@ -2,28 +2,61 @@ import random
 
 from typing import List, Optional, Tuple
 
-from src.constants.state_enums import GameKindEnum, DifficultyLevelEnum
+from src.models.model import Model
+from src.models.game_board.game_board_model import GameBoardModel
+from src.constants.state_enums import GameKindEnum, DifficultyLevelEnum, GameStateEnum
 from src.core.flashpoint_exceptions import TooManyPlayersException, InvalidGameKindException, PlayerNotFoundException
 from src.models.game_units.player_model import PlayerModel
 
 
-class GameStateModel(object):
-    """Class for maintaining the current Game state."""
+class GameStateModel(Model):
+    """Singleton Class for maintaining the current Game state."""
+    _instance = None
 
     def __init__(self, host: PlayerModel, num_players: int, game_kind: GameKindEnum):
-        self._host = host
-        self._max_desired_players = 6
-        self._players = [self._host]
-        self._players_turn_index = 0
-        self._difficulty_level = None
-        self._rules = game_kind
-        self._red_dice = 0
-        self._black_dice = 0
-        self._victims_saved = 0
-        self._victims_lost = 0
-        self._damage = 0
-        self._max_damage = 24
-        self._chat_history = []
+        if not GameStateModel._instance:
+            super().__init__()
+
+            self._host = host
+            self._max_desired_players = 6
+            self._players = [self._host]
+            self._players_turn_index = 0
+            self._difficulty_level = None
+            self._rules = game_kind
+            self._red_dice = 0
+            self._black_dice = 0
+
+            self._victims_saved = 0
+            self._victims_lost = 0
+            self._damage = 0
+            self._max_damage = 24
+            self._chat_history = []
+            self._state = GameStateEnum.READY_TO_JOIN
+
+            self._game_board = GameBoardModel(self._rules)
+
+            GameStateModel._instance = self
+
+        else:
+            print("Attempted to instantiate another singleton")
+            raise Exception("Networking is a Singleton")
+
+    @staticmethod
+    def __del__():
+        GameStateModel._instance = None
+
+    @classmethod
+    def instance(cls):
+        """Get the instance of this singleton"""
+        return cls._instance
+
+    @classmethod
+    def set_game(cls, game):
+        cls._instance = game
+
+    @property
+    def game_board(self) -> GameBoardModel:
+        return self._game_board
 
     @property
     def chat_history(self) -> List[Tuple[str, str]]:
@@ -145,3 +178,15 @@ class GameStateModel(object):
     @max_damage.setter
     def max_damage(self, damage: int):
         self._max_damage = damage
+
+    @property
+    def state(self) -> GameStateEnum:
+        return self._state
+
+    @state.setter
+    def state(self, game_state: GameStateEnum):
+        self._state = game_state
+
+    def game_lost(self):
+        self._state = GameStateEnum.LOST
+        # TODO: More stuff here for what is supposed to happen when the game ends.

@@ -1,9 +1,9 @@
+from src.models.game_units.game_unit import GameUnit
 from src.constants.state_enums import VictimStateEnum
-from src.models.game_units.poi_model import POIModel
 
 
-class VictimModel(POIModel):
+class VictimModel(GameUnit):
 
     def __init__(self, victim_state: VictimStateEnum):
-        super().__init__(victim_state)
+        super().__init__()
         self._state = victim_state

@@ -2,12 +2,14 @@ import pygame
 import os.path
 
 import src.constants.color as color
+from src.core.event_queue import EventQueue
 
 from src.UIComponents.rect_button import RectButton
 from src.UIComponents.rect_label import RectLabel
 from src.UIComponents.text import Text
 from src.UIComponents.input_box import InputBox
 from src.UIComponents.profile_list import ProfileList
+from src.constants.change_scene_enum import ChangeSceneEnum
 
 
 class StartScene(object):
@@ -23,9 +25,6 @@ class StartScene(object):
         #self.sometext =
         self._init_btn_register(((self.resolution[0]/2)-(500/2))+400, 592, "Create Profile",
                                 color.STANDARDBTN, color.BLACK)
-
-
-
         # self._text_bar1 = self._init_text_bar(500, 350, 400, 32)
         # self._text_bar2 = self._init_text_bar(500, 434, 400, 32)
 
@@ -59,7 +58,13 @@ class StartScene(object):
         box_size = (130, 48)
         self.buttonRegister = RectButton(x_pos, y_pos, box_size[0], box_size[1], clr, 0,
                                          Text(pygame.font.SysFont('Agency FB', 20), text, color_text))
+        self.buttonRegister.on_click(self.register_profile)
         self.sprite_grp.add(self.buttonRegister)
+
+    @staticmethod
+    def register_profile():
+        # Gets the text in the text bar and send the create profile event to the event queue (scene manager)
+        EventQueue.post(ChangeSceneEnum.REGISTER)
 
     @staticmethod
     def _init_text_bar(x_pos, y_pos, width, height):

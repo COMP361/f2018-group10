@@ -7,13 +7,6 @@ class DifficultyLevelEnum(Enum):
     HEROIC = auto()
 
 
-class DirectionEnum(Enum):
-    NORTH = auto()
-    EAST = auto()
-    WEST = auto()
-    SOUTH = auto()
-
-
 class DoorStatusEnum(Enum):
     OPEN = auto()
     CLOSED = auto()
@@ -30,18 +23,24 @@ class GameStateEnum(Enum):
     PLACING = auto()
     MAIN_GAME = auto()
     KNOCKED_DOWN_PLACEMENT = auto()
-    COMPLETED = auto()
+    LOST = auto()
+    WON = auto()
 
 
 class PlayerStatusEnum(Enum):
-    OFFLINE = auto()
     READY = auto()
+    NOT_READY = auto()
     IN_GAME = auto()
 
 
 class POIStatusEnum(Enum):
     HIDDEN = auto()
     REVEALED = auto()
+
+
+class POIIdentityEnum(Enum):
+    VICTIM = auto()
+    FALSE_ALARM = auto()
 
 
 class SpaceKindEnum(Enum):
