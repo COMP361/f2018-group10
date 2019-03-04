@@ -9,6 +9,7 @@ from src.constants.change_scene_enum import ChangeSceneEnum
 from src.action_events.ready_event import ReadyEvent
 from src.action_events.chat_event import ChatEvent
 from src.action_events.dummy_event import DummyEvent
+from src.action_events.start_game_event import StartGameEvent
 from src.models.game_state_model import GameStateModel
 from src.core.serializer import JSONSerializer
 from src.action_events.turn_events.turn_event import TurnEvent
@@ -224,12 +225,13 @@ class Networking:
             Starts the game
             :return:
             """
-            # Kill the broadcast
-            self.stop_broadcast.set()
-            print("Broadcast killed")
-
             if self.host:
+                # Kill the broadcast
+                self.stop_broadcast.set()
+                print("Broadcast killed")
                 self.host.accepting_disallow()
+                self.send_to_all_client(StartGameEvent)
+            EventQueue.post(ChangeSceneEnum.GAMEBOARDSCENE)
 
         def send_to_server(self, data, compress=True):
             """
