@@ -13,8 +13,6 @@ from src.models.game_state_model import GameStateModel
 from src.action_events.action_event import ActionEvent
 from src.action_events.turn_events.turn_event import TurnEvent
 from src.action_events.join_event import JoinEvent
-from src.action_events.ready_event import ReadyEvent
-from src.action_events.chat_event import ChatEvent
 from src.action_events.dummy_event import DummyEvent
 from src.action_events.disconnect_event import DisconnectEvent
 from src.external.Mastermind import *
@@ -64,8 +62,8 @@ class Networking:
     class NetworkingInner:
         host = None
         client = None
-        TIMEOUT_CONNECT = 200
-        TIMEOUT_RECEIVE = 200
+        TIMEOUT_CONNECT = 5000
+        TIMEOUT_RECEIVE = 5000
 
         stop_broadcast = threading.Event()
         stop_listen = threading.Event()
@@ -85,7 +83,7 @@ class Networking:
             :return:
             """
             # We use UDP to broadcast the host
-            self.host = Networking.Host()
+            self.host = Networking.Host(1, 2, 5)
 
             """
             # find unused ip address
@@ -285,16 +283,25 @@ class Networking:
             :param ip_addr: client's ip address
             :return:
             """
-            conn_obj = self.client_list[ip_addr]
-            if conn_obj is not None:
-                return conn_obj
-            else:
+            try:
+                conn_obj = self.client_list[ip_addr]
+                if conn_obj is not None:
+                    return conn_obj
+                else:
+                    raise Networking.Host.ClientNotFoundException
+            except KeyError:
                 raise Networking.Host.ClientNotFoundException
 
+        def client_exists(self, ip_addr: str):
+            try:
+                if self.lookup_client(ip_addr):
+                    return True
+                return False
+            except Networking.Host.ClientNotFoundException:
+                return False
+
         def kick_client(self, ip_addr: str):
-            key = self.lookup_client(ip_addr)
-            if key:
-                self.client_list.pop(key)
+            self.client_list.pop(ip_addr)
 
         def callback_connect_client(self, connection_object):
             """
@@ -304,14 +311,14 @@ class Networking:
             :param connection_object: Represents the appropriate connection
             :return:
             """
-            print(f"Client at {connection_object.address} is connected")
             # Assign a new connection object to the address (as a key value pair)
-            self.client_list[connection_object.address[0]] = connection_object
-
-            # Check if connected client exceeds limit
-            if len(self.client_list) >= 6:
-                print("Limit reached, stop accepting connections")
-                self.accepting_disallow()
+            if not self.client_exists(connection_object.address[0]):
+                if len(self.client_list) <= 6:
+                    self.client_list[connection_object.address[0]] = connection_object
+                    print(f"Client at {connection_object.address} is connected")
+                else:
+                    self.accepting_disallow()
+                    print("Limit reached, stop accepting connections")
             return super(MastermindServerUDP, self).callback_connect_client(connection_object)
 
         def callback_disconnect_client(self, connection_object):
@@ -347,6 +354,7 @@ class Networking:
             data = JSONSerializer.deserialize(data)
             # If it's a dummy event, don't do anything
             if isinstance(data, DummyEvent):
+                print("Received dummy event")
                 return
 
             print(f"Client at {connection_object.address} sent a message: {data.__class__}")
