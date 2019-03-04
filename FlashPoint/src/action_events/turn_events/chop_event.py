@@ -1,11 +1,11 @@
-from src.action_events.action_event import ActionEvent
+from src.action_events.turn_events.turn_event import TurnEvent
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 from src.models.game_board.wall_model import WallModel
 from src.core.flashpoint_exceptions import NotEnoughAPException, WallNotAdjacent, WallAlreadyDestroyed
 from src.constants.state_enums import WallStatusEnum
 
-class ChopEvent(ActionEvent):
+class ChopEvent(TurnEvent):
 
     def __init__(self):
         super().__init__()
@@ -38,4 +38,3 @@ class ChopEvent(ActionEvent):
             game.game_lost()
 
         return
-    

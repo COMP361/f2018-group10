@@ -11,7 +11,7 @@ from src.action_events.chat_event import ChatEvent
 from src.action_events.dummy_event import DummyEvent
 from src.models.game_state_model import GameStateModel
 from src.core.serializer import JSONSerializer
-from src.action_events.action_event import ActionEvent
+from src.action_events.turn_events.turn_event import TurnEvent
 from src.action_events.join_event import JoinEvent
 from src.action_events.disconnect_event import DisconnectEvent
 from src.external.Mastermind import *
@@ -358,7 +358,7 @@ class Networking:
                 return
 
             print(f"Client at {connection_object.address} sent a message: {data.__class__}")
-            if isinstance(data, ActionEvent):
+            if isinstance(data, TurnEvent):
                 if isinstance(data, JoinEvent):
                     data.execute(Networking.get_instance().game)
                     Networking.get_instance().game.add_player(data.player)
@@ -412,7 +412,7 @@ class Networking:
             signaler.start()
             receiver.start()
 
-        def send(self, data: ActionEvent, compression=None):
+        def send(self, data: TurnEvent, compression=None):
             """
             Send data to the server
             :param data: data to be sent, MUST be an instance of ActionEvent
@@ -456,7 +456,7 @@ class Networking:
             if isinstance(data, GameStateModel):
                 print(f"Updating game object, there are now: {len(data.players)} players.")
                 GameStateModel.set_game(data)
-            if isinstance(data, ActionEvent):
+            if isinstance(data, TurnEvent):
                     data.execute()
 
         def get_server_reply(self):

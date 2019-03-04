@@ -1,6 +1,6 @@
-from src.action_events.action_event import ActionEvent
+from src.action_events.turn_events.turn_event import TurnEvent
 
 
-class DisconnectEvent(ActionEvent):
+class DisconnectEvent(TurnEvent):
     def execute(self, *args, **kwargs):
         pass

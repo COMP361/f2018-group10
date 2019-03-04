@@ -1,8 +1,8 @@
 from src.models.game_state_model import GameStateModel
-from src.action_events.action_event import ActionEvent
+from src.action_events.turn_events.turn_event import TurnEvent
 
 
-class ChatEvent(ActionEvent):
+class ChatEvent(TurnEvent):
     """Class representing how to update a games chathistory so that players can chat."""
 
     def __init__(self, message: str, sender_nickname: str):
