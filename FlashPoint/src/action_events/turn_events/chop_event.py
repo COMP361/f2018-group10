@@ -5,20 +5,22 @@ from src.models.game_board.wall_model import WallModel
 from src.core.flashpoint_exceptions import NotEnoughAPException, WallNotAdjacent, WallAlreadyDestroyed
 from src.constants.state_enums import WallStatusEnum
 
+
 class ChopEvent(TurnEvent):
 
     def __init__(self):
         super().__init__()
 
-    def execute(self, game: GameStateModel, fireman: PlayerModel, wall: WallModel):
+    def execute(self, fireman: PlayerModel, wall: WallModel):
         # TODO: Start here - This is the precondition code - Move it to the GUI
-        validToChop = self.has_required_AP(fireman.ap, 2)
-        if not validToChop:
+        game = GameStateModel.instance()
+        valid_to_chop = self.has_required_AP(fireman.ap, 2)
+        if not valid_to_chop:
             raise NotEnoughAPException("chop the wall", 2)
 
         player_tile = game.game_board.get_tile_at(fireman.x_pos, fireman.y_pos)
-        isPlayerAdjacent = wall.is_player_adjacent(player_tile)
-        if not isPlayerAdjacent:
+
+        if wall not in player_tile.adjacent_edge_objects(player_tile):
             raise WallNotAdjacent(fireman.x_pos, fireman.y_pos)
 
         wall_status = wall.wall_status

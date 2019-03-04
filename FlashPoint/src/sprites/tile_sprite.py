@@ -1,10 +1,9 @@
 import pygame
 
-import src.constants.color as Color
 from src.UIComponents.interactable import Interactable
 from src.core.event_queue import EventQueue
-from src.models.game_board.tile_model import TileModel
 from src.observers.tile_observer import TileObserver
+
 
 class TileSprite(Interactable,TileObserver):
     """Graphical representation of a Tile and controls."""
