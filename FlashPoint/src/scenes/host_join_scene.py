@@ -1,6 +1,7 @@
 import pygame
 
 import src.constants.color as Color
+from src.core.custom_event import CustomEvent
 from src.core.event_queue import EventQueue
 from src.models.game_units.player_model import PlayerModel
 from src.UIComponents.rect_button import RectButton
@@ -19,14 +20,14 @@ class HostJoinScene(Scene):
         self._init_btn_host(575, 481, "Host", Color.STANDARDBTN, Color.BLACK)
         self._init_btn_join(575, 371, "Join", Color.STANDARDBTN, Color.BLACK)
         self._init_btn_back(20, 20, "Back", Color.STANDARDBTN, Color.BLACK)
-        self.buttonJoin.on_click(EventQueue.post, ChangeSceneEnum.JOINSCENE)
-        self.buttonBack.on_click(EventQueue.post, ChangeSceneEnum.STARTSCENE)
+        self.buttonJoin.on_click(EventQueue.post, CustomEvent(ChangeSceneEnum.JOINSCENE))
+        self.buttonBack.on_click(EventQueue.post, CustomEvent(ChangeSceneEnum.STARTSCENE))
         self.buttonHost.on_click(self.host)
 
     @staticmethod
     def host():
         Networking.get_instance().create_host()
-        EventQueue.post(ChangeSceneEnum.HOSTMENUSCENE)
+        EventQueue.post(CustomEvent(ChangeSceneEnum.HOSTMENUSCENE))
 
     def _init_background(self):
         box_size = (self.resolution[0], self.resolution[1])

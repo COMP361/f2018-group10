@@ -2,6 +2,8 @@ import json
 from datetime import datetime
 
 import pygame
+from src.constants.change_scene_enum import ChangeSceneEnum
+from src.core.custom_event import CustomEvent
 
 from src.UIComponents.chat_box import ChatBox
 from src.UIComponents.menu_window import MenuWindow
@@ -85,6 +87,7 @@ class GameBoardScene(object):
         # cross = pygame.image.load("media/GameHud/cross.png")
 
         back_btn.on_click(menu.close)
+        quit_btn.on_click(EventQueue.post(CustomEvent(ChangeSceneEnum.STARTSCENE)))
         save_btn.on_click(self._save)
 
         menu.add_component(back_btn)
