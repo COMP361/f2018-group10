@@ -23,10 +23,12 @@ class EventQueue(object):
     @staticmethod
     def block():
         """Block the event queue from being flushed"""
+        print("Blocking EventQueue")
         EventQueue.get_instance().blocked = True
 
     @staticmethod
     def unblock():
+        print("Unblocking EventQueue")
         EventQueue.get_instance().blocked = False
 
     @staticmethod
@@ -53,7 +55,7 @@ class EventQueue(object):
         def fill_queue(self):
             """Copy the pygame event queue into this object."""
             if not self.blocked:
-                self._events = pygame.event.get()
+                self._events += pygame.event.get()
 
         def post(self, event):
             self._events.append(event)

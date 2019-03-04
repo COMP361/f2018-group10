@@ -6,6 +6,7 @@ import threading
 import logging
 import time
 
+from src.core.custom_event import CustomEvent
 from src.core.serializer import JSONSerializer
 from src.core.event_queue import EventQueue
 from src.constants.change_scene_enum import ChangeSceneEnum
@@ -220,7 +221,7 @@ class Networking:
                 self.host.__del__()
                 self.host = None
             GameStateModel.__del__()
-            EventQueue.post(ChangeSceneEnum.HOSTJOINSCENE)
+            EventQueue.post(CustomEvent(ChangeSceneEnum.STARTSCENE))
 
         def send_to_server(self, data, compress=True):
             """
