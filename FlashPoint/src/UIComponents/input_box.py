@@ -7,6 +7,7 @@ from src.constants.fonts import TEXT_BOX_FONT_SIZE
 
 
 class InputBox(pg.sprite.Sprite):
+
     def __init__(self, *sprites, x=0, y=0, w=0, h=0, fsize=25, text=''):
         super().__init__(*sprites)
         pg.key.set_repeat(300, 50)
@@ -22,10 +23,10 @@ class InputBox(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.active = False
         self.message = ''
-        self.bg = pg.Surface((w,h))
-        self.bg.fill((64,64,64))
+        self.bg = pg.Surface((w, h))
+        self.bg.fill((64, 64, 64))
         self.rect2 = self.bg.get_rect()
-        self.rect2.move_ip(x,y)
+        self.rect2.move_ip(x, y)
         self.rect = pg.draw.rect(self.image, self.color, self.rect, 2)
         self.rect.move_ip(x, y)
         self.image.blit(self.txt_surface, (self.rect.x + 5, self.rect.y))
@@ -64,8 +65,8 @@ class InputBox(pg.sprite.Sprite):
         self.rect.w = width
 
     def draw(self, screen: pg.Surface):
-        screen.blit(self.bg,self.rect2)
-        screen.blit(self.txt_surface, (self.rect.x+5, self.rect.y))
+        screen.blit(self.bg, self.rect2)
+        screen.blit(self.txt_surface, (self.rect.x + 5, self.rect.y))
         pg.draw.rect(screen, self.color, self.rect, 2)
 
     def enable_enter(self):
