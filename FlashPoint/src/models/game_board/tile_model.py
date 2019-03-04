@@ -161,5 +161,4 @@ class TileModel(Model):
         self._associated_models.remove(model)
 
     def reset_adjacencies(self):
-        self._adjacent_edge_objects = {}
         self._adjacent_tiles = {}
