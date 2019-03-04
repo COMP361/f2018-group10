@@ -2,7 +2,6 @@ import src.constants.color as Color
 from src.models.game_state_model import GameStateModel
 from src.action_events.action_event import ActionEvent
 from src.models.game_units.player_model import PlayerModel
-from src.core.networking import Networking
 
 
 class JoinEvent(ActionEvent):
@@ -36,4 +35,3 @@ class JoinEvent(ActionEvent):
                 self.player.color = colors[color]
 
         GameStateModel.instance().add_player(self.player)
-        Networking.get_instance().send_to_all_client(GameStateModel.instance())
