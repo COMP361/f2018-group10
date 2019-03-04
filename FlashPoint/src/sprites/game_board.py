@@ -1,6 +1,7 @@
 import pygame
 
 import src.constants.main_constants as MainConst
+from src.action_events.fire_placement_event import FirePlacementEvent
 from src.UIComponents.file_importer import FileImporter
 from src.sprites.grid_sprite import GridSprite
 from src.core.event_queue import EventQueue
@@ -11,6 +12,9 @@ class GameBoard(pygame.sprite.Group):
 
     def __init__(self):
         super().__init__()
+        self._fire_placement_event = FirePlacementEvent()
+        self._fire_placement_event.execute()
+
         self.image = pygame.Surface((MainConst.SCREEN_RESOLUTION[0], MainConst.SCREEN_RESOLUTION[1]))
         self.rect = self.image.get_rect()
         self.grid = GridSprite(x_coord=self.rect.left, y_coord=self.rect.top)

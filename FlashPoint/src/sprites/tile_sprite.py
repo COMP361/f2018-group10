@@ -1,7 +1,7 @@
 import pygame
+from src.models.game_state_model import GameStateModel
 from src.constants.state_enums import SpaceStatusEnum
 from src.observers.observer import Observer
-from src.UIComponents.spritesheet import Spritesheet
 from src.UIComponents.interactable import Interactable
 from src.core.event_queue import EventQueue
 
@@ -9,15 +9,23 @@ from src.core.event_queue import EventQueue
 class TileSprite(Interactable, Observer):
     """Graphical representation of a Tile and controls."""
 
-    def __init__(self, image: pygame.Surface, x, y, x_offset, y_offset):
+    def __init__(self, image: pygame.Surface, fire_image: pygame.Surface,
+                 smoke_image: pygame.Surface, x, y, x_offset, y_offset, row, column):
         self.index = 0
         self.sprite_grp = pygame.sprite.Group()
         self.image = image
 
-        # Import these
-        self._fire_image = Spritesheet("")
-        self._smoke_image = None
-        self._backup_image = image.copy()
+        self.row = row
+        self.column = column
+
+        self._fire_image = fire_image
+        self._smoke_image = smoke_image
+        self._non_highlight_image = image.copy()
+        self._blank_image = image.copy()
+
+        # Initialize if place is Fire, Smoke or Safe
+        status = GameStateModel.instance().game_board.get_tile_at(row, column).space_status
+        self.tile_status_changed(status)
 
         Interactable.__init__(self, self.image.get_rect())
         self.rect = self.image.get_rect().move(x_offset, y_offset)
@@ -65,12 +73,12 @@ class TileSprite(Interactable, Observer):
         if self.hover() and self._is_enabled:
             if not self._is_hovered:
                 self._is_hovered = True
-                hover = pygame.Surface((self._backup_image.get_width(), self._backup_image.get_height()),
+                hover = pygame.Surface((self._non_highlight_image.get_width(), self._non_highlight_image.get_height()),
                                        pygame.SRCALPHA)
                 hover.fill((255, 255, 0, 128))
                 self.image.blit(hover, (0, 0))
         else:
-            self.image.blit(self._backup_image, (0, 0))
+            self.image.blit(self._non_highlight_image, (0, 0))
             self._is_hovered = False
 
     def _scroll(self):
@@ -89,7 +97,7 @@ class TileSprite(Interactable, Observer):
     def draw(self, screen: pygame.Surface):
         self._apply_highlight()
         self.sprite_grp.draw(self.image)
-
+        
         screen.blit(self.image, self.rect)
 
     def update(self, event_queue: EventQueue):
@@ -97,9 +105,13 @@ class TileSprite(Interactable, Observer):
         self._scroll()
 
     def tile_status_changed(self, status: SpaceStatusEnum):
+        new_surf = pygame.Surface((self._non_highlight_image.get_width(), self._non_highlight_image.get_height()),
+                               pygame.SRCALPHA)
+        self._non_highlight_image = self._blank_image.copy()
+
         if status == SpaceStatusEnum.FIRE:
-            self.image = self._fire_image.copy()
+            new_surf.blit(self._fire_image.copy(), (0, 0))
         elif status == SpaceStatusEnum.SMOKE:
-            self.image = self._smoke_image
-        elif status == SpaceStatusEnum.SAFE:
-            self.image = self._backup_image
+            new_surf.blit(self._smoke_image.copy(), (0, 0))
+
+        self._non_highlight_image.blit(new_surf, (0, 0), special_flags=pygame.BLEND_RGBA_MAX)

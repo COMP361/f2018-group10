@@ -13,10 +13,14 @@ class GridSprite(pygame.sprite.Group):
                  x_coord: int, y_coord: int,
                  tile_size: int=128, tiles_x: int=10, tiles_y: int=8):
         super().__init__(*sprites)
+
+        self._fire_image = Spritesheet("media/All Markers/fire.png", 1, 1).cell_images[0][0]
+        self._smoke_image = Spritesheet("media/All Markers/smoke.png", 1, 1).cell_images[0][0]
+
         self.contains_player = False
         self.height = tiles_y
         self.width = tiles_x
-        self.image = pygame.Surface((tile_size*tiles_x, tile_size*tiles_y))
+        self.image = pygame.Surface((tile_size*tiles_x, tile_size*tiles_y)).convert_alpha()
         self.rect = self.image.get_rect().move((x_coord, y_coord))
         self.grid = self._generate_grid(tile_size)
 
@@ -31,7 +35,7 @@ class GridSprite(pygame.sprite.Group):
             y_offset = 0
             for j in range(0, self.height):
                 image = tile_images[j][i]
-                tile = TileSprite(image, self.rect.x, self.rect.y, x_offset, y_offset)
+                tile = TileSprite(image, self._fire_image.copy(), self._smoke_image.copy(), self.rect.x, self.rect.y, x_offset, y_offset, j, i)
                 grid[i].append(tile)
                 self.add(grid[i][j])
                 GameStateModel.instance().game_board.get_tile_at(j, i).add_observer(tile)
