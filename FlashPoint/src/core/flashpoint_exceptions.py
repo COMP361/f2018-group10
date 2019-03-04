@@ -1,5 +1,6 @@
 from src.constants.state_enums import DirectionEnum, GameKindEnum
 from src.models.game_units.player_model import PlayerModel
+from src.models.game_units.poi_model import POIModel
 
 
 class FlashPointBaseException(Exception):
@@ -8,6 +9,14 @@ class FlashPointBaseException(Exception):
     """
 
     def __init__(self, message: str):
+        super().__init__(message)
+
+
+class POINotRevealedYetException(FlashPointBaseException):
+    """Class to tell you you can't identify a POI if it has not been revealed yet"""
+
+    def __init__(self, poi: POIModel):
+        message = f"{poi} was not revealed yet, cannot identify it."
         super().__init__(message)
 
 
