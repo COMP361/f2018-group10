@@ -1,28 +1,32 @@
 import pygame
 
 import src.constants.color as Color
+from src.observers.player_observer import PlayerObserver
 from src.UIComponents.interactable import Interactable
+from src.constants.state_enums import PlayerStatusEnum
 from src.core.event_queue import EventQueue
 
 #TODO
 
 #Add switches statement for expirienced mode
-class PlayerState(Interactable):
+
+class PlayerState(Interactable, PlayerObserver):
 
     def __init__(self, x: int, y: int, name: str,color: Color):
         self.image = pygame.Surface([64 , 64])
         self.bg = pygame.image.load('media/GameHud/wood2-150x64.png')
         self.frame = pygame.image.load('media/GameHud/frame150x64.png')
         self.player_icon = self.color_picker(color)
-        self.player_icon= pygame.transform.scale(self.player_icon,(70,70))
-        super().__init__(self.image.get_rect())
+        self.player_icon = pygame.transform.scale(self.player_icon,(70,70))
+        Interactable.__init__(self,self.image.get_rect())
         self.font_name = pygame.font.SysFont('Agency FB', 30)
         self.font_other = pygame.font.SysFont('Agency FB', 13)
         self.x = x
         self.y = y
         self.name = name   #nickname restriction 20 symbols
         self.color = color
-        self.AP = "Action Points:"
+        self.ap_num = 0
+        self.AP = f"Action Points: {self.ap_num}"
         self.SAP = "Special Action Points:"
         self.text = self.font_name.render(self.name, True, Color.WHITE)
         self.text_AP = self.font_other.render(self.AP, True, Color.WHITE)
@@ -80,27 +84,40 @@ class PlayerState(Interactable):
     def update(self, event_queue: EventQueue):
 
         self.image = pygame.Surface([150, 64])
-        #self.bg = pygame.transform.scale(self.bg, (150, 64))
         self.image.blit(self.bg, self.image.get_rect())
 
-        #self.frame = pygame.transform.scale(self.frame,(150,64))
-
-        #TODO Add switch statement for each player color!!!
-
-
-
-
-        #player_icon = pygame.transform.scale(player_icon, (70, 70))
         player_icon_rect = self.player_icon.get_rect()
         player_icon_rect.move_ip(75,0)
 
         self.image.blit(self.player_icon, player_icon_rect)
         self.image.blit(self.text, self.NAME_rect)
         self.image.blit(self.text_AP, self.AP_rect)
-        self.image.blit(self.text_SAP, self.SAP_rect)
+        #self.image.blit(self.text_SAP, self.SAP_rect)
         self.image.blit(self.frame,self.image.get_rect())
 
 
+    def draw(self, event_queue: EventQueue):
+        pass
+
+    def player_status_changed(self, status: PlayerStatusEnum):
+        pass
+
+    def player_ap_changed(self, updated_ap: int):
+        self.ap_num = updated_ap
+
+    def player_special_ap_changed(self, updated_ap: int):
+        pass
+
+    def player_position_changed(self, x_pos: int, y_pos: int):
+        self.x = x_pos
+        self.y = y_pos
+        pass
+
+    def player_wins_changed(self, wins: int):
+        pass
+
+    def player_losses_changed(self, losses: int):
+        pass
 
 
 

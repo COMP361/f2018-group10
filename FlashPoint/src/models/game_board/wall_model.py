@@ -8,6 +8,7 @@ from src.observers.wall_observer import WallObserver
 class WallModel(EdgeObstacleModel):
     """Logical state of a Wall object."""
     def __init__(self):
+        super().__init__()
         self._wall_status = WallStatusEnum.INTACT
 
     @property
@@ -25,7 +26,6 @@ class WallModel(EdgeObstacleModel):
         self._wall_status = WallStatusEnum.DESTROYED
         for obs in self.observers:
             obs.wall_status_changed(self._wall_status)
-
 
     @property
     def observers(self) -> List[WallObserver]:

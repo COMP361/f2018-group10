@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 
+import src.constants.color as Color
 from src.constants.state_enums import PlayerStatusEnum
 from src.observers.observer import Observer
 
