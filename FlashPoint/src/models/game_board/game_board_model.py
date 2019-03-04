@@ -124,7 +124,6 @@ class GameBoardModel(object):
 
             tiles[coord[0]][coord[1]].set_adjacent_edge_obstacle(direction, obstacle)
 
-
     def _init_all_tiles_experienced_classic(self):
         pass
 

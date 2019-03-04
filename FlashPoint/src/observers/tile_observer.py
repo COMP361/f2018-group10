@@ -7,5 +7,5 @@ class TileObserver(Observer):
     """ABC for classes concerned with getting tile state."""
 
     @abstractmethod
-    def tile_associated_models_changed(self):
+    def tile_status_changed(self):
         pass
