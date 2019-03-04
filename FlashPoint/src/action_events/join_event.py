@@ -5,12 +5,11 @@ from src.models.game_units.player_model import PlayerModel
 
 
 class JoinEvent(ActionEvent):
-
     def __init__(self, player: PlayerModel):
         super().__init__()
         self.player = player
 
-    def execute(self, game: GameStateModel):
+    def execute(self):
         self.player.color = None
 
         colors = {
@@ -22,7 +21,7 @@ class JoinEvent(ActionEvent):
             "green": Color.GREEN,
         }
 
-        list_players = game.players
+        list_players = GameStateModel.instance().players
 
         for color in colors:
             color_available = True
@@ -34,3 +33,5 @@ class JoinEvent(ActionEvent):
                     continue
             if color_available:
                 self.player.color = colors[color]
+
+        GameStateModel.instance().add_player(self.player)

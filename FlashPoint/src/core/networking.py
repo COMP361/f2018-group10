@@ -1,3 +1,7 @@
+import enum
+import json
+from typing import Union, Dict
+
 import ipaddress
 import socket
 import threading
@@ -6,14 +10,16 @@ import time
 
 from src.core.event_queue import EventQueue
 from src.constants.change_scene_enum import ChangeSceneEnum
+from src.constants.state_enums import DifficultyLevelEnum, GameKindEnum, PlayerStatusEnum
+from src.models.game_state_model import GameStateModel
+from src.action_events.action_event import ActionEvent
+from src.action_events.turn_events.turn_event import TurnEvent
+from src.action_events.join_event import JoinEvent
 from src.action_events.ready_event import ReadyEvent
 from src.action_events.chat_event import ChatEvent
 from src.action_events.dummy_event import DummyEvent
-from src.models.game_state_model import GameStateModel
-from src.core.serializer import JSONSerializer
-from src.action_events.action_event import ActionEvent
-from src.action_events.join_event import JoinEvent
 from src.action_events.disconnect_event import DisconnectEvent
+from src.models.game_units.player_model import PlayerModel
 from src.external.Mastermind import *
 
 logger = logging.getLogger("networking")
@@ -138,9 +144,11 @@ class Networking:
                 self.client.send(JoinEvent(player))
                 return True
             except MastermindErrorClient as e:
+                self.client.disconnect()
                 logger.error(f"Error connecting to server at: {ip}:{port}")
                 raise MastermindErrorClient(e)
             except OSError as e:
+                self.client.disconnect()
                 raise OSError(e)
 
         @staticmethod
@@ -216,20 +224,8 @@ class Networking:
                 self.host.disconnect()
                 self.host.__del__()
                 self.host = None
+            GameStateModel.__del__()
             EventQueue.post(ChangeSceneEnum.HOSTJOINSCENE)
-
-        # If game is started, stops new client from connecting
-        def start_game(self):
-            """
-            Starts the game
-            :return:
-            """
-            # Kill the broadcast
-            self.stop_broadcast.set()
-            print("Broadcast killed")
-
-            if self.host:
-                self.host.accepting_disallow()
 
         def send_to_server(self, data, compress=True):
             """
@@ -274,7 +270,6 @@ class Networking:
             """
             if self.host:
                 for client in self.host.client_list.values():
-               # for client in self.host.client_list.values():
                     print(f"Sending {data.__class__} to client at {client.address}\n")
                     try:
                         self.host.callback_client_send(client, data, compress)
@@ -331,7 +326,7 @@ class Networking:
             :return:
             """
             # Pops the client's connection object
-            game = Networking.get_instance().game
+            game = GameStateModel.instance()
             if game:
                 players = [x for x in game.players if x.ip == connection_object.address[0]]
                 if players:
@@ -358,22 +353,15 @@ class Networking:
                 return
 
             print(f"Client at {connection_object.address} sent a message: {data.__class__}")
-            if isinstance(data, ActionEvent):
-                if isinstance(data, JoinEvent):
-                    data.execute(Networking.get_instance().game)
-                    Networking.get_instance().game.add_player(data.player)
-                    Networking.get_instance().send_to_all_client(Networking.get_instance().game)
+            if isinstance(data, TurnEvent) or isinstance(data, ActionEvent):
+                data.execute()
+
                 if isinstance(data, DisconnectEvent):
                     # Kick the player that send the DC event and notify all other players.
                     # Need to have similar polling mechanics like in lobby
                     self.kick_client(connection_object.address[0])
-                    Networking.get_instance().send_to_all_client(Networking.get_instance().game)
-                if isinstance(data, ChatEvent):
-                    data.execute(Networking.get_instance().game)
-                    Networking.get_instance().send_to_all_client(data)
-                if isinstance(data, ReadyEvent):
-                    data.execute(Networking.get_instance().game)
-                    Networking.get_instance().send_to_all_client(data)
+
+                Networking.get_instance().send_to_all_client(GameStateModel.instance())
 
             return super(MastermindServerUDP, self).callback_client_handle(connection_object, data)
 
@@ -391,6 +379,7 @@ class Networking:
             """
             # define override here
             data = JSONSerializer.serialize(data)
+            print(f"Sending message to client at {connection_object.address} : {data}")
             return super(MastermindServerUDP, self).callback_client_send(connection_object, data, compression)
 
         class ClientNotFoundException(Exception):
@@ -412,7 +401,7 @@ class Networking:
             signaler.start()
             receiver.start()
 
-        def send(self, data: ActionEvent, compression=None):
+        def send(self, data: Union[ActionEvent, TurnEvent], compression=None):
             """
             Send data to the server
             :param data: data to be sent, MUST be an instance of ActionEvent
@@ -449,15 +438,16 @@ class Networking:
             time.sleep(0.5)
             return super(MastermindClientUDP, self).disconnect()
 
-        def callback_client_receive(self, data):
+        @staticmethod
+        def callback_client_receive(data):
             """Handle receiving data from host."""
             data: GameStateModel = JSONSerializer.deserialize(data)
             print(f"Received {data.__class__} object from host.")
             if isinstance(data, GameStateModel):
                 print(f"Updating game object, there are now: {len(data.players)} players.")
                 GameStateModel.set_game(data)
-            if isinstance(data, ActionEvent):
-                    data.execute()
+            if isinstance(data, TurnEvent) or isinstance(data, ActionEvent):
+                data.execute()
 
         def get_server_reply(self):
             """
@@ -489,3 +479,98 @@ class Networking:
             :return:
             """
             pass
+
+
+class JSONSerializer(object):
+    """Used for serializing and deserializing objects to JSON."""
+
+    @staticmethod
+    def _deserialize_game_state(payload: Dict) -> GameStateModel:
+        """Deserialize a game state"""
+        host: PlayerModel = JSONSerializer.deserialize(payload['_host'])
+        num_players = payload['_max_desired_players']
+        rules = GameKindEnum(payload['_rules']["value"])
+        game = GameStateModel(host, num_players, rules)
+
+        for player in [x for x in payload['_players'] if x['_ip'] != host.ip]:
+            player_obj: PlayerModel = JSONSerializer.deserialize(player)
+            game.add_player(player_obj)
+
+        if rules == GameKindEnum.EXPERIENCED:
+            game.difficulty_level = DifficultyLevelEnum(payload['_difficulty_level']['value'])
+
+        game.players_turn = payload['_players_turn_index']
+        game.damage = payload['_damage']
+        game.max_damage = payload['_max_damage']
+        game.victims_lost = payload['_victims_lost']
+        game.victims_saved = payload['_victims_saved']
+
+        return game
+
+    @staticmethod
+    def _deserialize_player(payload: Dict) -> PlayerModel:
+        ip = payload["_ip"]
+        nickname = payload['_nickname']
+
+        player = PlayerModel(ip, nickname)
+        player.x_pos = payload['_x_pos']
+        player.y_pos = payload['_y_pos']
+        player.color = tuple(payload['_color'])
+        player.status = PlayerStatusEnum(payload["_status"]["value"])
+        player.ap = payload['_ap']
+        player.special_ap = payload['_special_ap']
+        player.wins = payload['_wins']
+        player.losses = payload['_losses']
+
+        return player
+
+    @staticmethod
+    def _deserialize_chat_event(payload: Dict) -> ChatEvent:
+        message = payload['_message']
+        sender = payload['_sender']
+        return ChatEvent(message, sender)
+
+    @staticmethod
+    def _deserialize_ready_event(payload: Dict) -> ReadyEvent:
+        player: PlayerModel = JSONSerializer.deserialize(payload['_player'])
+        return ReadyEvent(player)
+
+    @staticmethod
+    def _deserialize_join_event(payload: Dict) -> JoinEvent:
+        player = JSONSerializer._deserialize_player(payload['player'])
+        return JoinEvent(player)
+
+    @staticmethod
+    def deserialize(payload: Dict) -> object:
+        """
+        Grab an object and deserialize it.
+        Note that the object must be able to take a dict as input. If there are nested objects or enums in the object,
+        it must define its own _deserialize method by implementing the Serializable abstract class.
+
+        Add to this case statement to be able to deserialize your object type.
+        """
+        object_type = payload["class"]
+        if object_type == PlayerModel.__name__:
+            return JSONSerializer._deserialize_player(payload)
+        elif object_type == GameStateModel.__name__:
+            return JSONSerializer._deserialize_game_state(payload)
+        elif object_type == JoinEvent.__name__:
+            return JSONSerializer._deserialize_join_event(payload)
+        elif object_type == ChatEvent.__name__:
+            return JSONSerializer._deserialize_chat_event(payload)
+        elif object_type == ReadyEvent.__name__:
+            return JSONSerializer._deserialize_ready_event(payload)
+        elif object_type == DummyEvent.__name__:
+            return DummyEvent()
+
+        print("WARNING: Could not deserialize object, not of recognized type.")
+
+    @staticmethod
+    def _safe_dict(obj):
+        obj.__setattr__("class", type(obj).__name__)
+        return obj.__dict__ if not isinstance(obj, enum.Enum) else {"name": type(obj).__name__, "value": obj.value}
+
+    @staticmethod
+    def serialize(input_obj: object) -> dict:
+        """Perform a deep serialize to a dict, then can be dumped into json file."""
+        return json.loads(json.dumps(input_obj, default=lambda x: JSONSerializer._safe_dict(x)))
