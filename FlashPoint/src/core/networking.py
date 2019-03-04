@@ -144,9 +144,11 @@ class Networking:
                 self.client.send(JoinEvent(player))
                 return True
             except MastermindErrorClient as e:
+                self.client.disconnect()
                 logger.error(f"Error connecting to server at: {ip}:{port}")
                 raise MastermindErrorClient(e)
             except OSError as e:
+                self.client.disconnect()
                 raise OSError(e)
 
         @staticmethod
@@ -324,7 +326,7 @@ class Networking:
             :return:
             """
             # Pops the client's connection object
-            game = Networking.get_instance().game
+            game = GameStateModel.instance()
             if game:
                 players = [x for x in game.players if x.ip == connection_object.address[0]]
                 if players:
@@ -352,18 +354,14 @@ class Networking:
 
             print(f"Client at {connection_object.address} sent a message: {data.__class__}")
             if isinstance(data, TurnEvent) or isinstance(data, ActionEvent):
-                # data.execute()
+                data.execute()
+
                 if isinstance(data, DisconnectEvent):
                     # Kick the player that send the DC event and notify all other players.
                     # Need to have similar polling mechanics like in lobby
                     self.kick_client(connection_object.address[0])
-                    Networking.get_instance().send_to_all_client(GameStateModel.instance())
-                if isinstance(data, ChatEvent):
-                    data.execute()
-                    Networking.get_instance().send_to_all_client(data)
-                if isinstance(data, ReadyEvent):
-                    data.execute()
-                    Networking.get_instance().send_to_all_client(data)
+
+                Networking.get_instance().send_to_all_client(GameStateModel.instance())
 
             return super(MastermindServerUDP, self).callback_client_handle(connection_object, data)
 
@@ -381,6 +379,7 @@ class Networking:
             """
             # define override here
             data = JSONSerializer.serialize(data)
+            print(f"Sending message to client at {connection_object.address} : {data}")
             return super(MastermindServerUDP, self).callback_client_send(connection_object, data, compression)
 
         class ClientNotFoundException(Exception):

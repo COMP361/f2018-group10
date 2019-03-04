@@ -1,9 +1,9 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 
-from src.models.game_state_model import GameStateModel
+from src.action_events.action_event import ActionEvent
 
 
-class TurnEvent(ABC):
+class TurnEvent(ActionEvent):
     """Abstract base class for all TurnEvent types. Checks if player has enough AP to execute
     a move and has an exec() method."""
 
