@@ -35,7 +35,7 @@ class GridSprite(pygame.sprite.Group):
             y_offset = 0
             for j in range(0, self.height):
                 image = tile_images[j][i]
-                tile = TileSprite(image, self._fire_image.copy(), self._smoke_image.copy(), self.rect.x, self.rect.y, x_offset, y_offset, j, i)
+                tile = TileSprite(image, self._fire_image, self._smoke_image, self.rect.x, self.rect.y, x_offset, y_offset, j, i)
                 grid[i].append(tile)
                 self.add(grid[i][j])
                 GameStateModel.instance().game_board.get_tile_at(j, i).add_observer(tile)

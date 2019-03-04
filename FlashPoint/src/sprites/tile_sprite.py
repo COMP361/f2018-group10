@@ -1,4 +1,5 @@
 import pygame
+from src.UIComponents.file_importer import FileImporter
 from src.models.game_state_model import GameStateModel
 from src.constants.state_enums import SpaceStatusEnum
 from src.observers.observer import Observer
@@ -105,13 +106,17 @@ class TileSprite(Interactable, Observer):
         self._scroll()
 
     def tile_status_changed(self, status: SpaceStatusEnum):
-        new_surf = pygame.Surface((self._non_highlight_image.get_width(), self._non_highlight_image.get_height()),
-                               pygame.SRCALPHA)
+        new_surf = pygame.Surface([self._non_highlight_image.get_width(), self._non_highlight_image.get_height()])
         self._non_highlight_image = self._blank_image.copy()
 
-        if status == SpaceStatusEnum.FIRE:
-            new_surf.blit(self._fire_image.copy(), (0, 0))
-        elif status == SpaceStatusEnum.SMOKE:
-            new_surf.blit(self._smoke_image.copy(), (0, 0))
+        new_surf = pygame.Surface.convert_alpha(new_surf)
+        new_surf.fill((0, 0, 0, 0), None, pygame.BLEND_RGBA_MULT)
 
-        self._non_highlight_image.blit(new_surf, (0, 0), special_flags=pygame.BLEND_RGBA_MAX)
+        if status == SpaceStatusEnum.FIRE:
+            image_file = FileImporter.import_image("media/All Markers/fire.png")
+            new_surf.blit(image_file, (0, 0))
+        elif status == SpaceStatusEnum.SMOKE:
+            image_file = FileImporter.import_image("media/All Markers/smoke.png")
+            new_surf.blit(image_file, (0, 0))
+
+        self._non_highlight_image.blit(new_surf, (0, 0))
