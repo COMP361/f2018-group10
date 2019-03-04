@@ -24,6 +24,14 @@ class GameBoardModel(object):
         self._poi_bank = GameBoardModel._init_pois()
         self._active_pois = []
 
+    @property
+    def tiles(self) -> List[TileModel]:
+        tile_list = []
+        for row in range(len(self._tiles)):
+            for column in range(len(self._tiles[row])):
+                tile_list.append(self.get_tile_at(row, column))
+        return tile_list
+
     @staticmethod
     def _init_pois():
         pois = []
@@ -95,7 +103,6 @@ class GameBoardModel(object):
 
         return tiles
 
-
     def set_adjacencies(self, tiles: List[List[TileModel]]):
         extended_grid = []
         for row in tiles:
@@ -112,7 +119,6 @@ class GameBoardModel(object):
                 extended_grid[i][j].east_tile = extended_grid[i][j + 1]
                 extended_grid[i][j].west_tile = extended_grid[i][j - 1]
                 extended_grid[i][j].south_tile = extended_grid[i + 1][j]
-
 
     def set_single_obstacle(self, tiles: List[List[TileModel]], adjacency: Dict, obstacle: EdgeObstacleModel):
         first_pair, second_pair = adjacency['first_pair'], adjacency['second_pair']

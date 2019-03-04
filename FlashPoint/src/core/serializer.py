@@ -2,6 +2,7 @@ import enum
 import json
 from typing import Dict
 
+from src.models.game_board.game_board_model import GameBoardModel
 from src.action_events.start_game_event import StartGameEvent
 from src.action_events.ready_event import ReadyEvent
 from src.action_events.chat_event import ChatEvent
@@ -101,6 +102,10 @@ class JSONSerializer(object):
 
     @staticmethod
     def _safe_dict(obj):
+        if isinstance(obj, GameBoardModel):
+            for tile in obj.tiles:
+                tile.reset_adjacencies()
+
         obj.__setattr__("class", type(obj).__name__)
         return obj.__dict__ if not isinstance(obj, enum.Enum) else {"name": type(obj).__name__, "value": obj.value}
 
