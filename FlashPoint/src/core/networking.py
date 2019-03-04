@@ -431,8 +431,7 @@ class Networking:
                         _server_reply = self.receive(False)
                         if _server_reply:
                             self._reply_queue.append(_server_reply)
-                            if not Networking.get_instance().is_host:
-                                self.callback_client_receive(_server_reply)
+                            self.callback_client_receive(_server_reply)
                     except OSError as e:
                         print(f"Error receiving data: {e}")
 
@@ -449,8 +448,11 @@ class Networking:
             data: GameStateModel = JSONSerializer.deserialize(data)
             print(f"Received {data.__class__} object from host.")
             if isinstance(data, GameStateModel):
-                print(f"Updating game object, there are now: {len(data.players)} players.")
-                GameStateModel.set_game(data)
+                if Networking.get_instance().is_host:
+                    print("Skipped updating game object as local machine is a host.")
+                else:
+                    print(f"Updating game object, there are now: {len(data.players)} players.")
+                    GameStateModel.set_game(data)
             if isinstance(data, TurnEvent) or isinstance(data, ActionEvent):
                 data.execute()
 
