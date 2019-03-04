@@ -1,3 +1,5 @@
+from typing import Union
+
 import ipaddress
 import socket
 import threading
@@ -9,9 +11,9 @@ from src.constants.change_scene_enum import ChangeSceneEnum
 from src.action_events.ready_event import ReadyEvent
 from src.action_events.chat_event import ChatEvent
 from src.action_events.dummy_event import DummyEvent
-from src.action_events.start_game_event import StartGameEvent
 from src.models.game_state_model import GameStateModel
 from src.core.serializer import JSONSerializer
+from src.action_events.action_event import ActionEvent
 from src.action_events.turn_events.turn_event import TurnEvent
 from src.action_events.join_event import JoinEvent
 from src.action_events.disconnect_event import DisconnectEvent
@@ -219,20 +221,6 @@ class Networking:
                 self.host = None
             EventQueue.post(ChangeSceneEnum.HOSTJOINSCENE)
 
-        # If game is started, stops new client from connecting
-        def start_game(self):
-            """
-            Starts the game
-            :return:
-            """
-            if self.host:
-                # Kill the broadcast
-                self.stop_broadcast.set()
-                print("Broadcast killed")
-                self.host.accepting_disallow()
-                self.send_to_all_client(StartGameEvent)
-            EventQueue.post(ChangeSceneEnum.GAMEBOARDSCENE)
-
         def send_to_server(self, data, compress=True):
             """
             Send data to server
@@ -360,7 +348,7 @@ class Networking:
                 return
 
             print(f"Client at {connection_object.address} sent a message: {data.__class__}")
-            if isinstance(data, TurnEvent):
+            if isinstance(data, TurnEvent) or isinstance(data, ActionEvent):
                 if isinstance(data, JoinEvent):
                     data.execute(Networking.get_instance().game)
                     Networking.get_instance().game.add_player(data.player)
@@ -371,10 +359,10 @@ class Networking:
                     self.kick_client(connection_object.address[0])
                     Networking.get_instance().send_to_all_client(Networking.get_instance().game)
                 if isinstance(data, ChatEvent):
-                    data.execute(Networking.get_instance().game)
+                    data.execute()
                     Networking.get_instance().send_to_all_client(data)
                 if isinstance(data, ReadyEvent):
-                    data.execute(Networking.get_instance().game)
+                    data.execute()
                     Networking.get_instance().send_to_all_client(data)
 
             return super(MastermindServerUDP, self).callback_client_handle(connection_object, data)
@@ -414,7 +402,7 @@ class Networking:
             signaler.start()
             receiver.start()
 
-        def send(self, data: TurnEvent, compression=None):
+        def send(self, data: Union[ActionEvent, TurnEvent], compression=None):
             """
             Send data to the server
             :param data: data to be sent, MUST be an instance of ActionEvent
@@ -451,15 +439,16 @@ class Networking:
             time.sleep(0.5)
             return super(MastermindClientUDP, self).disconnect()
 
-        def callback_client_receive(self, data):
+        @staticmethod
+        def callback_client_receive(data):
             """Handle receiving data from host."""
             data: GameStateModel = JSONSerializer.deserialize(data)
             print(f"Received {data.__class__} object from host.")
             if isinstance(data, GameStateModel):
                 print(f"Updating game object, there are now: {len(data.players)} players.")
                 GameStateModel.set_game(data)
-            if isinstance(data, TurnEvent):
-                    data.execute()
+            if isinstance(data, TurnEvent) or isinstance(data, ActionEvent):
+                data.execute()
 
         def get_server_reply(self):
             """

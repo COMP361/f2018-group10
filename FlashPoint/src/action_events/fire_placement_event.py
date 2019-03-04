@@ -1,9 +1,9 @@
 from src.constants.state_enums import GameKindEnum
 from src.models.game_state_model import GameStateModel
-from src.action_events.turn_events.turn_event import TurnEvent
+from src.action_events.action_event import ActionEvent
 
 
-class FirePlacementEvent(TurnEvent):
+class FirePlacementEvent(ActionEvent):
     """Event for placing fires at the beginning of the game."""
 
     def __init__(self):

@@ -12,11 +12,9 @@ class WallModel(EdgeObstacleModel):
     def __init__(self):
         self._wall_status = WallStatusEnum.INTACT
 
-
     @property
     def wall_status(self):
         return self._wall_status
-
 
     def damage_wall(self):
         """Set wall status to WallStatusEnum.DAMAGED"""
