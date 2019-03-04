@@ -1,4 +1,4 @@
-from action_events.action_event import ActionEvent
+from src.action_events.action_event import ActionEvent
 
 
 class DummyEvent(ActionEvent):

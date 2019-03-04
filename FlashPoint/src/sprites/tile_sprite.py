@@ -1,23 +1,39 @@
 import pygame
-
-import src.constants.color as Color
+from src.constants.state_enums import SpaceStatusEnum
+from src.observers.observer import Observer
+from src.UIComponents.spritesheet import Spritesheet
 from src.UIComponents.interactable import Interactable
 from src.core.event_queue import EventQueue
 
 
-class TileSprite(Interactable):
+class TileSprite(Interactable, Observer):
     """Graphical representation of a Tile and controls."""
+
     def __init__(self, image: pygame.Surface, x, y, x_offset, y_offset):
         self.index = 0
         self.sprite_grp = pygame.sprite.Group()
         self.image = image
+
+        # Import these
+        self._fire_image = Spritesheet("")
+        self._smoke_image = None
         self._backup_image = image.copy()
-        super().__init__(self.image.get_rect())
+
+        Interactable.__init__(self, self.image.get_rect())
         self.rect = self.image.get_rect().move(x_offset, y_offset)
         self.mouse_rect = pygame.Rect(self.rect).move(x, y)
-        self.is_hovered = False
+        self._is_hovered = False
         self._mouse_pos = (0, 0)  # For keeping track of previous location.
         self.is_scrolling = False
+        self._is_highlighted = False
+
+    @property
+    def highlighted(self) -> bool:
+        return self._is_highlighted and self._is_enabled
+
+    @highlighted.setter
+    def highlighted(self, value: bool):
+        self._is_highlighted = value
 
     def hover(self):
         if self._is_enabled:
@@ -45,16 +61,17 @@ class TileSprite(Interactable):
         """
         self._is_enabled = False
 
-    def _highlight(self):
+    def _apply_highlight(self):
         if self.hover() and self._is_enabled:
-            if not self.is_hovered:
-                self.is_hovered = True
-                hover = pygame.Surface((self._backup_image.get_width(), self._backup_image.get_height()), pygame.SRCALPHA)
+            if not self._is_hovered:
+                self._is_hovered = True
+                hover = pygame.Surface((self._backup_image.get_width(), self._backup_image.get_height()),
+                                       pygame.SRCALPHA)
                 hover.fill((255, 255, 0, 128))
                 self.image.blit(hover, (0, 0))
         else:
             self.image.blit(self._backup_image, (0, 0))
-            self.is_hovered = False
+            self._is_hovered = False
 
     def _scroll(self):
         """Move this Sprite in the direction of the scroll."""
@@ -70,10 +87,19 @@ class TileSprite(Interactable):
         self._mouse_pos = current_mouse_pos
 
     def draw(self, screen: pygame.Surface):
-        self._highlight()
+        self._apply_highlight()
         self.sprite_grp.draw(self.image)
+
         screen.blit(self.image, self.rect)
 
     def update(self, event_queue: EventQueue):
         self.sprite_grp.update(event_queue)
         self._scroll()
+
+    def tile_status_changed(self, status: SpaceStatusEnum):
+        if status == SpaceStatusEnum.FIRE:
+            self.image = self._fire_image.copy()
+        elif status == SpaceStatusEnum.SMOKE:
+            self.image = self._smoke_image
+        elif status == SpaceStatusEnum.SAFE:
+            self.image = self._backup_image

@@ -1,6 +1,7 @@
 import pygame
 
 import src.constants.color as Color
+from src.core.event_queue import EventQueue
 from src.action_events.ready_event import ReadyEvent
 from src.constants.state_enums import GameKindEnum, PlayerStatusEnum
 from src.models.game_state_model import GameStateModel
@@ -11,6 +12,7 @@ from src.UIComponents.text import Text
 from src.UIComponents.chat_box import ChatBox
 from src.constants.change_scene_enum import ChangeSceneEnum
 from src.core.networking import Networking
+from src.action_events.start_game_event import StartGameEvent
 
 
 class LobbyScene(object):
@@ -47,8 +49,14 @@ class LobbyScene(object):
             self.not_enough_players_ready_prompt()
             return
         # Perform the start game hook in Networking (ie. stop accepting new connections and kill broadcast)
-        Networking.get_instance().start_game()
-        pygame.event.post(pygame.event.Event(ChangeSceneEnum.GAMEBOARDSCENE, {}))
+
+        if Networking.get_instance().is_host:
+            # Kill the broadcast
+            Networking.get_instance().stop_broadcast.set()
+            print("Broadcast killed")
+            Networking.get_instance().host.accepting_disallow()
+            Networking.get_instance().send_to_all_client(StartGameEvent())
+        EventQueue.post(ChangeSceneEnum.GAMEBOARDSCENE)
         # TODO: TEST
 
     def set_ready(self):
@@ -59,7 +67,7 @@ class LobbyScene(object):
             self._current_player.status = PlayerStatusEnum.READY
             event = ReadyEvent(self._current_player)
             # TODO Tim or Francis implement waiting ready for all the other players and unreadying the players
-            if self._current_player.ip == Networking.get_instance().game.host.ip:
+            if self._current_player.ip == GameStateModel.instance().host.ip:
                 event.execute()
                 Networking.get_instance().send_to_all_client(event)
             else:
@@ -194,6 +202,6 @@ class LobbyScene(object):
 
         # game is mutated by reference, BE CAREFUL!!!
         if len(GameStateModel.instance().players) != self._player_count:
-            self._player_count = len(Networking.get_instance().game.players)
+            self._player_count = len(GameStateModel.instance().players)
             self.sprite_grp.empty()
             self._init_all(reuse=True)
