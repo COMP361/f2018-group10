@@ -77,7 +77,7 @@ class TileModel(Model):
         """
         tile = self._adjacent_tiles.get("North", None)
         if not tile:
-            raise TilePositionOutOfBoundsException(self, DirectionEnum.NORTH)
+            raise TilePositionOutOfBoundsException(self, "North")
         return tile
 
     @north_tile.setter
@@ -92,7 +92,7 @@ class TileModel(Model):
         """
         tile = self._adjacent_tiles.get("East", None)
         if not tile:
-            raise TilePositionOutOfBoundsException(self, DirectionEnum.EAST)
+            raise TilePositionOutOfBoundsException(self, "East")
         return tile
 
     @east_tile.setter
@@ -107,7 +107,7 @@ class TileModel(Model):
         """
         tile = self._adjacent_tiles.get("West", None)
         if not tile:
-            raise TilePositionOutOfBoundsException(self, DirectionEnum.WEST)
+            raise TilePositionOutOfBoundsException(self, "West")
         return tile
 
     @west_tile.setter
@@ -122,7 +122,7 @@ class TileModel(Model):
         """
         tile = self._adjacent_tiles.get("South", None)
         if not tile:
-            raise TilePositionOutOfBoundsException(self, DirectionEnum.SOUTH)
+            raise TilePositionOutOfBoundsException(self, "South")
         return tile
 
     @south_tile.setter
@@ -142,7 +142,7 @@ class TileModel(Model):
             raise TilePositionOutOfBoundsException(self, direction)
         return tile
 
-    def get_obstacle_in_direction(self, direction: str) -> Optional['TileModel']:
+    def get_obstacle_in_direction(self, direction: str) -> Optional['EdgeObstacleModel']:
         """
         Get the EdgeObstacle model
         :return: EdgeObstacleModel in the direction specified, or None.
