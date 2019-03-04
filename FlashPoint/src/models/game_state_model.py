@@ -7,7 +7,6 @@ from src.models.game_board.game_board_model import GameBoardModel
 from src.constants.state_enums import GameKindEnum, DifficultyLevelEnum, GameStateEnum
 from src.core.flashpoint_exceptions import TooManyPlayersException, InvalidGameKindException, PlayerNotFoundException
 from src.models.game_units.player_model import PlayerModel
-from src.sprites.notify_player_turn import NotifyPlayerTurn
 
 
 class GameStateModel(Model):
@@ -34,7 +33,6 @@ class GameStateModel(Model):
             self._max_damage = 24
             self._chat_history = []
             self._state = GameStateEnum.READY_TO_JOIN
-            self.observers.append(NotifyPlayerTurn(self._players[0]))
             self._notify_player_index()
             self._game_board = GameBoardModel(self._rules)
 
