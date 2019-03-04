@@ -82,7 +82,6 @@ class SceneManager(object):
             self._active_scene.draw(self.screen)
 
         def update(self, event_queue: EventQueue):
-
             self._active_scene.update(event_queue)
             for event in event_queue:
                 if event.type == ChangeSceneEnum.STARTSCENE:

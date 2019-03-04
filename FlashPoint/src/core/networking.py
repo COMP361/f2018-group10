@@ -347,6 +347,7 @@ class Networking:
             :param data: Data received from the connection
             :return:
             """
+            print("Received")
             if connection_object.address[0] == "127.0.0.1":
                 return
 
@@ -487,5 +488,6 @@ class Networking:
             Define callback here when client's connection to host is interrupted.
             :return:
             """
-            pass
+            print("Client disconnected")
+            self.disconnect()
 

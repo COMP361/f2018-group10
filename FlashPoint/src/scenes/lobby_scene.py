@@ -55,7 +55,7 @@ class LobbyScene(object):
             # Kill the broadcast
             Networking.get_instance().stop_broadcast.set()
             print("Broadcast killed")
-            # Networking.get_instance().host.accepting_disallow()
+            Networking.get_instance().host.accepting_disallow()
             Networking.get_instance().send_to_all_client(StartGameEvent())
         # TODO: TEST
 
