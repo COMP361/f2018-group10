@@ -197,7 +197,7 @@ class LobbyScene(object):
             self.players_not_ready_prompt.draw(screen)
 
     def update(self, event_queue):
-        self.sprite_grp.update(event_queue)
+
         self.chat_box.update(event_queue)
 
         # game is mutated by reference, BE CAREFUL!!!
@@ -205,3 +205,5 @@ class LobbyScene(object):
             self._player_count = len(GameStateModel.instance().players)
             self.sprite_grp.empty()
             self._init_all(reuse=True)
+
+        self.sprite_grp.update(event_queue)
