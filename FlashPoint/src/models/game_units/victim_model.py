@@ -8,5 +8,10 @@ class VictimModel(Model):
         super().__init__()
         self._state = victim_state
 
-    def set_dead(self):
-        self._state = VictimStateEnum.LOST  # Not sure if I should simply delete it or set it to dead.
+    @property
+    def state(self):
+        return self._state
+
+    @state.setter
+    def state(self, current_state: VictimStateEnum):
+        self._state = current_state
