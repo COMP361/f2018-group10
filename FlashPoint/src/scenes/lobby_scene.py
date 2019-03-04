@@ -57,7 +57,6 @@ class LobbyScene(object):
             print("Broadcast killed")
             Networking.get_instance().host.accepting_disallow()
             Networking.get_instance().send_to_all_client(StartGameEvent())
-        # TODO: TEST
 
     def set_ready(self):
         """Set the status of the current player to ready."""

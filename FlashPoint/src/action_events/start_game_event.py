@@ -1,5 +1,3 @@
-import time
-
 from src.core.custom_event import CustomEvent
 from src.constants.change_scene_enum import ChangeSceneEnum
 from src.core.event_queue import EventQueue
@@ -10,5 +8,5 @@ class StartGameEvent(ActionEvent):
     """Event to signal every client to start game."""
 
     def execute(self):
+        EventQueue.block()
         EventQueue.post(CustomEvent(ChangeSceneEnum.GAMEBOARDSCENE))
-        time.sleep(0.5)

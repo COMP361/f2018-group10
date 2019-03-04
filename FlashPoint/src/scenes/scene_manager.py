@@ -101,4 +101,5 @@ class SceneManager(object):
                 elif event.type == ChangeSceneEnum.LOBBYSCENE:
                     self.next(LobbyScene, self._current_player)
                 elif event.type == ChangeSceneEnum.GAMEBOARDSCENE:
+                    EventQueue.unblock()
                     self.next(GameBoardScene, self._current_player)
