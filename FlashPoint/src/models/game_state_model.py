@@ -14,6 +14,7 @@ class GameStateModel(Model):
     _instance = None
 
     def __init__(self, host: PlayerModel, num_players: int, game_kind: GameKindEnum):
+        print("Initializing game state...")
         if not GameStateModel._instance:
             super().__init__()
 
@@ -39,7 +40,7 @@ class GameStateModel(Model):
 
         else:
             print("Attempted to instantiate another singleton")
-            raise Exception("Networking is a Singleton")
+            raise Exception("GameStateModel is a Singleton")
 
     @staticmethod
     def __del__():
