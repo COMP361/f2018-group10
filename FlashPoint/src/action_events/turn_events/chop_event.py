@@ -1,17 +1,18 @@
-from src.action_events.action_event import ActionEvent
+from src.action_events.turn_events.turn_event import TurnEvent
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 from src.models.game_board.wall_model import WallModel
 from src.core.flashpoint_exceptions import NotEnoughAPException, WallNotAdjacent, WallAlreadyDestroyed
-from src.constants.state_enums import WallStatusEnum, GameStateEnum
+from src.constants.state_enums import WallStatusEnum
 
-class ChopEvent(ActionEvent):
+class ChopEvent(TurnEvent):
 
     def __init__(self):
         super().__init__()
 
     def execute(self, game: GameStateModel, fireman: PlayerModel, wall: WallModel):
-        validToChop = self.can_chop(fireman)
+        # TODO: Start here - This is the precondition code - Move it to the GUI
+        validToChop = self.has_required_AP(fireman.ap, 2)
         if not validToChop:
             raise NotEnoughAPException("chop the wall", 2)
 
@@ -22,6 +23,7 @@ class ChopEvent(ActionEvent):
         wall_status = wall.wall_status
         if wall_status == WallStatusEnum.DESTROYED:
             raise WallAlreadyDestroyed(fireman.x_pos, fireman.y_pos)
+        # End here
 
         if wall_status == WallStatusEnum.INTACT:
             wall.damage_wall()
@@ -36,12 +38,3 @@ class ChopEvent(ActionEvent):
             game.game_lost()
 
         return
-
-
-    def can_chop(self, fireman: PlayerModel) -> bool:
-        if fireman.ap < 2:
-            return False
-
-        return True
-
-

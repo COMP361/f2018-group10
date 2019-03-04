@@ -3,6 +3,8 @@ from src.observers.tile_observer import TileObserver
 
 from src.UIComponents.interactable import Interactable
 from src.core.event_queue import EventQueue
+from src.models.game_board.tile_model import TileModel
+from src.observers.tile_observer import TileObserver
 
 
 class TileSprite(Interactable, TileObserver):
@@ -90,3 +92,6 @@ class TileSprite(Interactable, TileObserver):
         self.sprite_grp.update(event_queue)
         self._scroll()
         self._check_highlight()
+
+    #def highlight_adjacent(self,current:TileModel):
+

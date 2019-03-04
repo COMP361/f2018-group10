@@ -1,12 +1,17 @@
 import pygame
 
 import src.constants.color as Color
+from src.core.event_queue import EventQueue
 from src.models.game_units.player_model import PlayerModel
+from src.models.game_state_model import GameStateModel
 
 from src.UIComponents.rect_button import RectButton
 from src.UIComponents.rect_label import RectLabel
 from src.UIComponents.text import Text
 from src.UIComponents.scene import Scene
+from src.constants.state_enums import GameKindEnum
+from src.constants.change_scene_enum import ChangeSceneEnum
+from src.core.networking import Networking
 
 
 class CreateGameMenu(Scene):
@@ -19,6 +24,19 @@ class CreateGameMenu(Scene):
         self._init_btn_back(20, 20, "Back", Color.STANDARDBTN, Color.BLACK)
         self._init_btn_family(575, 381, "Family", Color.STANDARDBTN, Color.BLACK)
         self._init_btn_exp(741, 381, "Experienced", Color.STANDARDBTN, Color.BLACK)
+
+        self.buttonExp.on_click(self.create_new_game, GameKindEnum.EXPERIENCED)
+        self.buttonFamily.on_click(self.create_new_game, GameKindEnum.FAMILY)
+        self.buttonBack.on_click(Networking.get_instance().disconnect)
+
+    # ------------- GAME CREATE/LOAD STUFF ---------- #
+
+    def create_new_game(self, game_kind: GameKindEnum):
+        """Instantiate a new family game and move to the lobby scene."""
+        GameStateModel(self._current_player, 6, game_kind)
+        EventQueue.post(ChangeSceneEnum.LOBBYSCENE)
+
+    # ----------------------------------------------- #
 
     def _init_background(self):
         box_size = (self.resolution[0], self.resolution[1])
