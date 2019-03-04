@@ -49,13 +49,6 @@ class GameBoardModel(object):
         """Create all tiles and set their adjacency. """
         tiles = []
 
-        # for i in range(self._dimensions[0]*self._dimensions[1]):
-        #     row = i % self._dimensions[0]
-        #     column = int(i / self._dimensions[0])
-        #     tile_kind = self._determine_tile_kind(row, column)
-        #     tile = TileModel(row, column, tile_kind)
-        #     tiles.append(tile)
-
         for i in range(self._dimensions[0]):
             tiles.append([])
             for j in range(self._dimensions[1]):
@@ -63,7 +56,6 @@ class GameBoardModel(object):
                 tile = TileModel(i, j, tile_kind)
                 tiles[i].append(tile)
 
-        # TODO: Abhijay: setting adjacency and creating walls/doors.
         # setting tile adjacencies
         extended_grid = []
         for row in tiles:

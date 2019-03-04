@@ -1,6 +1,7 @@
 from typing import Callable
 
 import pygame
+from src.constants.change_scene_enum import ChangeSceneEnum
 
 from src.core.event_queue import EventQueue
 
@@ -51,9 +52,10 @@ class Interactable(pygame.sprite.Sprite):
                 self.hover()
 
             for event in event_queue:
-                if event.type == pygame.MOUSEBUTTONUP and not self._clicked:
-                    self._clicked = True
-                    self.click()
+                if not isinstance(event, ChangeSceneEnum):
+                    if event.type == pygame.MOUSEBUTTONUP and not self._clicked:
+                        self._clicked = True
+                        self.click()
 
             if not click[0]:
                 self._clicked = False

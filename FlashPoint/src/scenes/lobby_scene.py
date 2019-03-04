@@ -1,25 +1,28 @@
 import pygame
 
 import src.constants.color as Color
-from src.constants.state_enums import GameKindEnum
+from src.action_events.ready_event import ReadyEvent
+from src.constants.state_enums import GameKindEnum, PlayerStatusEnum
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 from src.UIComponents.rect_button import RectButton
 from src.UIComponents.rect_label import RectLabel
 from src.UIComponents.text import Text
 from src.UIComponents.chat_box import ChatBox
+from src.constants.change_scene_enum import ChangeSceneEnum
 from src.core.networking import Networking
 
 
 class LobbyScene(object):
 
-    def __init__(self, screen, current_player: PlayerModel, game: GameStateModel):
+    def __init__(self, screen, current_player: PlayerModel):
         self._current_player = current_player
-        if Networking.get_instance().game.host.ip == self._current_player.ip:
-            self._current_player.color = Color.BLUE
-            Networking.get_instance().game.host.color = Color.BLUE
+        self._game = GameStateModel.instance()
 
-        self._game = game
+        if self._game.host.ip == self._current_player.ip:
+            self._current_player.color = Color.BLUE
+            self._game.host.color = Color.BLUE
+
         self._player_count = len(self._game.players)
         self.isReady = False
         self.resolution = (1280, 700)
@@ -27,15 +30,53 @@ class LobbyScene(object):
         self.players_not_ready_prompt = None
         self._init_all()
 
+        if self._game.rules == GameKindEnum.EXPERIENCED:
+            self.buttonSelChar.on_click(pygame.event.post, pygame.event.Event(ChangeSceneEnum.CHARACTERSCENE, {}))
+        if self._game.host.ip == self._current_player.ip:
+            self.start_button.on_click(self.start_game)
+        else:
+            self.buttonReady.on_click(self.set_ready)
+        self.buttonBack.on_click(Networking.get_instance().disconnect)
+
+    def start_game(self):
+        """Callback for when the host tries to start the game."""
+        game = GameStateModel.instance()
+        players_ready = len([player.status == PlayerStatusEnum.READY for player in game.players])
+        # TODO: change it back (==)
+        if not players_ready <= game.max_players:
+            self.not_enough_players_ready_prompt()
+            return
+        # Perform the start game hook in Networking (ie. stop accepting new connections and kill broadcast)
+        Networking.get_instance().start_game()
+        # TODO: TEST
+
+    def set_ready(self):
+        """Set the status of the current player to ready."""
+        if not self.isReady:
+            self.isReady = True
+            self.buttonReady.change_color(Color.STANDARDBTN)
+            self._current_player.status = PlayerStatusEnum.READY
+            event = ReadyEvent(self._current_player)
+            # TODO Tim or Francis implement waiting ready for all the other players and unreadying the players
+            if self._current_player.ip == GameStateModel.instance().host.ip:
+                event.execute()
+                Networking.get_instance().send_to_all_client(event)
+            else:
+                Networking.get_instance().client.send(event)
+        else:
+            self.isReady = False
+            self.buttonReady.change_color(Color.GREY)
+            self._current_player.status = PlayerStatusEnum.OFFLINE
+
     def _init_all(self, reuse=False):
         self._init_background()
         self._init_ip_addr()
-        self.chat_box = ChatBox(Networking.get_instance().game, self._current_player)
+        self.chat_box = ChatBox(GameStateModel.instance(), self._current_player)
 
         if not reuse:
             self._init_btn_back(20, 20, "Exit", Color.STANDARDBTN, Color.BLACK)
 
-            if self._current_player.ip == Networking.get_instance().game.host.ip:
+            if self._current_player.ip == GameStateModel.instance().host.ip:
                 self._init_start_game_button()
             else:
                 self._init_ready(1050, 575, "Ready", Color.STANDARDBTN, Color.BLACK)
@@ -45,7 +86,7 @@ class LobbyScene(object):
         else:
             if self._game.rules == GameKindEnum.EXPERIENCED:
                 self.sprite_grp.add(self.buttonSelChar)
-            if self._current_player.ip == Networking.get_instance().game.host.ip:
+            if self._current_player.ip == GameStateModel.instance().host.ip:
                 self.sprite_grp.add(self.start_button)
             else:
                 self.sprite_grp.add(self.buttonReady, self.buttonBack)
@@ -71,7 +112,7 @@ class LobbyScene(object):
         self.sprite_grp.add(self.this_img)
 
     def _init_background_player(self, rect):
-        user_box = RectLabel(rect[0], rect[1], rect[2], rect[3], "media/specialist_cards/generalist.png")
+        user_box = RectLabel(rect[0], rect[1], rect[2], rect[3], "media/specialist_cards/family.png")
         return user_box
 
     def _init_text_box(self, position, text, color):
@@ -120,7 +161,7 @@ class LobbyScene(object):
         self.sprite_grp.add(self._init_text_box(text_pos[0], self._current_player.nickname, self._current_player.color))
         self.sprite_grp.add(self._init_background_player(background_pos[0]))
 
-        players = [x for x in Networking.get_instance().game.players if x.ip != self._current_player.ip]
+        players = [x for x in GameStateModel.instance().players if x.ip != self._current_player.ip]
         i = 1
         for player in players:
             self.sprite_grp.add(self._init_text_box(text_pos[i], player.nickname, player.color))
@@ -151,7 +192,7 @@ class LobbyScene(object):
         self.chat_box.update(event_queue)
 
         # game is mutated by reference, BE CAREFUL!!!
-        if len(Networking.get_instance().game.players) != self._player_count:
+        if len(GameStateModel.instance().players) != self._player_count:
             self._player_count = len(Networking.get_instance().game.players)
             self.sprite_grp.empty()
             self._init_all(reuse=True)

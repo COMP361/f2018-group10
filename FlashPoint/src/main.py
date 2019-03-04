@@ -1,4 +1,3 @@
-import json
 import sys
 
 # If PyCharm is issuing warnings on pygame methods, suppress it. it's a bug with PyCharm
@@ -7,6 +6,7 @@ import pygame
 import src.constants.color as Color
 import src.constants.main_constants as MainConst
 from src.UIComponents.file_importer import FileImporter
+from src.core.networking import Networking
 from src.scenes.scene_manager import SceneManager
 from src.core.event_queue import EventQueue
 
@@ -34,7 +34,7 @@ class Main(object):
 
             for event in self.event_queue:
                 if event.type == pygame.QUIT:
-                    self.scene_manager.disconnect()
+                    Networking.get_instance().disconnect()
                     sys.exit()
 
             # Clear the screen to black
