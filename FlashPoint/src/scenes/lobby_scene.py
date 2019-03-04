@@ -202,6 +202,6 @@ class LobbyScene(object):
 
         # game is mutated by reference, BE CAREFUL!!!
         if len(GameStateModel.instance().players) != self._player_count:
-            self._player_count = len(Networking.get_instance().game.players)
+            self._player_count = len(GameStateModel.instance().players)
             self.sprite_grp.empty()
             self._init_all(reuse=True)
