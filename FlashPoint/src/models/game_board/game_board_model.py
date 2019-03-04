@@ -10,7 +10,6 @@ from src.constants.state_enums import GameKindEnum, SpaceKindEnum, SpaceStatusEn
     DoorStatusEnum, WallStatusEnum
 from src.models.game_board.wall_model import WallModel
 from src.models.game_board.door_model import DoorModel
-from src.scenes.game_board_scene import GameBoardScene
 
 
 class GameBoardModel(object):
@@ -168,18 +167,20 @@ class GameBoardModel(object):
                 obstacle = currentTile.adjacent_edge_objects.get(key)
 
                 if isinstance(obstacle,NullModel):
-                    ap_deduct = 2 if SpaceStatusEnum.FIRE else 1
-
-                    movable_tiles = self.get_movable_tiles(tile.x_coord, tile.y_coord, ap - ap_deduct, movable_tiles)
-
+                    ap_deduct = 2 if tile.space_status == SpaceStatusEnum.FIRE else 1
+                    if tile.space_status == SpaceStatusEnum.FIRE:
+                        movable_tiles = self.get_movable_tiles(tile.x_coord, tile.y_coord, ap - ap_deduct, movable_tiles)
+                    else:
+                        movable_tiles.append(tile)
+                        movable_tiles = self.get_movable_tiles(tile.x_coord, tile.y_coord, ap - ap_deduct, movable_tiles)
                 elif isinstance(obstacle, WallModel):
                     if tile.wall_status == WallStatusEnum.DESTROYED:
                         movable_tiles.append(tile)
-                        movable_tiles = self.get_movable_tiles(tile.x_coord, tile.y_coord, ap - 2, movable_tiles)
+                        movable_tiles = self.get_movable_tiles(tile.x_coord, tile.y_coord, ap - 1, movable_tiles)
                 elif isinstance(obstacle, DoorModel):
-                    if (tile.door_status == DoorStatusEnum.OPEN | tile.door_status == DoorStatusEnum.DESTROYED):
+                    if (tile.door_status == DoorStatusEnum.OPEN or tile.door_status == DoorStatusEnum.DESTROYED):
                         movable_tiles.append(tile)
-                        movable_tiles = self.get_movable_tiles(tile.x_coord, tile.y_coord, ap - 2, movable_tiles)
+                        movable_tiles = self.get_movable_tiles(tile.x_coord, tile.y_coord, ap - ap_deduct, movable_tiles)
 
         output = list(dict.fromkeys(movable_tiles))
         return output

@@ -2,12 +2,10 @@ import json
 from datetime import datetime
 
 import pygame
-from src.core.networking import Networking
 
 from src.UIComponents.chat_box import ChatBox
 from src.UIComponents.menu_window import MenuWindow
 from src.core.event_queue import EventQueue
-from src.core.networking import Networking
 from src.core.serializer import JSONSerializer
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
