@@ -1,7 +1,13 @@
+from datetime import datetime
+
 import pygame
 
 import src.constants.color as Color
 from src.core.event_queue import EventQueue
+
+import time
+
+from src.models.game_state_model import GameStateModel
 
 
 class CurrentPlayerState(pygame.sprite.Sprite):
@@ -20,14 +26,17 @@ class CurrentPlayerState(pygame.sprite.Sprite):
         self.player_im = pygame.transform.scale(self.player_im, (150, 150))
         self.font_name = pygame.font.SysFont('Agency FB', 30)
         self.font_other = pygame.font.SysFont('Agency FB', 23)
+        self.font_time = pygame.font.SysFont('Agency FB', 25)
         self.name = name
         self.AP = "AP:"
         self.SAP = "Special AP:"
-        self.time_left = "Time Left"
+        self.time_left ="Not your turn."
+
         self.text = self.font_name.render(self.name, True, Color.WHITE)
         self.text_AP = self.font_other.render(self.AP, True, Color.WHITE)
         self.text_SAP = self.font_other.render(self.SAP, True, Color.WHITE)
-        self.text_time_left = self.font_name.render(self.time_left, True, Color.WHITE)
+        self.turn = False
+        self.start = None
 
         self.rect = self.image.get_rect()
         self.rect.move_ip(x, y)
@@ -37,8 +46,7 @@ class CurrentPlayerState(pygame.sprite.Sprite):
         self.AP_rect.move_ip(15, 50)
         self.SAP_rect = self.text_SAP.get_rect()
         self.SAP_rect.move_ip(15, 70)
-        self.time_left_rect = self.text_time_left.get_rect()
-        self.time_left_rect.move_ip(15, 100)
+
         # self.is_hovered = False
 
     # IN CASE WE WILL NEED THIS
@@ -70,4 +78,18 @@ class CurrentPlayerState(pygame.sprite.Sprite):
         self.image.blit(self.text, self.P_rect)
         self.image.blit(self.text_AP, self.AP_rect)
         self.image.blit(self.text_SAP, self.SAP_rect)
-        self.image.blit(self.text_time_left, self.time_left_rect)
+
+        if self.turn:
+            self.time_left = self.countdown(self.start)
+            self.text_time_left = self.font_time.render(self.time_left, True, Color.WHITE)
+            self.time_left_rect = self.text_time_left.get_rect()
+            self.time_left_rect.move_ip(15, 100)
+            self.image.blit(self.text_time_left, self.time_left_rect)
+
+
+    def countdown(self,start):
+
+        time_int = int(abs((datetime.now() - start).total_seconds()))
+        time_str = "TOTAL TIME: " + f"{int(time_int/60):02d}:{(time_int % 60):02d}"
+        return time_str
+

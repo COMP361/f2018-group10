@@ -7,6 +7,7 @@ from src.models.game_board.game_board_model import GameBoardModel
 from src.constants.state_enums import GameKindEnum, DifficultyLevelEnum, GameStateEnum
 from src.core.flashpoint_exceptions import TooManyPlayersException, InvalidGameKindException, PlayerNotFoundException
 from src.models.game_units.player_model import PlayerModel
+from src.sprites.notify_player_turn import NotifyPlayerTurn
 
 
 class GameStateModel(Model):
@@ -32,7 +33,8 @@ class GameStateModel(Model):
             self._max_damage = 24
             self._chat_history = []
             self._state = GameStateEnum.READY_TO_JOIN
-
+            self.observers.append(NotifyPlayerTurn(self._players[0]))
+            self._notify_player_index()
             self._game_board = GameBoardModel(self._rules)
 
             GameStateModel._instance = self
@@ -40,6 +42,10 @@ class GameStateModel(Model):
         else:
             print("Attempted to instantiate another singleton")
             raise Exception("Networking is a Singleton")
+
+    def _notify_player_index(self):
+        for obs in self.observers:
+            obs.notify_player_index(self._players_turn_index)
 
     @staticmethod
     def __del__():
@@ -111,6 +117,7 @@ class GameStateModel(Model):
     def next_player(self):
         """Rotate to the next player in the players list, round robin style."""
         self._players_turn_index = (self._players_turn_index + 1) % len(self._players)
+        self._notify_player_index()
 
     @property
     def difficulty_level(self) -> Optional[DifficultyLevelEnum]:

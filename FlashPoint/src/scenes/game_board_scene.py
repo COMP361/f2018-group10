@@ -9,6 +9,7 @@ from src.core.event_queue import EventQueue
 from src.core.serializer import JSONSerializer
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
+from src.observers.game_state_observer import GameStateObserver
 from src.sprites.game_board import GameBoard
 from src.sprites.hud.player_state import PlayerState
 from src.sprites.hud.current_player_state import CurrentPlayerState
@@ -28,6 +29,8 @@ class GameBoardScene(object):
         self._game = GameStateModel.instance()
         self._current_player = current_player
 
+
+
         self.quit_btn = RectButton(200, 250, 100, 50, Color.STANDARDBTN, 0,
                                    Text(pygame.font.SysFont('Arial', 20), "Quit", Color.BLACK))
 
@@ -37,11 +40,13 @@ class GameBoardScene(object):
         self.menu = None
         self._init_sprites()
 
+
+
     def _init_sprites(self):
         for i, player in enumerate(self._game.players):
             self.active_sprites.add(PlayerState(0, 30 + 64*i, player.nickname, player.color))
-
-        self.active_sprites.add(CurrentPlayerState(1130, 550, self._current_player.nickname,self._current_player.color))
+        self._current_sprite = CurrentPlayerState(1130, 550, self._current_player.nickname,self._current_player.color)
+        self.active_sprites.add(self._current_sprite)
         self.active_sprites.add(TimeBar(0, 0))
         self.active_sprites.add(InGameStates(250, 650, self._game.damage, self._game.victims_saved, self._game.victims_lost))
         self.active_sprites.add(self._init_menu_button())
@@ -108,3 +113,4 @@ class GameBoardScene(object):
             self.menu.update(event_queue)
 
         self.chat_box.update(event_queue)
+
