@@ -4,6 +4,10 @@ import pygame
 import json
 import logging
 
+from src.UIComponents.text import Text
+
+import src.constants.color as Color
+from src.UIComponents.rect_label import RectLabel
 from src.core.serializer import JSONSerializer
 from src.models.game_units.player_model import PlayerModel
 from src.UIComponents.file_importer import FileImporter
@@ -57,6 +61,7 @@ class SceneManager(object):
         SceneManager.get_instance().update(event_queue)
 
     class SMInner(object):
+
         def __init__(self, screen: pygame.Surface):
             """
             Scene Manager. Initialize this before the game loop
@@ -129,7 +134,7 @@ class SceneManager(object):
                 temp = json.load(myFile)
                 for i, user in enumerate(temp):
                     player: PlayerModel = JSONSerializer.deserialize(user)
-                    self._active_scene.profile.set_profile(i, player.nickname, self.next, HostJoinScene, player)
+                    self._active_scene.profile.set_profile(i, player.nickname,player.wins,player.losses, self.next, HostJoinScene, player)
                     self._active_scene.profile.remove_profile_callback(i, self.remove_profile, player.nickname)
 
         def create_profile(self, text_bar: InputBox):
@@ -144,13 +149,18 @@ class SceneManager(object):
                 if not text_bar.text.strip():
                     return
 
+                size = len(text_bar.text.strip())
+
                 # Create a player model
-                player_model = PlayerModel(
-                    ip=Networking.get_instance().get_ip(),
-                    nickname=text_bar.text.strip()
-                )
-                player = JSONSerializer.serialize(player_model)
-                temp.append(player)
+                if size <=12:
+                    player_model = PlayerModel(
+                        ip=Networking.get_instance().get_ip(),
+                        nickname=text_bar.text.strip()
+                    )
+                    player = JSONSerializer.serialize(player_model)
+                    temp.append(player)
+            
+
 
             with open(self.profiles, mode='w', encoding='utf-8') as myFile:
                 json.dump(temp, myFile)
@@ -172,3 +182,4 @@ class SceneManager(object):
                 json.dump(temp, myFile)
 
             self.update_profiles()
+

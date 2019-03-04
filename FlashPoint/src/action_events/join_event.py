@@ -14,11 +14,11 @@ class JoinEvent(ActionEvent):
 
         colors = {
             "blue": Color.BLUE,
-            "white": Color.WHITE,
             "red": Color.RED,
             "orange": Color.ORANGE,
             "yellow": Color.YELLOW,
             "green": Color.GREEN,
+            "white": Color.WHITE,
         }
 
         list_players = GameStateModel.instance().players

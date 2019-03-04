@@ -85,3 +85,12 @@ class StartScene(object):
         self.text_bar1.update(event_queue)
         self.profile.update(event_queue)
         # self._text_bar2.update(event_queue)
+
+    def init_error_message(self, msg):
+        label_width = 400
+        label_left = (pygame.display.get_surface().get_size()[0] / 2) - (label_width / 2)
+        label_top = (pygame.display.get_surface().get_size()[1] / 6) * 2
+        error_msg_label = RectLabel(label_left, label_top, label_width, label_width, (255, 255, 255),
+                                    txt_obj=(Text(pygame.font.SysFont('Agency FB', 24), msg, color.RED)))
+        error_msg_label.set_transparent_background(True)
+        self.error_msg = error_msg_label
