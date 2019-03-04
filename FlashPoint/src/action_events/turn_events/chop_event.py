@@ -16,7 +16,8 @@ class ChopEvent(TurnEvent):
         if not validToChop:
             raise NotEnoughAPException("chop the wall", 2)
 
-        isPlayerAdjacent = wall.is_player_adjacent(game, fireman)
+        player_tile = game.game_board.get_tile_at(fireman.x_pos, fireman.y_pos)
+        isPlayerAdjacent = wall.is_player_adjacent(player_tile)
         if not isPlayerAdjacent:
             raise WallNotAdjacent(fireman.x_pos, fireman.y_pos)
 

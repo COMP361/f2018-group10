@@ -2,9 +2,8 @@ from typing import List
 
 from src.models.game_board.edge_obstacle_model import EdgeObstacleModel
 from src.constants.state_enums import WallStatusEnum
-from src.models.game_units.player_model import PlayerModel
+from src.models.game_board.tile_model import TileModel
 from src.observers.wall_observer import WallObserver
-# from src.models.game_state_model import GameStateModel
 
 
 class WallModel(EdgeObstacleModel):
@@ -30,13 +29,12 @@ class WallModel(EdgeObstacleModel):
             obs.wall_status_changed(self._wall_status)
 
 
-    # def is_player_adjacent(self, game: GameStateModel, fireman: PlayerModel) -> bool:
-    #     """Checks if the player is adjacent to the wall"""
-    #     player_tile = game.game_board.get_tile_at(fireman.x_pos, fireman.y_pos)
-    #     if self in player_tile.adjacent_edge_objects:
-    #         return True
-    #
-    #     return False
+    def is_player_adjacent(self, player_tile: TileModel) -> bool:
+        """Checks if the player is adjacent to the wall"""
+        if self in player_tile.adjacent_edge_objects:
+            return True
+
+        return False
 
 
     @property
