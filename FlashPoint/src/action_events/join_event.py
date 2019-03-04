@@ -1,10 +1,10 @@
 import src.constants.color as Color
 from src.models.game_state_model import GameStateModel
-from src.action_events.turn_events.turn_event import TurnEvent
+from src.action_events.action_event import ActionEvent
 from src.models.game_units.player_model import PlayerModel
 
 
-class JoinEvent(TurnEvent):
+class JoinEvent(ActionEvent):
 
     def __init__(self, player: PlayerModel):
         super().__init__()

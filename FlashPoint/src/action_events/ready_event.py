@@ -1,10 +1,10 @@
 from src.constants.state_enums import PlayerStatusEnum
 from src.models.game_state_model import GameStateModel
-from src.action_events.turn_events.turn_event import TurnEvent
+from src.action_events.action_event import ActionEvent
 from src.models.game_units.player_model import PlayerModel
 
 
-class ReadyEvent(TurnEvent):
+class ReadyEvent(ActionEvent):
     """Event to signal that this player has clicked Ready and is ready to play the game."""
 
     def __init__(self, player: PlayerModel):
