@@ -24,6 +24,14 @@ class GameBoardModel(object):
         self._poi_bank = GameBoardModel._init_pois()
         self._active_pois = []
 
+    @property
+    def tiles(self) -> List[TileModel]:
+        tile_list = []
+        for row in range(len(self._tiles)):
+            for column in range(len(self._tiles[row])):
+                tile_list.append(self.get_tile_at(row, column))
+        return tile_list
+
     @staticmethod
     def _init_pois():
         pois = []
@@ -56,21 +64,7 @@ class GameBoardModel(object):
                 tiles[i].append(tile)
 
         # setting tile adjacencies
-        extended_grid = []
-        for row in tiles:
-            extended_grid.append([NullModel()] + row + [NullModel()])
-
-        row_length = len(tiles[0])
-        extra_top_row = [NullModel() for x in range(row_length + 2)]
-        extra_bottom_row = [NullModel() for x in range(row_length + 2)]
-        extended_grid = [extra_top_row] + extended_grid + [extra_bottom_row]
-
-        for i in range(1, len(extended_grid) - 1):
-            for j in range(1, len(extended_grid[0]) - 1):
-                extended_grid[i][j].north_tile = extended_grid[i - 1][j]
-                extended_grid[i][j].east_tile = extended_grid[i][j + 1]
-                extended_grid[i][j].west_tile = extended_grid[i][j - 1]
-                extended_grid[i][j].south_tile = extended_grid[i + 1][j]
+        self.set_adjacencies(tiles)
 
         # setting the top and bottom walls on the outside of the house
         for top, bottom in [(0, 1), (6, 7)]:
@@ -108,6 +102,23 @@ class GameBoardModel(object):
             self.set_single_obstacle(tiles, adjacency, obstacle)
 
         return tiles
+
+    def set_adjacencies(self, tiles: List[List[TileModel]]):
+        extended_grid = []
+        for row in tiles:
+            extended_grid.append([NullModel()] + row + [NullModel()])
+
+        row_length = len(tiles[0])
+        extra_top_row = [NullModel() for x in range(row_length + 2)]
+        extra_bottom_row = [NullModel() for x in range(row_length + 2)]
+        extended_grid = [extra_top_row] + extended_grid + [extra_bottom_row]
+
+        for i in range(1, len(extended_grid) - 1):
+            for j in range(1, len(extended_grid[0]) - 1):
+                extended_grid[i][j].north_tile = extended_grid[i - 1][j]
+                extended_grid[i][j].east_tile = extended_grid[i][j + 1]
+                extended_grid[i][j].west_tile = extended_grid[i][j - 1]
+                extended_grid[i][j].south_tile = extended_grid[i + 1][j]
 
     def set_single_obstacle(self, tiles: List[List[TileModel]], adjacency: Dict, obstacle: EdgeObstacleModel):
         first_pair, second_pair = adjacency['first_pair'], adjacency['second_pair']

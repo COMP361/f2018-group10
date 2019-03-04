@@ -56,7 +56,6 @@ class LobbyScene(object):
             print("Broadcast killed")
             Networking.get_instance().host.accepting_disallow()
             Networking.get_instance().send_to_all_client(StartGameEvent())
-        EventQueue.post(ChangeSceneEnum.GAMEBOARDSCENE)
         # TODO: TEST
 
     def set_ready(self):

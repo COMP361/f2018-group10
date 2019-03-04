@@ -159,3 +159,6 @@ class TileModel(Model):
     def remove_associated_model(self, model: Model):
         """CAUTION: YOUR MODEL MUST HAVE AN __EQ__ METHOD DEFINED FOR THIS TO WORK AS EXPECTED"""
         self._associated_models.remove(model)
+
+    def reset_adjacencies(self):
+        self._adjacent_tiles = {}
