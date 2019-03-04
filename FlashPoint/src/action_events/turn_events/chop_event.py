@@ -20,7 +20,7 @@ class ChopEvent(TurnEvent):
 
         player_tile = game.game_board.get_tile_at(fireman.x_pos, fireman.y_pos)
 
-        if wall not in player_tile.adjacent_edge_objects(player_tile):
+        if wall not in player_tile.adjacent_edge_objects:
             raise WallNotAdjacent(fireman.x_pos, fireman.y_pos)
 
         wall_status = wall.wall_status
