@@ -62,8 +62,8 @@ class Networking:
     class NetworkingInner:
         host = None
         client = None
-        TIMEOUT_CONNECT = 5000
-        TIMEOUT_RECEIVE = 5000
+        TIMEOUT_CONNECT = 100
+        TIMEOUT_RECEIVE = 200
 
         stop_broadcast = threading.Event()
         stop_listen = threading.Event()
