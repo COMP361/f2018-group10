@@ -37,6 +37,8 @@ class AdvanceFireEvent(ActionEvent):
         elif status is SpaceStatusEnum.FIRE:
             self.explosion()
 
+        self.flashover()
+
     def get_tile(self):
         self.initial_tile = self.board.get_tile_at(self._red_dice,
                                                    self._black_dice)  # gets starting tile of advance fire.
