@@ -3,8 +3,6 @@ from typing import List
 import pygame
 
 from src.UIComponents.spritesheet import Spritesheet
-from src.constants.state_enums import SpaceKindEnum
-from src.models.game_board.tile_model import TileModel
 from src.sprites.tile_sprite import TileSprite
 
 

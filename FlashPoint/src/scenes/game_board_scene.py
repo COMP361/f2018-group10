@@ -43,7 +43,7 @@ class GameBoardScene(object):
         for i, player in enumerate(self._game.players):
             self.active_sprites.add(PlayerState(0, 30 + 64*i, player.nickname, player.color))
 
-        self.active_sprites.add(CurrentPlayerState(1130, 550, self._current_player.nickname,self._current_player.color))
+        self.active_sprites.add(CurrentPlayerState(1130, 550, self._current_player.nickname, self._current_player.color))
         self.active_sprites.add(TimeBar(0, 0))
         self.active_sprites.add(InGameStates(250, 650, self._game.damage, self._game.victims_saved, self._game.victims_lost))
         self.active_sprites.add(self._init_menu_button())
