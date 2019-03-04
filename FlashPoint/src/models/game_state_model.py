@@ -41,6 +41,10 @@ class GameStateModel(Model):
             print("Attempted to instantiate another singleton")
             raise Exception("Networking is a Singleton")
 
+    @staticmethod
+    def __del__():
+        GameStateModel._instance = None
+
     @classmethod
     def instance(cls):
         """Get the instance of this singleton"""

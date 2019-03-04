@@ -2,15 +2,15 @@ import src.constants.color as Color
 from src.models.game_state_model import GameStateModel
 from src.action_events.action_event import ActionEvent
 from src.models.game_units.player_model import PlayerModel
+from src.core.networking import Networking
 
 
 class JoinEvent(ActionEvent):
-
     def __init__(self, player: PlayerModel):
         super().__init__()
         self.player = player
 
-    def execute(self, game: GameStateModel):
+    def execute(self):
         self.player.color = None
 
         colors = {
@@ -22,7 +22,7 @@ class JoinEvent(ActionEvent):
             "green": Color.GREEN,
         }
 
-        list_players = game.players
+        list_players = GameStateModel.instance().players
 
         for color in colors:
             color_available = True
@@ -34,3 +34,6 @@ class JoinEvent(ActionEvent):
                     continue
             if color_available:
                 self.player.color = colors[color]
+
+        GameStateModel.instance().add_player(self.player)
+        Networking.get_instance().send_to_all_client(GameStateModel.instance())

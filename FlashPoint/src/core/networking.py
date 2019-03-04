@@ -8,15 +8,12 @@ import time
 
 from src.core.event_queue import EventQueue
 from src.constants.change_scene_enum import ChangeSceneEnum
-from src.action_events.ready_event import ReadyEvent
-from src.action_events.chat_event import ChatEvent
 from src.action_events.dummy_event import DummyEvent
 from src.models.game_state_model import GameStateModel
 from src.core.serializer import JSONSerializer
 from src.action_events.action_event import ActionEvent
 from src.action_events.turn_events.turn_event import TurnEvent
 from src.action_events.join_event import JoinEvent
-from src.action_events.disconnect_event import DisconnectEvent
 from src.external.Mastermind import *
 
 logger = logging.getLogger("networking")
@@ -219,6 +216,7 @@ class Networking:
                 self.host.disconnect()
                 self.host.__del__()
                 self.host = None
+            GameStateModel.__del__()
             EventQueue.post(ChangeSceneEnum.HOSTJOINSCENE)
 
         def send_to_server(self, data, compress=True):
@@ -264,7 +262,6 @@ class Networking:
             """
             if self.host:
                 for client in self.host.client_list.values():
-               # for client in self.host.client_list.values():
                     print(f"Sending {data.__class__} to client at {client.address}\n")
                     try:
                         self.host.callback_client_send(client, data, compress)
@@ -349,21 +346,19 @@ class Networking:
 
             print(f"Client at {connection_object.address} sent a message: {data.__class__}")
             if isinstance(data, TurnEvent) or isinstance(data, ActionEvent):
-                if isinstance(data, JoinEvent):
-                    data.execute(GameStateModel.instance())
-                    GameStateModel.instance().add_player(data.player)
-                    Networking.get_instance().send_to_all_client(GameStateModel.instance())
-                if isinstance(data, DisconnectEvent):
-                    # Kick the player that send the DC event and notify all other players.
-                    # Need to have similar polling mechanics like in lobby
-                    self.kick_client(connection_object.address[0])
-                    Networking.get_instance().send_to_all_client(GameStateModel.instance())
-                if isinstance(data, ChatEvent):
-                    data.execute()
-                    Networking.get_instance().send_to_all_client(data)
-                if isinstance(data, ReadyEvent):
-                    data.execute()
-                    Networking.get_instance().send_to_all_client(data)
+                data.execute()
+                #     Networking.get_instance().send_to_all_client(GameStateModel.instance())
+                # if isinstance(data, DisconnectEvent):
+                #     # Kick the player that send the DC event and notify all other players.
+                #     # Need to have similar polling mechanics like in lobby
+                #     self.kick_client(connection_object.address[0])
+                #     Networking.get_instance().send_to_all_client(GameStateModel.instance())
+                # if isinstance(data, ChatEvent):
+                #     data.execute()
+                #     Networking.get_instance().send_to_all_client(data)
+                # if isinstance(data, ReadyEvent):
+                #     data.execute()
+                #     Networking.get_instance().send_to_all_client(data)
 
             return super(MastermindServerUDP, self).callback_client_handle(connection_object, data)
 
