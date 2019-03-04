@@ -66,9 +66,18 @@ class AdvanceFireEvent(ActionEvent):
 
     def advance(self, d: str, tile: TileModel):
 
-        if tile.space_status is not SpaceStatusEnum.FIRE:  # makes sure the advancement of fire is done throughout
-            pass
+        model_list = tile.associated_models
+        for model in model_list:
+            if isinstance(player_model, model):
+                KnockDownEvent(model)
 
+            elif isinstance(VictimModel, model):
+                model.set_dead()
+                victim_lost = self.game_state.victims_lost()
+                self.game_state.victims_lost = victim_lost + 1
+
+            elif isinstance(POIModel, model):
+                model.reveal()
         else:
             obstacle = self.initial_tile.get_obstacle_in_direction(d)
             if isinstance(WallModel, obstacle):
