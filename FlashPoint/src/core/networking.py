@@ -1,16 +1,18 @@
+from typing import Union
+
 import ipaddress
 import socket
 import threading
 import logging
 import time
 
-from src.action_events.turn_events.turn_event import TurnEvent
 from src.core.custom_event import CustomEvent
 from src.core.serializer import JSONSerializer
 from src.core.event_queue import EventQueue
 from src.constants.change_scene_enum import ChangeSceneEnum
 from src.models.game_state_model import GameStateModel
 from src.action_events.action_event import ActionEvent
+from src.action_events.turn_events.turn_event import TurnEvent
 from src.action_events.join_event import JoinEvent
 from src.action_events.dummy_event import DummyEvent
 from src.action_events.disconnect_event import DisconnectEvent
@@ -221,19 +223,6 @@ class Networking:
             GameStateModel.__del__()
             EventQueue.post(CustomEvent(ChangeSceneEnum.STARTSCENE))
 
-        # If game is started, stops new client from connecting
-        def start_game(self):
-            """
-            Starts the game
-            :return:
-            """
-            # Kill the broadcast
-            self.stop_broadcast.set()
-            print("Broadcast killed")
-
-            if self.host:
-                self.host.accepting_disallow()
-
         def send_to_server(self, data, compress=True):
             """
             Send data to server
@@ -419,7 +408,7 @@ class Networking:
             signaler.start()
             receiver.start()
 
-        def send(self, data: ActionEvent, compression=None):
+        def send(self, data: Union[ActionEvent, TurnEvent], compression=None):
             """
             Send data to the server
             :param data: data to be sent, MUST be an instance of ActionEvent
@@ -458,7 +447,8 @@ class Networking:
             time.sleep(0.5)
             return super(MastermindClientUDP, self).disconnect()
 
-        def callback_client_receive(self, data):
+        @staticmethod
+        def callback_client_receive(data):
             """Handle receiving data from host."""
             data: GameStateModel = JSONSerializer.deserialize(data)
             print(f"Received {data.__class__} object from host.")
