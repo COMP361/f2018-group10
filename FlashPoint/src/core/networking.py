@@ -61,19 +61,18 @@ class Networking:
         return getattr(self.__instance, name)
 
     class NetworkingInner:
-        host = None
-        client = None
         TIMEOUT_CONNECT = 10
         TIMEOUT_RECEIVE = 10
 
         stop_broadcast = threading.Event()
         stop_listen = threading.Event()
 
-        server_reply = None
-
         def __init__(self):
+            self.host = None
+            self.client = None
             self.game = None
             self.stop_broadcast.set()
+            self.server_reply = None
 
         def create_host(self, port=20298):
             """
