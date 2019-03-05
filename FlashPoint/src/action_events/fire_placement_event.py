@@ -9,6 +9,7 @@ class FirePlacementEvent(ActionEvent):
     def __init__(self):
         super().__init__()
 
-    def execute(self, game: GameStateModel):
-        if game.difficulty_level == GameKindEnum.FAMILY:
+    def execute(self):
+        game = GameStateModel.instance()
+        if game.rules == GameKindEnum.FAMILY:
             game.game_board.set_fires_family()
