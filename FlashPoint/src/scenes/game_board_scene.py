@@ -35,7 +35,9 @@ class GameBoardScene(object):
                                    Text(pygame.font.SysFont('Arial', 20), "Quit", Color.BLACK))
 
         self.active_sprites = pygame.sprite.Group()   # Maybe add separate groups for different things later
-        self.game_board = GameBoard()
+        # self.game_board = GameBoard(current_player)
+        # self.chat_box = ChatBox(GameStateModel.instance(), self._current_player)
+        self.game_board = GameBoard(current_player)
         self.chat_box = ChatBox(self._current_player)
         self.menu = None
         self._init_sprites()

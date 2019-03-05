@@ -14,29 +14,35 @@ from src.sprites.tile_sprite import TileSprite
 
 class WallSprite(pygame.sprite.Sprite, WallObserver):
 
-
     def __init__(self, tile_sprite: TileSprite, tile_model: TileModel , current_player: PlayerModel, id : Tuple[int, int, str]):
         super().__init__()
         self._game: GameStateModel = GameStateModel.instance()
         self._current_player = current_player
-        self.button = None
+        self._button = None
         self.tile_model = tile_model
         self.damaged = False
         self.destroyed = False
         self.id = id
 
-        for wall in self.tile_model.adjacent_edge_objects:
-            if wall.id == self.id:
-                wall.add_observer(self)
+        for wall in self.tile_model.adjacent_edge_objects.values():
+            if isinstance(wall, WallModel):
+                if wall.id == self.id:
+                    wall.add_observer(self)
         self.tile_sprite = tile_sprite
         self._prev_x = self.tile_sprite.rect.x
         self._prev_y = self.tile_sprite.rect.y
 
-        #if self.button:
-         #   self.button.onclick(self.proccess_input)
+    @property
+    def button(self):
+        return self._button
+
+    @button.setter
+    def button(self, button):
+        self._button = button
+        self._button.on_click(self.process_input, self._current_player)
 
     def process_input(self, current_player: PlayerModel):
-        pass
+        print("Francis")
 
     def update(self, event_queue):
         diff_x = self.tile_sprite.rect.x - self._prev_x
@@ -44,6 +50,7 @@ class WallSprite(pygame.sprite.Sprite, WallObserver):
         self.button.rect.move_ip((diff_x, diff_y))
         self._prev_x = self.tile_sprite.rect.x
         self._prev_y = self.tile_sprite.rect.y
+        self._button.update(event_queue)
 
     def wall_status_changed(self, status: WallStatusEnum):
         if status == WallStatusEnum.DAMAGED:
