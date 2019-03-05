@@ -46,37 +46,45 @@ class GameStateModel(Model):
 
     @staticmethod
     def __del__():
-        GameStateModel._instance = None
+        with GameStateModel.lock:
+            GameStateModel._instance = None
 
     @classmethod
     def instance(cls):
         """Get the instance of this singleton"""
-        return cls._instance
+        with GameStateModel.lock:
+            return cls._instance
 
     @classmethod
     def set_game(cls, game):
-        cls._instance = game
+        with GameStateModel.lock:
+            cls._instance = game
 
     @property
     def game_board(self) -> GameBoardModel:
-        return self._game_board
+        with GameStateModel.lock:
+            return self._game_board
 
     @property
     def chat_history(self) -> List[Tuple[str, str]]:
-        return self._chat_history
+        with GameStateModel.lock:
+            return self._chat_history
 
     def add_chat_message(self, message: str, sender_nickname: str):
         """Add a chat message to the history."""
-        self._chat_history.append((message, sender_nickname))
+        with GameStateModel.lock:
+            self._chat_history.append((message, sender_nickname))
 
     @property
     def host(self) -> PlayerModel:
         """Get the PlayerModel assigned to the host of the current game."""
-        return self._host
+        with GameStateModel.lock:
+            return self._host
 
     @property
     def max_players(self) -> int:
-        return self._max_desired_players
+        with GameStateModel.lock:
+            return self._max_desired_players
 
     @max_players.setter
     def max_players(self, max_players: int):
@@ -85,7 +93,8 @@ class GameStateModel(Model):
 
     @property
     def players(self)-> List[PlayerModel]:
-        return self._players
+        with GameStateModel.lock:
+            return self._players
 
     def add_player(self, player: PlayerModel):
         """Add a player to the current game."""
@@ -95,10 +104,11 @@ class GameStateModel(Model):
             self._players.append(player)
 
     def get_player_by_ip(self, ip: str) -> PlayerModel:
-        matching_players = [player for player in self._players if player.ip == ip]
-        if not matching_players:
-            raise PlayerNotFoundException
-        return matching_players[0]
+        with GameStateModel.lock:
+            matching_players = [player for player in self._players if player.ip == ip]
+            if not matching_players:
+                raise PlayerNotFoundException
+            return matching_players[0]
 
     def remove_player(self, player: PlayerModel):
         """Remove a player from the current game."""
@@ -108,23 +118,27 @@ class GameStateModel(Model):
     @property
     def players_turn(self) -> PlayerModel:
         """The player who's turn it currently is."""
-        return self._players[self._players_turn_index]
+        with GameStateModel.lock:
+            return self._players[self._players_turn_index]
 
     @players_turn.setter
     def players_turn(self, turn: int):
-        self._players_turn_index = turn
+        with GameStateModel.lock:
+            self._players_turn_index = turn
 
     def next_player(self):
         """Rotate to the next player in the players list, round robin style."""
-        self._players_turn_index = (self._players_turn_index + 1) % len(self._players)
+        with GameStateModel.lock:
+            self._players_turn_index = (self._players_turn_index + 1) % len(self._players)
 
     @property
     def difficulty_level(self) -> Optional[DifficultyLevelEnum]:
         """Difficulty level of an experienced game. A Family game should not have a difficulty level."""
-        if self._rules != GameKindEnum.FAMILY or None:
-            print("WARNING: GameKind is FAMILY, you should not be accessing Difficulty Level.")
-            return
-        return self._difficulty_level
+        with GameStateModel.lock:
+            if self._rules != GameKindEnum.FAMILY or None:
+                print("WARNING: GameKind is FAMILY, you should not be accessing Difficulty Level.")
+                return
+            return self._difficulty_level
 
     @difficulty_level.setter
     def difficulty_level(self, level: DifficultyLevelEnum):
@@ -137,7 +151,8 @@ class GameStateModel(Model):
     @property
     def rules(self) -> GameKindEnum:
         """The Game rules, one of GameKindEnum.FAMILY or GameKindEnum.EXPERIENCED"""
-        return self._rules
+        with GameStateModel.lock:
+            return self._rules
 
     @rules.setter
     def rules(self, rules: GameKindEnum):
@@ -157,7 +172,8 @@ class GameStateModel(Model):
 
     @property
     def victims_saved(self) -> int:
-        return self._victims_saved
+        with GameStateModel.lock:
+            return self._victims_saved
 
     @victims_saved.setter
     def victims_saved(self, victims_saved: int):
@@ -166,7 +182,8 @@ class GameStateModel(Model):
 
     @property
     def victims_lost(self) -> int:
-        return self._victims_lost
+        with GameStateModel.lock:
+            return self._victims_lost
 
     @victims_lost.setter
     def victims_lost(self, victims_lost: int):
@@ -175,7 +192,8 @@ class GameStateModel(Model):
 
     @property
     def damage(self) -> int:
-        return self._damage
+        with GameStateModel.lock:
+            return self._damage
 
     @damage.setter
     def damage(self, damage: int):
@@ -184,15 +202,18 @@ class GameStateModel(Model):
 
     @property
     def max_damage(self) -> int:
-        return self._max_damage
+        with GameStateModel.lock:
+            return self._max_damage
 
     @max_damage.setter
     def max_damage(self, damage: int):
-        self._max_damage = damage
+        with GameStateModel.lock:
+            self._max_damage = damage
 
     @property
     def state(self) -> GameStateEnum:
-        return self._state
+        with GameStateModel.lock:
+            return self._state
 
     @state.setter
     def state(self, game_state: GameStateEnum):
