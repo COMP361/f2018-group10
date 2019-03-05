@@ -32,6 +32,7 @@ class GameBoardScene(object):
 
     def __init__(self, screen: pygame.display, current_player: PlayerModel):
         """:param screen : The display passed from main on which to draw the Scene."""
+
         self._save_games_file = "media/save_games.json"
         self.screen = screen
         self._game = GameStateModel.instance()
@@ -45,6 +46,7 @@ class GameBoardScene(object):
         self.chat_box = ChatBox(GameStateModel.instance(), self._current_player)
         self.menu = None
         self._init_sprites()
+        self.choose_start_pos_controller = ChooseStartingPositionController(self)
 
     def _init_sprites(self):
         for i, player in enumerate(self._game.players):
@@ -126,9 +128,8 @@ class GameBoardScene(object):
 
 class ChooseStartingPositionController(object):
 
-    def __init__(self, game_scene: GameBoardScene, the_player: PlayerModel):
+    def __init__(self, game_scene: GameBoardScene):
         self.scene = game_scene
-        self.associated_player_image = the_player.color
 
         """The offset of this rectlabel might be wickedly off, please someone has to check it"""
         self.choose_label = RectLabel(500, 250, 500, 150, Color.WHITE, 0,
@@ -138,9 +139,6 @@ class ChooseStartingPositionController(object):
         self.board_state = GameStateModel.instance()
         self.game_board = self.board_state.game_board()
         self.grid = GameBoard().grid
-
-    def draw(self):
-        pass
 
     def update(self):
         """Loop through the grid to find where the mouse is pointing"""
