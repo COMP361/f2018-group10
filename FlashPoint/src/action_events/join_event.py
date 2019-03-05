@@ -10,29 +10,30 @@ class JoinEvent(ActionEvent):
         self.player = player
 
     def execute(self):
-        self.player.color = None
+        with GameStateModel.lock:
+            self.player.color = None
 
-        colors = {
-            "blue": Color.BLUE,
-            "white": Color.WHITE,
-            "red": Color.RED,
-            "orange": Color.ORANGE,
-            "yellow": Color.YELLOW,
-            "green": Color.GREEN,
-        }
+            colors = {
+                "blue": Color.BLUE,
+                "white": Color.WHITE,
+                "red": Color.RED,
+                "orange": Color.ORANGE,
+                "yellow": Color.YELLOW,
+                "green": Color.GREEN,
+            }
 
-        list_players = GameStateModel.instance().players
+            list_players = GameStateModel.instance().players
 
-        for color in colors:
-            color_available = True
-            for player in list_players:
-                if player.color == colors[color]:
-                    color_available = False
+            for color in colors:
+                color_available = True
+                for player in list_players:
+                    if player.color == colors[color]:
+                        color_available = False
+                        break
+                    else:
+                        continue
+                if color_available:
+                    self.player.color = colors[color]
                     break
-                else:
-                    continue
-            if color_available:
-                self.player.color = colors[color]
-                break
 
-        GameStateModel.instance().add_player(self.player)
+            GameStateModel.instance().add_player(self.player)
