@@ -21,7 +21,7 @@ class PlayerSprite(pygame.sprite.Sprite, PlayerObserver):
         self.associated_player.super().add_observer(self)
 
     def _associate_image(self):
-        
+
         color = self.associated_player.color
 
         if color is Color.BLUE:

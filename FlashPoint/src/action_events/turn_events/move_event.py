@@ -14,4 +14,5 @@ class Move(ActionEvent):
         self.player = GameStateModel.instance().players_turn()
 
     def check_valid(self):
-        num_ap = self.player.
+        num_ap = self.player.ap
+        curr_location = [self.player.x_pos, self.player.y_pos]
