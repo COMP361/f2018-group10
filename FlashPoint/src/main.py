@@ -5,7 +5,6 @@ import pygame
 
 import src.constants.color as Color
 import src.constants.main_constants as MainConst
-from src.UIComponents.file_importer import FileImporter
 from src.core.networking import Networking
 from src.scenes.scene_manager import SceneManager
 from src.core.event_queue import EventQueue
@@ -19,8 +18,8 @@ class Main(object):
         pygame.display.set_caption(MainConst.WINDOW_TITLE)
         self.screen = pygame.display.set_mode(MainConst.SCREEN_RESOLUTION)
         self.clock = pygame.time.Clock()
-        self.scene_manager = SceneManager(self.screen)
-        self.event_queue = EventQueue()
+        SceneManager()
+        EventQueue()
 
     def main(self):
         # Run main loop
@@ -29,10 +28,10 @@ class Main(object):
         while True:
             # Lock frame rate at 60 FPS. Should only be called once per loop.
             self.clock.tick(60)
-            self.event_queue.fill_queue()
+            EventQueue.fill_queue()
             self.screen.fill(Color.BLACK)
 
-            for event in self.event_queue:
+            for event in EventQueue.get_instance():
                 if event.type == pygame.QUIT:
                     Networking.get_instance().disconnect()
                     sys.exit()
@@ -40,10 +39,10 @@ class Main(object):
             # Clear the screen to black
             self.screen.fill(Color.BLACK)
 
-            self.scene_manager.draw()
-            self.scene_manager.update(self.event_queue)
+            SceneManager.draw()
+            SceneManager.update(EventQueue.get_instance())
 
-            self.event_queue.flush_queue()
+            EventQueue.flush_queue()
 
             pygame.display.flip()
 

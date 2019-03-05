@@ -1,6 +1,7 @@
 import pygame
 
 import src.constants.color as Color
+from src.core.custom_event import CustomEvent
 from src.core.event_queue import EventQueue
 
 from src.UIComponents.rect_button import RectButton
@@ -49,8 +50,8 @@ class CharacterScene(Scene):
         self._init_btn_confirm(1050, 575, "Confirm", Color.STANDARDBTN, Color.BLACK)
 
         self._init_title_text()
-        self.buttonBack.on_click(EventQueue.post, ChangeSceneEnum.LOBBYSCENE)
-        self.buttonConfirm.on_click(EventQueue.post, ChangeSceneEnum.LOBBYSCENE)
+        self.buttonBack.on_click(EventQueue.post, CustomEvent(ChangeSceneEnum.LOBBYSCENE))
+        self.buttonConfirm.on_click(EventQueue.post, CustomEvent(ChangeSceneEnum.LOBBYSCENE))
 
     def _init_background(self):
         box_size = (self.resolution[0], self.resolution[1])

@@ -1,6 +1,8 @@
 import pygame
 
 import src.constants.color as Color
+from src.core.custom_event import CustomEvent
+from src.core.event_queue import EventQueue
 from src.action_events.ready_event import ReadyEvent
 from src.constants.state_enums import GameKindEnum, PlayerStatusEnum
 from src.models.game_state_model import GameStateModel
@@ -11,6 +13,7 @@ from src.UIComponents.text import Text
 from src.UIComponents.chat_box import ChatBox
 from src.constants.change_scene_enum import ChangeSceneEnum
 from src.core.networking import Networking
+from src.action_events.start_game_event import StartGameEvent
 
 
 class LobbyScene(object):
@@ -31,7 +34,7 @@ class LobbyScene(object):
         self._init_all()
 
         if self._game.rules == GameKindEnum.EXPERIENCED:
-            self.buttonSelChar.on_click(pygame.event.post, pygame.event.Event(ChangeSceneEnum.CHARACTERSCENE, {}))
+            self.buttonSelChar.on_click(EventQueue.post, CustomEvent(ChangeSceneEnum.CHARACTERSCENE))
         if self._game.host.ip == self._current_player.ip:
             self.start_button.on_click(self.start_game)
         else:
@@ -47,9 +50,13 @@ class LobbyScene(object):
             self.not_enough_players_ready_prompt()
             return
         # Perform the start game hook in Networking (ie. stop accepting new connections and kill broadcast)
-        Networking.get_instance().start_game()
-        pygame.event.post(pygame.event.Event(ChangeSceneEnum.GAMEBOARDSCENE, {}))
-        # TODO: TEST
+
+        if Networking.get_instance().is_host:
+            # Kill the broadcast
+            Networking.get_instance().stop_broadcast.set()
+            print("Broadcast killed")
+            Networking.get_instance().host.accepting_disallow()
+            Networking.get_instance().send_to_all_client(StartGameEvent())
 
     def set_ready(self):
         """Set the status of the current player to ready."""
@@ -59,7 +66,7 @@ class LobbyScene(object):
             self._current_player.status = PlayerStatusEnum.READY
             event = ReadyEvent(self._current_player)
             # TODO Tim or Francis implement waiting ready for all the other players and unreadying the players
-            if self._current_player.ip == Networking.get_instance().game.host.ip:
+            if self._current_player.ip == GameStateModel.instance().host.ip:
                 event.execute()
                 Networking.get_instance().send_to_all_client(event)
             else:
@@ -72,7 +79,7 @@ class LobbyScene(object):
     def _init_all(self, reuse=False):
         self._init_background()
         self._init_ip_addr()
-        self.chat_box = ChatBox(GameStateModel.instance(), self._current_player)
+        self.chat_box = ChatBox(self._current_player)
 
         if not reuse:
             self._init_btn_back(20, 20, "Exit", Color.STANDARDBTN, Color.BLACK)
@@ -189,11 +196,13 @@ class LobbyScene(object):
             self.players_not_ready_prompt.draw(screen)
 
     def update(self, event_queue):
-        self.sprite_grp.update(event_queue)
+
         self.chat_box.update(event_queue)
 
         # game is mutated by reference, BE CAREFUL!!!
         if len(GameStateModel.instance().players) != self._player_count:
-            self._player_count = len(Networking.get_instance().game.players)
+            self._player_count = len(GameStateModel.instance().players)
             self.sprite_grp.empty()
             self._init_all(reuse=True)
+
+        self.sprite_grp.update(event_queue)

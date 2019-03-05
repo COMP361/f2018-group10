@@ -1,7 +1,13 @@
+import json
+
 import pygame
 import os.path
 
 import src.constants.color as color
+from src.core.custom_event import CustomEvent
+from src.core.networking import Networking
+from src.core.serializer import JSONSerializer
+from src.models.game_units.player_model import PlayerModel
 from src.core.event_queue import EventQueue
 
 from src.UIComponents.rect_button import RectButton
@@ -15,6 +21,8 @@ from src.constants.change_scene_enum import ChangeSceneEnum
 class StartScene(object):
 
     def __init__(self, screen):
+
+        self.profiles = "media/profiles.json"
         self.resolution = (1280, 700)
         self.sprite_grp = pygame.sprite.Group()
         self._init_background()
@@ -22,11 +30,11 @@ class StartScene(object):
         self._init_profile_selector(((self.resolution[0]/2)-(500/2)), 330, color.GREY)
         self.text_bar1 = self._init_text_bar(((self.resolution[0]/2)-(500/2))-20, 600, 400, 32)
         self.text_bar1.disable_enter()
-        #self.sometext =
+
         self._init_btn_register(((self.resolution[0]/2)-(500/2))+400, 592, "Create Profile",
                                 color.STANDARDBTN, color.BLACK)
-        # self._text_bar1 = self._init_text_bar(500, 350, 400, 32)
-        # self._text_bar2 = self._init_text_bar(500, 434, 400, 32)
+
+        self.update_profiles()
 
     def _init_background(self):
         box_size = (self.resolution[0], self.resolution[1])
@@ -47,13 +55,6 @@ class StartScene(object):
                              Text(pygame.font.SysFont('Agency FB', 20), text, color_text))
         self.sprite_grp.add(user_box)
 
-    # def _init_btn_login(self, x_pos, y_pos, text, color, color_text):
-    #     box_size = (130, 48)
-    #     self.buttonLogin = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
-    #                                   Text(pygame.font.SysFont('Arial', 20), text, color_text))
-    #
-    #     self.sprite_grp.add(self.buttonLogin)
-
     def _init_btn_register(self, x_pos, y_pos, text, clr, color_text):
         box_size = (130, 48)
         self.buttonRegister = RectButton(x_pos, y_pos, box_size[0], box_size[1], clr, 0,
@@ -61,10 +62,10 @@ class StartScene(object):
         self.buttonRegister.on_click(self.register_profile)
         self.sprite_grp.add(self.buttonRegister)
 
-    @staticmethod
-    def register_profile():
+    def register_profile(self):
         # Gets the text in the text bar and send the create profile event to the event queue (scene manager)
-        EventQueue.post(ChangeSceneEnum.REGISTER)
+        self.create_profile(self.text_bar1)
+        self.update_profiles()
 
     @staticmethod
     def _init_text_bar(x_pos, y_pos, width, height):
@@ -85,3 +86,57 @@ class StartScene(object):
         self.text_bar1.update(event_queue)
         self.profile.update(event_queue)
         # self._text_bar2.update(event_queue)
+
+# ------------ Stuff for profiles and start scene ------------ #
+
+    def update_profiles(self):
+        if not os.path.exists(self.profiles):
+            with open(self.profiles, mode="w+", encoding='utf-8') as myFile:
+                myFile.write("[]")
+        with open(self.profiles, mode='r', encoding='utf-8') as myFile:
+            temp = json.load(myFile)
+            for i, user in enumerate(temp):
+                player: PlayerModel = JSONSerializer.deserialize(user)
+                self.profile.set_profile(i, player.nickname, EventQueue.post, CustomEvent(ChangeSceneEnum.HOSTJOINSCENE, player=player))
+                self.profile.remove_profile_callback(i, self.remove_profile, player.nickname)
+
+    def create_profile(self, text_bar: InputBox):
+        temp = {}
+        with open(self.profiles, mode='r+', encoding='utf-8') as myFile:
+
+            temp = json.load(myFile)
+            size = len(temp)
+            if size >= 3:
+                return
+
+            if not text_bar.text.strip():
+                return
+
+            # Create a player model
+            player_model = PlayerModel(
+                ip=Networking.get_instance().get_ip(),
+                nickname=text_bar.text.strip()
+            )
+            player = JSONSerializer.serialize(player_model)
+            temp.append(player)
+
+        with open(self.profiles, mode='w', encoding='utf-8') as myFile:
+            json.dump(temp, myFile)
+
+        self.update_profiles()
+
+    def remove_profile(self, removename: str):
+        temp = {}
+        with open(self.profiles, mode='r+', encoding='utf-8') as myFile:
+            temp = json.load(myFile)
+            for perm in temp:
+                for name in perm.values():
+                    if name == removename:
+                        temp.remove(perm)
+                    else:
+                        continue
+
+        with open(self.profiles, mode='w', encoding='utf-8') as myFile:
+            json.dump(temp, myFile)
+
+        self.update_profiles()
