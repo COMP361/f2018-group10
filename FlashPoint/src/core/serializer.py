@@ -23,6 +23,7 @@ class JSONSerializer(object):
 
         GameStateModel.lock.acquire()
         if GameStateModel.instance():
+            print("Deleted from serializer")
             GameStateModel.__del__()
         host: PlayerModel = JSONSerializer.deserialize(payload['_host'])
         num_players = payload['_max_desired_players']

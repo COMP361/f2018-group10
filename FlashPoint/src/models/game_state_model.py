@@ -45,6 +45,7 @@ class GameStateModel(Model):
 
     @staticmethod
     def __del__():
+        print('deleting game state aahahhafah')
         GameStateModel._instance = None
 
     @classmethod

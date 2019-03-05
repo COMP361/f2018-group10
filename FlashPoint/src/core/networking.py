@@ -63,8 +63,8 @@ class Networking:
     class NetworkingInner:
         host = None
         client = None
-        TIMEOUT_CONNECT = 100
-        TIMEOUT_RECEIVE = None
+        TIMEOUT_CONNECT = 10
+        TIMEOUT_RECEIVE = 10
 
         stop_broadcast = threading.Event()
         stop_listen = threading.Event()
@@ -220,6 +220,7 @@ class Networking:
                 self.host.disconnect()
                 self.host.__del__()
                 self.host = None
+            print("Deleting game state")
             GameStateModel.__del__()
             EventQueue.post(CustomEvent(ChangeSceneEnum.STARTSCENE))
 
