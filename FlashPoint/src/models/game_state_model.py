@@ -47,64 +47,87 @@ class GameStateModel(Model):
     @staticmethod
     def __del__():
         with GameStateModel.lock:
+            print("Lock acquired del")
             GameStateModel._instance = None
+        print("Lock released del")
 
     @classmethod
     def instance(cls):
         """Get the instance of this singleton"""
         with GameStateModel.lock:
+            print("Lock acquired instance")
+            print("Lock released istance")
             return cls._instance
 
     @classmethod
     def set_game(cls, game):
         with GameStateModel.lock:
+
+            print("Lock acquired set_game")
             cls._instance = game
+        print("Lock released set game")
 
     @property
     def game_board(self) -> GameBoardModel:
         with GameStateModel.lock:
+            print("Lock acquired game_board")
+            print("Lock released game board")
+
             return self._game_board
 
     @property
     def chat_history(self) -> List[Tuple[str, str]]:
         with GameStateModel.lock:
+            print("Lock acquired chat history")
+            print("Lock released chat history")
             return self._chat_history
 
     def add_chat_message(self, message: str, sender_nickname: str):
         """Add a chat message to the history."""
         with GameStateModel.lock:
+            print("lock acquired add chat message")
             self._chat_history.append((message, sender_nickname))
+        print("Lock released add chat message")
 
     @property
     def host(self) -> PlayerModel:
         """Get the PlayerModel assigned to the host of the current game."""
         with GameStateModel.lock:
+            print("Lock acquired host")
             return self._host
 
     @property
     def max_players(self) -> int:
         with GameStateModel.lock:
+            print("Lock acquired max_players")
             return self._max_desired_players
 
     @max_players.setter
     def max_players(self, max_players: int):
         with GameStateModel.lock:
+            print("Lock acquired max players set")
             self._max_desired_players = max_players
+        print("Lock released max players set")
+
 
     @property
     def players(self)-> List[PlayerModel]:
         with GameStateModel.lock:
+            print("Lock acquired players")
             return self._players
 
     def add_player(self, player: PlayerModel):
         """Add a player to the current game."""
         with GameStateModel.lock:
+            print("Lock acquired add player")
             if len(self._players) == self._max_desired_players:
                 raise TooManyPlayersException(player)
             self._players.append(player)
+        print("Lock released add player")
 
     def get_player_by_ip(self, ip: str) -> PlayerModel:
         with GameStateModel.lock:
+            print("Lock acquired get player by ip")
             matching_players = [player for player in self._players if player.ip == ip]
             if not matching_players:
                 raise PlayerNotFoundException
@@ -113,28 +136,34 @@ class GameStateModel(Model):
     def remove_player(self, player: PlayerModel):
         """Remove a player from the current game."""
         with GameStateModel.lock:
+            print("Lock acquired remove player")
             self._players.remove(player)
+        print("Lock released remove player")
 
     @property
     def players_turn(self) -> PlayerModel:
         """The player who's turn it currently is."""
         with GameStateModel.lock:
+            print("lock acqired players turn read")
             return self._players[self._players_turn_index]
 
     @players_turn.setter
     def players_turn(self, turn: int):
         with GameStateModel.lock:
+            print("Lock acquired players turn set")
             self._players_turn_index = turn
 
     def next_player(self):
         """Rotate to the next player in the players list, round robin style."""
         with GameStateModel.lock:
+            print("Lock acquired next player")
             self._players_turn_index = (self._players_turn_index + 1) % len(self._players)
 
     @property
     def difficulty_level(self) -> Optional[DifficultyLevelEnum]:
         """Difficulty level of an experienced game. A Family game should not have a difficulty level."""
         with GameStateModel.lock:
+            print("Lock acquired difficulty level")
             if self._rules != GameKindEnum.FAMILY or None:
                 print("WARNING: GameKind is FAMILY, you should not be accessing Difficulty Level.")
                 return
@@ -144,6 +173,7 @@ class GameStateModel(Model):
     def difficulty_level(self, level: DifficultyLevelEnum):
         """Set the difficulty level of the game. Game must be of type EXPERIENCED"""
         with GameStateModel.lock:
+            print("Lock acquired difficulty lvl setter")
             if self._rules != GameKindEnum.EXPERIENCED or None:
                 raise InvalidGameKindException("set difficulty level", self._rules)
             self._difficulty_level = level
@@ -152,12 +182,14 @@ class GameStateModel(Model):
     def rules(self) -> GameKindEnum:
         """The Game rules, one of GameKindEnum.FAMILY or GameKindEnum.EXPERIENCED"""
         with GameStateModel.lock:
+            print("LOck aquired rules")
             return self._rules
 
     @rules.setter
     def rules(self, rules: GameKindEnum):
         """Set the rules for this game. one of GameKindEnum.FAMILY or GameKindEnum.EXPERIENCED"""
         with GameStateModel.lock:
+            print("Lock acquired rules setter")
             self._rules = rules
 
     @property
