@@ -25,7 +25,7 @@ class JSONSerializer(object):
         host: PlayerModel = JSONSerializer.deserialize(payload['_host'])
         num_players = payload['_max_desired_players']
         rules = GameKindEnum(payload['_rules']["value"])
-        
+
         if not GameStateModel.instance():
             game = GameStateModel(host, num_players, rules)
         else:
@@ -33,7 +33,8 @@ class JSONSerializer(object):
 
         for player in [x for x in payload['_players'] if x['_ip'] != host.ip]:
             player_obj: PlayerModel = JSONSerializer.deserialize(player)
-            game.add_player(player_obj)
+            if player_obj not in game.players:
+                game.add_player(player_obj)
 
         if rules == GameKindEnum.EXPERIENCED:
             game.difficulty_level = DifficultyLevelEnum(payload['_difficulty_level']['value'])
