@@ -93,14 +93,11 @@ class AdvanceFireEvent(ActionEvent):
             if isinstance(obstacle, WallModel) and obstacle.wall_status != WallStatusEnum.DESTROYED:
                 obstacle.inflict_damage()
                 self.game_state.damage += 1
-                if not origin_tile.has_obstacle_in_direction(direction):
-                    origin_tile.set_adjacent_edge_obstacle(direction, NullModel())
 
             # fire does not move to the neighbouring tile
             # removing door that borders the tile
             elif isinstance(obstacle, DoorModel):
                 obstacle.destroy_door()
-                origin_tile.set_adjacent_edge_obstacle(direction, NullModel())
 
             # fire can move to the neighbouring tile
             # if the neighbouring tile is on fire, a shockwave is created
@@ -116,7 +113,49 @@ class AdvanceFireEvent(ActionEvent):
 
 
     def shockwave(self, tile: TileModel, direction: str):
-        pass
+        """
+        Send shockwave along a direction.
+
+        :param tile: the tile where the shockwave starts
+        :param direction: direction in which shockwave continues
+        :return:
+        """
+        should_stop = False
+        while not should_stop:
+            # if there is no obstacle in the given direction -
+            #   if neighbouring tile is not on fire, set it to fire
+            #   and stop the shockwave.
+            #   else set the current tile to the neighbouring tile
+            #   and continue the shockwave.
+            if not tile.has_obstacle_in_direction(direction):
+                nb_tile: TileModel = tile.get_tile_in_direction(direction)
+                if nb_tile.space_status != SpaceStatusEnum.FIRE:
+                    nb_tile.space_status = SpaceStatusEnum.FIRE
+                    should_stop = True
+
+                else:
+                    tile = nb_tile
+
+            # if there is an obstacle in the given direction,
+            # shockwave should stop.
+            else:
+                # 1. if obstacle is a wall, inflict damage on it and increment
+                #   game state damage.
+                # 2. if obstacle is a non-destroyed door, destroy it.
+                obstacle = tile.get_obstacle_in_direction(direction)
+                if isinstance(obstacle, WallModel):
+                    obstacle.inflict_damage()
+                    self.game_state.damage += 1
+
+                elif isinstance(obstacle, DoorModel) and obstacle.door_status != DoorStatusEnum.DESTROYED:
+                    obstacle.destroy_door()
+
+                else:
+                    pass
+
+                should_stop = True
+
+
     # def set_tile(self):
     #     self.initial_tile = self.board.get_tile_at(self.red_dice,
     #                                                self.black_dice)  # gets starting tile of advance fire.
