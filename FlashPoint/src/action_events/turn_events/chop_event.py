@@ -1,4 +1,5 @@
 from src.action_events.turn_events.turn_event import TurnEvent
+from src.models.game_board.null_model import NullModel
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 from src.models.game_board.wall_model import WallModel
@@ -11,7 +12,7 @@ class ChopEvent(TurnEvent):
     def __init__(self):
         super().__init__()
 
-    def execute(self, fireman: PlayerModel, wall: WallModel):
+    def execute(self, fireman: PlayerModel, wall: WallModel, direction: str):
         game: GameStateModel = GameStateModel.instance()
         # TODO: Start here - This is the precondition code - Move it to the GUI
         valid_to_chop = self.has_required_AP(fireman.ap, 2)
@@ -29,6 +30,8 @@ class ChopEvent(TurnEvent):
         # TODO: End here
 
         wall.inflict_damage()
+        if not player_tile.has_obstacle_in_direction(direction):
+            player_tile.set_adjacent_edge_obstacle(direction, NullModel())
 
         fireman.ap = fireman.ap - 2
         game.damage = game.damage + 1

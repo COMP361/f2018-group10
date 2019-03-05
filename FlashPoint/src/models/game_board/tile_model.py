@@ -1,10 +1,12 @@
 from typing import Optional
 
+from src.models.game_board.door_model import DoorModel
+from src.models.game_board.wall_model import WallModel
 from src.models.model import Model
 from src.core.flashpoint_exceptions import TilePositionOutOfBoundsException
 from src.models.game_board.edge_obstacle_model import EdgeObstacleModel
 from src.models.game_board.null_model import NullModel
-from src.constants.state_enums import SpaceKindEnum
+from src.constants.state_enums import SpaceKindEnum, DoorStatusEnum, WallStatusEnum
 from src.constants.state_enums import SpaceStatusEnum
 
 
@@ -149,6 +151,26 @@ class TileModel(Model):
         :return: EdgeObstacleModel in the direction specified, or None.
         """
         return self._adjacent_edge_objects.get(direction, None)
+
+    def has_obstacle_in_direction(self, direction: str) -> bool:
+        """
+        Checks whether there is an obstacle in the given direction.
+        :param direction:
+        :return: False if there is -
+                1. no obstacle
+                2. destroyed wall
+                3. destroyed door
+                True otherwise
+        """
+        obstacle: EdgeObstacleModel = self.get_obstacle_in_direction(direction)
+        if not obstacle:
+            return False
+        elif isinstance(obstacle, DoorModel) and obstacle.door_status == DoorStatusEnum.DESTROYED:
+            return False
+        elif isinstance(obstacle, WallModel) and obstacle.wall_status == WallStatusEnum.DESTROYED:
+            return False
+        else:
+            return True
 
     @property
     def associated_models(self):
