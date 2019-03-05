@@ -79,7 +79,7 @@ class LobbyScene(object):
     def _init_all(self, reuse=False):
         self._init_background()
         self._init_ip_addr()
-        self.chat_box = ChatBox(GameStateModel.instance(), self._current_player)
+        self.chat_box = ChatBox(self._current_player)
 
         if not reuse:
             self._init_btn_back(20, 20, "Exit", Color.STANDARDBTN, Color.BLACK)

@@ -1,4 +1,5 @@
 import random
+from threading import Lock
 
 from typing import List, Optional, Tuple
 
@@ -12,35 +13,36 @@ from src.models.game_units.player_model import PlayerModel
 class GameStateModel(Model):
     """Singleton Class for maintaining the current Game state."""
     _instance = None
+    lock = Lock()
 
     def __init__(self, host: PlayerModel, num_players: int, game_kind: GameKindEnum):
         print("Initializing game state...")
-        if not GameStateModel._instance:
-            super().__init__()
 
-            self._host = host
-            self._max_desired_players = 6
-            self._players = [self._host]
-            self._players_turn_index = 0
-            self._difficulty_level = None
-            self._rules = game_kind
-            self._red_dice = 0
-            self._black_dice = 0
+        with GameStateModel.lock:
+            if not GameStateModel._instance:
+                super().__init__()
+                self._host = host
+                self._max_desired_players = 6
+                self._players = [self._host]
+                self._players_turn_index = 0
+                self._difficulty_level = None
+                self._rules = game_kind
+                self._red_dice = 0
+                self._black_dice = 0
 
-            self._victims_saved = 0
-            self._victims_lost = 0
-            self._damage = 0
-            self._max_damage = 24
-            self._chat_history = []
-            self._state = GameStateEnum.READY_TO_JOIN
+                self._victims_saved = 0
+                self._victims_lost = 0
+                self._damage = 0
+                self._max_damage = 24
+                self._chat_history = []
+                self._state = GameStateEnum.READY_TO_JOIN
 
-            self._game_board = GameBoardModel(self._rules)
+                self._game_board = GameBoardModel(self._rules)
 
-            GameStateModel._instance = self
-
-        else:
-            print("Attempted to instantiate another singleton")
-            raise Exception("GameStateModel is a Singleton")
+                GameStateModel._instance = self
+            else:
+                print("Attempted to instantiate another singleton")
+                raise Exception("GameStateModel is a Singleton")
 
     @staticmethod
     def __del__():
@@ -78,7 +80,8 @@ class GameStateModel(Model):
 
     @max_players.setter
     def max_players(self, max_players: int):
-        self._max_desired_players = max_players
+        with GameStateModel.lock:
+            self._max_desired_players = max_players
 
     @property
     def players(self)-> List[PlayerModel]:
@@ -86,9 +89,10 @@ class GameStateModel(Model):
 
     def add_player(self, player: PlayerModel):
         """Add a player to the current game."""
-        if len(self._players) == self._max_desired_players:
-            raise TooManyPlayersException(player)
-        self._players.append(player)
+        with GameStateModel.lock:
+            if len(self._players) == self._max_desired_players:
+                raise TooManyPlayersException(player)
+            self._players.append(player)
 
     def get_player_by_ip(self, ip: str) -> PlayerModel:
         matching_players = [player for player in self._players if player.ip == ip]
@@ -98,7 +102,8 @@ class GameStateModel(Model):
 
     def remove_player(self, player: PlayerModel):
         """Remove a player from the current game."""
-        self._players.remove(player)
+        with GameStateModel.lock:
+            self._players.remove(player)
 
     @property
     def players_turn(self) -> PlayerModel:
@@ -124,9 +129,10 @@ class GameStateModel(Model):
     @difficulty_level.setter
     def difficulty_level(self, level: DifficultyLevelEnum):
         """Set the difficulty level of the game. Game must be of type EXPERIENCED"""
-        if self._rules != GameKindEnum.EXPERIENCED or None:
-            raise InvalidGameKindException("set difficulty level", self._rules)
-        self._difficulty_level = level
+        with GameStateModel.lock:
+            if self._rules != GameKindEnum.EXPERIENCED or None:
+                raise InvalidGameKindException("set difficulty level", self._rules)
+            self._difficulty_level = level
 
     @property
     def rules(self) -> GameKindEnum:
@@ -136,7 +142,8 @@ class GameStateModel(Model):
     @rules.setter
     def rules(self, rules: GameKindEnum):
         """Set the rules for this game. one of GameKindEnum.FAMILY or GameKindEnum.EXPERIENCED"""
-        self._rules = rules
+        with GameStateModel.lock:
+            self._rules = rules
 
     @property
     def roll_black_dice(self) -> int:
@@ -154,7 +161,8 @@ class GameStateModel(Model):
 
     @victims_saved.setter
     def victims_saved(self, victims_saved: int):
-        self._victims_saved = victims_saved
+        with GameStateModel.lock:
+            self._victims_saved = victims_saved
 
     @property
     def victims_lost(self) -> int:
@@ -162,7 +170,8 @@ class GameStateModel(Model):
 
     @victims_lost.setter
     def victims_lost(self, victims_lost: int):
-        self._victims_lost = victims_lost
+        with GameStateModel.lock:
+            self._victims_lost = victims_lost
 
     @property
     def damage(self) -> int:
@@ -170,7 +179,8 @@ class GameStateModel(Model):
 
     @damage.setter
     def damage(self, damage: int):
-        self._damage = damage
+        with GameStateModel.lock:
+            self._damage = damage
 
     @property
     def max_damage(self) -> int:
@@ -186,8 +196,9 @@ class GameStateModel(Model):
 
     @state.setter
     def state(self, game_state: GameStateEnum):
-        self._state = game_state
+        with GameStateModel.lock:
+            self._state = game_state
 
     def game_lost(self):
-        self._state = GameStateEnum.LOST
-        # TODO: More stuff here for what is supposed to happen when the game ends.
+        with GameStateModel.lock:
+            self._state = GameStateEnum.LOST

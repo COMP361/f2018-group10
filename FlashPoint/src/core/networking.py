@@ -361,13 +361,12 @@ class Networking:
             print(f"Client at {connection_object.address} sent a message: {data.__class__}")
             if isinstance(data, TurnEvent) or isinstance(data, ActionEvent):
                 data.execute()
-
+                if isinstance(data, JoinEvent):
+                    Networking.get_instance().send_to_all_client(GameStateModel.instance())
                 if isinstance(data, DisconnectEvent):
                     # Kick the player that send the DC event and notify all other players.
                     # Need to have similar polling mechanics like in lobby
                     self.kick_client(connection_object.address[0])
-
-            Networking.get_instance().send_to_all_client(GameStateModel.instance())
 
             return super(MastermindServerUDP, self).callback_client_handle(connection_object, data)
 
