@@ -13,7 +13,6 @@ from src.UIComponents.text import Text
 from src.UIComponents.chat_box import ChatBox
 from src.constants.change_scene_enum import ChangeSceneEnum
 from src.core.networking import Networking
-from src.action_events.start_game_event import StartGameEvent
 
 
 class LobbyScene(object):
@@ -66,7 +65,7 @@ class LobbyScene(object):
             self._current_player.status = PlayerStatusEnum.READY
             event = ReadyEvent(self._current_player)
             # TODO Tim or Francis implement waiting ready for all the other players and unreadying the players
-            if self._current_player.ip == GameStateModel.instance().host.ip:
+            if self._current_player.ip == Networking.get_instance().game.host.ip:
                 event.execute()
                 Networking.get_instance().send_to_all_client(event)
             else:
@@ -201,7 +200,7 @@ class LobbyScene(object):
 
         # game is mutated by reference, BE CAREFUL!!!
         if len(GameStateModel.instance().players) != self._player_count:
-            self._player_count = len(GameStateModel.instance().players)
+            self._player_count = len(Networking.get_instance().game.players)
             self.sprite_grp.empty()
             self._init_all(reuse=True)
 

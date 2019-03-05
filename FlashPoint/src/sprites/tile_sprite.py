@@ -77,6 +77,3 @@ class TileSprite(Interactable,TileObserver):
     def update(self, event_queue: EventQueue):
         self.sprite_grp.update(event_queue)
         self._scroll()
-
-    #def highlight_adjacent(self,current:TileModel):
-

@@ -5,7 +5,7 @@ from typing import List, Optional, Tuple
 
 from src.models.model import Model
 from src.models.game_board.game_board_model import GameBoardModel
-from src.constants.state_enums import GameKindEnum, DifficultyLevelEnum, GameStateEnum
+from src.constants.state_enums import GameKindEnum, DifficultyLevelEnum
 from src.core.flashpoint_exceptions import TooManyPlayersException, InvalidGameKindException, PlayerNotFoundException
 from src.models.game_units.player_model import PlayerModel
 
@@ -29,14 +29,13 @@ class GameStateModel(Model):
             self._red_dice = 0
             self._black_dice = 0
 
+            # self._game_board = GameBoardModel(self._rules)
+
             self._victims_saved = 0
             self._victims_lost = 0
             self._damage = 0
             self._max_damage = 24
             self._chat_history = []
-            self._state = GameStateEnum.READY_TO_JOIN
-
-            self._game_board = GameBoardModel(self._rules)
 
             GameStateModel._instance = self
         else:
