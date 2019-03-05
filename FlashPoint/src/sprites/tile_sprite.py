@@ -2,7 +2,6 @@ import pygame
 from src.UIComponents.file_importer import FileImporter
 from src.models.game_state_model import GameStateModel
 from src.constants.state_enums import SpaceStatusEnum
-from src.observers.observer import Observer
 from src.UIComponents.interactable import Interactable
 from src.core.event_queue import EventQueue
 from src.observers.tile_observer import TileObserver
@@ -32,7 +31,7 @@ class TileSprite(Interactable,TileObserver):
         Interactable.__init__(self, self.image.get_rect())
         self.rect = self.image.get_rect().move(x_offset, y_offset)
         self.mouse_rect = pygame.Rect(self.rect).move(x, y)
-        self.is_hovered = False
+        self._is_hovered = False
         self._mouse_pos = (0, 0)  # For keeping track of previous location.
         self.is_scrolling = False
 

@@ -4,6 +4,7 @@ import threading
 import logging
 import time
 
+from src.action_events.turn_events.turn_event import TurnEvent
 from src.core.custom_event import CustomEvent
 from src.core.serializer import JSONSerializer
 from src.core.event_queue import EventQueue

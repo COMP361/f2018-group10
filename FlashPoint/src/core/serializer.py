@@ -110,6 +110,7 @@ class JSONSerializer(object):
 
     @staticmethod
     def _safe_dict(obj):
+        print(obj)
         if isinstance(obj, GameBoardModel):
             for tile in obj.tiles:
                 tile.reset_adjacencies()

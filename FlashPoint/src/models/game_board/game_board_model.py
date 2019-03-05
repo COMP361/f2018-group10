@@ -3,7 +3,7 @@ import random
 from typing import List, Tuple, Dict
 
 from src.models.game_board.edge_obstacle_model import EdgeObstacleModel
-from src.models.game_board.null_tile_model import NullTileModel
+from src.models.game_board.null_model import NullModel
 from src.models.game_units.poi_model import POIModel
 from src.models.game_board.tile_model import TileModel
 from src.constants.state_enums import GameKindEnum, SpaceKindEnum, SpaceStatusEnum, POIIdentityEnum, DirectionEnum, \
@@ -56,13 +56,6 @@ class GameBoardModel(object):
         """Create all tiles and set their adjacency. """
         tiles = []
 
-        # for i in range(self._dimensions[0]*self._dimensions[1]):
-        #     row = i % self._dimensions[0]
-        #     column = int(i / self._dimensions[0])
-        #     tile_kind = self._determine_tile_kind(row, column)
-        #     tile = TileModel(row, column, tile_kind)
-        #     tiles.append(tile)
-
         for i in range(self._dimensions[0]):
             tiles.append([])
             for j in range(self._dimensions[1]):
@@ -78,16 +71,15 @@ class GameBoardModel(object):
         for top, bottom in [(0, 1), (6, 7)]:
             for i in range(1, 9):
                 wall = WallModel()
-                tiles[top][i].set_adjacent_edge_obstacle(DirectionEnum.SOUTH, wall)
-                tiles[bottom][i].set_adjacent_edge_obstacle(DirectionEnum.NORTH, wall)
+                tiles[top][i].set_adjacent_edge_obstacle("South", wall)
+                tiles[bottom][i].set_adjacent_edge_obstacle("North", wall)
 
         # setting the left and right walls on the outside of the house
         for left, right in [(0, 1), (8, 9)]:
             for i in range(1, 7):
                 wall = WallModel()
-                tiles[i][left].set_adjacent_edge_obstacle(DirectionEnum.EAST, wall)
-                tiles[i][right].set_adjacent_edge_obstacle(DirectionEnum.WEST, wall)
-
+                tiles[i][left].set_adjacent_edge_obstacle("East", wall)
+                tiles[i][right].set_adjacent_edge_obstacle("West", wall)
 
         # setting the doors present on the outside of the house EXPLICITLY
         with open("media/board_layouts/outside_door_locations.json", "r") as f:
@@ -133,16 +125,15 @@ class GameBoardModel(object):
         first_dirn, second_dirn = adjacency['first_dirn'], adjacency['second_dirn']
         for coord, direction in [(first_pair, first_dirn), (second_pair, second_dirn)]:
             if direction == 'NORTH':
-                direction = DirectionEnum.NORTH
+                direction = "North"
             elif direction == 'EAST':
-                direction = DirectionEnum.EAST
+                direction = "East"
             elif direction == 'WEST':
-                direction = DirectionEnum.WEST
+                direction = "West"
             else:
-                direction = DirectionEnum.SOUTH
+                direction = "South"
 
             tiles[coord[0]][coord[1]].set_adjacent_edge_obstacle(direction, obstacle)
-
 
     def _init_all_tiles_experienced_classic(self):
         pass

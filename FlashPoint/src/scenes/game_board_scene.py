@@ -2,7 +2,6 @@ import json
 from datetime import datetime
 
 import pygame
-from src.core.networking import Networking
 from src.constants.change_scene_enum import ChangeSceneEnum
 from src.core.custom_event import CustomEvent
 

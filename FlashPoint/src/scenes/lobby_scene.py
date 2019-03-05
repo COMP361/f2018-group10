@@ -1,6 +1,7 @@
 import pygame
 
 import src.constants.color as Color
+from src.action_events.start_game_event import StartGameEvent
 from src.core.custom_event import CustomEvent
 from src.core.event_queue import EventQueue
 from src.action_events.ready_event import ReadyEvent
@@ -44,8 +45,7 @@ class LobbyScene(object):
         """Callback for when the host tries to start the game."""
         game = GameStateModel.instance()
         players_ready = len([player.status == PlayerStatusEnum.READY for player in game.players])
-        # TODO: change it back (==)
-        if not players_ready <= game.max_players:
+        if not players_ready == game.max_players:
             self.not_enough_players_ready_prompt()
             return
         # Perform the start game hook in Networking (ie. stop accepting new connections and kill broadcast)
