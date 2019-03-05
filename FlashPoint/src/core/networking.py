@@ -62,8 +62,8 @@ class Networking:
         return getattr(self.__instance, name)
 
     class NetworkingInner:
-        TIMEOUT_CONNECT = 10
-        TIMEOUT_RECEIVE = 10
+        TIMEOUT_CONNECT = 5
+        TIMEOUT_RECEIVE = 5
 
         stop_broadcast = threading.Event()
         stop_listen = threading.Event()
@@ -359,7 +359,8 @@ class Networking:
             # If it's a dummy event, don't do anything
             if isinstance(data, DummyEvent):
                 # print("Received dummy event")
-                return
+                Networking.get_instance().send_to_client(connection_object.address[0], data)
+                return super(MastermindServerUDP, self).callback_client_handle(connection_object, data)
 
             print(f"Client at {connection_object.address} sent a message: {data.__class__}")
             if isinstance(data, TurnEvent) or isinstance(data, ActionEvent):
@@ -398,7 +399,6 @@ class Networking:
             pass
 
     class Client(MastermindClientUDP):
-
         def __init__(self, timeout_connect=None, timeout_receive=None):
             super(MastermindClientUDP, self).__init__(MM_UDP, timeout_connect, timeout_receive)
             self._pause_receive = threading.Event()
@@ -423,6 +423,8 @@ class Networking:
             self._pause_receive.set()
             try:
                 super(MastermindClientUDP, self).send(JSONSerializer.serialize(data), compression)
+            except MastermindErrorClient:
+                self.callback_disconnect()
             except MastermindErrorSocket:
                 self.callback_disconnect()
             self._pause_receive.clear()
@@ -440,8 +442,7 @@ class Networking:
                             self._reply_queue.append(_server_reply)
                             self.callback_client_receive(_server_reply)
                     except MastermindErrorClient:
-                        print("It seems that client is not connected...")
-                        self.disconnect()
+                        self.callback_disconnect()
                     except OSError as e:
                         print(f"Error receiving data: {e}")
 
@@ -495,6 +496,6 @@ class Networking:
             Define callback here when client's connection to host is interrupted.
             :return:
             """
-            print("Client disconnected")
+            print("It seems that client is not connected...")
             self.disconnect()
 
