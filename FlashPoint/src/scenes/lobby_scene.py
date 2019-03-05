@@ -1,7 +1,6 @@
 import pygame
 
 import src.constants.color as Color
-from src.action_events.start_game_event import StartGameEvent
 from src.core.custom_event import CustomEvent
 from src.core.event_queue import EventQueue
 from src.action_events.ready_event import ReadyEvent
@@ -14,6 +13,7 @@ from src.UIComponents.text import Text
 from src.UIComponents.chat_box import ChatBox
 from src.constants.change_scene_enum import ChangeSceneEnum
 from src.core.networking import Networking
+from src.action_events.start_game_event import StartGameEvent
 
 
 class LobbyScene(object):
@@ -45,7 +45,8 @@ class LobbyScene(object):
         """Callback for when the host tries to start the game."""
         game = GameStateModel.instance()
         players_ready = len([player.status == PlayerStatusEnum.READY for player in game.players])
-        if not players_ready == game.max_players:
+        # TODO: change it back (==)
+        if not players_ready <= game.max_players:
             self.not_enough_players_ready_prompt()
             return
         # Perform the start game hook in Networking (ie. stop accepting new connections and kill broadcast)
@@ -65,7 +66,7 @@ class LobbyScene(object):
             self._current_player.status = PlayerStatusEnum.READY
             event = ReadyEvent(self._current_player)
             # TODO Tim or Francis implement waiting ready for all the other players and unreadying the players
-            if self._current_player.ip == Networking.get_instance().game.host.ip:
+            if self._current_player.ip == GameStateModel.instance().host.ip:
                 event.execute()
                 Networking.get_instance().send_to_all_client(event)
             else:
@@ -200,7 +201,7 @@ class LobbyScene(object):
 
         # game is mutated by reference, BE CAREFUL!!!
         if len(GameStateModel.instance().players) != self._player_count:
-            self._player_count = len(Networking.get_instance().game.players)
+            self._player_count = len(GameStateModel.instance().players)
             self.sprite_grp.empty()
             self._init_all(reuse=True)
 
