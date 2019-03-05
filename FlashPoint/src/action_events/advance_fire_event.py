@@ -156,6 +156,45 @@ class AdvanceFireEvent(ActionEvent):
                 should_stop = True
 
 
+    def flashover(self):
+        """
+        Convert all smokes adjacent to fires
+        to smokes.
+        """
+        all_smokes_converted = False
+        while not all_smokes_converted:
+            num_converted = 0
+            for tile in self.board.tiles:
+                # if the tile does not have smoke,
+                # skip this iteration
+                if tile.space_status != SpaceStatusEnum.SMOKE:
+                    continue
+
+                # tile has smoke:
+                # check if neighbour is not blocked by obstacle
+                # and neighbour is not null. if neighbour on fire,
+                # set current tile to fire.
+                for direction, nb_tile in tile.adjacent_tiles.items():
+                    if isinstance(nb_tile, NullModel):
+                        continue
+
+                    obstacle = tile.get_obstacle_in_direction(direction)
+                    if isinstance(obstacle, WallModel) and obstacle.wall_status != WallStatusEnum.DESTROYED:
+                        continue
+                    elif isinstance(obstacle, DoorModel) and obstacle.door_status == DoorStatusEnum.CLOSED:
+                        continue
+                    else:
+                        pass
+
+                    if nb_tile.space_status == SpaceStatusEnum.FIRE:
+                        tile.space_status = SpaceStatusEnum.FIRE
+                        num_converted += 1
+                        break
+
+            if num_converted == 0:
+                all_smokes_converted = True
+
+
     # def set_tile(self):
     #     self.initial_tile = self.board.get_tile_at(self.red_dice,
     #                                                self.black_dice)  # gets starting tile of advance fire.
