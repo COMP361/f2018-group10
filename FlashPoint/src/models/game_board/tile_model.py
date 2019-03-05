@@ -148,9 +148,9 @@ class TileModel(Model):
     def get_obstacle_in_direction(self, direction: str) -> Optional['EdgeObstacleModel']:
         """
         Get the EdgeObstacle model
-        :return: EdgeObstacleModel in the direction specified, or None.
+        :return: EdgeObstacleModel in the direction specified, or NullModel.
         """
-        return self._adjacent_edge_objects.get(direction, None)
+        return self._adjacent_edge_objects.get(direction, NullModel())
 
     def has_obstacle_in_direction(self, direction: str) -> bool:
         """
@@ -163,7 +163,7 @@ class TileModel(Model):
                 True otherwise
         """
         obstacle: EdgeObstacleModel = self.get_obstacle_in_direction(direction)
-        if not obstacle:
+        if isinstance(obstacle, NullModel):
             return False
         elif isinstance(obstacle, DoorModel) and obstacle.door_status == DoorStatusEnum.DESTROYED:
             return False
