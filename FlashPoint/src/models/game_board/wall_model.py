@@ -8,13 +8,18 @@ from src.observers.wall_observer import WallObserver
 
 class WallModel(EdgeObstacleModel):
     """Logical state of a Wall object."""
-    def __init__(self):
+    def __init__(self, x: int, y: int, direction: str):
         super().__init__()
         self._wall_status = WallStatusEnum.INTACT
+        self._id = (x, y, direction)
 
     @property
     def wall_status(self):
         return self._wall_status
+
+    @property
+    def id(self):
+        return self._id
 
     def inflict_damage(self):
         """
