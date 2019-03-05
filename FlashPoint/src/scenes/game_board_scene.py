@@ -45,7 +45,7 @@ class GameBoardScene(object):
         self.chat_box = ChatBox(GameStateModel.instance(), self._current_player)
         self.menu = None
         self._init_sprites()
-        self.choose_start_pos_controller = ChooseStartingPositionController(self)
+        self.choose_start_pos_controller = ChooseStartingPositionController(self, current_player)
 
     def _init_sprites(self):
         for i, player in enumerate(self._game.players):
@@ -127,9 +127,9 @@ class GameBoardScene(object):
 
 class ChooseStartingPositionController(object):
 
-    def __init__(self, game_scene: GameBoardScene):
+    def __init__(self, game_scene: GameBoardScene,player: PlayerModel):
         self.scene = game_scene
-
+        self.player = player
         """The offset of this rectlabel might be wickedly off, please someone has to check it"""
         self.choose_label = RectLabel(500, 250, 500, 150, Color.WHITE, 0,
                                       Text(pygame.font.SysFont('Agency FB', 20), "Choose starting position",

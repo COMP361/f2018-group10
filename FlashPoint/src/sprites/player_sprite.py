@@ -17,12 +17,12 @@ class PlayerSprite(pygame.sprite.Sprite, PlayerObserver):
         self.image = FileImporter.import_image(self.associated_png)
         self.tile = tile_sprite
         self.rect = self.tile.rect
+        self.associated_player = GameStateModel.instance().players_turn()
+        self.associated_player.super().add_observer(self)
 
-    @staticmethod
-    def _associate_image():
-        game_state = GameStateModel.instance()
-        curr_player = game_state.players_turn()
-        color = curr_player.color
+    def _associate_image(self):
+        
+        color = self.associated_player.color
 
         if color is Color.BLUE:
             return "media/all_markers/blueFighter.png"
@@ -57,5 +57,3 @@ class PlayerSprite(pygame.sprite.Sprite, PlayerObserver):
 
     def choose_starting_location(self):
         pass
-
-
