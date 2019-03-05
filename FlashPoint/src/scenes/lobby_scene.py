@@ -1,6 +1,7 @@
 import pygame
 
 import src.constants.color as Color
+from src.core.custom_event import CustomEvent
 from src.core.event_queue import EventQueue
 from src.action_events.ready_event import ReadyEvent
 from src.constants.state_enums import GameKindEnum, PlayerStatusEnum
@@ -33,7 +34,7 @@ class LobbyScene(object):
         self._init_all()
 
         if self._game.rules == GameKindEnum.EXPERIENCED:
-            self.buttonSelChar.on_click(pygame.event.post, pygame.event.Event(ChangeSceneEnum.CHARACTERSCENE, {}))
+            self.buttonSelChar.on_click(EventQueue.post, CustomEvent(ChangeSceneEnum.CHARACTERSCENE))
         if self._game.host.ip == self._current_player.ip:
             self.start_button.on_click(self.start_game)
         else:
@@ -56,8 +57,6 @@ class LobbyScene(object):
             print("Broadcast killed")
             Networking.get_instance().host.accepting_disallow()
             Networking.get_instance().send_to_all_client(StartGameEvent())
-        EventQueue.post(ChangeSceneEnum.GAMEBOARDSCENE)
-        # TODO: TEST
 
     def set_ready(self):
         """Set the status of the current player to ready."""
@@ -80,7 +79,7 @@ class LobbyScene(object):
     def _init_all(self, reuse=False):
         self._init_background()
         self._init_ip_addr()
-        self.chat_box = ChatBox(GameStateModel.instance(), self._current_player)
+        self.chat_box = ChatBox(self._current_player)
 
         if not reuse:
             self._init_btn_back(20, 20, "Exit", Color.STANDARDBTN, Color.BLACK)

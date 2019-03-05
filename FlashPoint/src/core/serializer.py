@@ -1,7 +1,10 @@
 import enum
 import json
+import threading
 from typing import Dict
 
+from src.models.game_board.game_board_model import GameBoardModel
+from src.action_events.start_game_event import StartGameEvent
 from src.action_events.ready_event import ReadyEvent
 from src.action_events.chat_event import ChatEvent
 from src.action_events.dummy_event import DummyEvent
@@ -17,6 +20,10 @@ class JSONSerializer(object):
     @staticmethod
     def _deserialize_game_state(payload: Dict) -> GameStateModel:
         """Deserialize a game state"""
+
+        GameStateModel.lock.acquire()
+        if GameStateModel.instance():
+            GameStateModel.__del__()
         host: PlayerModel = JSONSerializer.deserialize(payload['_host'])
         num_players = payload['_max_desired_players']
         rules = GameKindEnum(payload['_rules']["value"])
@@ -34,6 +41,9 @@ class JSONSerializer(object):
         game.max_damage = payload['_max_damage']
         game.victims_lost = payload['_victims_lost']
         game.victims_saved = payload['_victims_saved']
+
+        GameStateModel.set_game(game)
+        GameStateModel.lock.release()
 
         return game
 
@@ -90,6 +100,8 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_chat_event(payload)
         elif object_type == ReadyEvent.__name__:
             return JSONSerializer._deserialize_ready_event(payload)
+        elif object_type == StartGameEvent.__name__:
+            return StartGameEvent()
         elif object_type == DummyEvent.__name__:
             return DummyEvent()
 
@@ -97,6 +109,9 @@ class JSONSerializer(object):
 
     @staticmethod
     def _safe_dict(obj):
+        if isinstance(obj, GameBoardModel):
+            for tile in obj.tiles:
+                tile.reset_adjacencies()
         obj.__setattr__("class", type(obj).__name__)
         return obj.__dict__ if not isinstance(obj, enum.Enum) else {"name": type(obj).__name__, "value": obj.value}
 

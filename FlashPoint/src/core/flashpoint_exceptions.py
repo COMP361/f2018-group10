@@ -60,17 +60,17 @@ class NotEnoughAPException(FlashPointBaseException):
         super().__init__(message)
 
 
-class WallNotAdjacent(FlashPointBaseException):
+class ModelNotAdjacentException(FlashPointBaseException):
     """Class to tell you that the wall is not adjacent to the player's current space."""
 
-    def __init__(self, player_x: int, player_y: int):
-        message = f"The wall is not adjacent to the player located at ({player_x}, {player_y})."
+    def __init__(self, model_type: str, player_x: int, player_y: int):
+        message = f"The {model_type} is not adjacent to the player located at ({player_x}, {player_y})."
         super().__init__(message)
 
 
-class WallAlreadyDestroyed(FlashPointBaseException):
+class WallAlreadyDestroyedException(FlashPointBaseException):
     """Class to tell you that the wall cannot be chopped because it is already destroyed."""
 
-    def __init__(self, player_x: int, player_y: int):
-        message = f"The wall adjacent to the player located at ({player_x}, {player_y}) cannot be chopped because it is already destroyed."
+    def __init__(self):
+        message = "The given wall is already destroyed."
         super().__init__(message)

@@ -2,6 +2,7 @@ import pygame
 
 import src.constants.color as Color
 import src.constants.fonts as Font
+from src.core.custom_event import CustomEvent
 from src.core.event_queue import EventQueue
 from src.models.game_units.player_model import PlayerModel
 from src.UIComponents.rect_button import RectButton
@@ -26,7 +27,7 @@ class JoinScene(object):
         self._init_btn_back(20, 20, "Back", Color.STANDARDBTN, Color.BLACK)
         self._text_bar = self._init_text_bar(500, 350, 400, 32)
         self.error_msg = ""
-        self.buttonBack.on_click(EventQueue.post, ChangeSceneEnum.HOSTJOINSCENE)
+        self.buttonBack.on_click(EventQueue.post, CustomEvent(ChangeSceneEnum.HOSTJOINSCENE), player=self._current_player)
         self.buttonConnect.on_click(self.join)
 
     def join(self):
@@ -45,7 +46,7 @@ class JoinScene(object):
             reply = Networking.wait_for_reply()
             if reply:
                 GameStateModel.set_game(JSONSerializer.deserialize(reply))
-                EventQueue.post(ChangeSceneEnum.LOBBYSCENE)
+                EventQueue.post(CustomEvent(ChangeSceneEnum.LOBBYSCENE))
             else:
                 raise ConnectionError
         except ConnectionError:
@@ -108,14 +109,6 @@ class JoinScene(object):
         if self.error_msg:
             self.error_msg.update(event_queue)
 
-        # message = self._text_bar.text
-        # if message:
-        #     data = {'ip': self._text_bar.message}
-        #     join_event = pygame.event.Event(CustomEvents.JOIN, **data)
-        #     pygame.event.post(join_event)
-        #     self._text_bar.text = ''
-
     @property
     def text_bar_msg(self):
-        #return self._text_bar.message
         return self._text_bar.text
