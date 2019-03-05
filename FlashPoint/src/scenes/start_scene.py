@@ -95,6 +95,7 @@ class StartScene(object):
                                     txt_obj=(Text(pygame.font.SysFont('Agency FB', 24), msg, color.RED)))
         error_msg_label.set_transparent_background(True)
         self.error_msg = error_msg_label
+
 # ------------ Stuff for profiles and start scene ------------ #
 
     def update_profiles(self):
@@ -105,7 +106,7 @@ class StartScene(object):
             temp = json.load(myFile)
             for i, user in enumerate(temp):
                 player: PlayerModel = JSONSerializer.deserialize(user)
-                self.profile.set_profile(i, player.nickname, EventQueue.post, CustomEvent(ChangeSceneEnum.HOSTJOINSCENE, player=player))
+                self.profile.set_profile(i, player.nickname,player.wins,player.losses, EventQueue.post, CustomEvent(ChangeSceneEnum.HOSTJOINSCENE, player=player))
                 self.profile.remove_profile_callback(i, self.remove_profile, player.nickname)
 
     def create_profile(self, text_bar: InputBox):
@@ -120,13 +121,19 @@ class StartScene(object):
             if not text_bar.text.strip():
                 return
 
+            size = len(text_bar.text.strip())
+
+            if size <= 12:
             # Create a player model
-            player_model = PlayerModel(
-                ip=Networking.get_instance().get_ip(),
-                nickname=text_bar.text.strip()
-            )
-            player = JSONSerializer.serialize(player_model)
-            temp.append(player)
+                player_model = PlayerModel(
+                    ip=Networking.get_instance().get_ip(),
+                    nickname=text_bar.text.strip()
+                )
+                player = JSONSerializer.serialize(player_model)
+                temp.append(player)
+            else:
+                msg = "Nickname must have less than 12 letters"
+                self.init_error_message(msg)
 
         with open(self.profiles, mode='w', encoding='utf-8') as myFile:
             json.dump(temp, myFile)
