@@ -1,6 +1,7 @@
 import pygame
 
 import src.constants.color as Color
+from src.core.custom_event import CustomEvent
 from src.core.event_queue import EventQueue
 from src.models.game_units.player_model import PlayerModel
 from src.models.game_state_model import GameStateModel
@@ -34,7 +35,7 @@ class CreateGameMenu(Scene):
     def create_new_game(self, game_kind: GameKindEnum):
         """Instantiate a new family game and move to the lobby scene."""
         GameStateModel(self._current_player, 6, game_kind)
-        EventQueue.post(ChangeSceneEnum.LOBBYSCENE)
+        EventQueue.post(CustomEvent(ChangeSceneEnum.LOBBYSCENE))
 
     # ----------------------------------------------- #
 

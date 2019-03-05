@@ -168,3 +168,6 @@ class TileModel(Model):
     @visited.setter
     def visited(self, visit_status: bool):
         self._visited = visit_status
+
+    def reset_adjacencies(self):
+        self._adjacent_tiles = {}

@@ -60,11 +60,11 @@ class NotEnoughAPException(FlashPointBaseException):
         super().__init__(message)
 
 
-class WallNotAdjacent(FlashPointBaseException):
+class ModelNotAdjacent(FlashPointBaseException):
     """Class to tell you that the wall is not adjacent to the player's current space."""
 
-    def __init__(self, player_x: int, player_y: int):
-        message = f"The wall is not adjacent to the player located at ({player_x}, {player_y})."
+    def __init__(self, model_type: str, player_x: int, player_y: int):
+        message = f"The {model_type} is not adjacent to the player located at ({player_x}, {player_y})."
         super().__init__(message)
 
 

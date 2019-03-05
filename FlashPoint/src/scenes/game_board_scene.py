@@ -2,6 +2,9 @@ import json
 from datetime import datetime
 
 import pygame
+from src.core.networking import Networking
+from src.constants.change_scene_enum import ChangeSceneEnum
+from src.core.custom_event import CustomEvent
 
 from src.UIComponents.chat_box import ChatBox
 from src.UIComponents.menu_window import MenuWindow
@@ -33,7 +36,7 @@ class GameBoardScene(object):
 
         self.active_sprites = pygame.sprite.Group()   # Maybe add separate groups for different things later
         self.game_board = GameBoard()
-        self.chat_box = ChatBox(GameStateModel.instance(), self._current_player)
+        self.chat_box = ChatBox(self._current_player)
         self.menu = None
         self._init_sprites()
 
@@ -59,6 +62,10 @@ class GameBoardScene(object):
 
         self.menu.close()
 
+    def _quit_btn_on_click(self):
+        Networking.get_instance().disconnect()
+        EventQueue.post(CustomEvent(ChangeSceneEnum.STARTSCENE))
+
     # Example of how to use the MenuClass YOU NEED TO MAKE ALL YOUR BUTTONS EXTEND INTERACTABLE!!!!!!!!!!!!!!!!!
     def _init_menu_button(self):
         btn = RectButton(0, 0, 30, 30, background=Color.GREEN, txt_obj=Text(pygame.font.SysFont('Arial', 23), ""))
@@ -80,6 +87,7 @@ class GameBoardScene(object):
         # cross = pygame.image.load("media/GameHud/cross.png")
 
         back_btn.on_click(menu.close)
+        quit_btn.on_click(self._quit_btn_on_click)
         save_btn.on_click(self._save)
 
         menu.add_component(back_btn)
@@ -101,10 +109,10 @@ class GameBoardScene(object):
 
     def update(self, event_queue: EventQueue):
         """Call the update() function of everything in this class."""
+
+        self.chat_box.update(event_queue)
         self.game_board.update(event_queue)
         self.game_board.update(event_queue)
         self.active_sprites.update(event_queue)
         if self.menu and not self.menu.is_closed:
             self.menu.update(event_queue)
-
-        self.chat_box.update(event_queue)
