@@ -16,3 +16,6 @@ class Move(ActionEvent):
     def check_valid(self):
         num_ap = self.player.ap
         curr_location = [self.player.x_pos, self.player.y_pos]
+
+    def execute(self):
+        pass
