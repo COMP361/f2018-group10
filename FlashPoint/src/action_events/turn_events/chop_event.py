@@ -2,7 +2,7 @@ from src.action_events.turn_events.turn_event import TurnEvent
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 from src.models.game_board.wall_model import WallModel
-from src.core.flashpoint_exceptions import NotEnoughAPException, ModelNotAdjacent, WallAlreadyDestroyed
+from src.core.flashpoint_exceptions import NotEnoughAPException, ModelNotAdjacentException, WallAlreadyDestroyedException
 from src.constants.state_enums import WallStatusEnum
 
 
@@ -20,22 +20,15 @@ class ChopEvent(TurnEvent):
 
         player_tile = game.game_board.get_tile_at(fireman.x_pos, fireman.y_pos)
 
-        if wall not in player_tile.adjacent_edge_objects:
-            raise ModelNotAdjacent("wall", fireman.x_pos, fireman.y_pos)
+        if wall not in player_tile.adjacent_edge_objects.values():
+            raise ModelNotAdjacentException("wall", fireman.x_pos, fireman.y_pos)
 
         wall_status = wall.wall_status
         if wall_status == WallStatusEnum.DESTROYED:
-            raise WallAlreadyDestroyed(fireman.x_pos, fireman.y_pos)
+            raise WallAlreadyDestroyedException()
         # TODO: End here
 
-        if wall_status == WallStatusEnum.INTACT:
-            wall.damage_wall()
-
-        elif wall_status == WallStatusEnum.DAMAGED:
-            wall.destroy_wall()
-
-        else:
-            pass
+        wall.inflict_damage()
 
         fireman.ap = fireman.ap - 2
         game.damage = game.damage + 1

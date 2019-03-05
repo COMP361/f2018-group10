@@ -24,7 +24,7 @@ class GameBoardModel(object):
         self._poi_bank = GameBoardModel._init_pois()
         self._active_pois = []
 
-    def get_tiles(self):
+    def get_tiles(self) -> List[List[TileModel]]:
         return self._tiles
 
     @property

@@ -208,7 +208,3 @@ class GameStateModel(Model):
         elif self._state == GameStateEnum.WON:
             # TODO: More stuff here for what is supposed to happen when the game is won.
             pass
-
-    def game_lost(self):
-        self._state = GameStateEnum.LOST
-        # TODO: More stuff here for what is supposed to happen when the game ends.
