@@ -33,5 +33,6 @@ class JoinEvent(ActionEvent):
                     continue
             if color_available:
                 self.player.color = colors[color]
+                break
 
         GameStateModel.instance().add_player(self.player)

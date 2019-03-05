@@ -32,7 +32,7 @@ class Spritesheet(object):
     def _image_at(self, rect):
         """Return a surface image for a specific Rect area."""
         rect = pygame.Rect(rect)
-        image = pygame.Surface(rect.size).convert_alpha()
+        image = pygame.Surface(rect.size)
         image.blit(self._sheet, (0, 0), rect)
         return image
 

@@ -1,8 +1,11 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
+
 from src.observers.observer import Observer
 
 
-class TileObserver(Observer,ABC):
+class TileObserver(Observer):
+    """ABC for classes concerned with getting tile state."""
 
-
-    pass
+    @abstractmethod
+    def tile_status_changed(self):
+        pass

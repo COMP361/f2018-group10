@@ -15,12 +15,11 @@ from src.models.game_units.player_model import PlayerModel
 
 
 class ChatBox:
-    def __init__(self, game: GameStateModel, current_player: PlayerModel):
-        self.chat_history = game.chat_history
+    def __init__(self, current_player: PlayerModel):
+        self.chat_history = GameStateModel.instance().chat_history
         self.group = pg.sprite.Group()
         self._init_chatbox()
         self.to_be_renamed = []
-        self.game = game
         self.current_player = current_player
 
     def _init_chatbox(self):
@@ -60,15 +59,10 @@ class ChatBox:
         self.chat_textbox.update(event_queue)
         message = self.chat_textbox.message
         if message:
-            # self.chat_history.append(self.chat_textbox.message)
-            # Commenting this line prevents message from being shown twice
-            # self.game.add_chat_message(self.chat_textbox.message, self.current_player.nickname)
             chat_event = ChatEvent(self.chat_textbox.message, self.current_player.nickname)
 
-            # TODO MAKE THIS A UTILITY IN NETWORKING
             if self.current_player.ip == GameStateModel.instance().host.ip:
                 Networking.get_instance().send_to_all_client(chat_event)
-                chat_event.execute()
             else:
                 Networking.get_instance().client.send(chat_event)
 
