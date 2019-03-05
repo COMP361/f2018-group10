@@ -359,7 +359,6 @@ class Networking:
             # If it's a dummy event, don't do anything
             if isinstance(data, DummyEvent):
                 # print("Received dummy event")
-                Networking.get_instance().send_to_client(connection_object.address[0], data)
                 return super(MastermindServerUDP, self).callback_client_handle(connection_object, data)
 
             print(f"Client at {connection_object.address} sent a message: {data.__class__}")
