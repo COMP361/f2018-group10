@@ -11,6 +11,7 @@ from src.models.game_units.player_model import PlayerModel
 class KnockDownEvent(ActionEvent):
 
     def __init__(self, player: PlayerModel):
+        super().__init__()
         self.player = player
 
     def execute(self):

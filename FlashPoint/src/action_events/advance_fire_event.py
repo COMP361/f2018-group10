@@ -1,6 +1,7 @@
 from src.action_events.action_event import ActionEvent
 from src.action_events.turn_events.knock_down_event import KnockDownEvent
-from src.constants.state_enums import WallStatusEnum, SpaceStatusEnum, SpaceKindEnum, VictimStateEnum, DoorStatusEnum
+from src.constants.state_enums import WallStatusEnum, SpaceStatusEnum, SpaceKindEnum, VictimStateEnum, DoorStatusEnum, \
+    POIStatusEnum
 from src.models.game_board.door_model import DoorModel
 from src.models.game_board.game_board_model import GameBoardModel
 from src.models.game_board.null_model import NullModel
@@ -33,41 +34,9 @@ class AdvanceFireEvent(ActionEvent):
         # Change state of tile depending on previous state
         self.initial_tile = self.board.get_tile_at(self.red_dice, self.black_dice)
         self.advance_on_tile(self.initial_tile)
-        # self.initial_tile.visited = True
-        # initial_tile_status = self.initial_tile.space_status
-
-        # If any fires adjacent to the tile, place Fire on the tile.
-        # for nb_tile in self.initial_tile.adjacent_tiles.values():
-        #     if nb_tile and nb_tile.space_status == SpaceStatusEnum.FIRE:
-        #         self.initial_tile.space_status = SpaceStatusEnum.FIRE
-        #         return
-
-        # # Safe -> Smoke
-        # if initial_tile_status == SpaceStatusEnum.SAFE:
-        #     self.initial_tile.space_status = SpaceStatusEnum.SMOKE
-        #
-        # # Smoke -> Fire
-        # elif initial_tile_status == SpaceStatusEnum.SMOKE:
-        #     self.initial_tile.space_status = SpaceStatusEnum.FIRE
-        #
-        # # Fire -> Explosion
-        # else:
-        #     self.explosion(self.initial_tile)
-
         # TODO: reset every tile's visit status
-
-
-        # next step is to determine what that tile contains.
-        # self.set_tile()
-        self.check_associated_models(self.initial_tile)
-        status = self.initial_tile.space_status()
-        # if status is SpaceStatusEnum.SAFE or status is SpaceStatusEnum.SMOKE:
-        #     self.initial_tile.space_status = SpaceStatusEnum.FIRE
-
-        # elif status is SpaceStatusEnum.FIRE:
-        #     self.explosion()
-
-        self.flash_over()
+        self.flashover()
+        self.affect_damages()
 
 
     def advance_on_tile(self, target_tile: TileModel):
@@ -195,9 +164,30 @@ class AdvanceFireEvent(ActionEvent):
                 all_smokes_converted = True
 
 
-    # def set_tile(self):
-    #     self.initial_tile = self.board.get_tile_at(self.red_dice,
-    #                                                self.black_dice)  # gets starting tile of advance fire.
+    def affect_damages(self):
+        """
+        Affect any valid damages to firemen,
+        victims, POIs
+        """
+        for tile in self.board.tiles:
+            assoc_models = tile.associated_models
+            tile_status = tile.space_status
+            if tile_status != SpaceStatusEnum.FIRE:
+                continue
+
+            for model in assoc_models:
+                if isinstance(model, PlayerModel):
+                    KnockDownEvent(model).execute()
+
+                elif isinstance(model, VictimModel):
+                    self.game_state.victims_lost += 1
+                    model: VictimModel = model
+                    model.state = VictimStateEnum.LOST
+
+                elif isinstance(model, POIModel):
+                    model.reveal()
+
+
 
     def check_associated_models(self, tile: TileModel):
         assoc_models = tile.associated_models()
@@ -206,7 +196,7 @@ class AdvanceFireEvent(ActionEvent):
                 KnockDownEvent(model).execute()
 
             elif isinstance(model, VictimModel):
-                self.game_state.victims_lost = self.game_state.victims_lost + 1
+                self.game_state.victims_lost += 1
                 model: VictimModel = model
                 model.state = VictimStateEnum.LOST
 
@@ -224,18 +214,18 @@ class AdvanceFireEvent(ActionEvent):
     #     for d in list_directions:
     #         self.advance(d, self.initial_tile)
 
-    def flash_over(self):
-        directions = ["North", "West", "South", "East"]
-        all_tiles = self.board.get_tiles()
-        for tile in all_tiles:  # go through all tiles of the board
-            if tile.space_kind is SpaceKindEnum.INDOOR:  # check if it is indoors
-                if tile.space_status is SpaceStatusEnum.SMOKE:
-                    for d in directions:  # loop in all directions
-                        adj_tile = tile.get_tile_in_direction(d)  # get adjacent tile
-                        if adj_tile.space_status() is SpaceStatusEnum.FIRE:  # if adacent tile is fire, place this
-                            # tile's smoke status to fire status.
-                            tile.space_status = SpaceStatusEnum.FIRE  # set to fire
-                            break  # break or else we are looping for nothing
+    # def flash_over(self):
+    #     directions = ["North", "West", "South", "East"]
+    #     all_tiles = self.board.get_tiles()
+    #     for tile in all_tiles:  # go through all tiles of the board
+    #         if tile.space_kind is SpaceKindEnum.INDOOR:  # check if it is indoors
+    #             if tile.space_status is SpaceStatusEnum.SMOKE:
+    #                 for d in directions:  # loop in all directions
+    #                     adj_tile = tile.get_tile_in_direction(d)  # get adjacent tile
+    #                     if adj_tile.space_status() is SpaceStatusEnum.FIRE:  # if adacent tile is fire, place this
+    #                         # tile's smoke status to fire status.
+    #                         tile.space_status = SpaceStatusEnum.FIRE  # set to fire
+    #                         break  # break or else we are looping for nothing
 
     def advance(self, d: str, tile: TileModel):
         self.check_associated_models(tile)

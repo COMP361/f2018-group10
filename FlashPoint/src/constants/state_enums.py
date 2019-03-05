@@ -36,7 +36,7 @@ class PlayerStatusEnum(Enum):
 class POIStatusEnum(Enum):
     HIDDEN = auto()
     REVEALED = auto()
-
+    LOST = auto()
 
 class POIIdentityEnum(Enum):
     VICTIM = auto()
