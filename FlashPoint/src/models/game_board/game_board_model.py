@@ -94,7 +94,6 @@ class GameBoardModel(object):
                 tiles[i][left].set_adjacent_edge_obstacle(DirectionEnum.EAST, wall)
                 tiles[i][right].set_adjacent_edge_obstacle(DirectionEnum.WEST, wall)
 
-
         # setting the doors present on the outside of the house EXPLICITLY
         with open("media/board_layouts/outside_door_locations.json", "r") as f:
             outside_doors = json.load(f)
@@ -131,7 +130,6 @@ class GameBoardModel(object):
                 direction = DirectionEnum.SOUTH
 
             tiles[coord[0]][coord[1]].set_adjacent_edge_obstacle(direction, obstacle)
-
 
     def _init_all_tiles_experienced_classic(self):
         pass

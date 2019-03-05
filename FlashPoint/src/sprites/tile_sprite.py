@@ -1,3 +1,5 @@
+from typing import Tuple
+
 import pygame
 
 import src.constants.color as Color
@@ -31,6 +33,10 @@ class TileSprite(Interactable):
         else:
             return False
 
+    """TODO: is clicked"""
+    def is_clicked(self):
+        return self.hover() and pygame.mouse.get_pressed()[0] #check if left click
+
     def enable(self):
         """
         Enables the event hook
@@ -45,12 +51,12 @@ class TileSprite(Interactable):
         """
         self._is_enabled = False
 
-    def _highlight(self):
+    def _highlight(self, color: Tuple[int, int, int, float]):
         if self.hover() and self._is_enabled:
             if not self.is_hovered:
                 self.is_hovered = True
                 hover = pygame.Surface((self._backup_image.get_width(), self._backup_image.get_height()), pygame.SRCALPHA)
-                hover.fill((255, 255, 0, 128))
+                hover.fill(color)
                 self.image.blit(hover, (0, 0))
         else:
             self.image.blit(self._backup_image, (0, 0))
@@ -70,7 +76,7 @@ class TileSprite(Interactable):
         self._mouse_pos = current_mouse_pos
 
     def draw(self, screen: pygame.Surface):
-        self._highlight()
+        self._highlight((235, 235, 9, 0.5))
         self.sprite_grp.draw(self.image)
         screen.blit(self.image, self.rect)
 
