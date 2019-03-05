@@ -21,8 +21,8 @@ class JSONSerializer(object):
     def _deserialize_game_state(payload: Dict) -> GameStateModel:
         """Deserialize a game state"""
 
+        GameStateModel.lock.acquire()
         if GameStateModel.instance():
-            GameStateModel.lock.acquire()
             GameStateModel.__del__()
         host: PlayerModel = JSONSerializer.deserialize(payload['_host'])
         num_players = payload['_max_desired_players']
