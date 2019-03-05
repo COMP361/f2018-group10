@@ -3,6 +3,7 @@ from src.action_events.turn_events.knock_down_event import KnockDownEvent
 from src.constants.state_enums import WallStatusEnum, SpaceStatusEnum, SpaceKindEnum, VictimStateEnum, DoorStatusEnum
 from src.models.game_board.door_model import DoorModel
 from src.models.game_board.game_board_model import GameBoardModel
+from src.models.game_board.null_model import NullModel
 from src.models.game_board.tile_model import TileModel
 from src.models.game_board.wall_model import WallModel
 from src.models.game_state_model import GameStateModel
@@ -86,18 +87,35 @@ class AdvanceFireEvent(ActionEvent):
 
 
     def explosion(self, origin_tile: TileModel):
-        for direction in self.directions:
+        for direction, obstacle in origin_tile.adjacent_edge_objects.items():
+            # fire does not move to the neighbouring tile
+            # damaging wall present along the tile
+            if isinstance(obstacle, WallModel) and obstacle.wall_status != WallStatusEnum.DESTROYED:
+                obstacle.inflict_damage()
+                self.game_state.damage += 1
+                if not origin_tile.has_obstacle_in_direction(direction):
+                    origin_tile.set_adjacent_edge_obstacle(direction, NullModel())
 
-            nb_tile: TileModel = origin_tile.get_tile_in_direction(direction)
-            if nb_tile:
-                if nb_tile.space_status == SpaceStatusEnum.FIRE:
-                    self.shockwave()
-                else:
-                    nb_tile.space_status = SpaceStatusEnum.FIRE
+            # fire does not move to the neighbouring tile
+            # removing door that borders the tile
+            elif isinstance(obstacle, DoorModel):
+                obstacle.destroy_door()
+                origin_tile.set_adjacent_edge_obstacle(direction, NullModel())
+
+            # fire can move to the neighbouring tile
+            # if the neighbouring tile is on fire, a shockwave is created
+            # else it is just set on fire.
+            else:
+                nb_tile = origin_tile.get_tile_in_direction(direction)
+                if nb_tile:
+                    if nb_tile.space_status == SpaceStatusEnum.FIRE:
+                        self.shockwave(nb_tile, direction)
+                    else:
+                        nb_tile.space_status = SpaceStatusEnum.FIRE
 
 
 
-    def shockwave(self):
+    def shockwave(self, tile: TileModel, direction: str):
         pass
     # def set_tile(self):
     #     self.initial_tile = self.board.get_tile_at(self.red_dice,
@@ -148,12 +166,12 @@ class AdvanceFireEvent(ActionEvent):
         if isinstance(obstacle, WallModel):
             status = obstacle.wall_status()
             if status is WallStatusEnum.INTACT:  # checks whether wall is intact
-                obstacle.damage_wall()  # make it damaged.
+                obstacle.inflict_damage()  # make it damaged.
                 damage = self.game_state.damage
                 self.game_state.damage = damage + 1  # increment damage count.
 
             elif status is WallStatusEnum.DAMAGED:  # checks if wall is damaged
-                obstacle.destroy_wall()
+                obstacle.inflict_damage()
                 damage = self.game_state.damage
                 self.game_state.damage = damage + 1  # increment damage count
 
