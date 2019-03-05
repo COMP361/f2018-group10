@@ -19,6 +19,7 @@ class TileModel(Model):
         self._space_status = SpaceStatusEnum.SAFE
         self._is_hotspot = False
         self._associated_models = []
+        self._visited = False
 
         self._adjacent_tiles = {
             "North": NullModel(),
@@ -159,3 +160,11 @@ class TileModel(Model):
     def remove_associated_model(self, model: Model):
         """CAUTION: YOUR MODEL MUST HAVE AN __EQ__ METHOD DEFINED FOR THIS TO WORK AS EXPECTED"""
         self._associated_models.remove(model)
+
+    @property
+    def visited(self):
+        return self._visited
+
+    @visited.setter
+    def visited(self, visit_status: bool):
+        self._visited = visit_status

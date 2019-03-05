@@ -173,8 +173,7 @@ class GameStateModel(Model):
     def damage(self, damage: int):
         self._damage = damage
         if self._damage >= self.max_damage:
-            game: GameStateModel = GameStateModel.instance()
-            game.state = GameStateEnum.LOST
+            self.state = GameStateEnum.LOST
 
     @property
     def max_damage(self) -> int:

@@ -18,31 +18,90 @@ class AdvanceFireEvent(ActionEvent):
         self.game_state: GameStateModel = GameStateModel.instance()
         self.board: GameBoardModel = self.game_state.game_board
         self.initial_tile: TileModel = None
-        self._red_dice = None
-        self._black_dice = None
+        self.red_dice = None
+        self.black_dice = None
+        self.directions = ["North", "South", "East", "West"]
 
     def execute(self, *args, **kwargs):
-        # Pick random location
-        if not self._red_dice:
-            # roll dice
-            self._red_dice = self.game_state.roll_red_dice
-        if not self._black_dice:
-            self._black_dice = self.game_state.roll_black_dice
+        # Pick random location: roll dice
+        if not self.red_dice:
+            self.red_dice = self.game_state.roll_red_dice()
+        if not self.black_dice:
+            self.black_dice = self.game_state.roll_black_dice()
+
+        # Change state of tile depending on previous state
+        self.initial_tile = self.board.get_tile_at(self.red_dice, self.black_dice)
+        self.advance_on_tile(self.initial_tile)
+        # self.initial_tile.visited = True
+        # initial_tile_status = self.initial_tile.space_status
+
+        # If any fires adjacent to the tile, place Fire on the tile.
+        # for nb_tile in self.initial_tile.adjacent_tiles.values():
+        #     if nb_tile and nb_tile.space_status == SpaceStatusEnum.FIRE:
+        #         self.initial_tile.space_status = SpaceStatusEnum.FIRE
+        #         return
+
+        # # Safe -> Smoke
+        # if initial_tile_status == SpaceStatusEnum.SAFE:
+        #     self.initial_tile.space_status = SpaceStatusEnum.SMOKE
+        #
+        # # Smoke -> Fire
+        # elif initial_tile_status == SpaceStatusEnum.SMOKE:
+        #     self.initial_tile.space_status = SpaceStatusEnum.FIRE
+        #
+        # # Fire -> Explosion
+        # else:
+        #     self.explosion(self.initial_tile)
+
+        # TODO: reset every tile's visit status
+
+
         # next step is to determine what that tile contains.
-        self.set_tile()
+        # self.set_tile()
         self.check_associated_models(self.initial_tile)
         status = self.initial_tile.space_status()
-        if status is SpaceStatusEnum.SAFE or status is SpaceStatusEnum.SMOKE:
-            self.initial_tile.space_status = SpaceStatusEnum.FIRE
+        # if status is SpaceStatusEnum.SAFE or status is SpaceStatusEnum.SMOKE:
+        #     self.initial_tile.space_status = SpaceStatusEnum.FIRE
 
-        elif status is SpaceStatusEnum.FIRE:
-            self.explosion()
+        # elif status is SpaceStatusEnum.FIRE:
+        #     self.explosion()
 
         self.flash_over()
 
-    def set_tile(self):
-        self.initial_tile = self.board.get_tile_at(self._red_dice,
-                                                   self._black_dice)  # gets starting tile of advance fire.
+
+    def advance_on_tile(self, target_tile: TileModel):
+        target_tile.visited = True
+        tile_status = target_tile.space_status
+        # Safe -> Smoke
+        if tile_status == SpaceStatusEnum.SAFE:
+            target_tile.space_status = SpaceStatusEnum.SMOKE
+
+        # Smoke -> Fire
+        elif tile_status == SpaceStatusEnum.SMOKE:
+            target_tile.space_status = SpaceStatusEnum.FIRE
+
+        # Fire -> Explosion
+        else:
+            self.explosion(target_tile)
+
+
+    def explosion(self, origin_tile: TileModel):
+        for direction in self.directions:
+
+            nb_tile: TileModel = origin_tile.get_tile_in_direction(direction)
+            if nb_tile:
+                if nb_tile.space_status == SpaceStatusEnum.FIRE:
+                    self.shockwave()
+                else:
+                    nb_tile.space_status = SpaceStatusEnum.FIRE
+
+
+
+    def shockwave(self):
+        pass
+    # def set_tile(self):
+    #     self.initial_tile = self.board.get_tile_at(self.red_dice,
+    #                                                self.black_dice)  # gets starting tile of advance fire.
 
     def check_associated_models(self, tile: TileModel):
         assoc_models = tile.associated_models()
@@ -62,12 +121,12 @@ class AdvanceFireEvent(ActionEvent):
             else:
                 pass
 
-    def explosion(self):
-        # fire has to go in all 4 directions:
-        # NORTH, WEST, SOUTH, EAST
-        list_directions = ["North", "West", "South", "East"]
-        for d in list_directions:
-            self.advance(d, self.initial_tile)
+    # def explosion(self):
+    #     # fire has to go in all 4 directions:
+    #     # NORTH, WEST, SOUTH, EAST
+    #     list_directions = ["North", "West", "South", "East"]
+    #     for d in list_directions:
+    #         self.advance(d, self.initial_tile)
 
     def flash_over(self):
         directions = ["North", "West", "South", "East"]
