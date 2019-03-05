@@ -2,12 +2,12 @@ from typing import Tuple
 
 import pygame
 
-import src.constants.color as Color
 from src.UIComponents.interactable import Interactable
 from src.core.event_queue import EventQueue
+from src.observers.tile_observer import TileObserver
 
 
-class TileSprite(Interactable):
+class TileSprite(Interactable,TileObserver):
     """Graphical representation of a Tile and controls."""
     def __init__(self, image: pygame.Surface, x, y, x_offset, y_offset):
         self.index = 0
@@ -83,3 +83,6 @@ class TileSprite(Interactable):
     def update(self, event_queue: EventQueue):
         self.sprite_grp.update(event_queue)
         self._scroll()
+
+    #def highlight_adjacent(self,current:TileModel):
+

@@ -7,7 +7,7 @@ from src.observers.door_observer import DoorObserver
 
 class DoorModel(EdgeObstacleModel):
 
-    def __init__(self, door_status: DoorStatusEnum=DoorStatusEnum.CLOSED):
+    def __init__(self, door_status: DoorStatusEnum = DoorStatusEnum.CLOSED):
         super().__init__()
         self._door_status = door_status
 

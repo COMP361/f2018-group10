@@ -39,8 +39,6 @@ class SceneManager(object):
         self.screen = screen
         self._active_scene = StartScene(self.screen)
         self._current_player = None
-        # self._game = None
-        # self._active_scene.buttonRegister.on_click(self.create_profile, self._active_scene.text_bar1)
         self.update_profiles()
 
     def next(self, next_scene: callable, *args):
@@ -62,42 +60,6 @@ class SceneManager(object):
         # Step two: Set the buttons.
         if isinstance(self._active_scene, StartScene):
             self.update_profiles()
-        #    self._active_scene.buttonRegister.on_click(self.create_profile, self._active_scene.text_bar1)
-
-        # if isinstance(self._active_scene, HostJoinScene):
-        #     self._active_scene.buttonJoin.on_click(self.next, JoinScene, self._current_player)
-        #     self._active_scene.buttonHost.on_click(self.host, HostMenuScene, self._current_player)
-        #     self._active_scene.buttonBack.on_click(self.next, StartScene)
-
-        # if isinstance(self._active_scene, JoinScene):
-        #     self._active_scene.buttonBack.on_click(self.next, HostJoinScene, self._current_player)
-        #     self._active_scene.buttonConnect.on_click(self.join)
-
-        # if isinstance(self._active_scene, HostMenuScene):
-        #     self._active_scene.buttonBack.on_click(self.disconnect, HostJoinScene, self._current_player)
-        #     self._active_scene.buttonNewGame.on_click(self.next, CreateGameMenu, self._current_player)
-        #     self._active_scene.buttonLogin.on_click(self.next, LoadGame, self._current_player)
-
-        # if isinstance(self._active_scene, CreateGameMenu):
-        #     self._active_scene.buttonBack.on_click(self.disconnect, HostJoinScene, self._current_player)
-        #     self._active_scene.buttonExp.on_click(self.create_new_game, GameKindEnum.EXPERIENCED)
-        #     self._active_scene.buttonFamily.on_click(self.create_new_game, GameKindEnum.FAMILY)
-
-        # if isinstance(self._active_scene, CharacterScene):
-        #     self._active_scene.buttonBack.on_click(self.next, LobbyScene, self._current_player, self._game)
-        #     self._active_scene.buttonConfirm.on_click(self.next, LobbyScene, self._current_player, self._game)
-
-        # if isinstance(self._active_scene, LoadGame):
-        #     self._active_scene.buttonBack.on_click(self.next, HostMenuScene, self._current_player)
-
-        # if isinstance(self._active_scene, LobbyScene):
-        #     if self._game.rules == GameKindEnum.EXPERIENCED:
-        #         self._active_scene.buttonSelChar.on_click(self.next, CharacterScene, self._current_player)
-        #     if Networking.get_instance().game.host.ip == self._current_player.ip:
-        #         self._active_scene.start_button.on_click(self.start_game)
-        #     else:
-        #         self._active_scene.buttonReady.on_click(self.set_ready)
-        #     self._active_scene.buttonBack.on_click(self.disconnect, HostJoinScene, self._current_player)
 
         FileImporter.play_audio("media/soundeffects/ButtonClick.wav", fade_ms=10)
 
@@ -129,11 +91,6 @@ class SceneManager(object):
                     self.next(LobbyScene, self._current_player)
                 elif event == ChangeSceneEnum.GAMEBOARDSCENE:
                     self.next(GameBoardScene, self._current_player)
-        # self._active_scene.update(event_queue)
-        # if isinstance(self._active_scene, GameBoardScene):
-        #     self._active_scene.quit_btn.on_click(self.disconnect, StartScene)
-        # for event in event_queue:
-        #     self.handle_event(event)
      
     # ------------ Stuff for profiles and start scene ------------ #
 

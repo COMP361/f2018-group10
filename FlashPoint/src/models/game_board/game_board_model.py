@@ -3,11 +3,11 @@ import random
 from typing import List, Tuple, Dict
 
 from src.models.game_board.edge_obstacle_model import EdgeObstacleModel
-from src.models.game_board.null_tile_model import NullTileModel
+from src.models.game_board.null_model import NullModel
 from src.models.game_units.poi_model import POIModel
 from src.models.game_board.tile_model import TileModel
-from src.constants.state_enums import GameKindEnum, SpaceKindEnum, SpaceStatusEnum, POIIdentityEnum, DirectionEnum, \
-    DoorStatusEnum
+from src.constants.state_enums import GameKindEnum, SpaceKindEnum, SpaceStatusEnum, POIIdentityEnum, \
+    DoorStatusEnum, WallStatusEnum
 from src.models.game_board.wall_model import WallModel
 from src.models.game_board.door_model import DoorModel
 
@@ -23,6 +23,9 @@ class GameBoardModel(object):
         self._tiles = self._init_all_tiles_family_classic() if game_type == GameKindEnum.FAMILY else None
         self._poi_bank = GameBoardModel._init_pois()
         self._active_pois = []
+
+    def get_tiles(self):
+        return self._tiles
 
     @staticmethod
     def _init_pois():
@@ -48,13 +51,6 @@ class GameBoardModel(object):
         """Create all tiles and set their adjacency. """
         tiles = []
 
-        # for i in range(self._dimensions[0]*self._dimensions[1]):
-        #     row = i % self._dimensions[0]
-        #     column = int(i / self._dimensions[0])
-        #     tile_kind = self._determine_tile_kind(row, column)
-        #     tile = TileModel(row, column, tile_kind)
-        #     tiles.append(tile)
-
         for i in range(self._dimensions[0]):
             tiles.append([])
             for j in range(self._dimensions[1]):
@@ -62,15 +58,14 @@ class GameBoardModel(object):
                 tile = TileModel(i, j, tile_kind)
                 tiles[i].append(tile)
 
-        # TODO: Abhijay: setting adjacency and creating walls/doors.
         # setting tile adjacencies
         extended_grid = []
         for row in tiles:
-            extended_grid.append([NullTileModel()] + row + [NullTileModel()])
+            extended_grid.append([NullModel()] + row + [NullModel()])
 
         row_length = len(tiles[0])
-        extra_top_row = [NullTileModel() for x in range(row_length + 2)]
-        extra_bottom_row = [NullTileModel() for x in range(row_length + 2)]
+        extra_top_row = [NullModel() for x in range(row_length + 2)]
+        extra_bottom_row = [NullModel() for x in range(row_length + 2)]
         extended_grid = [extra_top_row] + extended_grid + [extra_bottom_row]
 
         for i in range(1, len(extended_grid) - 1):
@@ -84,15 +79,15 @@ class GameBoardModel(object):
         for top, bottom in [(0, 1), (6, 7)]:
             for i in range(1, 9):
                 wall = WallModel()
-                tiles[top][i].set_adjacent_edge_obstacle(DirectionEnum.SOUTH, wall)
-                tiles[bottom][i].set_adjacent_edge_obstacle(DirectionEnum.NORTH, wall)
+                tiles[top][i].set_adjacent_edge_obstacle("South", wall)
+                tiles[bottom][i].set_adjacent_edge_obstacle("North", wall)
 
         # setting the left and right walls on the outside of the house
         for left, right in [(0, 1), (8, 9)]:
             for i in range(1, 7):
                 wall = WallModel()
-                tiles[i][left].set_adjacent_edge_obstacle(DirectionEnum.EAST, wall)
-                tiles[i][right].set_adjacent_edge_obstacle(DirectionEnum.WEST, wall)
+                tiles[i][left].set_adjacent_edge_obstacle("East", wall)
+                tiles[i][right].set_adjacent_edge_obstacle("West", wall)
 
         # setting the doors present on the outside of the house EXPLICITLY
         with open("media/board_layouts/outside_door_locations.json", "r") as f:
@@ -121,13 +116,13 @@ class GameBoardModel(object):
         first_dirn, second_dirn = adjacency['first_dirn'], adjacency['second_dirn']
         for coord, direction in [(first_pair, first_dirn), (second_pair, second_dirn)]:
             if direction == 'NORTH':
-                direction = DirectionEnum.NORTH
+                direction = "North"
             elif direction == 'EAST':
-                direction = DirectionEnum.EAST
+                direction = "East"
             elif direction == 'WEST':
-                direction = DirectionEnum.WEST
+                direction = "West"
             else:
-                direction = DirectionEnum.SOUTH
+                direction = "South"
 
             tiles[coord[0]][coord[1]].set_adjacent_edge_obstacle(direction, obstacle)
 
@@ -162,3 +157,31 @@ class GameBoardModel(object):
             poi.y_pos = locations[i][1]
             self._active_pois.append(poi)
             self.get_tile_at(poi.x_pos, poi.y_pos).add_associated_model(poi)
+
+    def get_movable_tiles(self,x:int,y:int,ap:int,movable_tiles= []) -> List[TileModel]:
+
+        #ap = action points
+        currentTile = self.get_tile_at(x,y)
+        if ap >= 1:
+            for key in currentTile.adjacent_edge_objects.keys():
+                tile = currentTile.adjacent_tiles.get(key)
+                obstacle = currentTile.adjacent_edge_objects.get(key)
+
+                if isinstance(obstacle,NullModel):
+                    ap_deduct = 2 if tile.space_status == SpaceStatusEnum.FIRE else 1
+                    if tile.space_status == SpaceStatusEnum.FIRE:
+                        movable_tiles = self.get_movable_tiles(tile.x_coord, tile.y_coord, ap - ap_deduct, movable_tiles)
+                    else:
+                        movable_tiles.append(tile)
+                        movable_tiles = self.get_movable_tiles(tile.x_coord, tile.y_coord, ap - ap_deduct, movable_tiles)
+                elif isinstance(obstacle, WallModel):
+                    if tile.wall_status == WallStatusEnum.DESTROYED:
+                        movable_tiles.append(tile)
+                        movable_tiles = self.get_movable_tiles(tile.x_coord, tile.y_coord, ap - 1, movable_tiles)
+                elif isinstance(obstacle, DoorModel):
+                    if (tile.door_status == DoorStatusEnum.OPEN or tile.door_status == DoorStatusEnum.DESTROYED):
+                        movable_tiles.append(tile)
+                        movable_tiles = self.get_movable_tiles(tile.x_coord, tile.y_coord, ap - ap_deduct, movable_tiles)
+
+        output = list(dict.fromkeys(movable_tiles))
+        return output
