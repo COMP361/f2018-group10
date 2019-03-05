@@ -22,13 +22,14 @@ class JSONSerializer(object):
         """Deserialize a game state"""
 
         GameStateModel.lock.acquire()
-        if GameStateModel.instance():
-            print("Deleted from serializer")
-            GameStateModel.__del__()
         host: PlayerModel = JSONSerializer.deserialize(payload['_host'])
         num_players = payload['_max_desired_players']
         rules = GameKindEnum(payload['_rules']["value"])
-        game = GameStateModel(host, num_players, rules)
+        
+        if not GameStateModel.instance():
+            game = GameStateModel(host, num_players, rules)
+        else:
+            game = GameStateModel.instance()
 
         for player in [x for x in payload['_players'] if x['_ip'] != host.ip]:
             player_obj: PlayerModel = JSONSerializer.deserialize(player)
