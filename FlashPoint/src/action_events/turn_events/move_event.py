@@ -15,7 +15,12 @@ class Move(ActionEvent):
 
     def check_valid(self):
         num_ap = self.player.ap
-        curr_location = [self.player.x_pos, self.player.y_pos]
+        curr_location = GameStateModel.instance().game_board.get_tile_at(self.player.x_pos, self.player.y_pos)
+        cost = 0
+        cost = self.compute_distance(curr_location, cost)
+
+    def compute_distance(self, curr_location: TileModel, cost: int):
+
 
     def execute(self):
         pass
