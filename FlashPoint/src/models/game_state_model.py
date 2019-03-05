@@ -1,5 +1,5 @@
 import random
-from threading import Lock
+from threading import RLock
 
 from typing import List, Optional, Tuple
 
@@ -13,7 +13,7 @@ from src.models.game_units.player_model import PlayerModel
 class GameStateModel(Model):
     """Singleton Class for maintaining the current Game state."""
     _instance = None
-    lock = Lock()
+    lock = RLock()
 
     def __init__(self, host: PlayerModel, num_players: int, game_kind: GameKindEnum):
         print("Initializing game state...")
