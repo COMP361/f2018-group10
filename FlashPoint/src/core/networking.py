@@ -207,7 +207,7 @@ class Networking:
                 logger.info("Disconnecting client")
                 self.client.disconnect()
                 self.client.__del__()
-                # self.client = None
+                self.client = None
             if self.host is not None:
                 logger.info("Disconnecting host")
                 # Kill the broadcast
@@ -275,7 +275,9 @@ class Networking:
 
     # Overridden classes
     class Host(MastermindServerUDP):
-        client_list = {}
+        def __init__(self, time_server_refresh=1.0, time_connection_refresh=2.0, time_connection_timeout=5.0):
+            MastermindServerUDP.__init__(self, time_server_refresh, time_connection_refresh, time_connection_timeout)
+            self.client_list = {}
 
         def lookup_client(self, ip_addr: str):
             """
@@ -348,14 +350,14 @@ class Networking:
             :param data: Data received from the connection
             :return:
             """
-            print("Received")
+            # print("Received")
             if connection_object.address[0] == "127.0.0.1":
                 return
 
             data = JSONSerializer.deserialize(data)
             # If it's a dummy event, don't do anything
             if isinstance(data, DummyEvent):
-                print("Received dummy event")
+                # print("Received dummy event")
                 return
 
             print(f"Client at {connection_object.address} sent a message: {data.__class__}")
