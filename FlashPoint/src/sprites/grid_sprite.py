@@ -55,7 +55,8 @@ class GridSprite(pygame.sprite.Group):
                 if self.east_obstacle:
                     if isinstance(self.east_obstacle, WallModel):
                         wall = WallSprite(tile_sprite, tile_model, self.current_player, (j, i, "East"))
-                        wall.button = RectButton(x_offset + 128 -7, y_offset, 14, 125, Color.BLACK)
+                        wall.button = RectButton(x_offset + 128-5, y_offset, 14, 125, Color.BLACK)
+                        #wall.button.set_transparent_background(True)
                         wall.button.on_click(wall.process_input)
                         self.wall_buttons.append(wall.button_input)
                         self.walls.append(wall)
@@ -64,8 +65,9 @@ class GridSprite(pygame.sprite.Group):
                 if self.south_obstacle:
                     if isinstance(self.south_obstacle, WallModel):
                         wall = WallSprite(tile_sprite, tile_model, self.current_player, (j, i, "South"))
-                        wall.button = RectButton(x_offset, y_offset + 128 - 7, 125, 14, Color.BLACK)
+                        wall.button = RectButton(x_offset, y_offset + 128 - 5, 125, 14, Color.BLACK)
                         wall.button.on_click(wall.process_input)
+                        #wall.button.set_transparent_background(True)
                         self.wall_buttons.append(wall.button_input)
                         self.walls.append(wall)
                         tile_model.add_observer(wall)

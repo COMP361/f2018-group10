@@ -44,8 +44,7 @@ class WallSprite(pygame.sprite.Sprite, WallObserver):
         self.tile_sprite = tile_sprite
         self._prev_x = self.tile_sprite.rect.x
         self._prev_y = self.tile_sprite.rect.y
-        self.button_input = RectButton(self.tile_sprite.rect.x + 50, self.tile_sprite.rect.y + 50, 200, 25, Color.BLACK,
-                                       0, Text(pygame.font.SysFont('Arial', 20), "CHoP tHaT MF wAlL", Color.ORANGE))
+        self.button_input = RectButton(self.tile_sprite.rect.x+50, self.tile_sprite.rect.y+50, 150, 25, Color.BLACK, 0, Text(pygame.font.SysFont('Arial', 20), "CHoP tHaT MF wAlL", Color.ORANGE))
         self.button_input.disable()
 
 
@@ -107,7 +106,7 @@ class WallSprite(pygame.sprite.Sprite, WallObserver):
         for event in event_queue:
             if event.type == pygame.MOUSEBUTTONUP:
 
-                if not ((self.button_input.rect.x <= pygame.mouse.get_pos()[0] <= self.button_input.rect.x + 200) and (
+                if not ((self.button_input.rect.x <= pygame.mouse.get_pos()[0] <= self.button_input.rect.x + 150) and (
                         self.button_input.rect.y <= pygame.mouse.get_pos()[1] <= self.button_input.rect.y + 25)):
                     self.button_input.disable()
         self._button.update(event_queue)
