@@ -19,6 +19,7 @@ class ChooseStartingPositionController(object):
         self.choose_label = RectLabel(500, 0, 300, 75, Color.GREY, 0,
                                       Text(pygame.font.SysFont('Agency FB', 30), "Choose starting position",
                                            Color.ORANGE))
+        self.wait_button = None
         self.board_state = GameStateModel.instance()
         self.game_board_model = self.board_state.game_board
         self.game_board_sprite = game_board
@@ -29,40 +30,48 @@ class ChooseStartingPositionController(object):
 
     def update(self, eventq: EventQueue):
 
-        """Loop through the grid to find where the mouse is pointing"""
-        for i in range(len(self.grid.grid)):
-            for j in range(len(self.grid.grid[i])):
-                """1. get the tile at i,j index
-                    2. see if that tile is outdoors or indoors
-                    3. if indoors: hover is red, cannot click
-                    4. if outdoors: hover is green, can click
-                    5. if outdoors and clicked, check if there is no player object on that tile
-                    6.a if there is a player sprite on that tile: hover red, cant click
-                    6b. instantiate ChooseStartingPositionEvent(this curr tile)
-                    6-1a. break out of this loop
-                    6-1b. delete this controller, """
-                curr_tile = self.grid.grid[i][j]
-                is_legal = True
-                # get associated tile_model
-                tile_model = self.game_board_model.get_tile_at(j, i)
-                out = tile_model.get_space_kind()
+        if not self.player == self.board_state.players_turn:
+            self.wait_button = RectLabel(500, 400, 300, 75, Color.GREY, 0,
+                                      Text(pygame.font.SysFont('Agency FB', 30), "Wait for your turn!",
+                                           Color.ORANGE))
+            self.set_active_labels(self.wait_button)
+        #Loop through the grid to find where the mouse is pointing
+        else:
+            if self.wait_button is not None:
+                self.wait_button.kill()
+            for i in range(len(self.grid.grid)):
+                for j in range(len(self.grid.grid[i])):
+                    """1. get the tile at i,j index
+                        2. see if that tile is outdoors or indoors
+                        3. if indoors: hover is red, cannot click
+                        4. if outdoors: hover is green, can click
+                        5. if outdoors and clicked, check if there is no player object on that tile
+                        6.a if there is a player sprite on that tile: hover red, cant click
+                        6b. instantiate ChooseStartingPositionEvent(this curr tile)
+                        6-1a. break out of this loop
+                        6-1b. delete this controller, """
+                    curr_tile = self.grid.grid[i][j]
+                    is_legal = True
+                    # get associated tile_model
+                    tile_model = self.game_board_model.get_tile_at(j, i)
+                    out = tile_model.get_space_kind()
 
-                for models in tile_model.associated_models:
-                    if isinstance(models, PlayerModel):
-                        is_legal = False
+                    for models in tile_model.associated_models:
+                        if isinstance(models, PlayerModel):
+                            is_legal = False
 
-                if is_legal and out == SpaceKindEnum.OUTDOOR:
-                    if curr_tile.hover():
-                        curr_tile.hover_color = Color.GREEN
+                    if is_legal and out == SpaceKindEnum.OUTDOOR:
+                        if curr_tile.hover():
+                            curr_tile.hover_color = Color.GREEN
 
-                    if curr_tile.is_clicked():
+                        if curr_tile.is_clicked():
 
-                        event = ChooseStartingPositionEvent(tile_model)
-                        self.game_board_sprite.add(PlayerSprite(curr_tile, self.grid))
-                        self.choose_label.kill()
-                        # delete this controller in case of success scenario, the backend event has been instantiated
-                        break
+                            event = ChooseStartingPositionEvent(tile_model)
+                            self.game_board_sprite.add(PlayerSprite(curr_tile, self.grid))
+                            self.choose_label.kill()
+                            # delete this controller in case of success scenario, the backend event has been instantiated
+                            break
 
-                else:
-                    if curr_tile.hover():
-                        curr_tile.hover_color = Color.RED
+                    else:
+                        if curr_tile.hover():
+                            curr_tile.hover_color = Color.RED
