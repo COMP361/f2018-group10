@@ -17,7 +17,6 @@ from src.action_events.start_game_event import StartGameEvent
 
 
 class LobbyScene(object):
-
     def __init__(self, screen, current_player: PlayerModel):
         self._current_player = current_player
         self._game = GameStateModel.instance()

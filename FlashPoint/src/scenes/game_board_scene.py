@@ -27,13 +27,14 @@ from src.sprites.notify_player_turn import NotifyPlayerTurn
 class GameBoardScene(object):
     """Scene for displaying the main game view"""
     def __init__(self, screen: pygame.display, current_player: PlayerModel):
-        """:param screen : The display passed from main on which to draw the Scene."""
+        """
+        :param screen : The display passed from main on which to draw the Scene.
+        """
         self._save_games_file = "media/save_games.json"
         self.screen = screen
         self._game = GameStateModel.instance()
         self._current_player = current_player
         self._current_sprite = None
-
 
         self.quit_btn = RectButton(200, 250, 100, 50, Color.STANDARDBTN, 0,
                                    Text(pygame.font.SysFont('Arial', 20), "Quit", Color.BLACK))
@@ -43,7 +44,7 @@ class GameBoardScene(object):
         self.chat_box = ChatBox(self._current_player)
         self.menu = None
         self._init_sprites()
-        self.notify_turn_popup = NotifyPlayerTurn(self._current_player,self._current_sprite)
+        self.notify_turn_popup = NotifyPlayerTurn(self._current_player,self._current_sprite,self.active_sprites)
 
 
     def _init_sprites(self):
@@ -75,9 +76,16 @@ class GameBoardScene(object):
     # Example of how to use the MenuClass YOU NEED TO MAKE ALL YOUR BUTTONS EXTEND INTERACTABLE!!!!!!!!!!!!!!!!!
     def _init_menu_button(self):
         btn = RectButton(0, 0, 30, 30, background=Color.GREEN, txt_obj=Text(pygame.font.SysFont('Arial', 23), ""))
-        btn.on_click(self._click_action)
+        # TODO CHANGE THIS BACK TO self._click_action
+        #btn.on_click(self._click_action)
+        btn.on_click(self._game.next_player)
         btn.set_transparent_background(True)
         return btn
+
+    def _init_end_turn_button(self):
+        btn = RectButton(1130,500,150,50,background=Color.ORANGE,txt_obj=Text(pygame.font.SysFont('Arial', 23), "End Turn"))
+        btn.on_click(self._end_turn_controller.start_end_turn)
+
 
     def _click_action(self):
         menu = MenuWindow([self.active_sprites, self.game_board], 500, 500, (400, 150))
