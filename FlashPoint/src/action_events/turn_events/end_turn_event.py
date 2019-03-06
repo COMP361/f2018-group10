@@ -1,4 +1,3 @@
-from abc import abstractmethod
 from src.action_events.action_event import ActionEvent
 from src.models.game_state_model import GameStateModel
 
@@ -12,10 +11,7 @@ class EndTurnEvent(ActionEvent):
     def __init__(self):
         super().__init__()
 
-
     def execute(self):
-
-
         GameStateModel.instance().next_player()
         """
         1)
