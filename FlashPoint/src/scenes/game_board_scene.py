@@ -75,8 +75,7 @@ class GameBoardScene(object):
     # Example of how to use the MenuClass YOU NEED TO MAKE ALL YOUR BUTTONS EXTEND INTERACTABLE!!!!!!!!!!!!!!!!!
     def _init_menu_button(self):
         btn = RectButton(0, 0, 30, 30, background=Color.GREEN, txt_obj=Text(pygame.font.SysFont('Arial', 23), ""))
-        # TODO CHANGE THIS BACK TO self._click_action
-        btn.on_click(self._game.next_player)
+        btn.on_click(self._click_action)
         btn.set_transparent_background(True)
         return btn
 
