@@ -237,3 +237,62 @@ class GameBoardModel(object):
 
         output = list(dict.fromkeys(movable_tiles))
         return output
+
+    def distance_between_tiles(self, first_tile: TileModel, second_tile: TileModel) -> int:
+        return abs(first_tile.x_coord - second_tile.x_coord) + abs(first_tile.y_coord - second_tile.y_coord)
+
+    def find_closest_parking_spots(self, parking_type: str, current_tile: TileModel) -> List[TileModel]:
+        """
+        Find the closest parking spot to a given position.
+
+        :param parking_type: "Engine" or "Ambulance"
+        :param current_tile:
+        :return: A list of the closest parking spots (the closer tile for each parking spot)
+        """
+        min_distance = 100
+        if parking_type == "Ambulance":
+            parking_spots = self.ambulance_spots
+        elif parking_type == "Engine":
+            parking_spots = self.engine_spots
+        else:
+            pass
+
+        spot_distances = {}
+        for park_spot in parking_spots:
+            first_tile = park_spot[0]
+            second_tile = park_spot[1]
+
+            dist_from_first_tile = self.distance_between_tiles(current_tile, first_tile)
+            dist_from_second_tile = self.distance_between_tiles(current_tile, second_tile)
+            # the smaller distance from the two tiles of the
+            # parking spot will denote the overall distance
+            # from the parking spot
+            dist_from_spot = min(dist_from_first_tile, dist_from_second_tile)
+
+            # determining the closer tile from the
+            # two tiles of the parking spot
+            if dist_from_first_tile < dist_from_second_tile:
+                closer_tile_on_spot = first_tile
+            else:
+                closer_tile_on_spot = second_tile
+
+            spot_key = first_tile.__str__() + second_tile.__str__()
+            # a dictionary which maps the key of the spot to
+            # the distance from that spot and the closer tile
+            # of that spot
+            spot_distances[spot_key] = (dist_from_spot, closer_tile_on_spot)
+
+            # determining the minimum distance
+            if dist_from_spot < min_distance:
+                min_distance = dist_from_spot
+
+        # make a list of the
+        # closest parking spots
+        closest_spots = []
+        for spot_key, value in spot_distances.items():
+            distance = value[0]
+            closer_tile_on_spot = value[1]
+            if distance == min_distance:
+                closest_spots.append(closer_tile_on_spot)
+
+        return closest_spots

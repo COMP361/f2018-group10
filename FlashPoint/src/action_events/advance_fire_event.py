@@ -194,5 +194,5 @@ class AdvanceFireEvent(ActionEvent):
         # removing any fire markers that were
         # placed outside of the building
         for tile in self.board.tiles:
-            if tile.space_kind == SpaceKindEnum.OUTDOOR and tile.space_status == SpaceStatusEnum.FIRE:
+            if tile.space_kind != SpaceKindEnum.INDOOR and tile.space_status == SpaceStatusEnum.FIRE:
                 tile.space_status = SpaceStatusEnum.SAFE
