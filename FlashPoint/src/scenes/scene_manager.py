@@ -86,13 +86,14 @@ class SceneManager(object):
             self._active_scene.update(event_queue)
             for event in event_queue:
                 if event.type == ChangeSceneEnum.STARTSCENE:
-                    self.next(StartScene, self._current_player)
+                    self.next(StartScene)
                 elif event.type == ChangeSceneEnum.CHARACTERSCENE:
                     self.next(CharacterScene, self._current_player)
                 elif event.type == ChangeSceneEnum.CREATEGAMEMENU:
                     self.next(CreateGameMenu, self._current_player)
                 elif event.type == ChangeSceneEnum.HOSTJOINSCENE:
-                    self.next(HostJoinScene, event.player)
+                    self._current_player = event.player
+                    self.next(HostJoinScene, self._current_player)
                 elif event.type == ChangeSceneEnum.HOSTMENUSCENE:
                     self.next(HostMenuScene, self._current_player)
                 elif event.type == ChangeSceneEnum.JOINSCENE:

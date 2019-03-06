@@ -1,4 +1,5 @@
 import random
+from threading import RLock
 
 from typing import List, Optional, Tuple
 
@@ -12,12 +13,13 @@ from src.models.game_units.player_model import PlayerModel
 class GameStateModel(Model):
     """Singleton Class for maintaining the current Game state."""
     _instance = None
+    lock = RLock()
 
     def __init__(self, host: PlayerModel, num_players: int, game_kind: GameKindEnum):
         print("Initializing game state...")
+
         if not GameStateModel._instance:
             super().__init__()
-
             self._host = host
             self._max_desired_players = 6
             self._players = [self._host]
@@ -37,7 +39,6 @@ class GameStateModel(Model):
             self._game_board = GameBoardModel(self._rules)
 
             GameStateModel._instance = self
-
         else:
             print("Attempted to instantiate another singleton")
             raise Exception("GameStateModel is a Singleton")
@@ -48,6 +49,7 @@ class GameStateModel(Model):
 
     @staticmethod
     def __del__():
+        print('deleting game state aahahhafah')
         GameStateModel._instance = None
 
     @classmethod
@@ -195,4 +197,3 @@ class GameStateModel(Model):
 
     def game_lost(self):
         self._state = GameStateEnum.LOST
-        # TODO: More stuff here for what is supposed to happen when the game ends.

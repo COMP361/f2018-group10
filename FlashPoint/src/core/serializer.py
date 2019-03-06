@@ -1,5 +1,6 @@
 import enum
 import json
+import threading
 from typing import Dict
 
 from src.models.game_board.game_board_model import GameBoardModel
@@ -19,15 +20,21 @@ class JSONSerializer(object):
     @staticmethod
     def _deserialize_game_state(payload: Dict) -> GameStateModel:
         """Deserialize a game state"""
-        GameStateModel.__del__()
+
+        GameStateModel.lock.acquire()
         host: PlayerModel = JSONSerializer.deserialize(payload['_host'])
         num_players = payload['_max_desired_players']
         rules = GameKindEnum(payload['_rules']["value"])
-        game = GameStateModel(host, num_players, rules)
+
+        if not GameStateModel.instance():
+            game = GameStateModel(host, num_players, rules)
+        else:
+            game = GameStateModel.instance()
 
         for player in [x for x in payload['_players'] if x['_ip'] != host.ip]:
             player_obj: PlayerModel = JSONSerializer.deserialize(player)
-            game.add_player(player_obj)
+            if player_obj not in game.players:
+                game.add_player(player_obj)
 
         if rules == GameKindEnum.EXPERIENCED:
             game.difficulty_level = DifficultyLevelEnum(payload['_difficulty_level']['value'])
@@ -37,6 +44,9 @@ class JSONSerializer(object):
         game.max_damage = payload['_max_damage']
         game.victims_lost = payload['_victims_lost']
         game.victims_saved = payload['_victims_saved']
+
+        GameStateModel.set_game(game)
+        GameStateModel.lock.release()
 
         return game
 
@@ -105,7 +115,6 @@ class JSONSerializer(object):
         if isinstance(obj, GameBoardModel):
             for tile in obj.tiles:
                 tile.reset_adjacencies()
-
         obj.__setattr__("class", type(obj).__name__)
         return obj.__dict__ if not isinstance(obj, enum.Enum) else {"name": type(obj).__name__, "value": obj.value}
 
