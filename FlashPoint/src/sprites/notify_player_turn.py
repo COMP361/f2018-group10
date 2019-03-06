@@ -12,8 +12,6 @@ from src.observers.game_state_observer import GameStateObserver
 from src.UIComponents.text import Text
 
 
-class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
-
 class NotifyPlayerTurn(pygame.sprite.Sprite,GameStateObserver):
 
     def __init__(self, current_player: PlayerModel,current_sprite:pygame.sprite.Sprite,sprite_group:pygame.sprite.Group):
