@@ -113,7 +113,8 @@ class Interactable(pygame.sprite.Sprite):
         """
         if self._is_enabled:
             if isinstance(self._click_action, Callable):
-                self._click_action(*self._click_args, **self._click_kwargs)
+                return self._click_action(*self._click_args, **self._click_kwargs)
+
 
     def hover(self):
         """
@@ -153,6 +154,10 @@ class Interactable(pygame.sprite.Sprite):
 
     def resize_rect(self, rect: pygame.rect.Rect):
         self._rect = rect
+
+    @property
+    def enabled(self):
+        return self._is_enabled
 
     # why is this so hard
     @property
