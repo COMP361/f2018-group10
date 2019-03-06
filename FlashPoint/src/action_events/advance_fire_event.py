@@ -186,7 +186,16 @@ class AdvanceFireEvent(ActionEvent):
 
                 elif isinstance(model, POIModel):
                     model.reveal()
+                    model.status = POIStatusEnum.LOST
 
+                else:
+                    pass
+
+        # removing any fire markers that were
+        # placed outside of the building
+        for tile in self.board.tiles:
+            if tile.space_kind == SpaceKindEnum.OUTDOOR and tile.space_status == SpaceStatusEnum.FIRE:
+                tile.space_status = SpaceStatusEnum.SAFE
 
 
     def check_associated_models(self, tile: TileModel):
