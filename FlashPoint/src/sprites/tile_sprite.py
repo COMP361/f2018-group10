@@ -17,7 +17,7 @@ class TileSprite(Interactable,TileObserver):
         self.index = 0
         self.sprite_grp = pygame.sprite.Group()
         self.image = image
-
+        self.hover_color = None
         self.row = row
         self.column = column
 
@@ -51,7 +51,11 @@ class TileSprite(Interactable,TileObserver):
 
     """TODO: is clicked"""
     def is_clicked(self):
-        return self.hover() and pygame.mouse.get_pressed()[0] #check if left click
+
+        clicked = self.hover() and pygame.mouse.get_pressed()[0] #check if left click
+        if clicked:
+            print("hello")
+        return clicked
 
     def enable(self):
         """
@@ -67,13 +71,14 @@ class TileSprite(Interactable,TileObserver):
         """
         self._is_enabled = False
 
-    def _highlight(self, color: Tuple[int, int, int, float]):
+    def highlight(self):
         if self.hover() and self._is_enabled:
             if not self._is_hovered:
-                self.is_hovered = True
+                self._is_hovered = True
                 hover = pygame.Surface(
                     (self._non_highlight_image.get_width(), self._non_highlight_image.get_height()), pygame.SRCALPHA)
-                hover.fill(color)
+                if self.hover_color:
+                    hover.fill(self.hover_color)
                 self.image.blit(hover, (0, 0))
         else:
             self.image.blit(self._non_highlight_image, (0, 0))
@@ -93,7 +98,7 @@ class TileSprite(Interactable,TileObserver):
         self._mouse_pos = current_mouse_pos
 
     def draw(self, screen: pygame.Surface):
-        self._highlight((235, 235, 9, 0.5))
+        self.highlight()
         self.sprite_grp.draw(self.image)
         
         screen.blit(self.image, self.rect)

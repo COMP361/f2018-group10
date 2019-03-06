@@ -48,7 +48,8 @@ class GameBoardScene(object):
         self.chat_box = ChatBox(self._current_player)
         self.menu = None
         self._init_sprites()
-        self.choose_start_pos_controller = ChooseStartingPositionController(self, current_player)
+        self.choose_start_pos_controller = ChooseStartingPositionController(current_player, self.game_board)
+        self.choose_start_pos_controller.set_active_labels(self.active_sprites)
 
     def _init_sprites(self):
         for i, player in enumerate(self._game.players):
@@ -130,6 +131,7 @@ class GameBoardScene(object):
             self.menu.update(event_queue)
 
         self.chat_box.update(event_queue)
+        self.choose_start_pos_controller.update(event_queue)
 
 
 """"TODO: Controller for starting position"""
@@ -137,22 +139,24 @@ class GameBoardScene(object):
 
 class ChooseStartingPositionController(object):
 
-    def __init__(self, game_scene: GameBoardScene,player: PlayerModel):
-        self.scene = game_scene
+    def __init__(self, player: PlayerModel, game_board: GameBoard):
         self.player = player
         """The offset of this rectlabel might be wickedly off, please someone has to check it"""
         self.choose_label = RectLabel(500, 0, 300, 75, Color.GREY, 0,
                                       Text(pygame.font.SysFont('Agency FB', 30), "Choose starting position",
                                            Color.ORANGE))
-        self.scene.active_sprites.add(self.choose_label)
         self.board_state = GameStateModel.instance()
         self.game_board = self.board_state.game_board
-        self.grid = GameBoard().grid
+        self.grid = game_board.grid
 
-    def update(self):
+    def set_active_labels(self, sprite_grp):
+        sprite_grp.add(self.choose_label)
+
+    def update(self, eventq: EventQueue):
+
         """Loop through the grid to find where the mouse is pointing"""
-        for i in self.grid[0]:
-            for j in self.grid:
+        for i in range(len(self.grid.grid)):
+            for j in range(len(self.grid.grid[i])):
                 """1. get the tile at i,j index
                     2. see if that tile is outdoors or indoors
                     3. if indoors: hover is red, cannot click
@@ -162,32 +166,30 @@ class ChooseStartingPositionController(object):
                     6b. instantiate ChooseStartingPositionEvent(this curr tile)
                     6-1a. break out of this loop
                     6-1b. delete this controller, """
-                curr_tile = self.grid[i][j]
+                curr_tile = self.grid.grid[i][j]
                 is_legal = True
                 # get associated tile_model
-                tile_model = self.game_board.get_tile_at(i, j)
+                tile_model = self.game_board.get_tile_at(j, i)
                 out = tile_model.get_space_kind()
 
-                for models in tile_model.associated_models():
+                for models in tile_model.associated_models:
                     if isinstance(models, PlayerModel):
-
                         is_legal = False
 
-                if is_legal and out is SpaceKindEnum.OUTDOOR:
+                if is_legal and out == SpaceKindEnum.OUTDOOR:
                     if curr_tile.hover():
-                        curr_tile.highlight(Color.GREEN)
+                        curr_tile.hover_color = Color.GREEN
 
                     if curr_tile.is_clicked():
                         ChooseStartingPositionEvent(tile_model)
-                        self.scene.active_sprites.add(PlayerSprite(curr_tile))
+                        PlayerSprite(curr_tile)
                         self.choose_label.kill()
-                        del self
                         # delete this controller in case of success scenario, the backend event has been instantiated
                         break
 
                 else:
                     if curr_tile.hover():
-                        curr_tile.highlight(Color.RED)
+                        curr_tile.hover_color = Color.RED
 
                 """"if out is SpaceKindEnum.INDOOR:
                     if curr_tile.hover():
