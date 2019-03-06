@@ -20,6 +20,7 @@ from src.sprites.hud.ingame_states import InGameStates
 import src.constants.color as Color
 from src.UIComponents.rect_button import RectButton
 from src.UIComponents.text import Text
+from src.sprites.notify_player_turn import NotifyPlayerTurn
 
 
 class GameBoardScene(object):
@@ -30,7 +31,7 @@ class GameBoardScene(object):
         self.screen = screen
         self._game = GameStateModel.instance()
         self._current_player = current_player
-
+        self._current_sprite = None
 
 
         self.quit_btn = RectButton(200, 250, 100, 50, Color.STANDARDBTN, 0,
@@ -41,7 +42,7 @@ class GameBoardScene(object):
         self.chat_box = ChatBox(GameStateModel.instance(), self._current_player)
         self.menu = None
         self._init_sprites()
-
+        self.notify_turn_popup = NotifyPlayerTurn(self._current_player,self._current_sprite)
 
 
     def _init_sprites(self):
@@ -69,7 +70,8 @@ class GameBoardScene(object):
     # Example of how to use the MenuClass YOU NEED TO MAKE ALL YOUR BUTTONS EXTEND INTERACTABLE!!!!!!!!!!!!!!!!!
     def _init_menu_button(self):
         btn = RectButton(0, 0, 30, 30, background=Color.GREEN, txt_obj=Text(pygame.font.SysFont('Arial', 23), ""))
-        btn.on_click(self._click_action)
+        # TODO CHANGE THIS BACK TO self._click_action
+        btn.on_click(self._game.next_player)
         btn.set_transparent_background(True)
         return btn
 
@@ -106,6 +108,7 @@ class GameBoardScene(object):
             self.menu.draw(screen)
 
         self.chat_box.draw(screen)
+        self.notify_turn_popup.draw(screen)
 
     def update(self, event_queue: EventQueue):
         """Call the update() function of everything in this class."""
@@ -116,4 +119,5 @@ class GameBoardScene(object):
             self.menu.update(event_queue)
 
         self.chat_box.update(event_queue)
+        self.notify_turn_popup.update(event_queue)
 
