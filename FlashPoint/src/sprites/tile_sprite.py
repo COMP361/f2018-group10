@@ -53,8 +53,7 @@ class TileSprite(Interactable,TileObserver):
     def is_clicked(self):
 
         clicked = self.hover() and pygame.mouse.get_pressed()[0] #check if left click
-        if clicked:
-            print("hello")
+
         return clicked
 
     def enable(self):

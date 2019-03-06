@@ -3,6 +3,7 @@ from datetime import datetime
 
 import pygame
 from src.constants.change_scene_enum import ChangeSceneEnum
+from src.controllers.choose_starting_position_controller import ChooseStartingPositionController
 from src.core.custom_event import CustomEvent
 
 from src.UIComponents.rect_label import RectLabel
@@ -134,77 +135,3 @@ class GameBoardScene(object):
         self.choose_start_pos_controller.update(event_queue)
 
 
-""""TODO: Controller for starting position"""
-
-
-class ChooseStartingPositionController(object):
-
-    def __init__(self, player: PlayerModel, game_board: GameBoard):
-        self.player = player
-        """The offset of this rectlabel might be wickedly off, please someone has to check it"""
-        self.choose_label = RectLabel(500, 0, 300, 75, Color.GREY, 0,
-                                      Text(pygame.font.SysFont('Agency FB', 30), "Choose starting position",
-                                           Color.ORANGE))
-        self.board_state = GameStateModel.instance()
-        self.game_board = self.board_state.game_board
-        self.grid = game_board.grid
-
-    def set_active_labels(self, sprite_grp):
-        sprite_grp.add(self.choose_label)
-
-    def update(self, eventq: EventQueue):
-
-        """Loop through the grid to find where the mouse is pointing"""
-        for i in range(len(self.grid.grid)):
-            for j in range(len(self.grid.grid[i])):
-                """1. get the tile at i,j index
-                    2. see if that tile is outdoors or indoors
-                    3. if indoors: hover is red, cannot click
-                    4. if outdoors: hover is green, can click
-                    5. if outdoors and clicked, check if there is no player object on that tile
-                    6.a if there is a player sprite on that tile: hover red, cant click
-                    6b. instantiate ChooseStartingPositionEvent(this curr tile)
-                    6-1a. break out of this loop
-                    6-1b. delete this controller, """
-                curr_tile = self.grid.grid[i][j]
-                is_legal = True
-                # get associated tile_model
-                tile_model = self.game_board.get_tile_at(j, i)
-                out = tile_model.get_space_kind()
-
-                for models in tile_model.associated_models:
-                    if isinstance(models, PlayerModel):
-                        is_legal = False
-
-                if is_legal and out == SpaceKindEnum.OUTDOOR:
-                    if curr_tile.hover():
-                        curr_tile.hover_color = Color.GREEN
-
-                    if curr_tile.is_clicked():
-                        ChooseStartingPositionEvent(tile_model)
-                        PlayerSprite(curr_tile)
-                        self.choose_label.kill()
-                        # delete this controller in case of success scenario, the backend event has been instantiated
-                        break
-
-                else:
-                    if curr_tile.hover():
-                        curr_tile.hover_color = Color.RED
-
-                """"if out is SpaceKindEnum.INDOOR:
-                    if curr_tile.hover():
-                        curr_tile.highlight(Color.RED)
-                    
-
-                elif out is SpaceKindEnum.OUTDOOR:
-                    
-                    # have to loop through tile_model to check if there is a player on that tile:
-                    for models in tile_model.associated_models():
-                        if isinstance(models, PlayerModel):
-                            
-                            
-                    if curr_tile.hover():
-                        curr_tile.highlight(Color.GREEN)
-                    
-                    if curr_tile.is_clicked():
-                        """
