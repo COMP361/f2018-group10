@@ -1,11 +1,11 @@
 import threading
-from datetime import datetime
 import pygame
 import time
 from threading import Thread
 import src.constants.color as Color
 from src.UIComponents.rect_button import RectButton
 from src.action_events.turn_events.end_turn_event import EndTurnEvent
+from src.core.networking import Networking
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 from src.observers.game_state_observer import GameStateObserver
@@ -18,7 +18,7 @@ class NotifyPlayerTurn(pygame.sprite.Sprite,GameStateObserver):
         super().__init__()
         self.enabled = False
         self.running = True
-        self.countdown_thread = Thread(target=self.countdown, args=(10,))
+        self.countdown_thread = None
         self.image = pygame.Surface([250, 50])
         self.font_time = pygame.font.SysFont('Agency FB', 25)
         bg = pygame.image.load('media/GameHud/wood2.png')
@@ -50,6 +50,8 @@ class NotifyPlayerTurn(pygame.sprite.Sprite,GameStateObserver):
             self._active_sprites.add(self._init_end_turn_button())
             self._current_sprite.turn = True
             self.running = True
+
+            self.countdown_thread = Thread(target=self.countdown, args=(10,))
             self.countdown_thread.start()
 
     def _init_end_turn_button(self):
@@ -67,15 +69,20 @@ class NotifyPlayerTurn(pygame.sprite.Sprite,GameStateObserver):
             time.sleep(1)
             count -= 1
 
-        self._end_turn()
+        #self._end_turn()
 
-    def _end_turn(self):
         turn_event = EndTurnEvent()
         # send end turn, see ChatBox for example
+        if Networking.get_instance().is_host:
+            Networking.get_instance().send_to_all_client(turn_event)
+        else:
+            Networking.get_instance().client.send(turn_event)
+
+    def _end_turn(self):
         self._current_sprite.turn = False
         self.enabled = False
         self.running = False
-        if threading.current_thread().__class__.__name__ == '_MainThread':
-            while self.countdown_thread.is_alive():
-                time.sleep(0.01)
-        self.countdown_thread = Thread(target=self.countdown, args=(120,))
+
+        if self.countdown_thread != threading.current_thread() and self.countdown_thread.is_alive():
+            self.countdown_thread.join()
+
