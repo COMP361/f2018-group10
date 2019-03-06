@@ -1,11 +1,10 @@
 from src.action_events.action_event import ActionEvent
 from src.models.game_units.player_model import PlayerModel
 
-"""TODO: resolve knock down. Please refer to M5 models to save some time on this:
-    Player status = KnockedDown
-    Player location = Nearest Ambulance
-
-"""
+# TODO: resolve knock down. Please refer to M5 models to save some time on this:
+# Player status = KnockedDown
+# Player location = Nearest Ambulance
+#
 
 
 class KnockDownEvent(ActionEvent):
