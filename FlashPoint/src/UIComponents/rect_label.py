@@ -96,3 +96,7 @@ class RectLabel(pygame.sprite.Sprite, Components):
     def set_transparent_background(self, x: bool):
         self.transparent_bg = x
         self._render()
+
+    def change_text(self,txt_obj:Text):
+        self.txt_obj = txt_obj
+        self._render()

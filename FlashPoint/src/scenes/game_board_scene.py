@@ -12,6 +12,7 @@ from src.core.networking import Networking
 from src.core.serializer import JSONSerializer
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
+from src.observers.game_state_observer import GameStateObserver
 from src.sprites.game_board import GameBoard
 from src.sprites.hud.player_state import PlayerState
 from src.sprites.hud.current_player_state import CurrentPlayerState
@@ -20,6 +21,7 @@ from src.sprites.hud.ingame_states import InGameStates
 import src.constants.color as Color
 from src.UIComponents.rect_button import RectButton
 from src.UIComponents.text import Text
+from src.sprites.notify_player_turn import NotifyPlayerTurn
 
 
 class GameBoardScene(object):
@@ -30,6 +32,8 @@ class GameBoardScene(object):
         self.screen = screen
         self._game = GameStateModel.instance()
         self._current_player = current_player
+        self._current_sprite = None
+
 
         self.quit_btn = RectButton(200, 250, 100, 50, Color.STANDARDBTN, 0,
                                    Text(pygame.font.SysFont('Arial', 20), "Quit", Color.BLACK))
@@ -39,12 +43,14 @@ class GameBoardScene(object):
         self.chat_box = ChatBox(self._current_player)
         self.menu = None
         self._init_sprites()
+        self.notify_turn_popup = NotifyPlayerTurn(self._current_player,self._current_sprite)
+
 
     def _init_sprites(self):
         for i, player in enumerate(self._game.players):
             self.active_sprites.add(PlayerState(0, 30 + 64*i, player.nickname, player.color))
-
-        self.active_sprites.add(CurrentPlayerState(1130, 550, self._current_player.nickname,self._current_player.color))
+        self._current_sprite = CurrentPlayerState(1130, 550, self._current_player.nickname,self._current_player.color)
+        self.active_sprites.add(self._current_sprite)
         self.active_sprites.add(TimeBar(0, 0))
         self.active_sprites.add(InGameStates(250, 650, self._game.damage, self._game.victims_saved, self._game.victims_lost))
         self.active_sprites.add(self._init_menu_button())
@@ -69,7 +75,8 @@ class GameBoardScene(object):
     # Example of how to use the MenuClass YOU NEED TO MAKE ALL YOUR BUTTONS EXTEND INTERACTABLE!!!!!!!!!!!!!!!!!
     def _init_menu_button(self):
         btn = RectButton(0, 0, 30, 30, background=Color.GREEN, txt_obj=Text(pygame.font.SysFont('Arial', 23), ""))
-        btn.on_click(self._click_action)
+        # TODO CHANGE THIS BACK TO self._click_action
+        btn.on_click(self._game.next_player)
         btn.set_transparent_background(True)
         return btn
 
@@ -106,6 +113,7 @@ class GameBoardScene(object):
             self.menu.draw(screen)
 
         self.chat_box.draw(screen)
+        self.notify_turn_popup.draw(screen)
 
     def update(self, event_queue: EventQueue):
         """Call the update() function of everything in this class."""
@@ -116,3 +124,7 @@ class GameBoardScene(object):
         self.active_sprites.update(event_queue)
         if self.menu and not self.menu.is_closed:
             self.menu.update(event_queue)
+
+        self.chat_box.update(event_queue)
+        self.notify_turn_popup.update(event_queue)
+
