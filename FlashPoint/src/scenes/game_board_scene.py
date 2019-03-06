@@ -34,7 +34,6 @@ class GameBoardScene(object):
         self._current_player = current_player
         self._current_sprite = None
 
-
         self.quit_btn = RectButton(200, 250, 100, 50, Color.STANDARDBTN, 0,
                                    Text(pygame.font.SysFont('Arial', 20), "Quit", Color.BLACK))
 
@@ -43,7 +42,7 @@ class GameBoardScene(object):
         self.chat_box = ChatBox(self._current_player)
         self.menu = None
         self._init_sprites()
-        self.notify_turn_popup = NotifyPlayerTurn(self._current_player,self._current_sprite)
+        self.notify_turn_popup = NotifyPlayerTurn(self._current_player,self._current_sprite,self.active_sprites)
 
 
     def _init_sprites(self):
@@ -76,9 +75,15 @@ class GameBoardScene(object):
     def _init_menu_button(self):
         btn = RectButton(0, 0, 30, 30, background=Color.GREEN, txt_obj=Text(pygame.font.SysFont('Arial', 23), ""))
         # TODO CHANGE THIS BACK TO self._click_action
+        #btn.on_click(self._click_action)
         btn.on_click(self._game.next_player)
         btn.set_transparent_background(True)
         return btn
+
+    def _init_end_turn_button(self):
+        btn = RectButton(1130,500,150,50,background=Color.ORANGE,txt_obj=Text(pygame.font.SysFont('Arial', 23), "End Turn"))
+        btn.on_click(self._end_turn_controller.start_end_turn)
+
 
     def _click_action(self):
         menu = MenuWindow([self.active_sprites, self.game_board], 500, 500, (400, 150))

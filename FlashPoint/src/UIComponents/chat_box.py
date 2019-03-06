@@ -68,9 +68,10 @@ class ChatBox:
 
             self.chat_textbox.message = ''
 
-        self.chat_history = GameStateModel.instance().chat_history
-        self._init_message_box()
-        self.chat_textbox.rect.w = self.chat_history_bg.rect.w
+        if GameStateModel.instance():
+            self.chat_history = GameStateModel.instance().chat_history
+            self._init_message_box()
+            self.chat_textbox.rect.w = self.chat_history_bg.rect.w
 
     def draw(self, screen):
         for message in self.to_be_renamed:

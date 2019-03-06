@@ -220,7 +220,6 @@ class Networking:
                 self.host.disconnect()
                 self.host.__del__()
                 self.host = None
-            print("Deleting game state")
             GameStateModel.__del__()
             EventQueue.post(CustomEvent(ChangeSceneEnum.STARTSCENE))
 
