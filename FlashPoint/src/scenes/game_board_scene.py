@@ -34,7 +34,6 @@ class GameBoardScene(object):
         self._current_player = current_player
         self._current_sprite = None
 
-
         self.quit_btn = RectButton(200, 250, 100, 50, Color.STANDARDBTN, 0,
                                    Text(pygame.font.SysFont('Arial', 20), "Quit", Color.BLACK))
 
@@ -43,8 +42,7 @@ class GameBoardScene(object):
         self.chat_box = ChatBox(self._current_player)
         self.menu = None
         self._init_sprites()
-        self.notify_turn_popup = NotifyPlayerTurn(self._current_player,self._current_sprite)
-
+        self.notify_turn_popup = NotifyPlayerTurn(self._current_player, self._current_sprite)
 
     def _init_sprites(self):
         for i, player in enumerate(self._game.players):

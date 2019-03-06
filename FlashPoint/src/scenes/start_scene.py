@@ -20,7 +20,6 @@ from src.constants.change_scene_enum import ChangeSceneEnum
 
 
 class StartScene(object):
-
     def __init__(self, screen):
         if GameStateModel.instance():
             GameStateModel.__del__()
@@ -108,7 +107,10 @@ class StartScene(object):
             temp = json.load(myFile)
             for i, user in enumerate(temp):
                 player: PlayerModel = JSONSerializer.deserialize(user)
-                self.profile.set_profile(i, player.nickname,player.wins,player.losses, EventQueue.post, CustomEvent(ChangeSceneEnum.HOSTJOINSCENE, player=player))
+                self.profile.set_profile(
+                    i, player.nickname, player.wins, player.losses, EventQueue.post,
+                    CustomEvent(ChangeSceneEnum.HOSTJOINSCENE, player=player)
+                )
                 self.profile.remove_profile_callback(i, self.remove_profile, player.nickname)
 
     def create_profile(self, text_bar: InputBox):
