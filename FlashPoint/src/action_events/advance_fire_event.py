@@ -34,7 +34,6 @@ class AdvanceFireEvent(ActionEvent):
         # Change state of tile depending on previous state
         self.initial_tile = self.board.get_tile_at(self.red_dice, self.black_dice)
         self.advance_on_tile(self.initial_tile)
-        # TODO: reset every tile's visit status
         self.flashover()
         self.affect_damages()
 
@@ -187,7 +186,7 @@ class AdvanceFireEvent(ActionEvent):
                 elif isinstance(model, POIModel):
                     model.reveal()
                     model.status = POIStatusEnum.LOST
-                    self.board.remove_poi(model)
+                    self.board.remove_poi_or_victim(model)
 
                 else:
                     pass

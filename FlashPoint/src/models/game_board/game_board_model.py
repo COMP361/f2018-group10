@@ -36,12 +36,17 @@ class GameBoardModel(object):
         return tile_list
 
     @property
-    def active_pois(self) -> List[POIModel]:
+    def active_pois(self):
         return self._active_pois
 
-    def remove_poi(self, poi: POIModel):
-        if poi in self._active_pois:
-            self._active_pois.remove(poi)
+    def remove_poi_or_victim(self, poi_or_victim):
+        if poi_or_victim in self._active_pois:
+            self._active_pois.remove(poi_or_victim)
+
+    def get_random_poi_from_bank(self) -> POIModel:
+        number = random.randint(0, len(self._poi_bank))
+        poi = self._poi_bank.pop(number)
+        return poi
 
     @staticmethod
     def _init_pois():
@@ -171,8 +176,7 @@ class GameBoardModel(object):
         locations = [[2, 4], [5, 1], [5, 8]]
 
         for i in range(3):
-            number = random.randint(0, len(self._poi_bank))
-            poi = self._poi_bank.pop(number)
+            poi = self.get_random_poi_from_bank()
             # Location indices are inverted cause i wrote the list wrong lel
             poi.x_pos = locations[i][0]
             poi.y_pos = locations[i][1]
