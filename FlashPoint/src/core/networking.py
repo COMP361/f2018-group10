@@ -442,8 +442,8 @@ class Networking:
                             self.callback_client_receive(_server_reply)
                     except MastermindErrorClient:
                         self.callback_disconnect()
-                    except OSError as e:
-                        print(f"Error receiving data: {e}")
+                    except OSError:
+                        self.callback_disconnect()
 
         def disconnect(self):
             self._pause_blk_signal.set()
