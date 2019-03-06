@@ -29,8 +29,9 @@ class GameBoardScene(object):
     """Scene for displaying the main game view"""
 
     def __init__(self, screen: pygame.display, current_player: PlayerModel):
-        """:param screen : The display passed from main on which to draw the Scene."""
-
+        """
+        :param screen : The display passed from main on which to draw the Scene.
+        """
         self._save_games_file = "media/save_games.json"
         self.screen = screen
         self._game = GameStateModel.instance()
