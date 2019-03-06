@@ -46,7 +46,7 @@ class GridSprite(pygame.sprite.Group):
                 tile_sprite = TileSprite(image, self._fire_image, self._smoke_image, self.rect.x, self.rect.y, x_offset, y_offset, j, i)
                 grid[i].append(tile_sprite)
 
-                tile_model = GameStateModel.instance().game_board.get_tile_at(int(y_offset / 128), int(x_offset/ 128))
+                tile_model = GameStateModel.instance().game_board.get_tile_at(int(y_offset / 128), int(x_offset / 128))
                 self.east_obstacle = tile_model.get_obstacle_in_direction("East")
                 self.south_obstacle = tile_model.get_obstacle_in_direction("South")
 
@@ -54,15 +54,19 @@ class GridSprite(pygame.sprite.Group):
                     if isinstance(self.east_obstacle, WallModel):
                         wall = WallSprite(tile_sprite, tile_model, self.current_player, (j, i, "East"))
                         wall.button = RectButton(x_offset + 128 -7, y_offset, 14, 125, Color.BLACK)
+                        wall.button.on_click(wall.process_input, None)
                         self.walls.append(wall)
+                        tile_model.add_observer(wall)
+
                 if self.south_obstacle:
                     if isinstance(self.south_obstacle, WallModel):
-                        wall = WallSprite(tile_sprite, tile_model, self.current_player, (j, i, "West"))
+                        wall = WallSprite(tile_sprite, tile_model, self.current_player, (j, i, "South"))
                         wall.button = RectButton(x_offset, y_offset + 128 - 7, 125, 14, Color.BLACK)
+                        wall.button.on_click(wall.process_input, None)
                         self.walls.append(wall)
+                        tile_model.add_observer(wall)
 
                 self.add(grid[i][j])
-                GameStateModel.instance().game_board.get_tile_at(j, i).add_observer(tile_sprite)
 
                 y_offset += tile_size
             x_offset += tile_size
@@ -71,6 +75,7 @@ class GridSprite(pygame.sprite.Group):
     def draw(self, screen: pygame.Surface):
         for tile in self:
             tile.draw(screen)
+
         for wall in self.walls:
             wall.draw(screen)
 

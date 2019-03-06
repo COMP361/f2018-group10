@@ -4,6 +4,7 @@ import pygame
 
 from src.UIComponents.rect_label import RectLabel
 from src.constants.state_enums import WallStatusEnum
+from src.core.event_queue import EventQueue
 from src.models.game_board.tile_model import TileModel
 from src.models.game_board.wall_model import WallModel
 from src.models.game_state_model import GameStateModel
@@ -39,10 +40,12 @@ class WallSprite(pygame.sprite.Sprite, WallObserver):
     @button.setter
     def button(self, button):
         self._button = button
-        self._button.on_click(self.process_input, self._current_player)
+       # self._button.on_click(self.process_input, self._current_player)
 
     def process_input(self, current_player: PlayerModel):
-        print("Francis")
+        print(self.id)
+        x = EventQueue.get_instance()
+        print(self.tile_model)
 
     def update(self, event_queue):
         diff_x = self.tile_sprite.rect.x - self._prev_x
