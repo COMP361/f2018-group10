@@ -35,7 +35,6 @@ class GameStateModel(Model):
             self._max_damage = 24
             self._chat_history = []
             self._state = GameStateEnum.READY_TO_JOIN
-            #self._notify_player_index()
             self._game_board = GameBoardModel(self._rules)
 
             GameStateModel._instance = self
@@ -49,7 +48,6 @@ class GameStateModel(Model):
 
     @staticmethod
     def __del__():
-        print('deleting game state aahahhafah')
         GameStateModel._instance = None
 
     @classmethod

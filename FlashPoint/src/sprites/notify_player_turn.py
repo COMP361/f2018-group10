@@ -1,4 +1,3 @@
-from datetime import datetime
 import pygame
 import time
 from threading import Thread
@@ -8,16 +7,14 @@ from src.models.game_units.player_model import PlayerModel
 from src.observers.game_state_observer import GameStateObserver
 
 
+class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
 
-class NotifyPlayerTurn(pygame.sprite.Sprite,GameStateObserver):
-
-    def __init__(self, current_player: PlayerModel,current_sprite:pygame.sprite.Sprite):
+    def __init__(self, current_player: PlayerModel, current_sprite: pygame.sprite.Sprite):
         super().__init__()
         self.enabled = False
         self.countdown_thread = Thread(target=self.countdown, args=(10,))
-        self.image = pygame.Surface([250,50])
+        self.image = pygame.Surface([250, 50])
         self.font_time = pygame.font.SysFont('Agency FB', 25)
-        #self.image.fill(Color.ORANGE)
         bg = pygame.image.load('media/GameHud/wood2.png')
         self.bg = pygame.transform.scale(bg, (250, 50))
         self.msg = "YOUR TURN"
@@ -34,11 +31,10 @@ class NotifyPlayerTurn(pygame.sprite.Sprite,GameStateObserver):
 
     def draw(self, screen: pygame.display):
         if self.enabled and self._current_sprite.turn:
-            self.image.blit(self.bg,self.image.get_rect())
-            self.image.blit(self.frame,self.image.get_rect())
-            self.image.blit(self.text, self.image.get_rect().move(77,7))
-            screen.blit(self.image, self.image.get_rect().move(880,600))
-
+            self.image.blit(self.bg, self.image.get_rect())
+            self.image.blit(self.frame, self.image.get_rect())
+            self.image.blit(self.text, self.image.get_rect().move(77, 7))
+            screen.blit(self.image, self.image.get_rect().move(880, 600))
 
     def notify_player_index(self, player_index: int):
 
@@ -47,12 +43,9 @@ class NotifyPlayerTurn(pygame.sprite.Sprite,GameStateObserver):
             self._current_sprite.turn = True
             self.countdown_thread.start()
 
-
-
-
     def countdown(self, count):
         while count:
-            mins,secs = divmod(count, 60)
+            mins, secs = divmod(count, 60)
             temp = '{:02d}:{:02d}'.format(mins, secs)
             self.time_str = f"TIME LEFT: {temp}"
             self._current_sprite.text_time_left = self.font_time.render(self.time_str, True, Color.GREEN2)
@@ -60,4 +53,3 @@ class NotifyPlayerTurn(pygame.sprite.Sprite,GameStateObserver):
             count -= 1
 
         self._current_sprite.turn = False
-
