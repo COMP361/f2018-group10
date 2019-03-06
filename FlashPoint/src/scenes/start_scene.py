@@ -4,6 +4,7 @@ import pygame
 import os.path
 
 import src.constants.color as color
+from src.models.game_state_model import GameStateModel
 from src.core.custom_event import CustomEvent
 from src.core.networking import Networking
 from src.core.serializer import JSONSerializer
@@ -21,7 +22,8 @@ from src.constants.change_scene_enum import ChangeSceneEnum
 class StartScene(object):
 
     def __init__(self, screen):
-
+        if GameStateModel.instance():
+            GameStateModel.__del__()
         self.profiles = "media/profiles.json"
         self.resolution = (1280, 700)
         self.sprite_grp = pygame.sprite.Group()

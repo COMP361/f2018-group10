@@ -221,7 +221,6 @@ class Networking:
                 self.host.disconnect()
                 self.host.__del__()
                 self.host = None
-            GameStateModel.__del__()
             EventQueue.post(CustomEvent(ChangeSceneEnum.STARTSCENE))
 
         def send_to_server(self, data, compress=True):
