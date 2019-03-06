@@ -47,6 +47,8 @@ class POIIdentityEnum(Enum):
 class SpaceKindEnum(Enum):
     INDOOR = auto()
     OUTDOOR = auto()
+    ENGINE_PARKING = auto()
+    AMBULANCE_PARKING = auto()
 
 
 class SpaceStatusEnum(Enum):

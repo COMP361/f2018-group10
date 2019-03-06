@@ -96,6 +96,19 @@ class GameBoardModel(object):
                 tiles[i][left].set_adjacent_edge_obstacle("East", wall)
                 tiles[i][right].set_adjacent_edge_obstacle("West", wall)
 
+        # setting the ambulance and engine parking spaces
+        with open("media/board_layouts/engine_ambulance_locations.json", "r") as f:
+            parking_spots = json.load(f)
+            
+        for park_spot in parking_spots:
+            first_x, first_y = park_spot['first_tile']
+            second_x, second_y = park_spot['second_tile']
+            if park_spot['parking_type'] == "Ambulance":
+                tiles[first_x][first_y].space_kind = SpaceKindEnum.AMBULANCE_PARKING
+                tiles[second_x][second_y].space_kind = SpaceKindEnum.AMBULANCE_PARKING
+            else:
+                tiles[first_x][first_y].space_kind = SpaceKindEnum.ENGINE_PARKING
+                tiles[second_x][second_y].space_kind = SpaceKindEnum.ENGINE_PARKING
 
         # setting the doors present on the outside of the house EXPLICITLY
         with open("media/board_layouts/outside_door_locations.json", "r") as f:
