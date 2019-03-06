@@ -36,7 +36,7 @@ class WallSprite(pygame.sprite.Sprite, WallObserver):
         self._prev_y = self.tile_sprite.rect.y
         self.button_input = RectButton(self.tile_sprite.rect.x+50, self.tile_sprite.rect.y+50, 150, 25, Color.BLACK, 0, Text(pygame.font.SysFont('Arial', 20), "CHoP tHaT MF wAlL", Color.ORANGE))
         self.button_input.disable()
-        self.button_input.on_click(print, "hello")
+        self.button_input.on_click(self.wall_chop)
 
     @property
     def button(self):
@@ -45,6 +45,10 @@ class WallSprite(pygame.sprite.Sprite, WallObserver):
     @button.setter
     def button(self, button):
         self._button = button
+
+    def wall_chop(self):
+        self.button_input.disable()
+        print("Francisdadasdad")
 
     def process_input(self):
         self.button_input.enable()
