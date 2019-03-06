@@ -1,4 +1,4 @@
-from src.constants.state_enums import GameKindEnum
+from src.constants.state_enums import DirectionEnum, GameKindEnum
 from src.models.game_units.player_model import PlayerModel
 
 
@@ -23,8 +23,8 @@ class POINotRevealedYetException(FlashPointBaseException):
 class TilePositionOutOfBoundsException(FlashPointBaseException):
     """Class to tell you that you fucked up."""
 
-    def __init__(self, tile, direction: str):
-        message = f"{tile} has no adjacent tile in direction: {direction}."
+    def __init__(self, tile, direction: DirectionEnum):
+        message = f"{tile} has no adjacent tile in direction: {direction.value}."
         super().__init__(message)
 
 

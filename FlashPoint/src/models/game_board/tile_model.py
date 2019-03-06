@@ -40,9 +40,8 @@ class TileModel(Model):
     def __str__(self):
         return f"Tile at: ({self.x_coord}, {self.y_coord})."
 
-    def _notify_status(self):
-        for obs in self._observers:
-            obs.tile_status_changed(self._space_status)
+    def get_space_kind(self):
+        return self._space_kind
 
     @property
     def x_coord(self):
@@ -63,7 +62,6 @@ class TileModel(Model):
     @space_status.setter
     def space_status(self, space_status: SpaceStatusEnum):
         self._space_status = space_status
-        self._notify_status()
 
     @property
     def is_hotspot(self):

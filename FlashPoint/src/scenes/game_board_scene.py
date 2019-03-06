@@ -2,16 +2,18 @@ import json
 from datetime import datetime
 
 import pygame
-from src.core.networking import Networking
 from src.constants.change_scene_enum import ChangeSceneEnum
+from src.controllers.choose_starting_position_controller import ChooseStartingPositionController
 from src.core.custom_event import CustomEvent
 
 from src.UIComponents.chat_box import ChatBox
 from src.UIComponents.menu_window import MenuWindow
 from src.core.event_queue import EventQueue
+from src.core.networking import Networking
 from src.core.serializer import JSONSerializer
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
+from src.observers.game_state_observer import GameStateObserver
 from src.sprites.game_board import GameBoard
 from src.sprites.hud.player_state import PlayerState
 from src.sprites.hud.current_player_state import CurrentPlayerState
@@ -20,35 +22,42 @@ from src.sprites.hud.ingame_states import InGameStates
 import src.constants.color as Color
 from src.UIComponents.rect_button import RectButton
 from src.UIComponents.text import Text
+from src.sprites.notify_player_turn import NotifyPlayerTurn
 
 
 class GameBoardScene(object):
     """Scene for displaying the main game view"""
+
     def __init__(self, screen: pygame.display, current_player: PlayerModel):
-        """:param screen : The display passed from main on which to draw the Scene."""
+        """
+        :param screen : The display passed from main on which to draw the Scene.
+        """
         self._save_games_file = "media/save_games.json"
         self.screen = screen
         self._game = GameStateModel.instance()
         self._current_player = current_player
+        self._current_sprite = None
 
         self.quit_btn = RectButton(200, 250, 100, 50, Color.STANDARDBTN, 0,
                                    Text(pygame.font.SysFont('Arial', 20), "Quit", Color.BLACK))
 
         self.active_sprites = pygame.sprite.Group()   # Maybe add separate groups for different things later
-        # self.game_board = GameBoard(current_player)
-        # self.chat_box = ChatBox(GameStateModel.instance(), self._current_player)
         self.game_board = GameBoard(current_player)
         self.chat_box = ChatBox(self._current_player)
         self.menu = None
         self._init_sprites()
+        self.notify_turn_popup = NotifyPlayerTurn(self._current_player, self._current_sprite)
+        self.choose_start_pos_controller = ChooseStartingPositionController(current_player, self.game_board)
+        self.choose_start_pos_controller.set_active_labels(self.active_sprites)
 
     def _init_sprites(self):
         for i, player in enumerate(self._game.players):
             self.active_sprites.add(PlayerState(0, 30 + 64*i, player.nickname, player.color))
-
-        self.active_sprites.add(CurrentPlayerState(1130, 550, self._current_player.nickname, self._current_player.color))
+        self._current_sprite = CurrentPlayerState(1130, 550, self._current_player.nickname,self._current_player.color)
+        self.active_sprites.add(self._current_sprite)
         self.active_sprites.add(TimeBar(0, 0))
-        self.active_sprites.add(InGameStates(250, 650, self._game.damage, self._game.victims_saved, self._game.victims_lost))
+        self.active_sprites.add(
+            InGameStates(250, 650, self._game.damage, self._game.victims_saved, self._game.victims_lost))
         self.active_sprites.add(self._init_menu_button())
 
     def _save(self):
@@ -82,7 +91,7 @@ class GameBoardScene(object):
                               Text(pygame.font.SysFont('Agency FB', 20), "Save", Color.BLACK))
 
         quit_btn = RectButton(200, 250, 100, 50, Color.STANDARDBTN, 0,
-                                   Text(pygame.font.SysFont('Agency FB', 20), "Quit", Color.BLACK))
+                              Text(pygame.font.SysFont('Agency FB', 20), "Quit", Color.BLACK))
 
         back_btn = RectButton(50, 50, 50, 50, "media/GameHud/crosss.png", 0)
 
@@ -108,6 +117,7 @@ class GameBoardScene(object):
             self.menu.draw(screen)
 
         self.chat_box.draw(screen)
+        self.notify_turn_popup.draw(screen)
 
     def update(self, event_queue: EventQueue):
         """Call the update() function of everything in this class."""
@@ -115,5 +125,11 @@ class GameBoardScene(object):
         self.chat_box.update(event_queue)
         self.game_board.update(event_queue)
         self.active_sprites.update(event_queue)
+
         if self.menu and not self.menu.is_closed:
             self.menu.update(event_queue)
+
+        self.chat_box.update(event_queue)
+        self.notify_turn_popup.update(event_queue)
+
+        self.choose_start_pos_controller.update(event_queue)

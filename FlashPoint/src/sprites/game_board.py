@@ -23,9 +23,14 @@ class GameBoard(pygame.sprite.Group):
         self.background = FileImporter.import_image("media/backgrounds/WoodBack.jpeg")
 
     def draw(self, screen: pygame.Surface):
+
         self.image.blit(self.background, (0, 0))
         self.grid.draw(self.image)
+        for sprite in self:
+            self.image.blit(sprite.image, sprite.rect)
         screen.blit(self.image, self.rect)
 
     def update(self, event_q: EventQueue):
         self.grid.update(event_q)
+        for sprite in self:
+            sprite.update(event_q)

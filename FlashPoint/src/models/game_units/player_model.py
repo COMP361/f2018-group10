@@ -57,19 +57,14 @@ class PlayerModel(Model):
     def x_pos(self) -> int:
         return self._x_pos
 
-    @x_pos.setter
-    def x_pos(self, x_pos: int):
+    def set_pos(self, x_pos: int, y_pos: int):
         self._x_pos = x_pos
+        self._y_pos = y_pos
         self._notify_position()
 
     @property
     def y_pos(self) -> int:
         return self._y_pos
-
-    @y_pos.setter
-    def y_pos(self, y_pos: int):
-        self._y_pos = y_pos
-        self._notify_position()
 
     @property
     def ip(self) -> str:

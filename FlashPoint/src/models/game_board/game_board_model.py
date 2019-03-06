@@ -6,8 +6,8 @@ from src.models.game_board.edge_obstacle_model import EdgeObstacleModel
 from src.models.game_board.null_model import NullModel
 from src.models.game_units.poi_model import POIModel
 from src.models.game_board.tile_model import TileModel
-from src.constants.state_enums import GameKindEnum, SpaceKindEnum, SpaceStatusEnum, POIIdentityEnum, \
-    DoorStatusEnum, WallStatusEnum
+from src.constants.state_enums import GameKindEnum, SpaceKindEnum, SpaceStatusEnum, POIIdentityEnum, DirectionEnum, \
+    DoorStatusEnum
 from src.models.game_board.wall_model import WallModel
 from src.models.game_board.door_model import DoorModel
 
@@ -52,7 +52,7 @@ class GameBoardModel(object):
 
     def _determine_tile_kind(self, row: int, column: int) -> SpaceKindEnum:
         """Return whether this tile should be indoor or outdoor based on the positions."""
-        outdoor = any([row == 0, row == self._dimensions[0], column == 0, column == self._dimensions[1]])
+        outdoor = any([row == 0, row == self._dimensions[0]-1, column == 0, column == self._dimensions[1]-1])
         return SpaceKindEnum.OUTDOOR if outdoor else SpaceKindEnum.INDOOR
 
     def _init_all_tiles_family_classic(self) -> List[List[TileModel]]:
@@ -66,6 +66,7 @@ class GameBoardModel(object):
                 tile = TileModel(i, j, tile_kind)
                 tiles[i].append(tile)
 
+        # TODO: Abhijay: setting adjacency and creating walls/doors.
         # setting tile adjacencies
         self.set_adjacencies(tiles)
 
@@ -82,7 +83,6 @@ class GameBoardModel(object):
                 wall = WallModel(i, left, "East")
                 tiles[i][left].set_adjacent_edge_obstacle("East", wall)
                 tiles[i][right].set_adjacent_edge_obstacle("West", wall)
-
 
         # setting the doors present on the outside of the house EXPLICITLY
         with open("media/board_layouts/outside_door_locations.json", "r") as f:
@@ -169,31 +169,3 @@ class GameBoardModel(object):
             poi.y_pos = locations[i][1]
             self._active_pois.append(poi)
             self.get_tile_at(poi.x_pos, poi.y_pos).add_associated_model(poi)
-
-    def get_movable_tiles(self,x:int,y:int,ap:int,movable_tiles= []) -> List[TileModel]:
-
-        #ap = action points
-        currentTile = self.get_tile_at(x,y)
-        if ap >= 1:
-            for key in currentTile.adjacent_edge_objects.keys():
-                tile = currentTile.adjacent_tiles.get(key)
-                obstacle = currentTile.adjacent_edge_objects.get(key)
-
-                if isinstance(obstacle,NullModel):
-                    ap_deduct = 2 if tile.space_status == SpaceStatusEnum.FIRE else 1
-                    if tile.space_status == SpaceStatusEnum.FIRE:
-                        movable_tiles = self.get_movable_tiles(tile.x_coord, tile.y_coord, ap - ap_deduct, movable_tiles)
-                    else:
-                        movable_tiles.append(tile)
-                        movable_tiles = self.get_movable_tiles(tile.x_coord, tile.y_coord, ap - ap_deduct, movable_tiles)
-                elif isinstance(obstacle, WallModel):
-                    if tile.wall_status == WallStatusEnum.DESTROYED:
-                        movable_tiles.append(tile)
-                        movable_tiles = self.get_movable_tiles(tile.x_coord, tile.y_coord, ap - 1, movable_tiles)
-                elif isinstance(obstacle, DoorModel):
-                    if (tile.door_status == DoorStatusEnum.OPEN or tile.door_status == DoorStatusEnum.DESTROYED):
-                        movable_tiles.append(tile)
-                        movable_tiles = self.get_movable_tiles(tile.x_coord, tile.y_coord, ap - ap_deduct, movable_tiles)
-
-        output = list(dict.fromkeys(movable_tiles))
-        return output
