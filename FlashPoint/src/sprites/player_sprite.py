@@ -36,6 +36,8 @@ class PlayerSprite(pygame.sprite.Sprite, PlayerObserver):
             return "media/all_markers/whiteFighter.png"
         elif color is Color.YELLOW:
             return "media/all_markers/yellowFighter.png"
+        elif color is Color.RED:
+            return "media/all_markers/redFighter.png"
 
     def player_ap_changed(self, updated_ap: int):
         pass
