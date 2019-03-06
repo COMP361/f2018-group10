@@ -216,6 +216,7 @@ class Networking:
                 # Stops accepting connection
                 self.host.accepting_disallow()
                 # Disconnects all clients
+                self.send_to_all_client(DisconnectEvent())
                 self.host.disconnect_clients()
                 self.host.disconnect()
                 self.host.__del__()
@@ -464,6 +465,8 @@ class Networking:
                     GameStateModel.set_game(data)
             if isinstance(data, TurnEvent) or isinstance(data, ActionEvent):
                 data.execute()
+                if isinstance(data, DisconnectEvent):
+                    Networking.get_instance().disconnect()
 
         def get_server_reply(self):
             """
