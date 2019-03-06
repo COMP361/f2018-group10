@@ -36,6 +36,7 @@ class WallSprite(pygame.sprite.Sprite, WallObserver):
         self._prev_y = self.tile_sprite.rect.y
         self.button_input = RectButton(self.tile_sprite.rect.x+128, self.tile_sprite.rect.y+128, 200, 25, Color.BLACK, 0, Text(pygame.font.SysFont('Arial', 20), "CHoP tHaT MF wAlL", Color.ORANGE))
         self.button_input.disable()
+        self.button_input.on_click(print, "hello")
 
     @property
     def button(self):
@@ -46,14 +47,16 @@ class WallSprite(pygame.sprite.Sprite, WallObserver):
         self._button = button
 
     def process_input(self):
-
         self.button_input.enable()
+        def f():
+            print("Hello")
+        self.button_input.on_click(f)
 
     def update(self, event_queue):
         for event in event_queue:
             if event.type == pygame.MOUSEBUTTONUP:
-                if not (self.button_input.rect.x >= pygame.mouse.get_pos()[0] >= self.button_input.rect.x + 200) and not(
-                        self.button_input.rect.y >= pygame.mouse.get_pos()[1] >= self.button_input.rect.y + 25):
+                if not (self.button_input.rect.x <= pygame.mouse.get_pos()[0] <= self.button_input.rect.x + 200) and not(
+                        self.button_input.rect.y <= pygame.mouse.get_pos()[1] <= self.button_input.rect.y + 25):
                     self.button_input.disable()
         diff_x = self.tile_sprite.rect.x - self._prev_x
         diff_y = self.tile_sprite.rect.y - self._prev_y
@@ -63,6 +66,7 @@ class WallSprite(pygame.sprite.Sprite, WallObserver):
         self.button_input.rect.x = self.tile_sprite.rect.x
         self.button_input.rect.y = self.tile_sprite.rect.y
         self._button.update(event_queue)
+        self.button_input.update(event_queue)
 
 
     def wall_status_changed(self, status: WallStatusEnum):
@@ -72,6 +76,8 @@ class WallSprite(pygame.sprite.Sprite, WallObserver):
             self.destroyed = True
         else:
             raise Exception("Wall status changed back to Intact")
+
+
 
     def draw(self, screen):
         self.button.draw(screen)
