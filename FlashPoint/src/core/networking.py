@@ -336,7 +336,7 @@ class Networking:
             if game:
                 players = [x for x in game.players if x.ip == connection_object.address[0]]
                 if players:
-                    game.remove_player(players[0])
+                    # game.remove_player(players[0])
                     self.kick_client(connection_object.address[0])
             return super(MastermindServerUDP, self).callback_disconnect()
 
