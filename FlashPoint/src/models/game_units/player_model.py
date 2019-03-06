@@ -1,6 +1,8 @@
 from typing import Tuple, List
 
 import src.constants.color as Color
+from src.models.game_board.null_model import NullModel
+from src.models.game_units.victim_model import VictimModel
 from src.observers.player_observer import PlayerObserver
 from src.constants.state_enums import PlayerStatusEnum
 from src.models.model import Model
@@ -20,6 +22,7 @@ class PlayerModel(Model):
         self._special_ap = 0
         self._wins = 0
         self._losses = 0
+        self._carrying_victim = NullModel()
 
     def __eq__(self, other):
         x = [other.ip == self.ip, other.nickname == self.nickname, other.x_pos == self.x_pos, other.y_pos == self.y_pos]
@@ -139,3 +142,12 @@ class PlayerModel(Model):
     def status(self, status: PlayerStatusEnum):
         self._status = status
         self._notify_status()
+
+    @property
+    def carrying_victim(self):
+        return self._carrying_victim
+
+    @carrying_victim.setter
+    def carrying_victim(self, victim: VictimModel):
+        self._carrying_victim = victim
+        
