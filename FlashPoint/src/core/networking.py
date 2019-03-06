@@ -216,12 +216,11 @@ class Networking:
                 # Stops accepting connection
                 self.host.accepting_disallow()
                 # Disconnects all clients
+                self.send_to_all_client(DisconnectEvent())
                 self.host.disconnect_clients()
                 self.host.disconnect()
                 self.host.__del__()
                 self.host = None
-            print("Deleting game state")
-            GameStateModel.__del__()
             EventQueue.post(CustomEvent(ChangeSceneEnum.STARTSCENE))
 
         def send_to_server(self, data, compress=True):
@@ -443,8 +442,8 @@ class Networking:
                             self.callback_client_receive(_server_reply)
                     except MastermindErrorClient:
                         self.callback_disconnect()
-                    except OSError as e:
-                        print(f"Error receiving data: {e}")
+                    except OSError:
+                        self.callback_disconnect()
 
         def disconnect(self):
             self._pause_blk_signal.set()
@@ -462,6 +461,8 @@ class Networking:
                 GameStateModel.set_game(data)
             if isinstance(data, TurnEvent) or isinstance(data, ActionEvent):
                 data.execute()
+                if isinstance(data, DisconnectEvent):
+                    Networking.get_instance().disconnect()
 
         def get_server_reply(self):
             """
@@ -487,11 +488,12 @@ class Networking:
             else:
                 self._pause_blk_signal.clear()
 
-        def callback_disconnect(self):
+        @staticmethod
+        def callback_disconnect():
             """
             Define callback here when client's connection to host is interrupted.
             :return:
             """
             print("It seems that client is not connected...")
-            self.disconnect()
+            Networking.get_instance().disconnect()
 

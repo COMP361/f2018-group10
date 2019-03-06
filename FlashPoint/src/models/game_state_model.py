@@ -37,7 +37,6 @@ class GameStateModel(Model):
             self._max_damage = 24
             self._chat_history = []
             self._state = GameStateEnum.READY_TO_JOIN
-
             self._game_board = GameBoardModel(self._rules)
 
             GameStateModel._instance = self
@@ -45,9 +44,12 @@ class GameStateModel(Model):
             print("Attempted to instantiate another singleton")
             raise Exception("GameStateModel is a Singleton")
 
+    def _notify_player_index(self):
+        for obs in self.observers:
+            obs.notify_player_index(self._players_turn_index)
+
     @staticmethod
     def __del__():
-        print('deleting game state aahahhafah')
         GameStateModel._instance = None
 
     @classmethod
@@ -116,6 +118,7 @@ class GameStateModel(Model):
     def next_player(self):
         """Rotate to the next player in the players list, round robin style."""
         self._players_turn_index = (self._players_turn_index + 1) % len(self._players)
+        self._notify_player_index()
 
     @property
     def difficulty_level(self) -> Optional[DifficultyLevelEnum]:
