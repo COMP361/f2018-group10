@@ -35,6 +35,14 @@ class GameBoardModel(object):
                 tile_list.append(self.get_tile_at(row, column))
         return tile_list
 
+    @property
+    def active_pois(self) -> List[POIModel]:
+        return self._active_pois
+
+    def remove_poi(self, poi: POIModel):
+        if poi in self._active_pois:
+            self._active_pois.remove(poi)
+
     @staticmethod
     def _init_pois():
         pois = []
@@ -52,7 +60,7 @@ class GameBoardModel(object):
 
     def _determine_tile_kind(self, row: int, column: int) -> SpaceKindEnum:
         """Return whether this tile should be indoor or outdoor based on the positions."""
-        outdoor = any([row == 0, row == self._dimensions[0], column == 0, column == self._dimensions[1]])
+        outdoor = any([row == 0, row == self._dimensions[0]-1, column == 0, column == self._dimensions[1]-1])
         return SpaceKindEnum.OUTDOOR if outdoor else SpaceKindEnum.INDOOR
 
     def _init_all_tiles_family_classic(self) -> List[List[TileModel]]:

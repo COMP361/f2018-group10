@@ -187,6 +187,7 @@ class AdvanceFireEvent(ActionEvent):
                 elif isinstance(model, POIModel):
                     model.reveal()
                     model.status = POIStatusEnum.LOST
+                    self.board.remove_poi(model)
 
                 else:
                     pass
