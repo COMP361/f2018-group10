@@ -366,15 +366,16 @@ class Networking:
                     Networking.get_instance().send_to_all_client(data)
                     return super(MastermindServerUDP, self).callback_client_handle(connection_object, data)
 
-                if isinstance(data, JoinEvent):
-                    Networking.get_instance().send_to_all_client(GameStateModel.instance())
+                data.execute()
 
                 if isinstance(data, DisconnectEvent):
                     # Kick the player that send the DC event and notify all other players.
                     # Need to have similar polling mechanics like in lobby
                     self.kick_client(connection_object.address[0])
 
-                data.execute()
+                if isinstance(data, JoinEvent):
+                    Networking.get_instance().send_to_all_client(GameStateModel.instance())
+
             return super(MastermindServerUDP, self).callback_client_handle(connection_object, data)
 
         def callback_client_send(self, connection_object, data, compression=None):
