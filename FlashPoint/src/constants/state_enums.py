@@ -31,6 +31,7 @@ class PlayerStatusEnum(Enum):
     READY = auto()
     NOT_READY = auto()
     IN_GAME = auto()
+    KNOCKED_DOWN = auto()
 
 
 class POIStatusEnum(Enum):

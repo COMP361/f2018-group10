@@ -1,5 +1,5 @@
 from src.action_events.action_event import ActionEvent
-from src.action_events.turn_events.knock_down_event import KnockDownEvent
+from src.action_events.knock_down_event import KnockDownEvent
 from src.constants.state_enums import WallStatusEnum, SpaceStatusEnum, SpaceKindEnum, VictimStateEnum, DoorStatusEnum, \
     POIStatusEnum
 from src.models.game_board.door_model import DoorModel

@@ -1,4 +1,5 @@
 from src.action_events.action_event import ActionEvent
+from src.constants.state_enums import PlayerStatusEnum
 from src.models.game_units.player_model import PlayerModel
 
 # TODO: resolve knock down. Please refer to M5 models to save some time on this:
@@ -14,4 +15,4 @@ class KnockDownEvent(ActionEvent):
         self.player = player
 
     def execute(self):
-        pass
+        self.player.status = PlayerStatusEnum.KNOCKED_DOWN
