@@ -20,7 +20,8 @@ class ChooseStartingPositionController(object):
                                       Text(pygame.font.SysFont('Agency FB', 30), "Choose starting position",
                                            Color.ORANGE))
         self.board_state = GameStateModel.instance()
-        self.game_board = self.board_state.game_board
+        self.game_board_model = self.board_state.game_board
+        self.game_board_sprite = game_board
         self.grid = game_board.grid
 
     def set_active_labels(self, sprite_grp):
@@ -43,7 +44,7 @@ class ChooseStartingPositionController(object):
                 curr_tile = self.grid.grid[i][j]
                 is_legal = True
                 # get associated tile_model
-                tile_model = self.game_board.get_tile_at(j, i)
+                tile_model = self.game_board_model.get_tile_at(j, i)
                 out = tile_model.get_space_kind()
 
                 for models in tile_model.associated_models:
@@ -55,8 +56,9 @@ class ChooseStartingPositionController(object):
                         curr_tile.hover_color = Color.GREEN
 
                     if curr_tile.is_clicked():
-                        ChooseStartingPositionEvent(tile_model)
-                        self.game_board.add(PlayerSprite(curr_tile, self.grid))
+
+                        event = ChooseStartingPositionEvent(tile_model)
+                        self.game_board_sprite.add(PlayerSprite(curr_tile, self.grid))
                         self.choose_label.kill()
                         # delete this controller in case of success scenario, the backend event has been instantiated
                         break
@@ -64,21 +66,3 @@ class ChooseStartingPositionController(object):
                 else:
                     if curr_tile.hover():
                         curr_tile.hover_color = Color.RED
-
-                """"if out is SpaceKindEnum.INDOOR:
-                    if curr_tile.hover():
-                        curr_tile.highlight(Color.RED)
-
-
-                elif out is SpaceKindEnum.OUTDOOR:
-
-                    # have to loop through tile_model to check if there is a player on that tile:
-                    for models in tile_model.associated_models():
-                        if isinstance(models, PlayerModel):
-
-
-                    if curr_tile.hover():
-                        curr_tile.highlight(Color.GREEN)
-
-                    if curr_tile.is_clicked():
-                        """

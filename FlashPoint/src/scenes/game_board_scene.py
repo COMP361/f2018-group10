@@ -119,7 +119,6 @@ class GameBoardScene(object):
 
         self.chat_box.update(event_queue)
         self.game_board.update(event_queue)
-        self.game_board.update(event_queue)
         self.active_sprites.update(event_queue)
 
         if self.menu and not self.menu.is_closed:

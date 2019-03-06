@@ -113,7 +113,7 @@ class Interactable(pygame.sprite.Sprite):
         """
         if self._is_enabled:
             if isinstance(self._click_action, Callable):
-                self._click_action(*self._click_args, **self._click_kwargs)
+                return self._click_action(*self._click_args, **self._click_kwargs)
 
     def hover(self):
         """

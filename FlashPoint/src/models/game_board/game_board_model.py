@@ -49,7 +49,7 @@ class GameBoardModel(object):
 
     def _determine_tile_kind(self, row: int, column: int) -> SpaceKindEnum:
         """Return whether this tile should be indoor or outdoor based on the positions."""
-        outdoor = any([row == 0, row == self._dimensions[0], column == 0, column == self._dimensions[1]])
+        outdoor = any([row == 0, row == self._dimensions[0]-1, column == 0, column == self._dimensions[1]-1])
         return SpaceKindEnum.OUTDOOR if outdoor else SpaceKindEnum.INDOOR
 
     def _init_all_tiles_family_classic(self) -> List[List[TileModel]]:

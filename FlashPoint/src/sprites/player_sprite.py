@@ -58,3 +58,4 @@ class PlayerSprite(pygame.sprite.Sprite, PlayerObserver):
 
     def choose_starting_location(self):
         pass
+

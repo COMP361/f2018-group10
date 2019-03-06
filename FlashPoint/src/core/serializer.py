@@ -1,6 +1,5 @@
 import enum
 import json
-import threading
 from typing import Dict
 
 from src.models.game_board.game_board_model import GameBoardModel
@@ -45,9 +44,7 @@ class JSONSerializer(object):
         game.victims_lost = payload['_victims_lost']
         game.victims_saved = payload['_victims_saved']
 
-        GameStateModel.set_game(game)
         GameStateModel.lock.release()
-
         return game
 
     @staticmethod
