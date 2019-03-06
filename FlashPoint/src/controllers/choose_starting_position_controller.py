@@ -20,7 +20,10 @@ class ChooseStartingPositionController(object):
         self.choose_label = RectLabel(500, 0, 300, 75, Color.GREY, 0,
                                       Text(pygame.font.SysFont('Agency FB', 30), "Choose starting position",
                                            Color.ORANGE))
-        self.wait_button = None
+
+        self.wait_button = RectLabel(500, 400, 300, 75, Color.GREY, 0,
+                                      Text(pygame.font.SysFont('Agency FB', 30), "Wait for your turn!",
+                                           Color.ORANGE))
         self.board_state = GameStateModel.instance()
         self.game_board_model = self.board_state.game_board
         self.game_board_sprite = game_board
@@ -29,17 +32,13 @@ class ChooseStartingPositionController(object):
 
     def set_active_labels(self, sprite_grp):
         sprite_grp.add(self.choose_label)
-        if self.wait_button:
+        if not self.player == self.board_state.players_turn:
             sprite_grp.add(self.wait_button)
 
     def update(self, eventq: EventQueue):
 
-        if not self.player == self.board_state.players_turn:
-            self.wait_button = RectLabel(500, 400, 300, 75, Color.GREY, 0,
-                                      Text(pygame.font.SysFont('Agency FB', 30), "Wait for your turn!",
-                                           Color.ORANGE))
+        if self.player == self.board_state.players_turn:
         # Loop through the grid to find where the mouse is pointing
-        else:
             if self.wait_button:
                 self.wait_button.kill()
                 self.wait_button = None
