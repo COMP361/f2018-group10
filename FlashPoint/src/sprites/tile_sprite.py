@@ -69,9 +69,10 @@ class TileSprite(Interactable,TileObserver):
 
     def _highlight(self, color: Tuple[int, int, int, float]):
         if self.hover() and self._is_enabled:
-            if not self.is_hovered:
+            if not self._is_hovered:
                 self.is_hovered = True
-                hover = pygame.Surface((self._backup_image.get_width(), self._backup_image.get_height()), pygame.SRCALPHA)
+                hover = pygame.Surface(
+                    (self._non_highlight_image.get_width(), self._non_highlight_image.get_height()), pygame.SRCALPHA)
                 hover.fill(color)
                 self.image.blit(hover, (0, 0))
         else:

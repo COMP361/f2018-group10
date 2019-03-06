@@ -141,12 +141,12 @@ class ChooseStartingPositionController(object):
         self.scene = game_scene
         self.player = player
         """The offset of this rectlabel might be wickedly off, please someone has to check it"""
-        self.choose_label = RectLabel(500, 250, 500, 150, Color.WHITE, 0,
-                                      Text(pygame.font.SysFont('Agency FB', 20), "Choose starting position",
-                                           Color.BLACK))
+        self.choose_label = RectLabel(500, 0, 300, 75, Color.GREY, 0,
+                                      Text(pygame.font.SysFont('Agency FB', 30), "Choose starting position",
+                                           Color.ORANGE))
         self.scene.active_sprites.add(self.choose_label)
         self.board_state = GameStateModel.instance()
-        self.game_board = self.board_state.game_board()
+        self.game_board = self.board_state.game_board
         self.grid = GameBoard().grid
 
     def update(self):
@@ -180,6 +180,7 @@ class ChooseStartingPositionController(object):
                     if curr_tile.is_clicked():
                         ChooseStartingPositionEvent(tile_model)
                         self.scene.active_sprites.add(PlayerSprite(curr_tile))
+                        self.choose_label.kill()
                         del self
                         # delete this controller in case of success scenario, the backend event has been instantiated
                         break
