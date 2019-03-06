@@ -16,17 +16,17 @@ class ChopEvent(TurnEvent):
         game: GameStateModel = GameStateModel.instance()
         # TODO: Start here - This is the precondition code - Move it to the GUI
         valid_to_chop = self.has_required_AP(fireman.ap, 2)
-        if not valid_to_chop:
-            raise NotEnoughAPException("chop the wall", 2)
-
-        player_tile = game.game_board.get_tile_at(fireman.x_pos, fireman.y_pos)
-
-        if wall not in player_tile.adjacent_edge_objects.values():
-            raise ModelNotAdjacentException("wall", fireman.x_pos, fireman.y_pos)
-
-        wall_status = wall.wall_status
-        if wall_status == WallStatusEnum.DESTROYED:
-            raise WallAlreadyDestroyedException()
+        # if not valid_to_chop:
+        #     raise NotEnoughAPException("chop the wall", 2)
+        #
+        # player_tile = game.game_board.get_tile_at(fireman.x_pos, fireman.y_pos)
+        #
+        # if wall not in player_tile.adjacent_edge_objects.values():
+        #     raise ModelNotAdjacentException("wall", fireman.x_pos, fireman.y_pos)
+        #
+        # wall_status = wall.wall_status
+        # if wall_status == WallStatusEnum.DESTROYED:
+        #     raise WallAlreadyDestroyedException()
         # TODO: End here
 
         wall.inflict_damage()
