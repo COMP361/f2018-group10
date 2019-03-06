@@ -492,11 +492,12 @@ class Networking:
             else:
                 self._pause_blk_signal.clear()
 
-        def callback_disconnect(self):
+        @staticmethod
+        def callback_disconnect():
             """
             Define callback here when client's connection to host is interrupted.
             :return:
             """
             print("It seems that client is not connected...")
-            self.disconnect()
+            Networking.get_instance().disconnect()
 
