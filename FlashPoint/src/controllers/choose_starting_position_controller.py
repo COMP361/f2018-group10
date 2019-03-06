@@ -27,6 +27,8 @@ class ChooseStartingPositionController(object):
 
     def set_active_labels(self, sprite_grp):
         sprite_grp.add(self.choose_label)
+        if self.wait_button:
+            sprite_grp.add(self.wait_button)
 
     def update(self, eventq: EventQueue):
 
@@ -34,11 +36,11 @@ class ChooseStartingPositionController(object):
             self.wait_button = RectLabel(500, 400, 300, 75, Color.GREY, 0,
                                       Text(pygame.font.SysFont('Agency FB', 30), "Wait for your turn!",
                                            Color.ORANGE))
-            self.set_active_labels(self.wait_button)
-        #Loop through the grid to find where the mouse is pointing
+        # Loop through the grid to find where the mouse is pointing
         else:
-            if self.wait_button is not None:
+            if self.wait_button:
                 self.wait_button.kill()
+                self.wait_button = None
             for i in range(len(self.grid.grid)):
                 for j in range(len(self.grid.grid[i])):
                     """1. get the tile at i,j index
