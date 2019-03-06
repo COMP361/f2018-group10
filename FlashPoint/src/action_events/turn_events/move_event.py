@@ -20,7 +20,7 @@ class Move(ActionEvent):
         cost = self.compute_distance(curr_location, cost)
 
     def compute_distance(self, curr_location: TileModel, cost: int):
-
+        pass
 
     def execute(self):
         pass

@@ -13,12 +13,13 @@ class PlayerSprite(pygame.sprite.Sprite, PlayerObserver):
 
     def __init__(self, tile_sprite: TileSprite):
         super().__init__()
-        self.associated_png = self._associate_image()
-        self.image = FileImporter.import_image(self.associated_png)
+
         self.tile = tile_sprite
         self.rect = self.tile.rect
-        self.associated_player = GameStateModel.instance().players_turn()
-        self.associated_player.super().add_observer(self)
+        self.associated_player = GameStateModel.instance().players_turn
+        self.associated_player.add_observer(self)
+        self.associated_png = self._associate_image()
+        self.image = FileImporter.import_image(self.associated_png)
 
     def _associate_image(self):
 
