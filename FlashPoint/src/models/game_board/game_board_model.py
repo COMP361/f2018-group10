@@ -23,6 +23,8 @@ class GameBoardModel(object):
         self._tiles = self._init_all_tiles_family_classic() if game_type == GameKindEnum.FAMILY else None
         self._poi_bank = GameBoardModel._init_pois()
         self._active_pois = []
+        self._ambulance_spots = []
+        self._engine_spots = []
 
     def get_tiles(self) -> List[List[TileModel]]:
         return self._tiles
@@ -34,6 +36,14 @@ class GameBoardModel(object):
             for column in range(len(self._tiles[row])):
                 tile_list.append(self.get_tile_at(row, column))
         return tile_list
+
+    @property
+    def ambulance_spots(self) -> List[Tuple[TileModel]]:
+        return self._ambulance_spots
+
+    @property
+    def engine_spots(self) -> List[Tuple[TileModel]]:
+        return self._engine_spots
 
     @property
     def active_pois(self):
@@ -103,12 +113,16 @@ class GameBoardModel(object):
         for park_spot in parking_spots:
             first_x, first_y = park_spot['first_tile']
             second_x, second_y = park_spot['second_tile']
+            first_tile = tiles[first_x][first_y]
+            second_tile = tiles[second_x][second_y]
             if park_spot['parking_type'] == "Ambulance":
-                tiles[first_x][first_y].space_kind = SpaceKindEnum.AMBULANCE_PARKING
-                tiles[second_x][second_y].space_kind = SpaceKindEnum.AMBULANCE_PARKING
+                first_tile.space_kind = SpaceKindEnum.AMBULANCE_PARKING
+                second_tile.space_kind = SpaceKindEnum.AMBULANCE_PARKING
+                self.ambulance_spots.append((first_tile, second_tile))
             else:
-                tiles[first_x][first_y].space_kind = SpaceKindEnum.ENGINE_PARKING
-                tiles[second_x][second_y].space_kind = SpaceKindEnum.ENGINE_PARKING
+                first_tile.space_kind = SpaceKindEnum.ENGINE_PARKING
+                second_tile.space_kind = SpaceKindEnum.ENGINE_PARKING
+                self.engine_spots.append((first_tile, second_tile))
 
         # setting the doors present on the outside of the house EXPLICITLY
         with open("media/board_layouts/outside_door_locations.json", "r") as f:
