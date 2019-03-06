@@ -56,8 +56,7 @@ class JSONSerializer(object):
         nickname = payload['_nickname']
 
         player = PlayerModel(ip, nickname)
-        player.x_pos = payload['_x_pos']
-        player.y_pos = payload['_y_pos']
+        player.set_pos(payload['_x_pos'], payload['_y_pos'])
         player.color = tuple(payload['_color'])
         player.status = PlayerStatusEnum(payload["_status"]["value"])
         player.ap = payload['_ap']

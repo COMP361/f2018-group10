@@ -6,18 +6,12 @@ from src.constants.change_scene_enum import ChangeSceneEnum
 from src.controllers.choose_starting_position_controller import ChooseStartingPositionController
 from src.core.custom_event import CustomEvent
 
-from src.UIComponents.rect_label import RectLabel
-from src.action_events.turn_events.choose_starting_position_event import ChooseStartingPositionEvent
-from src.constants.state_enums import SpaceKindEnum
-from src.core.networking import Networking
-
 from src.UIComponents.chat_box import ChatBox
 from src.UIComponents.menu_window import MenuWindow
 from src.core.event_queue import EventQueue
 from src.core.networking import Networking
 from src.core.serializer import JSONSerializer
 from src.models.game_state_model import GameStateModel
-from src.models.game_units import player_model
 from src.models.game_units.player_model import PlayerModel
 from src.sprites.game_board import GameBoard
 from src.sprites.hud.player_state import PlayerState
@@ -27,7 +21,6 @@ from src.sprites.hud.ingame_states import InGameStates
 import src.constants.color as Color
 from src.UIComponents.rect_button import RectButton
 from src.UIComponents.text import Text
-from src.sprites.player_sprite import PlayerSprite
 
 
 class GameBoardScene(object):
@@ -128,10 +121,9 @@ class GameBoardScene(object):
         self.game_board.update(event_queue)
         self.game_board.update(event_queue)
         self.active_sprites.update(event_queue)
+
         if self.menu and not self.menu.is_closed:
             self.menu.update(event_queue)
 
         self.chat_box.update(event_queue)
         self.choose_start_pos_controller.update(event_queue)
-
-

@@ -56,7 +56,7 @@ class ChooseStartingPositionController(object):
 
                     if curr_tile.is_clicked():
                         ChooseStartingPositionEvent(tile_model)
-                        PlayerSprite(curr_tile)
+                        self.game_board.add(PlayerSprite(curr_tile, self.grid))
                         self.choose_label.kill()
                         # delete this controller in case of success scenario, the backend event has been instantiated
                         break
