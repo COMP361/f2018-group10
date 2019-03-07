@@ -20,6 +20,8 @@ class GameBoardModel(object):
 
     def __init__(self, game_type: GameKindEnum):
         self._dimensions = (8, 10)
+        self._ambulance_spots = []
+        self._engine_spots = []
         self._tiles = self._init_all_tiles_family_classic() if game_type == GameKindEnum.FAMILY else None
         self._poi_bank = GameBoardModel._init_pois()
         self._active_pois = []
@@ -34,6 +36,27 @@ class GameBoardModel(object):
             for column in range(len(self._tiles[row])):
                 tile_list.append(self.get_tile_at(row, column))
         return tile_list
+
+    @property
+    def ambulance_spots(self) -> List[Tuple[TileModel]]:
+        return self._ambulance_spots
+
+    @property
+    def engine_spots(self) -> List[Tuple[TileModel]]:
+        return self._engine_spots
+
+    @property
+    def active_pois(self):
+        return self._active_pois
+
+    def remove_poi_or_victim(self, poi_or_victim):
+        if poi_or_victim in self._active_pois:
+            self._active_pois.remove(poi_or_victim)
+
+    def get_random_poi_from_bank(self) -> POIModel:
+        number = random.randint(0, len(self._poi_bank))
+        poi = self._poi_bank.pop(number)
+        return poi
 
     @staticmethod
     def _init_pois():
@@ -83,6 +106,24 @@ class GameBoardModel(object):
                 wall = WallModel(i, left, "East")
                 tiles[i][left].set_adjacent_edge_obstacle("East", wall)
                 tiles[i][right].set_adjacent_edge_obstacle("West", wall)
+
+        # setting the ambulance and engine parking spaces
+        with open("media/board_layouts/engine_ambulance_locations.json", "r") as f:
+            parking_spots = json.load(f)
+            
+        for park_spot in parking_spots:
+            first_x, first_y = park_spot['first_tile']
+            second_x, second_y = park_spot['second_tile']
+            first_tile = tiles[first_x][first_y]
+            second_tile = tiles[second_x][second_y]
+            if park_spot['parking_type'] == "Ambulance":
+                first_tile.space_kind = SpaceKindEnum.AMBULANCE_PARKING
+                second_tile.space_kind = SpaceKindEnum.AMBULANCE_PARKING
+                self.ambulance_spots.append((first_tile, second_tile))
+            else:
+                first_tile.space_kind = SpaceKindEnum.ENGINE_PARKING
+                second_tile.space_kind = SpaceKindEnum.ENGINE_PARKING
+                self.engine_spots.append((first_tile, second_tile))
 
         # setting the doors present on the outside of the house EXPLICITLY
         with open("media/board_layouts/outside_door_locations.json", "r") as f:
@@ -162,10 +203,96 @@ class GameBoardModel(object):
         locations = [[2, 4], [5, 1], [5, 8]]
 
         for i in range(3):
-            number = random.randint(0, len(self._poi_bank))
-            poi = self._poi_bank.pop(number)
+            poi = self.get_random_poi_from_bank()
             # Location indices are inverted cause i wrote the list wrong lel
             poi.x_pos = locations[i][0]
             poi.y_pos = locations[i][1]
             self._active_pois.append(poi)
             self.get_tile_at(poi.x_pos, poi.y_pos).add_associated_model(poi)
+
+    def get_movable_tiles(self,x:int,y:int,ap:int,movable_tiles= []) -> List[TileModel]:
+
+        #ap = action points
+        currentTile = self.get_tile_at(x,y)
+        if ap >= 1:
+            for key in currentTile.adjacent_edge_objects.keys():
+                tile = currentTile.adjacent_tiles.get(key)
+                obstacle = currentTile.adjacent_edge_objects.get(key)
+
+                if isinstance(obstacle,NullModel):
+                    ap_deduct = 2 if tile.space_status == SpaceStatusEnum.FIRE else 1
+                    if tile.space_status == SpaceStatusEnum.FIRE:
+                        movable_tiles = self.get_movable_tiles(tile.x_coord, tile.y_coord, ap - ap_deduct, movable_tiles)
+                    else:
+                        movable_tiles.append(tile)
+                        movable_tiles = self.get_movable_tiles(tile.x_coord, tile.y_coord, ap - ap_deduct, movable_tiles)
+                elif isinstance(obstacle, WallModel):
+                    if tile.wall_status == WallStatusEnum.DESTROYED:
+                        movable_tiles.append(tile)
+                        movable_tiles = self.get_movable_tiles(tile.x_coord, tile.y_coord, ap - 1, movable_tiles)
+                elif isinstance(obstacle, DoorModel):
+                    if (tile.door_status == DoorStatusEnum.OPEN or tile.door_status == DoorStatusEnum.DESTROYED):
+                        movable_tiles.append(tile)
+                        movable_tiles = self.get_movable_tiles(tile.x_coord, tile.y_coord, ap - ap_deduct, movable_tiles)
+
+        output = list(dict.fromkeys(movable_tiles))
+        return output
+
+    def distance_between_tiles(self, first_tile: TileModel, second_tile: TileModel) -> int:
+        return abs(first_tile.x_coord - second_tile.x_coord) + abs(first_tile.y_coord - second_tile.y_coord)
+
+    def find_closest_parking_spots(self, parking_type: str, current_tile: TileModel) -> List[TileModel]:
+        """
+        Find the closest parking spot to a given position.
+
+        :param parking_type: "Engine" or "Ambulance"
+        :param current_tile:
+        :return: A list of the closest parking spots (the closer tile for each parking spot)
+        """
+        min_distance = 100
+        if parking_type == "Ambulance":
+            parking_spots = self.ambulance_spots
+        elif parking_type == "Engine":
+            parking_spots = self.engine_spots
+        else:
+            pass
+
+        spot_distances = {}
+        for park_spot in parking_spots:
+            first_tile = park_spot[0]
+            second_tile = park_spot[1]
+
+            dist_from_first_tile = self.distance_between_tiles(current_tile, first_tile)
+            dist_from_second_tile = self.distance_between_tiles(current_tile, second_tile)
+            # the smaller distance from the two tiles of the
+            # parking spot will denote the overall distance
+            # from the parking spot
+            dist_from_spot = min(dist_from_first_tile, dist_from_second_tile)
+
+            # determining the closer tile from the
+            # two tiles of the parking spot
+            if dist_from_first_tile < dist_from_second_tile:
+                closer_tile_on_spot = first_tile
+            else:
+                closer_tile_on_spot = second_tile
+
+            spot_key = first_tile.__str__() + second_tile.__str__()
+            # a dictionary which maps the key of the spot to
+            # the distance from that spot and the closer tile
+            # of that spot
+            spot_distances[spot_key] = (dist_from_spot, closer_tile_on_spot)
+
+            # determining the minimum distance
+            if dist_from_spot < min_distance:
+                min_distance = dist_from_spot
+
+        # make a list of the
+        # closest parking spots
+        closest_spots = []
+        for spot_key, value in spot_distances.items():
+            distance = value[0]
+            closer_tile_on_spot = value[1]
+            if distance == min_distance:
+                closest_spots.append(closer_tile_on_spot)
+
+        return closest_spots
