@@ -338,6 +338,7 @@ class Networking:
                 players = [x for x in game.players if x.ip == connection_object.address[0]]
                 if players:
                     # game.remove_player(players[0])
+                    print(f"Removing player at {connection_object.address}")
                     self.kick_client(connection_object.address[0])
             return super(MastermindServerUDP, self).callback_disconnect()
 
@@ -442,8 +443,8 @@ class Networking:
                             self.callback_client_receive(_server_reply)
                     except MastermindErrorClient:
                         self.callback_disconnect()
-                    except OSError as e:
-                        print(f"Error receiving data: {e}")
+                    except OSError:
+                        self.callback_disconnect()
 
         def disconnect(self):
             self._pause_blk_signal.set()

@@ -78,7 +78,7 @@ class JSONSerializer(object):
     def _deserialize_ready_event(payload: Dict) -> ReadyEvent:
         player: PlayerModel = JSONSerializer.deserialize(payload['_player'])
         ready: bool = payload['_ready']
-        return ReadyEvent(player,ready)
+        return ReadyEvent(player, ready)
 
     @staticmethod
     def _deserialize_join_event(payload: Dict) -> JoinEvent:
