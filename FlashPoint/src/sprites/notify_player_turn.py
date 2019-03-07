@@ -12,9 +12,9 @@ from src.observers.game_state_observer import GameStateObserver
 from src.UIComponents.text import Text
 
 
-class NotifyPlayerTurn(pygame.sprite.Sprite,GameStateObserver):
+class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
 
-    def __init__(self, current_player: PlayerModel,current_sprite:pygame.sprite.Sprite,sprite_group:pygame.sprite.Group):
+    def __init__(self, current_player: PlayerModel, current_sprite:pygame.sprite.Sprite,sprite_group:pygame.sprite.Group):
         super().__init__()
         self.enabled = False
         self.running = True
@@ -47,7 +47,8 @@ class NotifyPlayerTurn(pygame.sprite.Sprite,GameStateObserver):
 
         self.enabled = GameStateModel.instance().players[player_index] == self._current_player
         if self.enabled:
-            self._active_sprites.add(self._init_end_turn_button())
+            self.btn = self._init_end_turn_button()
+            self._active_sprites.add(self.btn)
             self._current_sprite.turn = True
             self.running = True
 
@@ -68,9 +69,8 @@ class NotifyPlayerTurn(pygame.sprite.Sprite,GameStateObserver):
             self._current_sprite.text_time_left = self.font_time.render(self.time_str, True, Color.GREEN2)
             time.sleep(1)
             count -= 1
-
-        #self._end_turn()
-
+        self.enabled = False
+        self._active_sprites.remove(self.btn)
         turn_event = EndTurnEvent()
         # send end turn, see ChatBox for example
         if Networking.get_instance().is_host:
