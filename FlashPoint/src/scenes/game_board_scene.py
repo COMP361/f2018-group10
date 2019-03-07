@@ -79,11 +79,12 @@ class GameBoardScene(object):
 
     def _init_not_your_turn(self):
 
-        rct = RectLabel(880,600,250,50,background=Color.ORANGE,
-                        txt_obj=Text(pygame.font.SysFont('Agency FB', 30),"NOT YOUR TURN",Color.GREEN2))
+        rct = RectLabel(880, 600, 250, 50, background=Color.ORANGE,
+                        txt_obj=Text(pygame.font.SysFont('Agency FB', 30), "NOT YOUR TURN", Color.GREEN2))
         rct.change_bg_image('media/GameHud/wood2.png')
         rct.add_frame('media/GameHud/frame.png')
         return rct
+
 
     def _quit_btn_on_click(self):
         Networking.get_instance().disconnect()

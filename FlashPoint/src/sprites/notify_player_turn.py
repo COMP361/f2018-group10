@@ -18,20 +18,12 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
 
     def __init__(self, current_player: PlayerModel, current_sprite:pygame.sprite.Sprite,sprite_group:pygame.sprite.Group):
         super().__init__()
+        self.image = pygame.Surface([0,0])
+        self.rect = self.image.get_rect()
         self.enabled = False
         self.running = True
         self.countdown_thread = None
-        self.image = pygame.Surface([250, 50])
         self.font_time = pygame.font.SysFont('Agency FB', 25)
-        bg = pygame.image.load('media/GameHud/wood2.png')
-        self.bg = pygame.transform.scale(bg, (250, 50))
-        self.msg = "YOUR TURN"
-        frame = pygame.image.load('media/GameHud/frame.png')
-        self.frame = pygame.transform.scale(frame, (250, 50))
-        self.font_name = pygame.font.SysFont('Agency FB', 30)
-        self.text = self.font_name.render(self.msg, True, Color.GREEN2)
-        self.rect = self.image.get_rect()
-        self.rect.move_ip(880, 600)
 
         self.not_your_turn = self._init_not_your_turn()
 
@@ -42,25 +34,6 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
         self._active_sprites = sprite_group
 
         GameStateModel.instance().add_observer(self)
-
-    # def draw(self, screen: pygame.display):
-    #     #if self.enabled and self._current_sprite.turn:
-    #
-    #
-    #         # self.image.blit(self.bg, self.image.get_rect())
-    #         # self.image.blit(self.frame, self.image.get_rect())
-    #         # self.image.blit(self.text, self.image.get_rect().move(77, 7))
-    #         # screen.blit(self.image, self.image.get_rect().move(880, 600))
-    #
-    # # def draw(self, screen:pygame.display):
-    # #
-    # #     if self.enabled and self._current_sprite.turn:
-    # #         self.image.blit(self.bg, self.image.get_rect())
-    # #         self.image.blit(self.frame, self.image.get_rect())
-    # #         self.image.blit(self.text, self.image.get_rect().move(77, 7))
-    # #         screen.blit(self.image, self.rect)
-
-
 
     def notify_player_index(self, player_index: int):
 
