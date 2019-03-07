@@ -336,7 +336,7 @@ class Networking:
             if game:
                 players = [x for x in game.players if x.ip == connection_object.address[0]]
                 if players:
-                    game.remove_player(players[0])
+                    # game.remove_player(players[0])
                     self.kick_client(connection_object.address[0])
             return super(MastermindServerUDP, self).callback_disconnect()
 
@@ -367,12 +367,14 @@ class Networking:
                     return super(MastermindServerUDP, self).callback_client_handle(connection_object, data)
 
                 data.execute()
-                if isinstance(data, JoinEvent):
-                    Networking.get_instance().send_to_all_client(GameStateModel.instance())
+
                 if isinstance(data, DisconnectEvent):
                     # Kick the player that send the DC event and notify all other players.
                     # Need to have similar polling mechanics like in lobby
                     self.kick_client(connection_object.address[0])
+
+                if isinstance(data, JoinEvent):
+                    Networking.get_instance().send_to_all_client(GameStateModel.instance())
 
             return super(MastermindServerUDP, self).callback_client_handle(connection_object, data)
 
@@ -457,11 +459,7 @@ class Networking:
             data: GameStateModel = JSONSerializer.deserialize(data)
             print(f"Received {data.__class__} object from host.")
             if isinstance(data, GameStateModel):
-                if Networking.get_instance().is_host:
-                    print("Skipped updating game object as local machine is a host.")
-                else:
-                    print(f"Updating game object, there are now: {len(data.players)} players.")
-                    GameStateModel.set_game(data)
+                GameStateModel.set_game(data)
             if isinstance(data, TurnEvent) or isinstance(data, ActionEvent):
                 data.execute()
                 if isinstance(data, DisconnectEvent):

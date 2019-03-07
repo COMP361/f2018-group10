@@ -3,6 +3,7 @@ from datetime import datetime
 
 import pygame
 from src.constants.change_scene_enum import ChangeSceneEnum
+from src.controllers.choose_starting_position_controller import ChooseStartingPositionController
 from src.core.custom_event import CustomEvent
 
 from src.UIComponents.chat_box import ChatBox
@@ -25,9 +26,13 @@ from src.sprites.notify_player_turn import NotifyPlayerTurn
 
 
 class GameBoardScene(object):
-    """Scene for displaying the main game view"""
+    """
+    Scene for displaying the main game view
+    """
     def __init__(self, screen: pygame.display, current_player: PlayerModel):
-        """:param screen : The display passed from main on which to draw the Scene."""
+        """
+        :param screen : The display passed from main on which to draw the Scene.
+        """
         self._save_games_file = "media/save_games.json"
         self.screen = screen
         self._game = GameStateModel.instance()
@@ -37,12 +42,16 @@ class GameBoardScene(object):
         self.quit_btn = RectButton(200, 250, 100, 50, Color.STANDARDBTN, 0,
                                    Text(pygame.font.SysFont('Arial', 20), "Quit", Color.BLACK))
 
-        self.active_sprites = pygame.sprite.Group()   # Maybe add separate groups for different things later
+        self.active_sprites = pygame.sprite.Group()  # Maybe add separate groups for different things later
         self.game_board = GameBoard()
         self.chat_box = ChatBox(self._current_player)
         self.menu = None
         self._init_sprites()
         self.notify_turn_popup = NotifyPlayerTurn(self._current_player, self._current_sprite)
+        self.choose_start_pos_controller = ChooseStartingPositionController(
+                                            current_player, self.game_board, self.chat_box
+                                            )
+        self.choose_start_pos_controller.set_active_labels(self.active_sprites)
 
     def _init_sprites(self):
         for i, player in enumerate(self._game.players):
@@ -50,7 +59,8 @@ class GameBoardScene(object):
         self._current_sprite = CurrentPlayerState(1130, 550, self._current_player.nickname,self._current_player.color)
         self.active_sprites.add(self._current_sprite)
         self.active_sprites.add(TimeBar(0, 0))
-        self.active_sprites.add(InGameStates(250, 650, self._game.damage, self._game.victims_saved, self._game.victims_lost))
+        self.active_sprites.add(
+            InGameStates(250, 650, self._game.damage, self._game.victims_saved, self._game.victims_lost))
         self.active_sprites.add(self._init_menu_button())
 
     def _save(self):
@@ -84,7 +94,7 @@ class GameBoardScene(object):
                               Text(pygame.font.SysFont('Agency FB', 20), "Save", Color.BLACK))
 
         quit_btn = RectButton(200, 250, 100, 50, Color.STANDARDBTN, 0,
-                                   Text(pygame.font.SysFont('Agency FB', 20), "Quit", Color.BLACK))
+                              Text(pygame.font.SysFont('Agency FB', 20), "Quit", Color.BLACK))
 
         back_btn = RectButton(50, 50, 50, 50, "media/GameHud/crosss.png", 0)
 
@@ -115,13 +125,13 @@ class GameBoardScene(object):
     def update(self, event_queue: EventQueue):
         """Call the update() function of everything in this class."""
 
-        self.chat_box.update(event_queue)
-        self.game_board.update(event_queue)
+        # self.chat_box.update(event_queue)
         self.game_board.update(event_queue)
         self.active_sprites.update(event_queue)
+
         if self.menu and not self.menu.is_closed:
             self.menu.update(event_queue)
 
         self.chat_box.update(event_queue)
         self.notify_turn_popup.update(event_queue)
-
+        self.choose_start_pos_controller.update(event_queue)
