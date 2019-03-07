@@ -110,13 +110,13 @@ class GameBoardScene(object):
 
     def draw(self, screen: pygame.display):
         """Draw all currently active sprites."""
-        self.game_board.draw(screen)
         self.active_sprites.draw(screen)
 
         if self.menu and not self.menu.is_closed:
             self.menu.draw(screen)
 
         self.chat_box.draw(screen)
+        self.game_board.draw(screen)
         self.notify_turn_popup.draw(screen)
 
     def update(self, event_queue: EventQueue):

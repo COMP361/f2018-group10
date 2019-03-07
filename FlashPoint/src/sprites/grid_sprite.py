@@ -49,25 +49,25 @@ class GridSprite(pygame.sprite.Group):
                 grid[i].append(tile_sprite)
 
                 tile_model = GameStateModel.instance().game_board.get_tile_at(int(y_offset / 128), int(x_offset / 128))
-                self.east_obstacle = tile_model.get_obstacle_in_direction("East")
-                self.south_obstacle = tile_model.get_obstacle_in_direction("South")
+                east_obstacle = tile_model.get_obstacle_in_direction("East")
+                south_obstacle = tile_model.get_obstacle_in_direction("South")
 
-                if self.east_obstacle:
-                    if isinstance(self.east_obstacle, WallModel):
-                        wall = WallSprite(tile_sprite, tile_model, self.current_player, (j, i, "East"))
+                if east_obstacle:
+                    if isinstance(east_obstacle, WallModel):
+                        wall = WallSprite(east_obstacle, "vertical", tile_sprite, tile_model, (j, i, "East"))
                         wall.button = RectButton(x_offset + 128-5, y_offset, 14, 125, Color.BLACK)
-                        #wall.button.set_transparent_background(True)
+                        # wall.button.set_transparent_background(True)
                         wall.button.on_click(wall.process_input)
                         self.wall_buttons.append(wall.button_input)
                         self.walls.append(wall)
                         tile_model.add_observer(wall)
 
-                if self.south_obstacle:
-                    if isinstance(self.south_obstacle, WallModel):
-                        wall = WallSprite(tile_sprite, tile_model, self.current_player, (j, i, "South"))
+                if south_obstacle:
+                    if isinstance(south_obstacle, WallModel):
+                        wall = WallSprite(south_obstacle, "horizontal", tile_sprite, tile_model, (j, i, "South"))
                         wall.button = RectButton(x_offset, y_offset + 128 - 5, 125, 14, Color.BLACK)
                         wall.button.on_click(wall.process_input)
-                        #wall.button.set_transparent_background(True)
+                        # wall.button.set_transparent_background(True)
                         self.wall_buttons.append(wall.button_input)
                         self.walls.append(wall)
                         tile_model.add_observer(wall)

@@ -159,7 +159,7 @@ class GameStateModel(Model):
 
     @victims_saved.setter
     def victims_saved(self, victims_saved: int):
-            self._victims_saved = victims_saved
+        self._victims_saved = victims_saved
         if self._victims_saved == 7:
             self.state = GameStateEnum.WON
 
@@ -169,7 +169,7 @@ class GameStateModel(Model):
 
     @victims_lost.setter
     def victims_lost(self, victims_lost: int):
-            self._victims_lost = victims_lost
+        self._victims_lost = victims_lost
         if self._victims_lost >= 4:
             self.state = GameStateEnum.LOST
 
@@ -179,7 +179,7 @@ class GameStateModel(Model):
 
     @damage.setter
     def damage(self, damage: int):
-            self._damage = damage
+        self._damage = damage
         if self._damage >= self.max_damage:
             self.state = GameStateEnum.LOST
 
@@ -197,7 +197,7 @@ class GameStateModel(Model):
 
     @state.setter
     def state(self, game_state: GameStateEnum):
-            self._state = game_state
+        self._state = game_state
         if self._state == GameStateEnum.LOST:
             # TODO: More stuff here for what is supposed to happen when the game is lost.
             pass
