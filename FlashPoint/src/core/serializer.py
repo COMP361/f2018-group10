@@ -2,6 +2,9 @@ import enum
 import json
 from typing import Dict
 
+from src.observers.observer import Observer
+from src.models.game_board.tile_model import TileModel
+from src.action_events.turn_events.choose_starting_position_event import ChooseStartingPositionEvent
 from src.models.game_board.game_board_model import GameBoardModel
 from src.action_events.start_game_event import StartGameEvent
 from src.action_events.ready_event import ReadyEvent
@@ -80,6 +83,13 @@ class JSONSerializer(object):
         return JoinEvent(player)
 
     @staticmethod
+    def _deserialize_choose_position_event(payload: Dict):
+        tile: TileModel = JSONSerializer.deserialize(payload['tile'])
+        event = ChooseStartingPositionEvent(tile)
+        event.player = JSONSerializer.deserialize(payload['player'])
+        return event
+
+    @staticmethod
     def deserialize(payload: Dict) -> object:
         """
         Grab an object and deserialize it.
@@ -101,6 +111,8 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_ready_event(payload)
         elif object_type == StartGameEvent.__name__:
             return StartGameEvent()
+        elif object_type == ChooseStartingPositionEvent.__name__:
+            return JSONSerializer._deserialize_choose_position_event(payload)
         elif object_type == DummyEvent.__name__:
             return DummyEvent()
 
@@ -108,9 +120,15 @@ class JSONSerializer(object):
 
     @staticmethod
     def _safe_dict(obj):
+        print(obj)
+        if isinstance(obj, Observer):
+            print("Observer, skipping serialize")
+            return ""
+
         if isinstance(obj, GameBoardModel):
             for tile in obj.tiles:
                 tile.reset_adjacencies()
+
         obj.__setattr__("class", type(obj).__name__)
         return obj.__dict__ if not isinstance(obj, enum.Enum) else {"name": type(obj).__name__, "value": obj.value}
 

@@ -1,8 +1,9 @@
 import pygame
+from src.core.networking import Networking
 from src.UIComponents.chat_box import ChatBox
 from src.UIComponents.rect_label import RectLabel
 from src.action_events.turn_events.choose_starting_position_event import ChooseStartingPositionEvent
-from src.constants.state_enums import SpaceKindEnum
+from src.constants.state_enums import SpaceKindEnum, GameStateEnum
 from src.core.event_queue import EventQueue
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
@@ -21,7 +22,7 @@ class ChooseStartingPositionController(object):
                                       Text(pygame.font.SysFont('Agency FB', 30), "Choose starting position",
                                            Color.ORANGE))
 
-        self.wait_button = RectLabel(500, 400, 300, 75, Color.GREY, 0,
+        self.wait_button = RectLabel(500, 400, 300, 300, Color.GREY, 0,
                                       Text(pygame.font.SysFont('Agency FB', 30), "Wait for your turn!",
                                            Color.ORANGE))
         self.board_state = GameStateModel.instance()
@@ -31,20 +32,22 @@ class ChooseStartingPositionController(object):
         self.grid = game_board.grid
 
     def set_active_labels(self, sprite_grp):
-        sprite_grp.add(self.choose_label)
-        if not self.player == self.board_state.players_turn:
+        if self.board_state.state == GameStateEnum.PLACING:
+            sprite_grp.add(self.choose_label)
+        if not self.player == self.board_state.players_turn and self.board_state.state == GameStateEnum.PLACING:
             sprite_grp.add(self.wait_button)
 
     def update(self, eventq: EventQueue):
+        if not self.board_state.state == GameStateEnum.PLACING:
+            return
 
         if self.player == self.board_state.players_turn:
-        # Loop through the grid to find where the mouse is pointing
             if self.wait_button:
                 self.wait_button.kill()
                 self.wait_button = None
             mouse_pos = pygame.mouse.get_pos()
             cb = self.chat_box_area.chat_textbox.rect
-            # bit weird but I guess it works
+            # Loop through the grid to find where the mouse is pointing
             for i in range(len(self.grid.grid)):
                 for j in range(len(self.grid.grid[i])):
                     """1. get the tile at i,j index
@@ -66,7 +69,7 @@ class ChooseStartingPositionController(object):
                         if isinstance(models, PlayerModel):
                             is_legal = False
 
-                    if is_legal and out == SpaceKindEnum.OUTDOOR:
+                    if is_legal and out != SpaceKindEnum.INDOOR:
                         if curr_tile.hover():
                             curr_tile.hover_color = Color.GREEN
 
@@ -76,7 +79,11 @@ class ChooseStartingPositionController(object):
                                 self.game_board_sprite.add(PlayerSprite(curr_tile, self.grid))
                                 self.choose_label.kill()
                                 # delete this controller in case of success scenario,
-                                # the backend event has been instantiated
+
+                                if Networking.get_instance().is_host:
+                                    Networking.get_instance().send_to_all_client(event)
+                                else:
+                                    Networking.get_instance().client.send(event)
                                 break
 
                     else:

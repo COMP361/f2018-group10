@@ -13,7 +13,6 @@ from src.core.networking import Networking
 from src.core.serializer import JSONSerializer
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
-from src.observers.game_state_observer import GameStateObserver
 from src.sprites.game_board import GameBoard
 from src.sprites.hud.player_state import PlayerState
 from src.sprites.hud.current_player_state import CurrentPlayerState
@@ -47,7 +46,6 @@ class GameBoardScene(object):
         self.chat_box = ChatBox(self._current_player)
         self.menu = None
         self._init_sprites()
-        self.notify_turn_popup = NotifyPlayerTurn(self._current_player, self._current_sprite)
         self.choose_start_pos_controller = ChooseStartingPositionController(
                                             current_player, self.game_board, self.chat_box
                                             )
@@ -62,6 +60,8 @@ class GameBoardScene(object):
         self.active_sprites.add(
             InGameStates(250, 650, self._game.damage, self._game.victims_saved, self._game.victims_lost))
         self.active_sprites.add(self._init_menu_button())
+        self.notify_turn_popup = NotifyPlayerTurn(self._current_player, self._current_sprite)
+        self.active_sprites.add(self.notify_turn_popup)
 
     def _save(self):
         """Save the current game state to the hosts machine"""
