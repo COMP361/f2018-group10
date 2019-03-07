@@ -55,6 +55,7 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
             self.countdown_thread = Thread(target=self.countdown, args=(10,))
             self.countdown_thread.start()
 
+
     def _init_end_turn_button(self):
         btn = RectButton(1130, 500, 150, 50, background=Color.ORANGE,
                          txt_obj=Text(pygame.font.SysFont('Arial', 23), "End Turn"))
@@ -69,11 +70,18 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
             self._current_sprite.text_time_left = self.font_time.render(self.time_str, True, Color.GREEN2)
             time.sleep(1)
             count -= 1
+        self.time_str = ""
         self.enabled = False
+        self.running = False
+        self._current_sprite.turn = False
         self._active_sprites.remove(self.btn)
         turn_event = EndTurnEvent()
         # send end turn, see ChatBox for example
-        Networking.get_instance().send_to_server(turn_event)
+        #Networking.get_instance().send_to_server(turn_event)
+        if Networking.get_instance().is_host:
+            Networking.get_instance().send_to_all_client(turn_event)
+        else:
+            Networking.get_instance().client.send(turn_event)
 
     def _end_turn(self):
         self._current_sprite.turn = False

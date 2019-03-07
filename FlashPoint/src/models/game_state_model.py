@@ -43,7 +43,7 @@ class GameStateModel(Model):
             raise Exception("GameStateModel is a Singleton")
 
     def _notify_player_index(self):
-        for obs in self.observers:
+        for obs in self._observers:
             obs.notify_player_index(self._players_turn_index)
 
     @staticmethod
