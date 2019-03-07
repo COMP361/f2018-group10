@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 
 from src.models.game_board.door_model import DoorModel
 from src.models.game_board.wall_model import WallModel
@@ -8,6 +8,7 @@ from src.models.game_board.edge_obstacle_model import EdgeObstacleModel
 from src.models.game_board.null_model import NullModel
 from src.constants.state_enums import SpaceKindEnum, DoorStatusEnum, WallStatusEnum
 from src.constants.state_enums import SpaceStatusEnum
+from src.observers.tile_observer import TileObserver
 
 
 class TileModel(Model):
@@ -40,8 +41,17 @@ class TileModel(Model):
     def __str__(self):
         return f"Tile at: ({self.x_coord}, {self.y_coord})."
 
-    def get_space_kind(self):
-        return self._space_kind
+    def _notify_status(self):
+        for obs in self.observers:
+            obs.tile_status_changed(self.space_status)
+
+    def _notify_assoc_models(self):
+        for obs in self.observers:
+            obs.tile_assoc_models_changed(self.associated_models)
+
+    @property
+    def observers(self) -> List[TileObserver]:
+        return self._observers
 
     @property
     def x_coord(self):
@@ -66,6 +76,7 @@ class TileModel(Model):
     @space_status.setter
     def space_status(self, space_status: SpaceStatusEnum):
         self._space_status = space_status
+        self._notify_status()
 
     @property
     def is_hotspot(self):
@@ -185,10 +196,12 @@ class TileModel(Model):
 
     def add_associated_model(self, model: Model):
         self._associated_models.append(model)
+        self._notify_assoc_models()
 
     def remove_associated_model(self, model: Model):
         """CAUTION: YOUR MODEL MUST HAVE AN __EQ__ METHOD DEFINED FOR THIS TO WORK AS EXPECTED"""
         self._associated_models.remove(model)
+        self._notify_assoc_models()
 
     @property
     def visited(self):

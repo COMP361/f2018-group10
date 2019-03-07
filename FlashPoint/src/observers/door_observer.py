@@ -5,7 +5,6 @@ from src.observers.observer import Observer
 
 class DoorObserver(Observer, ABC):
 
-
-    def door_status_changed(self,status:DoorStatusEnum):
+    @abstractmethod
+    def door_status_changed(self, status:DoorStatusEnum):
         pass
-

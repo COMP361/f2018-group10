@@ -4,6 +4,7 @@ from src.UIComponents.rect_label import RectLabel
 from src.action_events.turn_events.choose_starting_position_event import ChooseStartingPositionEvent
 from src.constants.state_enums import SpaceKindEnum
 from src.core.event_queue import EventQueue
+from src.models.game_board.tile_model import TileModel
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 from src.sprites.game_board import GameBoard
@@ -59,14 +60,14 @@ class ChooseStartingPositionController(object):
                     curr_tile = self.grid.grid[i][j]
                     is_legal = True
                     # get associated tile_model
-                    tile_model = self.game_board_model.get_tile_at(j, i)
-                    out = tile_model.get_space_kind()
+                    tile_model: TileModel = self.game_board_model.get_tile_at(j, i)
+                    out = tile_model.space_kind
 
                     for models in tile_model.associated_models:
                         if isinstance(models, PlayerModel):
                             is_legal = False
 
-                    if is_legal and out == SpaceKindEnum.OUTDOOR:
+                    if is_legal and out != SpaceKindEnum.INDOOR:
                         if curr_tile.hover():
                             curr_tile.hover_color = Color.GREEN
 
