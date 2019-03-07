@@ -21,7 +21,7 @@ class GameStateModel(Model):
         if not GameStateModel._instance:
             super().__init__()
             self._host = host
-            self._max_desired_players = 6
+            self._max_desired_players = 2
             self._players = [self._host]
             self._players_turn_index = 0
             self._difficulty_level = None
@@ -40,12 +40,13 @@ class GameStateModel(Model):
             self._game_board = GameBoardModel(self._rules)
 
             GameStateModel._instance = self
+
         else:
             print("Attempted to instantiate another singleton")
             raise Exception("GameStateModel is a Singleton")
 
     def _notify_player_index(self):
-        for obs in self.observers:
+        for obs in self._observers:
             obs.notify_player_index(self._players_turn_index)
 
     @staticmethod

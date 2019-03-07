@@ -2,6 +2,8 @@ import json
 from datetime import datetime
 
 import pygame
+
+from src.UIComponents.rect_label import RectLabel
 from src.constants.change_scene_enum import ChangeSceneEnum
 from src.controllers.choose_starting_position_controller import ChooseStartingPositionController
 from src.core.custom_event import CustomEvent
@@ -52,12 +54,20 @@ class GameBoardScene(object):
                                             current_player, self.game_board, self.chat_box
                                             )
         self.choose_start_pos_controller.set_active_labels(self.active_sprites)
+        #self.notify_turn_popup = NotifyPlayerTurn(self._current_player,self._current_sprite,self.active_sprites)
+
+        if Networking.get_instance().is_host:
+            GameStateModel.instance()._notify_player_index()
+
 
     def _init_sprites(self):
         for i, player in enumerate(self._game.players):
             self.active_sprites.add(PlayerState(0, 30 + 64*i, player.nickname, player.color))
         self._current_sprite = CurrentPlayerState(1130, 550, self._current_player.nickname,self._current_player.color)
         self.active_sprites.add(self._current_sprite)
+        self.notify_turn_popup = NotifyPlayerTurn(self._current_player, self._current_sprite, self.active_sprites)
+        self.active_sprites.add(self._init_not_your_turn())
+        self.active_sprites.add(self.notify_turn_popup)
         self.active_sprites.add(TimeBar(0, 0))
         self.active_sprites.add(
             InGameStates(250, 650, self._game.damage, self._game.victims_saved, self._game.victims_lost))
@@ -76,6 +86,15 @@ class GameBoardScene(object):
 
         self.menu.close()
 
+    def _init_not_your_turn(self):
+
+        rct = RectLabel(880, 600, 250, 50, background=Color.ORANGE,
+                        txt_obj=Text(pygame.font.SysFont('Agency FB', 30), "NOT YOUR TURN", Color.GREEN2))
+        rct.change_bg_image('media/GameHud/wood2.png')
+        rct.add_frame('media/GameHud/frame.png')
+        return rct
+
+
     def _quit_btn_on_click(self):
         Networking.get_instance().disconnect()
         EventQueue.post(CustomEvent(ChangeSceneEnum.STARTSCENE))
@@ -83,9 +102,16 @@ class GameBoardScene(object):
     # Example of how to use the MenuClass YOU NEED TO MAKE ALL YOUR BUTTONS EXTEND INTERACTABLE!!!!!!!!!!!!!!!!!
     def _init_menu_button(self):
         btn = RectButton(0, 0, 30, 30, background=Color.GREEN, txt_obj=Text(pygame.font.SysFont('Arial', 23), ""))
+        # TODO CHANGE THIS BACK TO self._click_action
         btn.on_click(self._click_action)
+        #btn.on_click(self._game.next_player)
         btn.set_transparent_background(True)
         return btn
+
+    def _init_end_turn_button(self):
+        btn = RectButton(1130,500,150,50,background=Color.ORANGE,txt_obj=Text(pygame.font.SysFont('Arial', 23), "End Turn"))
+        btn.on_click(self._end_turn_controller.start_end_turn)
+
 
     def _click_action(self):
         menu = MenuWindow([self.active_sprites, self.game_board], 500, 500, (400, 150))
@@ -120,6 +146,7 @@ class GameBoardScene(object):
         self.chat_box.draw(screen)
         self.active_sprites.draw(screen)
         self.notify_turn_popup.draw(screen)
+        #self.notify_turn_popup.draw(screen)
 
     def update(self, event_queue: EventQueue):
         """Call the update() function of everything in this class."""
@@ -134,3 +161,4 @@ class GameBoardScene(object):
         self.chat_box.update(event_queue)
         self.notify_turn_popup.update(event_queue)
         self.choose_start_pos_controller.update(event_queue)
+        #self.notify_turn_popup.update(event_queue)

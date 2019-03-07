@@ -6,6 +6,7 @@ import threading
 import logging
 import time
 
+from src.action_events.turn_events.end_turn_event import EndTurnEvent
 from src.action_events.chat_event import ChatEvent
 from src.core.custom_event import CustomEvent
 from src.core.serializer import JSONSerializer
@@ -337,6 +338,7 @@ class Networking:
                 players = [x for x in game.players if x.ip == connection_object.address[0]]
                 if players:
                     # game.remove_player(players[0])
+                    print(f"Removing player at {connection_object.address}")
                     self.kick_client(connection_object.address[0])
             return super(MastermindServerUDP, self).callback_disconnect()
 
@@ -362,7 +364,7 @@ class Networking:
 
             print(f"Client at {connection_object.address} sent a message: {data.__class__}")
             if isinstance(data, TurnEvent) or isinstance(data, ActionEvent):
-                if isinstance(data, ChatEvent):
+                if isinstance(data, ChatEvent) or isinstance(data, EndTurnEvent):
                     Networking.get_instance().send_to_all_client(data)
                     return super(MastermindServerUDP, self).callback_client_handle(connection_object, data)
 

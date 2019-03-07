@@ -2,6 +2,7 @@ import enum
 import json
 from typing import Dict
 
+from src.action_events.turn_events.end_turn_event import EndTurnEvent
 from src.models.game_board.game_board_model import GameBoardModel
 from src.action_events.start_game_event import StartGameEvent
 from src.action_events.ready_event import ReadyEvent
@@ -72,12 +73,17 @@ class JSONSerializer(object):
     @staticmethod
     def _deserialize_ready_event(payload: Dict) -> ReadyEvent:
         player: PlayerModel = JSONSerializer.deserialize(payload['_player'])
-        return ReadyEvent(player)
+        ready: bool = payload['_ready']
+        return ReadyEvent(player, ready)
 
     @staticmethod
     def _deserialize_join_event(payload: Dict) -> JoinEvent:
         player = JSONSerializer._deserialize_player(payload['player'])
         return JoinEvent(player)
+
+    @staticmethod
+    def _deserialize_end_turn_event(payload: Dict) -> EndTurnEvent:
+        return EndTurnEvent()
 
     @staticmethod
     def deserialize(payload: Dict) -> object:
@@ -101,6 +107,8 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_ready_event(payload)
         elif object_type == StartGameEvent.__name__:
             return StartGameEvent()
+        elif object_type == EndTurnEvent.__name__:
+            return JSONSerializer._deserialize_end_turn_event(payload)
         elif object_type == DummyEvent.__name__:
             return DummyEvent()
 

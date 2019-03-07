@@ -10,9 +10,10 @@ from src.core.event_queue import EventQueue
 import time
 
 from src.models.game_state_model import GameStateModel
+from src.observers.game_state_observer import GameStateObserver
 
 
-class CurrentPlayerState(pygame.sprite.Sprite):
+class CurrentPlayerState(pygame.sprite.Sprite,GameStateObserver):
 
     def __init__(self, x: int, y: int, name: str, color: Color):
         super().__init__()
@@ -31,9 +32,9 @@ class CurrentPlayerState(pygame.sprite.Sprite):
         self.font_other = pygame.font.SysFont('Agency FB', 23)
         self.font_time = pygame.font.SysFont('Agency FB', 25)
         self.name = name
-        self.AP = "AP:"
-        self.SAP = "Special AP:"
-        self.time_left ="Not your turn."
+        self.AP = f'AP: {4}'
+        self.SAP = f'Special AP:{4}'
+
 
         self.text = self.font_name.render(self.name, True, Color.GREEN2)
         self.text_AP = self.font_other.render(self.AP, True, Color.GREEN2)
@@ -81,6 +82,7 @@ class CurrentPlayerState(pygame.sprite.Sprite):
         self.image.blit(self.frame, self.image.get_rect())
         self.image.blit(self.text, self.P_rect)
         self.image.blit(self.text_AP, self.AP_rect)
+        #if gamemode is expirienced
         #self.image.blit(self.text_SAP, self.SAP_rect)
 
         if self.turn:
@@ -99,4 +101,7 @@ class CurrentPlayerState(pygame.sprite.Sprite):
     #         count -= 1
     #
     #     self.turn = False
+
+    def notify_player_index(self, player_index: int):
+        pass
 
