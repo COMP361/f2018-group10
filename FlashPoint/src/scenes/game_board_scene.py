@@ -49,7 +49,7 @@ class GameBoardScene(object):
         self.chat_box = ChatBox(self._current_player)
         self.menu = None
         self._init_sprites()
-        self.notify_turn_popup = NotifyPlayerTurn(self._current_player, self._current_sprite)
+        self.notify_turn_popup = NotifyPlayerTurn(self._current_player, self._current_sprite,self.active_sprites)
         self.choose_start_pos_controller = ChooseStartingPositionController(
                                             current_player, self.game_board, self.chat_box
                                             )
@@ -145,8 +145,6 @@ class GameBoardScene(object):
         self.game_board.draw(screen)
         self.chat_box.draw(screen)
         self.active_sprites.draw(screen)
-        self.notify_turn_popup.draw(screen)
-        #self.notify_turn_popup.draw(screen)
 
     def update(self, event_queue: EventQueue):
         """Call the update() function of everything in this class."""
@@ -161,4 +159,3 @@ class GameBoardScene(object):
         self.chat_box.update(event_queue)
         self.notify_turn_popup.update(event_queue)
         self.choose_start_pos_controller.update(event_queue)
-        #self.notify_turn_popup.update(event_queue)
