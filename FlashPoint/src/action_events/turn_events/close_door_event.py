@@ -6,10 +6,14 @@ from src.models.game_units.player_model import PlayerModel
 
 class CloseDoorEvent(TurnEvent):
 
-    def __init__(self):
+    def __init__(self, door: DoorModel, fireman: PlayerModel):
         super().__init__()
+        self.door = door
+        self.fireman = fireman
 
-    def execute(self, door: DoorModel, fireman: PlayerModel):
+    def execute(self):
+        door = self.door
+        fireman = self.fireman
         # TODO: Start here - This is the precondition code - Move it to the GUI
         if not self.has_required_AP(fireman.ap, 1):
             raise NotEnoughAPException("close the door", 1)
