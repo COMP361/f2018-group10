@@ -49,7 +49,7 @@ class TimeBar(pygame.sprite.Sprite):
         time_int = int(abs((datetime.now() - self._start_time).total_seconds()))
         time_str = "TOTAL TIME: "+f"{int(time_int/60):02d}:{(time_int % 60):02d}"
         show_time = pygame.font.SysFont('Agency FB', 28)
-        text = show_time.render(time_str, True, Color.WHITE)
+        text = show_time.render(time_str, True, Color.GREEN2)
         text_rect = text.get_rect()
         text_rect.move_ip(1135,-3)
         self.image.blit(text,text_rect)

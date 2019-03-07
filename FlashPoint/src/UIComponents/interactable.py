@@ -113,7 +113,8 @@ class Interactable(pygame.sprite.Sprite):
         """
         if self._is_enabled:
             if isinstance(self._click_action, Callable):
-                self._click_action(*self._click_args, **self._click_kwargs)
+                return self._click_action(*self._click_args, **self._click_kwargs)
+
 
     def hover(self):
         """
@@ -140,7 +141,7 @@ class Interactable(pygame.sprite.Sprite):
         Enables the event hook
         :return:
         """
-        print(f"Enabling: {self}")
+        # print(f"Enabling: {self}")
         self._is_enabled = True
 
     def disable(self):
@@ -148,11 +149,15 @@ class Interactable(pygame.sprite.Sprite):
         Disables the event hook
         :return:
         """
-        print(f"Disabling: {self}")
+        # print(f"Disabling: {self}")
         self._is_enabled = False
 
     def resize_rect(self, rect: pygame.rect.Rect):
         self._rect = rect
+
+    @property
+    def enabled(self):
+        return self._is_enabled
 
     # why is this so hard
     @property

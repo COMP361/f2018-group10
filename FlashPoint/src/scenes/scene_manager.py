@@ -51,6 +51,7 @@ class SceneManager(object):
         SceneManager.get_instance().update(event_queue)
 
     class SMInner(object):
+
         def __init__(self, screen: pygame.Surface):
             """
             Scene Manager. Initialize this before the game loop

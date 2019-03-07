@@ -40,6 +40,9 @@ class TileModel(Model):
     def __str__(self):
         return f"Tile at: ({self.x_coord}, {self.y_coord})."
 
+    def get_space_kind(self):
+        return self._space_kind
+
     @property
     def x_coord(self):
         return self._x_coord

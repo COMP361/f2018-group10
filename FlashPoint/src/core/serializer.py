@@ -1,6 +1,5 @@
 import enum
 import json
-import threading
 from typing import Dict
 
 from src.models.game_board.game_board_model import GameBoardModel
@@ -22,16 +21,19 @@ class JSONSerializer(object):
         """Deserialize a game state"""
 
         GameStateModel.lock.acquire()
-        if GameStateModel.instance():
-            GameStateModel.__del__()
         host: PlayerModel = JSONSerializer.deserialize(payload['_host'])
         num_players = payload['_max_desired_players']
         rules = GameKindEnum(payload['_rules']["value"])
-        game = GameStateModel(host, num_players, rules)
+
+        if not GameStateModel.instance():
+            game = GameStateModel(host, num_players, rules)
+        else:
+            game = GameStateModel.instance()
 
         for player in [x for x in payload['_players'] if x['_ip'] != host.ip]:
             player_obj: PlayerModel = JSONSerializer.deserialize(player)
-            game.add_player(player_obj)
+            if player_obj not in game.players:
+                game.add_player(player_obj)
 
         if rules == GameKindEnum.EXPERIENCED:
             game.difficulty_level = DifficultyLevelEnum(payload['_difficulty_level']['value'])
@@ -42,9 +44,7 @@ class JSONSerializer(object):
         game.victims_lost = payload['_victims_lost']
         game.victims_saved = payload['_victims_saved']
 
-        GameStateModel.set_game(game)
         GameStateModel.lock.release()
-
         return game
 
     @staticmethod
@@ -53,8 +53,7 @@ class JSONSerializer(object):
         nickname = payload['_nickname']
 
         player = PlayerModel(ip, nickname)
-        player.x_pos = payload['_x_pos']
-        player.y_pos = payload['_y_pos']
+        player.set_pos(payload['_x_pos'], payload['_y_pos'])
         player.color = tuple(payload['_color'])
         player.status = PlayerStatusEnum(payload["_status"]["value"])
         player.ap = payload['_ap']

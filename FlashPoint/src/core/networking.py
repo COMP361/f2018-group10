@@ -6,6 +6,7 @@ import threading
 import logging
 import time
 
+from src.action_events.chat_event import ChatEvent
 from src.core.custom_event import CustomEvent
 from src.core.serializer import JSONSerializer
 from src.core.event_queue import EventQueue
@@ -61,19 +62,18 @@ class Networking:
         return getattr(self.__instance, name)
 
     class NetworkingInner:
-        host = None
-        client = None
-        TIMEOUT_CONNECT = 100
-        TIMEOUT_RECEIVE = None
+        TIMEOUT_CONNECT = 5
+        TIMEOUT_RECEIVE = 5
 
         stop_broadcast = threading.Event()
         stop_listen = threading.Event()
 
-        server_reply = None
-
         def __init__(self):
+            self.host = None
+            self.client = None
             self.game = None
             self.stop_broadcast.set()
+            self.server_reply = None
 
         def create_host(self, port=20298):
             """
@@ -207,7 +207,7 @@ class Networking:
                 logger.info("Disconnecting client")
                 self.client.disconnect()
                 self.client.__del__()
-                # self.client = None
+                self.client = None
             if self.host is not None:
                 logger.info("Disconnecting host")
                 # Kill the broadcast
@@ -216,11 +216,11 @@ class Networking:
                 # Stops accepting connection
                 self.host.accepting_disallow()
                 # Disconnects all clients
+                self.send_to_all_client(DisconnectEvent())
                 self.host.disconnect_clients()
                 self.host.disconnect()
                 self.host.__del__()
                 self.host = None
-            GameStateModel.__del__()
             EventQueue.post(CustomEvent(ChangeSceneEnum.STARTSCENE))
 
         def send_to_server(self, data, compress=True):
@@ -275,7 +275,9 @@ class Networking:
 
     # Overridden classes
     class Host(MastermindServerUDP):
-        client_list = {}
+        def __init__(self, time_server_refresh=1.0, time_connection_refresh=2.0, time_connection_timeout=5.0):
+            MastermindServerUDP.__init__(self, time_server_refresh, time_connection_refresh, time_connection_timeout)
+            self.client_list = {}
 
         def lookup_client(self, ip_addr: str):
             """
@@ -334,7 +336,7 @@ class Networking:
             if game:
                 players = [x for x in game.players if x.ip == connection_object.address[0]]
                 if players:
-                    game.remove_player(players[0])
+                    # game.remove_player(players[0])
                     self.kick_client(connection_object.address[0])
             return super(MastermindServerUDP, self).callback_disconnect()
 
@@ -348,25 +350,31 @@ class Networking:
             :param data: Data received from the connection
             :return:
             """
-            print("Received")
+            # print("Received")
             if connection_object.address[0] == "127.0.0.1":
                 return
 
             data = JSONSerializer.deserialize(data)
             # If it's a dummy event, don't do anything
             if isinstance(data, DummyEvent):
-                print("Received dummy event")
-                return
+                # print("Received dummy event")
+                return super(MastermindServerUDP, self).callback_client_handle(connection_object, data)
 
             print(f"Client at {connection_object.address} sent a message: {data.__class__}")
             if isinstance(data, TurnEvent) or isinstance(data, ActionEvent):
+                if isinstance(data, ChatEvent):
+                    Networking.get_instance().send_to_all_client(data)
+                    return super(MastermindServerUDP, self).callback_client_handle(connection_object, data)
+
                 data.execute()
-                if isinstance(data, JoinEvent):
-                    Networking.get_instance().send_to_all_client(GameStateModel.instance())
+
                 if isinstance(data, DisconnectEvent):
                     # Kick the player that send the DC event and notify all other players.
                     # Need to have similar polling mechanics like in lobby
                     self.kick_client(connection_object.address[0])
+
+                if isinstance(data, JoinEvent):
+                    Networking.get_instance().send_to_all_client(GameStateModel.instance())
 
             return super(MastermindServerUDP, self).callback_client_handle(connection_object, data)
 
@@ -391,7 +399,6 @@ class Networking:
             pass
 
     class Client(MastermindClientUDP):
-
         def __init__(self, timeout_connect=None, timeout_receive=None):
             super(MastermindClientUDP, self).__init__(MM_UDP, timeout_connect, timeout_receive)
             self._pause_receive = threading.Event()
@@ -416,6 +423,8 @@ class Networking:
             self._pause_receive.set()
             try:
                 super(MastermindClientUDP, self).send(JSONSerializer.serialize(data), compression)
+            except MastermindErrorClient:
+                self.callback_disconnect()
             except MastermindErrorSocket:
                 self.callback_disconnect()
             self._pause_receive.clear()
@@ -433,10 +442,9 @@ class Networking:
                             self._reply_queue.append(_server_reply)
                             self.callback_client_receive(_server_reply)
                     except MastermindErrorClient:
-                        print("It seems that client is not connected...")
-                        self.disconnect()
-                    except OSError as e:
-                        print(f"Error receiving data: {e}")
+                        self.callback_disconnect()
+                    except OSError:
+                        self.callback_disconnect()
 
         def disconnect(self):
             self._pause_blk_signal.set()
@@ -451,13 +459,11 @@ class Networking:
             data: GameStateModel = JSONSerializer.deserialize(data)
             print(f"Received {data.__class__} object from host.")
             if isinstance(data, GameStateModel):
-                if Networking.get_instance().is_host:
-                    print("Skipped updating game object as local machine is a host.")
-                else:
-                    print(f"Updating game object, there are now: {len(data.players)} players.")
-                    GameStateModel.set_game(data)
+                GameStateModel.set_game(data)
             if isinstance(data, TurnEvent) or isinstance(data, ActionEvent):
                 data.execute()
+                if isinstance(data, DisconnectEvent):
+                    Networking.get_instance().disconnect()
 
         def get_server_reply(self):
             """
@@ -483,11 +489,12 @@ class Networking:
             else:
                 self._pause_blk_signal.clear()
 
-        def callback_disconnect(self):
+        @staticmethod
+        def callback_disconnect():
             """
             Define callback here when client's connection to host is interrupted.
             :return:
             """
-            print("Client disconnected")
-            self.disconnect()
+            print("It seems that client is not connected...")
+            Networking.get_instance().disconnect()
 

@@ -6,8 +6,8 @@ from src.models.game_board.edge_obstacle_model import EdgeObstacleModel
 from src.models.game_board.null_model import NullModel
 from src.models.game_units.poi_model import POIModel
 from src.models.game_board.tile_model import TileModel
-from src.constants.state_enums import GameKindEnum, SpaceKindEnum, SpaceStatusEnum, POIIdentityEnum, \
-    DoorStatusEnum, WallStatusEnum
+from src.constants.state_enums import GameKindEnum, SpaceKindEnum, SpaceStatusEnum, POIIdentityEnum, DirectionEnum, \
+    DoorStatusEnum
 from src.models.game_board.wall_model import WallModel
 from src.models.game_board.door_model import DoorModel
 
@@ -89,6 +89,7 @@ class GameBoardModel(object):
                 tile = TileModel(i, j, tile_kind)
                 tiles[i].append(tile)
 
+        # TODO: Abhijay: setting adjacency and creating walls/doors.
         # setting tile adjacencies
         self.set_adjacencies(tiles)
 
@@ -177,7 +178,6 @@ class GameBoardModel(object):
                 direction = "South"
 
             tiles[coord[0]][coord[1]].set_adjacent_edge_obstacle(direction, obstacle)
-
 
     def _init_all_tiles_experienced_classic(self):
         pass

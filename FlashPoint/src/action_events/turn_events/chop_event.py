@@ -1,39 +1,18 @@
 from src.action_events.turn_events.turn_event import TurnEvent
-from src.models.game_board.null_model import NullModel
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 from src.models.game_board.wall_model import WallModel
-from src.core.flashpoint_exceptions import NotEnoughAPException, ModelNotAdjacentException, WallAlreadyDestroyedException
-from src.constants.state_enums import WallStatusEnum
 
 
 class ChopEvent(TurnEvent):
 
-    def __init__(self):
+    def __init__(self, fireman: PlayerModel, wall: WallModel):
         super().__init__()
+        self.player = fireman
+        self.wall = wall
 
-    def execute(self, fireman: PlayerModel, wall: WallModel, direction: str):
+    def execute(self):
         game: GameStateModel = GameStateModel.instance()
-        # TODO: Start here - This is the precondition code - Move it to the GUI
-        valid_to_chop = self.has_required_AP(fireman.ap, 2)
-        if not valid_to_chop:
-            raise NotEnoughAPException("chop the wall", 2)
-
-        player_tile = game.game_board.get_tile_at(fireman.x_pos, fireman.y_pos)
-
-        if wall not in player_tile.adjacent_edge_objects.values():
-            raise ModelNotAdjacentException("wall", fireman.x_pos, fireman.y_pos)
-
-        wall_status = wall.wall_status
-        if wall_status == WallStatusEnum.DESTROYED:
-            raise WallAlreadyDestroyedException()
-        # TODO: End here
-
-        wall.inflict_damage()
-        if not player_tile.has_obstacle_in_direction(direction):
-            player_tile.set_adjacent_edge_obstacle(direction, NullModel())
-
-        fireman.ap = fireman.ap - 2
-        game.damage = game.damage + 1
-
-        return
+        self.wall.inflict_damage()
+        self.player.ap -= 2
+        game.damage += 1
