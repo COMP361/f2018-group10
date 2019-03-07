@@ -28,16 +28,16 @@ class MoveController(object):
 
     def update_reachable_tiles(self):
         for tile in self.reachable_tiles:
-            x_pos = tile.x_coord
-            y_pos = tile.y_coord
-            assoc_tile_sprite = self.board.grid.grid[x_pos][y_pos]
+            row = tile.row
+            column = tile.column
+            assoc_tile_sprite = self.board.grid.grid[row][column]
             # Now make colour of those light up green on hover
 
             assoc_tile_sprite.hover_color = Color.GREEN
 
     def check_valid(self):
         num_ap = self.player.ap
-        curr_location = GameStateModel.instance().game_board.get_tile_at(self.player.x_pos, self.player.y_pos)
+        curr_location = GameStateModel.instance().game_board.get_tile_at(self.player.row, self.player.column)
         cost = 0
         cost = self.compute_distance(curr_location, cost, num_ap)
         if cost >= 0:

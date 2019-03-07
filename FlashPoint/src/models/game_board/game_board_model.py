@@ -167,28 +167,28 @@ class GameBoardModel(object):
 
     def set_single_tile_adjacencies(self, tile: TileModel):
         # set north tile
-        if tile.x_coord == 0:
+        if tile.row == 0:
             tile.set_adjacent_tile("North", NullModel())
         else:
-            tile.set_adjacent_tile("North", self.get_tile_at(tile.x_coord-1, tile.y_coord))
+            tile.set_adjacent_tile("North", self.get_tile_at(tile.row - 1, tile.column))
 
         # set east tile
-        if tile.y_coord == BOARD_DIMENSIONS[1] - 1:
+        if tile.column == BOARD_DIMENSIONS[1] - 1:
             tile.set_adjacent_tile("East", NullModel())
         else:
-            tile.set_adjacent_tile("East", self.get_tile_at(tile.x_coord, tile.y_coord+1))
+            tile.set_adjacent_tile("East", self.get_tile_at(tile.row, tile.column + 1))
 
         # set west tile
-        if tile.y_coord == 0:
+        if tile.column == 0:
             tile.set_adjacent_tile("West", NullModel())
         else:
-            tile.set_adjacent_tile("West", self.get_tile_at(tile.x_coord, tile.y_coord-1))
+            tile.set_adjacent_tile("West", self.get_tile_at(tile.row, tile.column - 1))
 
         # set south tile
-        if tile.x_coord == BOARD_DIMENSIONS[0] - 1:
+        if tile.row == BOARD_DIMENSIONS[0] - 1:
             tile.set_adjacent_tile("South", NullModel())
         else:
-            tile.set_adjacent_tile("South", self.get_tile_at(tile.x_coord+1, tile.y_coord))
+            tile.set_adjacent_tile("South", self.get_tile_at(tile.row + 1, tile.column))
 
     def set_single_obstacle(self, tiles: List[List[TileModel]], adjacency: Dict, obstacle: EdgeObstacleModel):
         first_pair, second_pair = adjacency['first_pair'], adjacency['second_pair']
@@ -234,7 +234,7 @@ class GameBoardModel(object):
             poi.x_pos = locations[i][0]
             poi.y_pos = locations[i][1]
             self._active_pois.append(poi)
-            self.get_tile_at(poi.x_pos, poi.y_pos).add_associated_model(poi)
+            self.get_tile_at(poi.row, poi.column).add_associated_model(poi)
 
     def get_movable_tiles(self,x:int,y:int,ap:int,movable_tiles= []) -> List[TileModel]:
 
@@ -248,24 +248,24 @@ class GameBoardModel(object):
                 if isinstance(obstacle,NullModel):
                     ap_deduct = 2 if tile.space_status == SpaceStatusEnum.FIRE else 1
                     if tile.space_status == SpaceStatusEnum.FIRE:
-                        movable_tiles = self.get_movable_tiles(tile.x_coord, tile.y_coord, ap - ap_deduct, movable_tiles)
+                        movable_tiles = self.get_movable_tiles(tile.row, tile.column, ap - ap_deduct, movable_tiles)
                     else:
                         movable_tiles.append(tile)
-                        movable_tiles = self.get_movable_tiles(tile.x_coord, tile.y_coord, ap - ap_deduct, movable_tiles)
+                        movable_tiles = self.get_movable_tiles(tile.row, tile.column, ap - ap_deduct, movable_tiles)
                 elif isinstance(obstacle, WallModel):
                     if tile.wall_status == WallStatusEnum.DESTROYED:
                         movable_tiles.append(tile)
-                        movable_tiles = self.get_movable_tiles(tile.x_coord, tile.y_coord, ap - 1, movable_tiles)
+                        movable_tiles = self.get_movable_tiles(tile.row, tile.column, ap - 1, movable_tiles)
                 elif isinstance(obstacle, DoorModel):
                     if (tile.door_status == DoorStatusEnum.OPEN or tile.door_status == DoorStatusEnum.DESTROYED):
                         movable_tiles.append(tile)
-                        movable_tiles = self.get_movable_tiles(tile.x_coord, tile.y_coord, ap - ap_deduct, movable_tiles)
+                        movable_tiles = self.get_movable_tiles(tile.row, tile.column, ap - ap_deduct, movable_tiles)
 
         output = list(dict.fromkeys(movable_tiles))
         return output
 
     def distance_between_tiles(self, first_tile: TileModel, second_tile: TileModel) -> int:
-        return abs(first_tile.x_coord - second_tile.x_coord) + abs(first_tile.y_coord - second_tile.y_coord)
+        return abs(first_tile.row - second_tile.row) + abs(first_tile.column - second_tile.column)
 
     def find_closest_parking_spots(self, parking_type: str, current_tile: TileModel) -> List[TileModel]:
         """

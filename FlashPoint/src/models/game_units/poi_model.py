@@ -12,8 +12,8 @@ class POIModel(Model):
         super().__init__()
         self._identity = identity
         self._status = POIStatusEnum.HIDDEN
-        self._x_pos = 0
-        self._y_pos = 0
+        self._row = 0
+        self._column = 0
 
     def reveal(self):
         if self._status is POIStatusEnum.HIDDEN:
@@ -25,23 +25,23 @@ class POIModel(Model):
 
     def _notify_position(self):
         for obs in self.observers:
-            obs.poi_position_changed(self.x_pos, self.y_pos)
+            obs.poi_position_changed(self.row, self.column)
 
     @property
     def observers(self) -> List[POIObserver]:
         return self._observers
 
     @property
-    def x_pos(self) -> int:
-        return self._x_pos
+    def row(self) -> int:
+        return self._row
 
     @property
-    def y_pos(self) -> int:
-        return self._y_pos
+    def column(self) -> int:
+        return self._column
 
-    def set_position(self, x: int, y: int):
-        self._x_pos = x
-        self._y_pos = y
+    def set_position(self, row: int, column: int):
+        self._row = row
+        self._column = column
         self._notify_position()
 
     @property
