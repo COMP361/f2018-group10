@@ -33,6 +33,7 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
         self.rect = self.image.get_rect()
         self.rect.move_ip(880, 600)
 
+        self.not_your_turn = self._init_not_your_turn()
 
 
 
@@ -67,6 +68,7 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
         if self.enabled:
             self.your_turn = self._init_your_turn()
             self.btn = self._init_end_turn_button()
+            self._active_sprites.remove(self.not_your_turn)
             self._active_sprites.add(self.btn)
             self._active_sprites.add(self.your_turn)
             self._current_sprite.turn = True
@@ -92,6 +94,13 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
         rct.add_frame('media/GameHud/frame.png')
         return rct
 
+    def _init_not_your_turn(self):
+
+        rct = RectLabel(880,600,250,50,background=Color.ORANGE,
+                        txt_obj=Text(pygame.font.SysFont('Agency FB', 30),"NOT YOUR TURN",Color.GREEN2))
+        rct.change_bg_image('media/GameHud/wood2.png')
+        rct.add_frame('media/GameHud/frame.png')
+        return rct
 
     def countdown(self, count):
         while count and self.running:
@@ -107,6 +116,7 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
         self._current_sprite.turn = False
         self._active_sprites.remove(self.btn)
         self._active_sprites.remove(self.your_turn)
+        self._active_sprites.add(self.not_your_turn)
         turn_event = EndTurnEvent()
         # send end turn, see ChatBox for example
         #Networking.get_instance().send_to_server(turn_event)
