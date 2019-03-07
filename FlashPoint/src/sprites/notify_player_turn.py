@@ -73,10 +73,7 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
         self._active_sprites.remove(self.btn)
         turn_event = EndTurnEvent()
         # send end turn, see ChatBox for example
-        if Networking.get_instance().is_host:
-            Networking.get_instance().send_to_all_client(turn_event)
-        else:
-            Networking.get_instance().client.send(turn_event)
+        Networking.get_instance().send_to_server(turn_event)
 
     def _end_turn(self):
         self._current_sprite.turn = False

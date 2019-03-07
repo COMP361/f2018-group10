@@ -113,7 +113,7 @@ class JSONSerializer(object):
         elif object_type == EndTurnEvent.__name__:
             return JSONSerializer._deserialize_end_turn_event(payload)
         elif object_type == DummyEvent.__name__:
-            return JSONSerializer._deserialize_end_turn_event(payload)
+            return DummyEvent()
 
         print("WARNING: Could not deserialize object, not of recognized type.")
 
