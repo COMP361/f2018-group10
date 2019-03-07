@@ -1,5 +1,5 @@
 
 
 class NullModel(object):
-    """Class used to indicate an uninitialized tile."""
+    """Class used to indicate an uninitialized model."""
 

@@ -14,7 +14,8 @@ class TurnEvent(ActionEvent):
     def execute(self, *args, **kwargs):
         pass
 
-    def has_required_AP(self, playerAP: int, requiredAP: int) -> bool:
+    @staticmethod
+    def has_required_AP(playerAP: int, requiredAP: int) -> bool:
         if playerAP < requiredAP:
             return False
 

@@ -42,8 +42,8 @@ class GameBoardScene(object):
         self.quit_btn = RectButton(200, 250, 100, 50, Color.STANDARDBTN, 0,
                                    Text(pygame.font.SysFont('Arial', 20), "Quit", Color.BLACK))
 
-        self.active_sprites = pygame.sprite.Group()  # Maybe add separate groups for different things later
-        self.game_board = GameBoard()
+        self.active_sprites = pygame.sprite.Group()   # Maybe add separate groups for different things later
+        self.game_board = GameBoard(current_player)
         self.chat_box = ChatBox(self._current_player)
         self.menu = None
         self._init_sprites()
@@ -113,13 +113,12 @@ class GameBoardScene(object):
 
     def draw(self, screen: pygame.display):
         """Draw all currently active sprites."""
-        self.game_board.draw(screen)
-        self.active_sprites.draw(screen)
-
         if self.menu and not self.menu.is_closed:
             self.menu.draw(screen)
 
+        self.game_board.draw(screen)
         self.chat_box.draw(screen)
+        self.active_sprites.draw(screen)
         self.notify_turn_popup.draw(screen)
 
     def update(self, event_queue: EventQueue):

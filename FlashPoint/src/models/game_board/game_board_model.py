@@ -24,6 +24,9 @@ class GameBoardModel(object):
         self._poi_bank = GameBoardModel._init_pois()
         self._active_pois = []
 
+    def get_tiles(self) -> List[List[TileModel]]:
+        return self._tiles
+
     @property
     def tiles(self) -> List[TileModel]:
         tile_list = []
@@ -70,14 +73,14 @@ class GameBoardModel(object):
         # setting the top and bottom walls on the outside of the house
         for top, bottom in [(0, 1), (6, 7)]:
             for i in range(1, 9):
-                wall = WallModel()
+                wall = WallModel(top, i, "South")
                 tiles[top][i].set_adjacent_edge_obstacle("South", wall)
                 tiles[bottom][i].set_adjacent_edge_obstacle("North", wall)
 
         # setting the left and right walls on the outside of the house
         for left, right in [(0, 1), (8, 9)]:
             for i in range(1, 7):
-                wall = WallModel()
+                wall = WallModel(i, left, "East")
                 tiles[i][left].set_adjacent_edge_obstacle("East", wall)
                 tiles[i][right].set_adjacent_edge_obstacle("West", wall)
 
@@ -85,9 +88,9 @@ class GameBoardModel(object):
         with open("media/board_layouts/outside_door_locations.json", "r") as f:
             outside_doors = json.load(f)
 
-        for out_door_adjacency in outside_doors:
-            door = DoorModel(DoorStatusEnum.OPEN)
-            self.set_single_obstacle(tiles, out_door_adjacency, door)
+        for out_door_adj in outside_doors:
+            door = DoorModel(out_door_adj['first_pair'][0], out_door_adj['first_pair'][1], out_door_adj['first_dirn'], DoorStatusEnum.OPEN)
+            self.set_single_obstacle(tiles, out_door_adj, door)
 
         # setting the walls and doors present inside the house
         with open("media/board_layouts/tiles_adjacencies.json", "r") as f:
@@ -95,9 +98,9 @@ class GameBoardModel(object):
 
         for adjacency in inner_adjacencies:
             if adjacency['obstacle_type'] == 'wall':
-                obstacle = WallModel()
+                obstacle = WallModel(adjacency['first_pair'][0], adjacency['first_pair'][1], adjacency['first_dirn'])
             else:
-                obstacle = DoorModel()
+                obstacle = DoorModel(adjacency['first_pair'][0], adjacency['first_pair'][1], adjacency['first_dirn'])
 
             self.set_single_obstacle(tiles, adjacency, obstacle)
 

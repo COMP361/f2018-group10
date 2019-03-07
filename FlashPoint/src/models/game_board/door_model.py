@@ -7,13 +7,18 @@ from src.observers.door_observer import DoorObserver
 
 class DoorModel(EdgeObstacleModel):
 
-    def __init__(self, door_status: DoorStatusEnum = DoorStatusEnum.CLOSED):
+    def __init__(self, x: int, y: int, direction: str, door_status: DoorStatusEnum = DoorStatusEnum.CLOSED):
         super().__init__()
         self._door_status = door_status
+        self._id = (x, y, direction)
 
     @property
     def door_status(self):
         return self._door_status
+
+    @property
+    def id(self):
+        return self._id
 
     def open_door(self):
         """Set the door status of this door to DoorStatusEnum.OPEN"""
