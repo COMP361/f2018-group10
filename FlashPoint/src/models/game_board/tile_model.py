@@ -52,6 +52,10 @@ class TileModel(Model):
     def space_kind(self):
         return self._space_kind
 
+    @space_kind.setter
+    def space_kind(self, kind: SpaceKindEnum):
+        self._space_kind = kind
+
     @property
     def space_status(self):
         return self._space_status
