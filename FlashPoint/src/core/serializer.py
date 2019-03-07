@@ -125,9 +125,8 @@ class JSONSerializer(object):
             print("Observer, skipping serialize")
             return ""
 
-        if isinstance(obj, GameBoardModel):
-            for tile in obj.tiles:
-                tile.reset_adjacencies()
+        if isinstance(obj, TileModel):
+            obj.reset_adjacencies()
 
         obj.__setattr__("class", type(obj).__name__)
         return obj.__dict__ if not isinstance(obj, enum.Enum) else {"name": type(obj).__name__, "value": obj.value}
