@@ -27,7 +27,7 @@ class JoinScene(object):
         self._init_btn_back(20, 20, "Back", Color.STANDARDBTN, Color.BLACK)
         self._text_bar = self._init_text_bar(500, 350, 400, 32)
         self.error_msg = ""
-        self.buttonBack.on_click(EventQueue.post, CustomEvent(ChangeSceneEnum.HOSTJOINSCENE), player=self._current_player)
+        self.buttonBack.on_click(EventQueue.post, CustomEvent(ChangeSceneEnum.HOSTJOINSCENE, player=self._current_player))
         self.buttonConnect.on_click(self.join)
 
     def join(self):
