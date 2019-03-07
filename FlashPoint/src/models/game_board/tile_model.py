@@ -55,6 +55,10 @@ class TileModel(Model):
     def space_kind(self):
         return self._space_kind
 
+    @space_kind.setter
+    def space_kind(self, kind: SpaceKindEnum):
+        self._space_kind = kind
+
     @property
     def space_status(self):
         return self._space_status
@@ -151,9 +155,9 @@ class TileModel(Model):
     def get_obstacle_in_direction(self, direction: str) -> Optional['EdgeObstacleModel']:
         """
         Get the EdgeObstacle model
-        :return: EdgeObstacleModel in the direction specified, or None.
+        :return: EdgeObstacleModel in the direction specified, or NullModel.
         """
-        return self._adjacent_edge_objects.get(direction, None)
+        return self._adjacent_edge_objects.get(direction, NullModel())
 
     def has_obstacle_in_direction(self, direction: str) -> bool:
         """
@@ -166,7 +170,7 @@ class TileModel(Model):
                 True otherwise
         """
         obstacle: EdgeObstacleModel = self.get_obstacle_in_direction(direction)
-        if not obstacle:
+        if isinstance(obstacle, NullModel):
             return False
         elif isinstance(obstacle, DoorModel) and obstacle.door_status == DoorStatusEnum.DESTROYED:
             return False
