@@ -125,7 +125,7 @@ class GameBoardScene(object):
             self.menu.draw(screen)
 
         self.chat_box.draw(screen)
-        self.notify_turn_popup.draw(screen)
+        #self.notify_turn_popup.draw(screen)
 
     def update(self, event_queue: EventQueue):
         """Call the update() function of everything in this class."""

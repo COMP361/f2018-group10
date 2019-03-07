@@ -4,6 +4,7 @@ import time
 from threading import Thread
 import src.constants.color as Color
 from src.UIComponents.rect_button import RectButton
+from src.UIComponents.rect_label import RectLabel
 from src.action_events.turn_events.end_turn_event import EndTurnEvent
 from src.core.event_queue import EventQueue
 from src.core.networking import Networking
@@ -32,6 +33,9 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
         self.rect = self.image.get_rect()
         self.rect.move_ip(880, 600)
 
+
+
+
         self._current_player = current_player
         self._current_sprite = current_sprite
         self._active_sprites = sprite_group
@@ -39,18 +43,21 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
         GameStateModel.instance().add_observer(self)
 
     # def draw(self, screen: pygame.display):
-    #     if self.enabled and self._current_sprite.turn:
-    #         self.image.blit(self.bg, self.image.get_rect())
-    #         self.image.blit(self.frame, self.image.get_rect())
-    #         self.image.blit(self.text, self.image.get_rect().move(77, 7))
-    #         screen.blit(self.image, self.image.get_rect().move(880, 600))
-
-    def draw(self, screen:pygame.display):
-        if self.enabled and self._current_sprite.turn:
-            self.image.blit(self.bg, self.image.get_rect())
-            self.image.blit(self.frame, self.image.get_rect())
-            self.image.blit(self.text, self.image.get_rect().move(77, 7))
-            screen.blit(self.image, self.rect)
+    #     #if self.enabled and self._current_sprite.turn:
+    #
+    #
+    #         # self.image.blit(self.bg, self.image.get_rect())
+    #         # self.image.blit(self.frame, self.image.get_rect())
+    #         # self.image.blit(self.text, self.image.get_rect().move(77, 7))
+    #         # screen.blit(self.image, self.image.get_rect().move(880, 600))
+    #
+    # # def draw(self, screen:pygame.display):
+    # #
+    # #     if self.enabled and self._current_sprite.turn:
+    # #         self.image.blit(self.bg, self.image.get_rect())
+    # #         self.image.blit(self.frame, self.image.get_rect())
+    # #         self.image.blit(self.text, self.image.get_rect().move(77, 7))
+    # #         screen.blit(self.image, self.rect)
 
 
 
@@ -58,8 +65,10 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
 
         self.enabled = GameStateModel.instance().players[player_index] == self._current_player
         if self.enabled:
+            self.your_turn = self._init_your_turn()
             self.btn = self._init_end_turn_button()
             self._active_sprites.add(self.btn)
+            self._active_sprites.add(self.your_turn)
             self._current_sprite.turn = True
             self.running = True
 
@@ -69,11 +78,20 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
 
     def _init_end_turn_button(self):
         btn = RectButton(1130, 500, 150, 50, background=Color.ORANGE,
-                         txt_obj=Text(pygame.font.SysFont('Arial', 23), "END TURN",Color.GREEN2))
+                         txt_obj=Text(pygame.font.SysFont('Agency FB', 23), "END TURN",Color.GREEN2))
         btn.change_bg_image('media/GameHud/wood2.png')
         btn.add_frame('media/GameHud/frame.png')
         btn.on_click(self._end_turn)
         return btn
+
+    def _init_your_turn(self):
+
+        rct = RectLabel(880,600,250,50,background=Color.ORANGE,
+                        txt_obj=Text(pygame.font.SysFont('Agency FB', 30),"YOUR TURN",Color.GREEN2))
+        rct.change_bg_image('media/GameHud/wood2.png')
+        rct.add_frame('media/GameHud/frame.png')
+        return rct
+
 
     def countdown(self, count):
         while count and self.running:
@@ -88,6 +106,7 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
         self.running = False
         self._current_sprite.turn = False
         self._active_sprites.remove(self.btn)
+        self._active_sprites.remove(self.your_turn)
         turn_event = EndTurnEvent()
         # send end turn, see ChatBox for example
         #Networking.get_instance().send_to_server(turn_event)
