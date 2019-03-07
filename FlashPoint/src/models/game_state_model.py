@@ -38,6 +38,7 @@ class GameStateModel(Model):
             self._game_board = GameBoardModel(self._rules)
 
             GameStateModel._instance = self
+
         else:
             print("Attempted to instantiate another singleton")
             raise Exception("GameStateModel is a Singleton")

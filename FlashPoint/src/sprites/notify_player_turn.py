@@ -5,6 +5,7 @@ from threading import Thread
 import src.constants.color as Color
 from src.UIComponents.rect_button import RectButton
 from src.action_events.turn_events.end_turn_event import EndTurnEvent
+from src.core.event_queue import EventQueue
 from src.core.networking import Networking
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
@@ -29,19 +30,29 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
         self.font_name = pygame.font.SysFont('Agency FB', 30)
         self.text = self.font_name.render(self.msg, True, Color.GREEN2)
         self.rect = self.image.get_rect()
-        self.rect.move_ip(500, 500)
+        self.rect.move_ip(880, 600)
+
         self._current_player = current_player
         self._current_sprite = current_sprite
         self._active_sprites = sprite_group
 
         GameStateModel.instance().add_observer(self)
 
-    def draw(self, screen: pygame.display):
+    # def draw(self, screen: pygame.display):
+    #     if self.enabled and self._current_sprite.turn:
+    #         self.image.blit(self.bg, self.image.get_rect())
+    #         self.image.blit(self.frame, self.image.get_rect())
+    #         self.image.blit(self.text, self.image.get_rect().move(77, 7))
+    #         screen.blit(self.image, self.image.get_rect().move(880, 600))
+
+    def update(self, event_queue:EventQueue):
         if self.enabled and self._current_sprite.turn:
             self.image.blit(self.bg, self.image.get_rect())
             self.image.blit(self.frame, self.image.get_rect())
             self.image.blit(self.text, self.image.get_rect().move(77, 7))
-            screen.blit(self.image, self.image.get_rect().move(880, 600))
+            #screen.blit(self.image, self.image.get_rect().move(880, 600))
+
+
 
     def notify_player_index(self, player_index: int):
 
@@ -58,7 +69,9 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
 
     def _init_end_turn_button(self):
         btn = RectButton(1130, 500, 150, 50, background=Color.ORANGE,
-                         txt_obj=Text(pygame.font.SysFont('Arial', 23), "End Turn"))
+                         txt_obj=Text(pygame.font.SysFont('Arial', 23), "END TURN",Color.GREEN2))
+        btn.change_bg_image('media/GameHud/wood2.png')
+        btn.add_frame('media/GameHud/frame.png')
         btn.on_click(self._end_turn)
         return btn
 

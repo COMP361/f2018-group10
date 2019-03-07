@@ -7,7 +7,10 @@ from src.core.event_queue import EventQueue
 #TODO
 
 #Add switches statement for expirienced mode
-class PlayerState(Interactable):
+from src.models.game_state_model import GameStateModel
+
+
+class PlayerState(Interactable,GameStateModel):
 
     def __init__(self, x: int, y: int, name: str,color: Color):
         self.image = pygame.Surface([64 , 64])
@@ -101,6 +104,7 @@ class PlayerState(Interactable):
         self.image.blit(self.frame,self.image.get_rect())
 
 
-
+    def notify_player_index(self, player_index: int):
+        pass
 
 
