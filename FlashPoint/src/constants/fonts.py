@@ -1,1 +1,2 @@
 TEXT_BOX_FONT_SIZE = 28
+MAIN_FONT = "Agency FB"

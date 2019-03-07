@@ -1,6 +1,7 @@
 from typing import Callable
 
 import pygame
+from src.constants.change_scene_enum import ChangeSceneEnum
 
 from src.core.event_queue import EventQueue
 
@@ -51,9 +52,10 @@ class Interactable(pygame.sprite.Sprite):
                 self.hover()
 
             for event in event_queue:
-                if event.type == pygame.MOUSEBUTTONUP and not self._clicked:
-                    self._clicked = True
-                    self.click()
+                if not isinstance(event, ChangeSceneEnum):
+                    if event.type == pygame.MOUSEBUTTONUP and not self._clicked:
+                        self._clicked = True
+                        self.click()
 
             if not click[0]:
                 self._clicked = False
@@ -111,7 +113,8 @@ class Interactable(pygame.sprite.Sprite):
         """
         if self._is_enabled:
             if isinstance(self._click_action, Callable):
-                self._click_action(*self._click_args, **self._click_kwargs)
+                return self._click_action(*self._click_args, **self._click_kwargs)
+
 
     def hover(self):
         """
@@ -138,7 +141,7 @@ class Interactable(pygame.sprite.Sprite):
         Enables the event hook
         :return:
         """
-        print(f"Enabling: {self}")
+        # print(f"Enabling: {self}")
         self._is_enabled = True
 
     def disable(self):
@@ -146,11 +149,15 @@ class Interactable(pygame.sprite.Sprite):
         Disables the event hook
         :return:
         """
-        print(f"Disabling: {self}")
+        # print(f"Disabling: {self}")
         self._is_enabled = False
 
     def resize_rect(self, rect: pygame.rect.Rect):
         self._rect = rect
+
+    @property
+    def enabled(self):
+        return self._is_enabled
 
     # why is this so hard
     @property

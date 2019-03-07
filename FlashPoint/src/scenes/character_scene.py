@@ -1,18 +1,23 @@
 import pygame
 
 import src.constants.color as Color
+from src.core.custom_event import CustomEvent
+from src.core.event_queue import EventQueue
 
 from src.UIComponents.rect_button import RectButton
 from src.UIComponents.rect_label import RectLabel
 
 from src.UIComponents.scene import Scene
 from src.UIComponents.text import Text
+from src.models.game_units.player_model import PlayerModel
+from src.constants.change_scene_enum import ChangeSceneEnum
 
 
 class CharacterScene(Scene):
-    def __init__(self, screen):
+    def __init__(self, screen, current_player: PlayerModel):
         self.label_grp = pygame.sprite.Group()
-
+        self._current_player = current_player
+        
         Scene.__init__(self, screen)
         self._init_background()
         self.create_label(0, 0, 100, 150)
@@ -23,36 +28,37 @@ class CharacterScene(Scene):
                              "media/specialist_cards/driver_operator.png")
 
         self.create_butn_img(650, 150, 100, 150,
-                             "media/fire_captain.png")
+                             "media/specialist_cards/fire_captain.png")
 
         self.create_butn_img(850, 150, 99, 150,
                              "media/specialist_cards/generalist.png")
 
         self.create_butn_img(250, 450, 100, 150,
-                             "media/specialist_cards/hazmat_tech.png")
+                             "media/specialist_cards/hazmat_technician.png")
 
         self.create_butn_img(450, 450, 99, 150,
-                             "media/specialist_cards/imaging_tech.png")
+                             "media/specialist_cards/imaging_technician.png")
 
         self.create_butn_img(650, 450, 99, 150,
                              "media/specialist_cards/paramedic.png")
 
         self.create_butn_img(850, 450, 98, 150,
-                             "media/specialist_cards/rescue.png")
+                             "media/specialist_cards/rescue_specialist.png")
 
         self._init_btn_back(20, 20, "Back", Color.STANDARDBTN, Color.BLACK)
 
         self._init_btn_confirm(1050, 575, "Confirm", Color.STANDARDBTN, Color.BLACK)
 
         self._init_title_text()
+        self.buttonBack.on_click(EventQueue.post, CustomEvent(ChangeSceneEnum.LOBBYSCENE))
+        self.buttonConfirm.on_click(EventQueue.post, CustomEvent(ChangeSceneEnum.LOBBYSCENE))
 
     def _init_background(self):
         box_size = (self.resolution[0], self.resolution[1])
-        background_box = RectLabel(0, 0, box_size[0], box_size[1], "media/flashpoint_background.png")
+        background_box = RectLabel(0, 0, box_size[0], box_size[1], "media/backgrounds/flashpoint_background.png")
         self.sprite_grp.add(background_box)
 
     def create_butn_img(self, x, y, width, height, path):
-
         label = self.create_label(x, y, width, height)
         self.label_grp.add(label)
         self.sprite_grp.add(label)

@@ -1,13 +1,8 @@
-from abc import ABC, abstractmethod
+from src.models.model import Model
 
 
-class VehicleModel(ABC):
+class VehicleModel(Model):
     """Base class for Ambulance and Engine"""
 
-    def __init__(self, parking_spot):
+    def __init__(self):
         super().__init__()
-        self._parking_spot = parking_spot
-
-    @abstractmethod
-    def drive(self, tile):
-        pass
