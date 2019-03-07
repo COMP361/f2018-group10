@@ -12,6 +12,9 @@ class DoorModel(EdgeObstacleModel):
         self._door_status = door_status
         self._id = (x, y, direction)
 
+    def __str__(self):
+        return f"Door at ({self.id[0]}, {self.id[1]}) in direction {self.id[2]}."
+
     @property
     def door_status(self):
         return self._door_status

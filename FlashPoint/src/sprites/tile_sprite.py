@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Tuple, List
 
 import pygame
 from src.UIComponents.file_importer import FileImporter
@@ -6,6 +6,7 @@ from src.models.game_state_model import GameStateModel
 from src.constants.state_enums import SpaceStatusEnum
 from src.UIComponents.interactable import Interactable
 from src.core.event_queue import EventQueue
+from src.models.model import Model
 from src.observers.tile_observer import TileObserver
 
 
@@ -50,6 +51,10 @@ class TileSprite(Interactable,TileObserver):
             return False
 
     """TODO: is clicked"""
+
+    def tile_assoc_models_changed(self, assoc_models: List[Model]):
+        pass
+
     def is_clicked(self):
 
         clicked = self.hover() and pygame.mouse.get_pressed()[0] # check if left click

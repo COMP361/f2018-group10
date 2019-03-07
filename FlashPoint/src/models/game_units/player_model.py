@@ -28,6 +28,12 @@ class PlayerModel(Model):
         x = [other.ip == self.ip, other.nickname == self.nickname, other.x_pos == self.x_pos, other.y_pos == self.y_pos]
         return all(x)
 
+    def info(self):
+        print("### Player ###")
+        print("Position: ({x}, {y})".format(x=self.x_pos, y=self.y_pos))
+        print("AP: {ap}".format(ap=self.ap))
+        print("Status: {status}".format(status=self.status))
+
     def _notify_position(self):
         for obs in self.observers:
             obs.player_position_changed(self.x_pos, self.y_pos)
