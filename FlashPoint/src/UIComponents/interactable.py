@@ -140,7 +140,7 @@ class Interactable(pygame.sprite.Sprite):
         Enables the event hook
         :return:
         """
-        print(f"Enabling: {self}")
+        #print(f"Enabling: {self}")
         self._is_enabled = True
 
     def disable(self):
@@ -148,7 +148,7 @@ class Interactable(pygame.sprite.Sprite):
         Disables the event hook
         :return:
         """
-        print(f"Disabling: {self}")
+        #print(f"Disabling: {self}")
         self._is_enabled = False
 
     def resize_rect(self, rect: pygame.rect.Rect):
