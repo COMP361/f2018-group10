@@ -6,11 +6,13 @@ import src.constants.color as Color
 from src.UIComponents.interactable import Interactable
 from src.UIComponents.rect_button import RectButton
 from src.core.event_queue import EventQueue
+from src.models.game_board.door_model import DoorModel
 from src.models.game_board.wall_model import WallModel
 from src.models.game_state_model import GameStateModel
 
 from src.UIComponents.spritesheet import Spritesheet
 from src.models.game_units.player_model import PlayerModel
+from src.sprites.hud.door_sprite import DoorSprite
 from src.sprites.tile_sprite import TileSprite
 from src.sprites.wall_sprite import WallSprite
 
@@ -32,6 +34,8 @@ class GridSprite(pygame.sprite.Group):
         self.rect = self.image.get_rect().move((x_coord, y_coord))
         self.walls = []
         self.wall_buttons = []
+        self.doors = []
+        self.door_buttons = []
         self.grid = self._generate_grid(tile_size)
 
     def _generate_grid(self, tile_size: int) -> List[List[TileSprite]]:
@@ -53,6 +57,9 @@ class GridSprite(pygame.sprite.Group):
                 south_obstacle = tile_model.get_obstacle_in_direction("South")
 
                 if east_obstacle:
+                    if isinstance(east_obstacle, DoorModel):
+                        door = DoorSprite(east_obstacle, "vertical", tile_sprite, tile_model, (j, i, "EAST"))
+                        door.button =
                     if isinstance(east_obstacle, WallModel):
                         wall = WallSprite(east_obstacle, "vertical", tile_sprite, tile_model, (j, i, "East"))
                         wall.button = RectButton(x_offset + 128-5, y_offset, 14, 125, Color.BLACK)
