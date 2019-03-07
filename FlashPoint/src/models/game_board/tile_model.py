@@ -153,6 +153,9 @@ class TileModel(Model):
     def set_adjacent_edge_obstacle(self, direction: str, edge_obstacle: EdgeObstacleModel):
         self._adjacent_edge_objects[direction] = edge_obstacle
 
+    def set_adjacent_tile(self, direction: str, tile):
+        self._adjacent_tiles[direction] = tile
+
     def get_tile_in_direction(self, direction: str):
         """
         Get the TileModel in a specified direction.
