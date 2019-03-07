@@ -1,4 +1,5 @@
 import pygame
+from src.UIComponents.chat_box import ChatBox
 from src.UIComponents.rect_label import RectLabel
 from src.action_events.turn_events.choose_starting_position_event import ChooseStartingPositionEvent
 from src.constants.state_enums import SpaceKindEnum
@@ -13,7 +14,7 @@ from src.sprites.player_sprite import PlayerSprite
 
 class ChooseStartingPositionController(object):
 
-    def __init__(self, player: PlayerModel, game_board: GameBoard):
+    def __init__(self, player: PlayerModel, game_board: GameBoard, chat_box: ChatBox):
         self.player = player
         """The offset of this rectlabel might be wickedly off, please someone has to check it"""
         self.choose_label = RectLabel(500, 0, 300, 75, Color.GREY, 0,
@@ -26,6 +27,7 @@ class ChooseStartingPositionController(object):
         self.board_state = GameStateModel.instance()
         self.game_board_model = self.board_state.game_board
         self.game_board_sprite = game_board
+        self.chat_box_area = chat_box
         self.grid = game_board.grid
 
     def set_active_labels(self, sprite_grp):
@@ -40,6 +42,9 @@ class ChooseStartingPositionController(object):
             if self.wait_button:
                 self.wait_button.kill()
                 self.wait_button = None
+            mouse_pos = pygame.mouse.get_pos()
+            cb = self.chat_box_area.chat_textbox.rect
+            # bit weird but I guess it works
             for i in range(len(self.grid.grid)):
                 for j in range(len(self.grid.grid[i])):
                     """1. get the tile at i,j index
@@ -66,11 +71,13 @@ class ChooseStartingPositionController(object):
                             curr_tile.hover_color = Color.GREEN
 
                         if curr_tile.is_clicked():
-                            event = ChooseStartingPositionEvent(tile_model)
-                            self.game_board_sprite.add(PlayerSprite(curr_tile, self.grid))
-                            self.choose_label.kill()
-                            # delete this controller in case of success scenario, the backend event has been instantiated
-                            break
+                            if not ((cb.x < mouse_pos[0] < cb.x + cb.width) and (cb.y < mouse_pos[1] < cb.y + cb.height)):
+                                event = ChooseStartingPositionEvent(tile_model)
+                                self.game_board_sprite.add(PlayerSprite(curr_tile, self.grid))
+                                self.choose_label.kill()
+                                # delete this controller in case of success scenario,
+                                # the backend event has been instantiated
+                                break
 
                     else:
                         if curr_tile.hover():

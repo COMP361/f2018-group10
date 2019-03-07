@@ -30,7 +30,6 @@ class InputBox(pg.sprite.Sprite):
         self.rect.move_ip(x, y)
         self.image.blit(self.txt_surface, (self.rect.x + 5, self.rect.y))
 
-
     def handle_event(self, event):
         if event.type == pg.MOUSEBUTTONDOWN:
             if self.rect.collidepoint(event.pos):

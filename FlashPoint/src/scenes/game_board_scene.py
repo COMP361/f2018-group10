@@ -26,8 +26,9 @@ from src.sprites.notify_player_turn import NotifyPlayerTurn
 
 
 class GameBoardScene(object):
-    """Scene for displaying the main game view"""
-
+    """
+    Scene for displaying the main game view
+    """
     def __init__(self, screen: pygame.display, current_player: PlayerModel):
         """
         :param screen : The display passed from main on which to draw the Scene.
@@ -47,7 +48,9 @@ class GameBoardScene(object):
         self.menu = None
         self._init_sprites()
         self.notify_turn_popup = NotifyPlayerTurn(self._current_player, self._current_sprite)
-        self.choose_start_pos_controller = ChooseStartingPositionController(current_player, self.game_board)
+        self.choose_start_pos_controller = ChooseStartingPositionController(
+                                            current_player, self.game_board, self.chat_box
+                                            )
         self.choose_start_pos_controller.set_active_labels(self.active_sprites)
 
     def _init_sprites(self):
@@ -121,7 +124,7 @@ class GameBoardScene(object):
     def update(self, event_queue: EventQueue):
         """Call the update() function of everything in this class."""
 
-        self.chat_box.update(event_queue)
+        # self.chat_box.update(event_queue)
         self.game_board.update(event_queue)
         self.active_sprites.update(event_queue)
 
@@ -130,5 +133,4 @@ class GameBoardScene(object):
 
         self.chat_box.update(event_queue)
         self.notify_turn_popup.update(event_queue)
-
         self.choose_start_pos_controller.update(event_queue)
