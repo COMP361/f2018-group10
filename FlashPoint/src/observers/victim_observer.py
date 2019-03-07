@@ -13,3 +13,7 @@ class VictimObserver(Observer, ABC):
     @abstractmethod
     def victim_state_changed(self, state: VictimStateEnum):
         pass
+
+    @abstractmethod
+    def victim_position_changed(self, x: int, y: int):
+        pass

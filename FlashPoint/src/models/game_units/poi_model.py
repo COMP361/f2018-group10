@@ -35,18 +35,13 @@ class POIModel(Model):
     def x_pos(self) -> int:
         return self._x_pos
 
-    @x_pos.setter
-    def x_pos(self, x_pos: int):
-        self._x_pos = x_pos
-        self._notify_position()
-
     @property
     def y_pos(self) -> int:
         return self._y_pos
 
-    @y_pos.setter
-    def y_pos(self, y_pos: int):
-        self._y_pos = y_pos
+    def set_position(self, x: int, y: int):
+        self._x_pos = x
+        self._y_pos = y
         self._notify_position()
 
     @property
@@ -66,3 +61,7 @@ class POIModel(Model):
 
         else:
             return self._identity
+
+    @property
+    def observers(self) -> List[POIObserver]:
+        return self._observers
