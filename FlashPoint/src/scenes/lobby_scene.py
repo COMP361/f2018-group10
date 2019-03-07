@@ -34,7 +34,7 @@ class LobbyScene(object):
 
         if self._game.rules == GameKindEnum.EXPERIENCED:
             self.buttonSelChar.on_click(EventQueue.post, CustomEvent(ChangeSceneEnum.CHARACTERSCENE))
-        if self._game.host.ip == self._current_player.ip:
+        if Networking.get_instance().is_host:
             self._current_player.status = PlayerStatusEnum.READY
             self.isReady = True
             self.start_button.on_click(self.start_game)
@@ -66,13 +66,11 @@ class LobbyScene(object):
             self.isReady = True
             self.buttonReady.change_color(Color.STANDARDBTN)
             self._current_player.status = PlayerStatusEnum.READY
-            event = ReadyEvent(self._current_player,True)
+            event = ReadyEvent(self._current_player, True)
 
             if self._current_player.ip == GameStateModel.instance().host.ip:
                 event.execute()
                 Networking.get_instance().send_to_all_client(event)
-
-
             else:
                 Networking.get_instance().client.send(event)
         else:
@@ -86,7 +84,6 @@ class LobbyScene(object):
             else:
                 Networking.get_instance().client.send(event)
 
-
     def _init_all(self, reuse=False):
         self._init_background()
         self._init_ip_addr()
@@ -98,7 +95,8 @@ class LobbyScene(object):
             if self._current_player.ip == GameStateModel.instance().host.ip:
                 self._init_start_game_button()
             else:
-                self._init_ready(1050, 575, "Ready", Color.STANDARDBTN, Color.BLACK)
+                # Ready button is grey at first
+                self._init_ready(1050, 575, "Ready", Color.GREY, Color.BLACK)
 
             if self._game.rules == GameKindEnum.EXPERIENCED:
                 self._init_selec_char(1050, 475, "Select Character", Color.STANDARDBTN, Color.BLACK)
@@ -207,15 +205,15 @@ class LobbyScene(object):
             self.players_not_ready_prompt.draw(screen)
 
     def update(self, event_queue):
-
-        game = GameStateModel.instance()
-        players_ready = len([player.status == PlayerStatusEnum.READY for player in game.players])
-        if players_ready == game.max_players:
-            self.start_button.enable()
-            self.start_button.change_color(Color.GREEN)
-        else:
-            self.start_button.disable()
-            self.start_button.change_color(Color.GREY)
+        if Networking.get_instance().is_host:
+            game = GameStateModel.instance()
+            players_ready = len([player for player in game.players if player.status == PlayerStatusEnum.READY])
+            if players_ready == game.max_players:
+                self.start_button.enable()
+                self.start_button.change_color(Color.GREEN)
+            else:
+                self.start_button.disable()
+                self.start_button.change_color(Color.GREY)
 
         self.chat_box.update(event_queue)
 
