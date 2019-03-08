@@ -2,6 +2,7 @@ import pygame
 import time
 from threading import Thread
 import src.constants.color as Color
+from constants.state_enums import GameStateEnum
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 from src.observers.game_state_observer import GameStateObserver
@@ -53,3 +54,6 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
             count -= 1
 
         self._current_sprite.turn = False
+
+    def notify_game_state(self, game_state: GameStateEnum):
+        pass

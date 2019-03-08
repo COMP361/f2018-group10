@@ -18,7 +18,7 @@ class PlayerModel(Model):
         self._nickname = nickname
         self._color = Color.WHITE  # White by default (not racist I swear)
         self._status = PlayerStatusEnum.NOT_READY
-        self._ap = 0
+        self._ap = 4
         self._special_ap = 0
         self._wins = 0
         self._losses = 0

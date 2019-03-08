@@ -22,7 +22,7 @@ class TileModel(Model):
         self._space_status = SpaceStatusEnum.SAFE
         self._is_hotspot = False
         self._associated_models = []
-        self._visited = False
+        self._visit_count = 0
 
         self._adjacent_tiles = {
             "North": NullModel(),
@@ -207,12 +207,12 @@ class TileModel(Model):
         self._notify_assoc_models()
 
     @property
-    def visited(self):
-        return self._visited
+    def visit_count(self):
+        return self._visit_count
 
-    @visited.setter
-    def visited(self, visit_status: bool):
-        self._visited = visit_status
+    @visit_count.setter
+    def visit_count(self, visit_count: int):
+        self._visit_count = visit_count
 
     def reset_adjacencies(self):
         self._adjacent_tiles = {}

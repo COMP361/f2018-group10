@@ -392,7 +392,7 @@ class Networking:
             """
             # define override here
             data = JSONSerializer.serialize(data)
-            print(f"Sending message to client at {connection_object.address} : {data}")
+            print(f"Sending message to client at {connection_object.address} : {data['class']}")
             return super(MastermindServerUDP, self).callback_client_send(connection_object, data, compression)
 
         class ClientNotFoundException(Exception):

@@ -1,0 +1,55 @@
+from src.core.event_queue import EventQueue
+from src.sprites.tile_sprite import TileSprite
+from src.sprites.game_board import GameBoard
+from src.models.game_units.player_model import PlayerModel
+from src.constants.state_enums import GameStateEnum
+from src.controllers.choose_starting_position_controller import ChooseStartingPositionController
+# from src.controllers.extinguish_controller import ExtinguishController
+from src.controllers.move_controller import MoveController
+from src.models.game_state_model import GameStateModel
+from src.observers.game_state_observer import GameStateObserver
+
+
+class TileInputController(GameStateObserver):
+
+    _instance = None
+
+    def __init__(self, current_player: PlayerModel):
+        if TileInputController._instance:
+            raise Exception("TileInputController is a singleton")
+
+        # self.extinguish_controller =  ExtinguishController()
+        self.game_board_sprite = GameBoard.instance()
+        self.move_controller = MoveController(current_player)
+        self.choose_starting_controller = ChooseStartingPositionController(current_player)
+        GameStateModel.instance().add_observer(self)
+        GameStateModel.instance().state = GameStateEnum.PLACING
+        TileInputController._instance = self
+
+    @classmethod
+    def instance(cls):
+        return cls._instance
+
+    def move_and_extinguish(self, tile: TileSprite):
+        self.move_controller.process_input(tile)
+        # self.extinguish_controller.process_input(tile)
+
+    def notify_player_index(self, player_index: int):
+        pass
+
+    def notify_game_state(self, state: GameStateEnum):
+        on_click = None
+        if state == GameStateEnum.PLACING:
+            on_click = self.choose_starting_controller.process_input
+        elif state == GameStateEnum.MAIN_GAME:
+            on_click = self.move_and_extinguish
+
+        grid = self.game_board_sprite.grid.grid
+        for column in range(len(grid)):
+            for row in range(len(grid[column])):
+                tile = grid[column][row]
+                tile.on_click(on_click, tile)
+
+    def update(self, event_queue: EventQueue):
+        self.move_controller.update(event_queue)
+        self.choose_starting_controller.update(event_queue)

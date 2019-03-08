@@ -11,7 +11,11 @@ from src.core.event_queue import EventQueue
 class GameBoard(pygame.sprite.Group):
     """Wrapper class for the Grid class. Contains methods specific for user interfacing."""
 
+    _instance = None
+
     def __init__(self, current_player: PlayerModel):
+        if GameBoard._instance:
+            raise Exception("GameBoard is a singleton")
         super().__init__()
         self._fire_placement_event = FirePlacementEvent()
         self._fire_placement_event.execute()
@@ -20,6 +24,11 @@ class GameBoard(pygame.sprite.Group):
         self.rect = self.image.get_rect()
         self.grid = GridSprite(x_coord=self.rect.left, y_coord=self.rect.top, current_player=current_player)
         self.background = FileImporter.import_image("media/backgrounds/WoodBack.jpeg")
+        GameBoard._instance = self
+
+    @classmethod
+    def instance(cls):
+        return cls._instance
 
     def draw(self, screen: pygame.Surface):
 

@@ -21,7 +21,7 @@ class GameStateModel(Model):
         if not GameStateModel._instance:
             super().__init__()
             self._host = host
-            self._max_desired_players = 6
+            self._max_desired_players = 2
             self._players = [self._host]
             self._players_turn_index = 0
             self._difficulty_level = None
@@ -47,6 +47,10 @@ class GameStateModel(Model):
     def _notify_player_index(self):
         for obs in self.observers:
             obs.notify_player_index(self._players_turn_index)
+
+    def _notify_state(self):
+        for obs in self.observers:
+            obs.notify_game_state(self._state)
 
     @staticmethod
     def __del__():
@@ -105,6 +109,10 @@ class GameStateModel(Model):
     def remove_player(self, player: PlayerModel):
         """Remove a player from the current game."""
         self._players.remove(player)
+
+    @property
+    def players_turn_index(self) -> int:
+        return self._players_turn_index
 
     @property
     def players_turn(self) -> PlayerModel:
@@ -198,6 +206,7 @@ class GameStateModel(Model):
     @state.setter
     def state(self, game_state: GameStateEnum):
         self._state = game_state
+        self._notify_state()
         if self._state == GameStateEnum.LOST:
             # TODO: More stuff here for what is supposed to happen when the game is lost.
             pass
