@@ -45,8 +45,8 @@ class PlayerSprite(pygame.sprite.Sprite, PlayerObserver):
     def player_special_ap_changed(self, updated_ap: int):
         pass
 
-    def player_position_changed(self, x_pos: int, y_pos: int):
-        self.tile_sprite = self.grid.grid[x_pos][y_pos]
+    def player_position_changed(self, row: int, column: int):
+        self.tile_sprite = self.grid.grid[row][column]
         self.rect = self.tile_sprite.rect
 
     def player_wins_changed(self, wins: int):

@@ -15,5 +15,5 @@ class VictimObserver(Observer, ABC):
         pass
 
     @abstractmethod
-    def victim_position_changed(self, x: int, y: int):
+    def victim_position_changed(self, row: int, column: int):
         pass

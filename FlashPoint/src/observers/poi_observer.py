@@ -12,5 +12,5 @@ class POIObserver(Observer):
         pass
 
     @abstractmethod
-    def poi_position_changed(self, x_pos: int, y_pos: int):
+    def poi_position_changed(self, row: int, column: int):
         pass
