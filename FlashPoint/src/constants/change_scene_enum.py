@@ -14,3 +14,5 @@ class ChangeSceneEnum(Enum):
     LOBBYSCENE = auto()
     GAMEBOARDSCENE = auto()
     REGISTER = auto()
+    LOSESCENE = auto()
+    WINSCENE = auto()
