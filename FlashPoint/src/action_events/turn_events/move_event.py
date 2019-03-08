@@ -14,4 +14,4 @@ class MoveEvent(ActionEvent):
 
     def execute(self):
         """Guessing what has to be done is to make everything sync up with the networking"""
-        pass
+        self.player.set_pos(self.tile.x_coord, self.tile.y_coord)

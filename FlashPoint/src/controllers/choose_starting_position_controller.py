@@ -16,18 +16,27 @@ from src.sprites.player_sprite import PlayerSprite
 
 class ChooseStartingPositionController(object):
 
-    def __init__(self, game_board_sprite: GameBoard, current_player: PlayerModel):
+    _instance = None
+
+    def __init__(self, current_player: PlayerModel):
+        if ChooseStartingPositionController._instance:
+            raise Exception("ChooseStartingPositionController is a singleton")
         self.current_player = current_player
-        self.game_board_sprite = game_board_sprite
+        self.game_board_sprite = GameBoard.instance()
         self.choose_prompt = RectLabel(500, 0, 350, 75, Color.GREY, 0,
                                        Text(pygame.font.SysFont('Agency FB', 30), "Choose Starting Position",
                                             Color.ORANGE))
         self.wait_prompt = RectLabel(500, 400, 300, 50, Color.GREY, 0,
-                                               Text(pygame.font.SysFont('Agency FB', 30), "Wait for your turn!",
+                                     Text(pygame.font.SysFont('Agency FB', 30), "Wait for your turn!",
                                                     Color.ORANGE))
 
         self.game_board_sprite.add(self.choose_prompt)
         self.game_board_sprite.add(self.wait_prompt)
+        ChooseStartingPositionController._instance = self
+
+    @classmethod
+    def instance(cls):
+        return cls._instance
 
     def _apply_hover(self):
         for i in range(len(self.game_board_sprite.grid.grid)):
@@ -66,7 +75,6 @@ class ChooseStartingPositionController(object):
             return
 
         event = ChooseStartingPositionEvent(tile_model)
-        self.game_board_sprite.add(PlayerSprite(tile_sprite, self.game_board_sprite.grid))
         self.choose_prompt.kill()
 
         if Networking.get_instance().is_host:

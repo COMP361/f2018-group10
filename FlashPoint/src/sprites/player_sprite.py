@@ -1,4 +1,5 @@
 import pygame
+from src.models.game_board.tile_model import TileModel
 from src.sprites.grid_sprite import GridSprite
 
 from src.UIComponents.file_importer import FileImporter
@@ -6,16 +7,16 @@ from src.constants.state_enums import PlayerStatusEnum
 from src.models.game_state_model import GameStateModel
 from src.observers.player_observer import PlayerObserver
 import src.constants.color as Color
-from src.sprites.tile_sprite import TileSprite
 
 
 class PlayerSprite(pygame.sprite.Sprite, PlayerObserver):
     """Visual representation of a Player and/or his fireman."""
 
-    def __init__(self, tile_sprite: TileSprite, grid: GridSprite):
+    def __init__(self, tile_model: TileModel, grid: GridSprite):
         super().__init__()
         self.grid = grid
-        self.tile_sprite = tile_sprite
+        self.tile_model = tile_model
+        self.tile_sprite = grid.grid[tile_model.y_coord][tile_model.x_coord]
         self.rect = self.tile_sprite.rect
         self.associated_player = GameStateModel.instance().players_turn
         self.associated_player.add_observer(self)
@@ -46,7 +47,7 @@ class PlayerSprite(pygame.sprite.Sprite, PlayerObserver):
         pass
 
     def player_position_changed(self, x_pos: int, y_pos: int):
-        self.tile_sprite = self.grid.grid[x_pos][y_pos]
+        self.tile_sprite = self.grid.grid[y_pos][x_pos]
         self.rect = self.tile_sprite.rect
 
     def player_wins_changed(self, wins: int):

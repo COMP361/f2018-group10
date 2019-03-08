@@ -12,13 +12,23 @@ from src.observers.game_state_observer import GameStateObserver
 
 class TileInputController(GameStateObserver):
 
-    def __init__(self, current_player: PlayerModel, game_board_sprite: GameBoard):
+    _instance = None
+
+    def __init__(self, current_player: PlayerModel):
+        if TileInputController._instance:
+            raise Exception("TileInputController is a singleton")
+
         # self.extinguish_controller =  ExtinguishController()
-        self.game_board_sprite = game_board_sprite
-        self.move_controller = MoveController(game_board_sprite, current_player)
-        self.choose_starting_controller = ChooseStartingPositionController(game_board_sprite, current_player)
+        self.game_board_sprite = GameBoard.instance()
+        self.move_controller = MoveController(current_player)
+        self.choose_starting_controller = ChooseStartingPositionController(current_player)
         GameStateModel.instance().add_observer(self)
-        GameStateModel.instance().state = GameStateEnum.MAIN_GAME
+        GameStateModel.instance().state = GameStateEnum.PLACING
+        TileInputController._instance = self
+
+    @classmethod
+    def instance(cls):
+        return cls._instance
 
     def move_and_extinguish(self, tile: TileSprite):
         self.move_controller.process_input(tile)

@@ -20,13 +20,22 @@ from src.sprites.game_board import GameBoard
 
 class MoveController(PlayerObserver):
 
-    def __init__(self, game_board_sprite: GameBoard, current_player: PlayerModel):
-        self.game_board_sprite = game_board_sprite
+    _instance = None
+
+    def __init__(self, current_player: PlayerModel):
+        if MoveController._instance:
+            raise Exception("MoveController is a singleton")
+        self.game_board_sprite = GameBoard.instance()
         self.current_player = current_player
         self.moveable_tiles = self._determine_reachable_tiles(
-            self.current_player.y_pos, self.current_player.x_pos, self.current_player.ap, [])
+            self.current_player.x_pos, self.current_player.y_pos, self.current_player.ap, [])
         self.current_player.add_observer(self)
         GameStateModel.instance().game_board.reset_tiles_visit_status()
+        MoveController._instance = self
+
+    @classmethod
+    def instance(cls):
+        return cls._instance
 
     def _determine_reachable_tiles(self, row: int, column: int, ap: int, movable_tiles: List[TileModel]) -> List[TileModel]:
 
@@ -55,7 +64,7 @@ class MoveController(PlayerObserver):
         for key in current_tile.adjacent_edge_objects.keys():
             tile: TileModel = current_tile.adjacent_tiles.get(key)
             obstacle: EdgeObstacleModel = current_tile.adjacent_edge_objects.get(key)
-            if isinstance(tile, NullModel) or tile.visit_count > 2:
+            if isinstance(tile, NullModel) or tile.visit_count > 3:
                 continue
 
             ap_deduct = 2 if tile.space_status == SpaceStatusEnum.FIRE else 1
@@ -117,8 +126,10 @@ class MoveController(PlayerObserver):
         pass
 
     def player_position_changed(self, x_pos: int, y_pos: int):
+
+        GameStateModel.instance().game_board.reset_tiles_visit_status()
         self.moveable_tiles = self._determine_reachable_tiles(
-            self.current_player.y_pos, self.current_player.x_pos, self.current_player.ap, [])
+            self.current_player.x_pos, self.current_player.y_pos, self.current_player.ap, [])
         GameStateModel.instance().game_board.reset_tiles_visit_status()
 
     def player_wins_changed(self, wins: int):

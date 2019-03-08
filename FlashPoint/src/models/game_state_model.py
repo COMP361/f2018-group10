@@ -111,6 +111,10 @@ class GameStateModel(Model):
         self._players.remove(player)
 
     @property
+    def players_turn_index(self) -> int:
+        return self._players_turn_index
+
+    @property
     def players_turn(self) -> PlayerModel:
         """The player who's turn it currently is."""
         return self._players[self._players_turn_index]

@@ -2,10 +2,10 @@ import enum
 import json
 from typing import Dict
 
+from src.action_events.turn_events.move_event import MoveEvent
 from src.observers.observer import Observer
 from src.models.game_board.tile_model import TileModel
 from src.action_events.turn_events.choose_starting_position_event import ChooseStartingPositionEvent
-from src.models.game_board.game_board_model import GameBoardModel
 from src.action_events.start_game_event import StartGameEvent
 from src.action_events.ready_event import ReadyEvent
 from src.action_events.chat_event import ChatEvent
@@ -84,10 +84,25 @@ class JSONSerializer(object):
 
     @staticmethod
     def _deserialize_choose_position_event(payload: Dict):
-        tile: TileModel = JSONSerializer.deserialize(payload['tile'])
+        tile_dict = payload['tile']
+        tile: TileModel = GameStateModel.instance().game_board.get_tile_at(tile_dict['_x_coord'], tile_dict['_y_coord'])
+        GameStateModel.instance().game_board.set_single_tile_adjacencies(tile)
         event = ChooseStartingPositionEvent(tile)
-        event.player = JSONSerializer.deserialize(payload['player'])
         return event
+
+    @staticmethod
+    def _deserialize_move_event(payload: Dict):
+        tile_dict = payload['tile']
+        tile: TileModel = GameStateModel.instance().game_board.get_tile_at(tile_dict['_x_coord'], tile_dict['_y_coord'])
+        GameStateModel.instance().game_board.set_single_tile_adjacencies(tile)
+        event = MoveEvent(tile)
+        return event
+
+    @staticmethod
+    def _deserialize_tile(payload: Dict) -> TileModel:
+        tile: TileModel = TileModel(payload['_x_coord'], payload['_y_coord'], payload['_space_kind'])
+        GameStateModel.instance().game_board.set_single_tile_adjacencies(tile)
+        return tile
 
     @staticmethod
     def deserialize(payload: Dict) -> object:
@@ -99,10 +114,15 @@ class JSONSerializer(object):
         Add to this case statement to be able to deserialize your object type.
         """
         object_type = payload["class"]
+
+        # --------------MODELS----------------
         if object_type == PlayerModel.__name__:
             return JSONSerializer._deserialize_player(payload)
+        elif object_type == TileModel.__name__:
+            return JSONSerializer._deserialize_tile(payload)
         elif object_type == GameStateModel.__name__:
             return JSONSerializer._deserialize_game_state(payload)
+        # --------------EVENTS------------------
         elif object_type == JoinEvent.__name__:
             return JSONSerializer._deserialize_join_event(payload)
         elif object_type == ChatEvent.__name__:
@@ -113,17 +133,18 @@ class JSONSerializer(object):
             return StartGameEvent()
         elif object_type == ChooseStartingPositionEvent.__name__:
             return JSONSerializer._deserialize_choose_position_event(payload)
+        elif object_type == MoveEvent.__name__:
+            return JSONSerializer._deserialize_move_event(payload)
         elif object_type == DummyEvent.__name__:
             return DummyEvent()
 
-        print("WARNING: Could not deserialize object, not of recognized type.")
+        print(f"WARNING: Could not deserialize object {object_type}, not of recognized type.")
 
     @staticmethod
     def _safe_dict(obj):
-        print(obj)
+
         if isinstance(obj, Observer):
-            print("Observer, skipping serialize")
-            return ""
+            return {"class": type(obj).__name__}
 
         if isinstance(obj, TileModel):
             obj.reset_adjacencies()

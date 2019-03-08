@@ -52,10 +52,13 @@ class TileSprite(Interactable,TileObserver):
     """TODO: is clicked"""
 
     def is_clicked(self):
+        if not self.hover():
+            return False
 
-        clicked = self.hover() and pygame.mouse.get_pressed()[0] # check if left click
-
-        return clicked
+        for event in EventQueue.get_instance():
+            if event.type == pygame.MOUSEBUTTONUP:
+                return True
+        return False
 
     def enable(self):
         """

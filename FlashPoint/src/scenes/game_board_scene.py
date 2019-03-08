@@ -48,7 +48,7 @@ class GameBoardScene(object):
         self.menu = None
         self._init_sprites()
         # self.chat_box
-        self.tile_input_controller = TileInputController(self._current_player, self.game_board)
+        self.tile_input_controller = TileInputController(self._current_player)
         # self.choose_start_pos_controller = ChooseStartingPositionController(self.game_board, current_player)
 
     def _init_sprites(self):
