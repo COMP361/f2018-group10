@@ -54,11 +54,10 @@ class GameBoardScene(object):
                                             current_player, self.game_board, self.chat_box
                                             )
         self.choose_start_pos_controller.set_active_labels(self.active_sprites)
-        #self.notify_turn_popup = NotifyPlayerTurn(self._current_player,self._current_sprite,self.active_sprites)
+        # self.notify_turn_popup = NotifyPlayerTurn(self._current_player,self._current_sprite,self.active_sprites)
 
         if Networking.get_instance().is_host:
-            GameStateModel.instance()._notify_player_index()
-
+            GameStateModel.instance().players_turn = 0
 
     def _init_sprites(self):
         for i, player in enumerate(self._game.players):

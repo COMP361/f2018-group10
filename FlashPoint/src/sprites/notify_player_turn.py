@@ -16,9 +16,11 @@ from src.UIComponents.text import Text
 
 class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
 
-    def __init__(self, current_player: PlayerModel, current_sprite:pygame.sprite.Sprite,sprite_group:pygame.sprite.Group):
+    def __init__(self, current_player: PlayerModel, current_sprite: pygame.sprite.Sprite,
+                 sprite_group: pygame.sprite.Group):
         super().__init__()
-        self.image = pygame.Surface([0,0])
+        self.has_run = False
+        self.image = pygame.Surface([0, 0])
         self.rect = self.image.get_rect()
         self.enabled = False
         self.running = True
@@ -26,8 +28,6 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
         self.font_time = pygame.font.SysFont('Agency FB', 25)
 
         self.not_your_turn = self._init_not_your_turn()
-
-
 
         self._current_player = current_player
         self._current_sprite = current_sprite
@@ -48,12 +48,20 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
             self.running = True
 
             self.countdown_thread = Thread(target=self.countdown, args=(10,))
-            self.countdown_thread.start()
+            self.countdown_thread.name = "countdown"
 
+            if self.has_run:
+                for thread in threading.enumerate():
+                    if thread.name == "countdown":
+                        if thread.is_alive():
+                            thread.join()
+            else:
+                self.has_run = True
+            self.countdown_thread.start()
 
     def _init_end_turn_button(self):
         btn = RectButton(1130, 500, 150, 50, background=Color.ORANGE,
-                         txt_obj=Text(pygame.font.SysFont('Agency FB', 23), "END TURN",Color.GREEN2))
+                         txt_obj=Text(pygame.font.SysFont('Agency FB', 23), "END TURN", Color.GREEN2))
         btn.change_bg_image('media/GameHud/wood2.png')
         btn.add_frame('media/GameHud/frame.png')
         btn.on_click(self._end_turn)
@@ -61,23 +69,23 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
 
     def _init_your_turn(self):
 
-        rct = RectLabel(880,600,250,50,background=Color.ORANGE,
-                        txt_obj=Text(pygame.font.SysFont('Agency FB', 30),"YOUR TURN",Color.GREEN2))
+        rct = RectLabel(880, 600, 250, 50, background=Color.ORANGE,
+                        txt_obj=Text(pygame.font.SysFont('Agency FB', 30), "YOUR TURN", Color.GREEN2))
         rct.change_bg_image('media/GameHud/wood2.png')
         rct.add_frame('media/GameHud/frame.png')
         return rct
 
     def _init_not_your_turn(self):
 
-        rct = RectLabel(880,600,250,50,background=Color.ORANGE,
-                        txt_obj=Text(pygame.font.SysFont('Agency FB', 30),"NOT YOUR TURN",Color.GREEN2))
+        rct = RectLabel(880, 600, 250, 50, background=Color.ORANGE,
+                        txt_obj=Text(pygame.font.SysFont('Agency FB', 30), "NOT YOUR TURN", Color.GREEN2))
         rct.change_bg_image('media/GameHud/wood2.png')
         rct.add_frame('media/GameHud/frame.png')
         return rct
 
     def countdown(self, count):
         while count and self.running:
-            mins,secs = divmod(count, 60)
+            mins, secs = divmod(count, 60)
             temp = '{:02d}:{:02d}'.format(mins, secs)
             self.time_str = f"TIME LEFT: {temp}"
             self._current_sprite.text_time_left = self.font_time.render(self.time_str, True, Color.GREEN2)
@@ -92,7 +100,7 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
         self._active_sprites.add(self.not_your_turn)
         turn_event = EndTurnEvent()
         # send end turn, see ChatBox for example
-        #Networking.get_instance().send_to_server(turn_event)
+        # Networking.get_instance().send_to_server(turn_event)
         if Networking.get_instance().is_host:
             Networking.get_instance().send_to_all_client(turn_event)
         else:
@@ -103,7 +111,3 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
         self._current_sprite.turn = False
         self.enabled = False
         self.running = False
-
-        if self.countdown_thread != threading.current_thread() and self.countdown_thread.is_alive():
-            self.countdown_thread.join()
-
