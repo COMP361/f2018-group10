@@ -7,9 +7,9 @@ from src.models.game_state_model import GameStateModel
 
 class MoveEvent(ActionEvent):
 
-    def __init__(self):
+    def __init__(self, destination: TileModel):
         super().__init__()
-        self.is_valid = False
+        self.tile = destination
         self.player = GameStateModel.instance().players_turn()
 
     def execute(self):

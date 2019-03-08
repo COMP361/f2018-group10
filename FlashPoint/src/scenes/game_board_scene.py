@@ -46,10 +46,8 @@ class GameBoardScene(object):
         self.chat_box = ChatBox(self._current_player)
         self.menu = None
         self._init_sprites()
-        self.choose_start_pos_controller = ChooseStartingPositionController(
-                                            current_player, self.game_board, self.chat_box
-                                            )
-        self.choose_start_pos_controller.set_active_labels(self.active_sprites)
+        # self.chat_box
+        self.choose_start_pos_controller = ChooseStartingPositionController(self.game_board, current_player)
 
     def _init_sprites(self):
         for i, player in enumerate(self._game.players):

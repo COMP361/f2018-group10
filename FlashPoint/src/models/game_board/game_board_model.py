@@ -169,3 +169,7 @@ class GameBoardModel(object):
             poi.y_pos = locations[i][1]
             self._active_pois.append(poi)
             self.get_tile_at(poi.x_pos, poi.y_pos).add_associated_model(poi)
+
+    def reset_tiles_visit_status(self):
+        for tile in self.tiles:
+            tile.visited = False
