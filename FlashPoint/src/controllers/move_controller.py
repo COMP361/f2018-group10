@@ -30,7 +30,7 @@ class MoveController(PlayerObserver):
         self.moveable_tiles = self._determine_reachable_tiles(
             self.current_player.x_pos, self.current_player.y_pos, self.current_player.ap, [])
         self.current_player.add_observer(self)
-        GameStateModel.instance().game_board.reset_tiles_visit_status()
+        GameStateModel.instance().game_board.reset_tiles_visit_count()
         MoveController._instance = self
 
     @classmethod
@@ -127,10 +127,10 @@ class MoveController(PlayerObserver):
 
     def player_position_changed(self, x_pos: int, y_pos: int):
 
-        GameStateModel.instance().game_board.reset_tiles_visit_status()
+        GameStateModel.instance().game_board.reset_tiles_visit_count()
         self.moveable_tiles = self._determine_reachable_tiles(
             self.current_player.x_pos, self.current_player.y_pos, self.current_player.ap, [])
-        GameStateModel.instance().game_board.reset_tiles_visit_status()
+        GameStateModel.instance().game_board.reset_tiles_visit_count()
 
     def player_wins_changed(self, wins: int):
         pass
