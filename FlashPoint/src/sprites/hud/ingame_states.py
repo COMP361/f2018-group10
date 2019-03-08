@@ -1,12 +1,15 @@
 import pygame
 import src.constants.color as Color
 from src.core.event_queue import EventQueue
+from src.models.game_state_model import GameStateModel
+from src.observers.game_state_observer import GameStateObserver
 
 
-class InGameStates(pygame.sprite.Sprite):
+class InGameStates(pygame.sprite.Sprite,GameStateObserver):
 
     def __init__(self, x: int, y: int, current_damage: int, victims_dead: int, victims_saved: int):
         super().__init__()
+        GameStateModel.instance().add_observer(self)
         self.image = pygame.Surface([880, 50])
         self.font = pygame.font.SysFont('Agency FB', 35)
 
@@ -37,3 +40,22 @@ class InGameStates(pygame.sprite.Sprite):
         self.image.blit(self.damage, self.damage_rect)
         self.image.blit(self.victims_saved, self.victims_saved_rect)
         self.image.blit(self.victims_dead, self.victims_dead_rect)
+
+    def damage_changed(self, new_damage: int):
+        self.damage_str = f"Damage: {new_damage}/24"
+        self.damage = self.font.render(self.damage_str, True, Color.WHITE)
+
+
+    def saved_victims(self, victims_saved: int):
+        self.victims_saved_str = f"Victims Saved: {victims_saved}/4"
+        self.victims_saved = self.font.render(self.victims_saved_str, True, Color.WHITE)
+
+
+    def dead_victims(self, victims_dead: int):
+        self.victims_dead_str = f"Victims Dead: {victims_dead}/7"
+        self.victims_dead = self.font.render(self.victims_dead_str, True, Color.WHITE)
+
+    def notify_player_index(self, player_index: int):
+        pass
+
+

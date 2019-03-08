@@ -83,6 +83,7 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
             self._current_sprite.text_time_left = self.font_time.render(self.time_str, True, Color.GREEN2)
             time.sleep(1)
             count -= 1
+
         self.time_str = ""
         self.enabled = False
         self.running = False
@@ -107,3 +108,12 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
         if self.countdown_thread != threading.current_thread() and self.countdown_thread.is_alive():
             self.countdown_thread.join()
 
+
+    def damage_changed(self, new_damage: int):
+        pass
+
+    def saved_victims(self, victims_saved: int):
+        pass
+
+    def dead_victims(self, victims_dead: int):
+        pass

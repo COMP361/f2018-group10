@@ -12,7 +12,11 @@ class EndTurnEvent(ActionEvent):
         super().__init__()
 
     def execute(self):
+        #for testing
+        #GameStateModel.instance().damage = 5
+        #GameStateModel.instance().players_turn.ap =  GameStateModel.instance().players_turn.ap + 4
         GameStateModel.instance().next_player()
+
         """
         1)
         2)start the AdvanceFire
