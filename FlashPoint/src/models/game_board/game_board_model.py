@@ -322,3 +322,8 @@ class GameBoardModel(object):
                 closest_spots.append(closer_tile_on_spot)
 
         return closest_spots
+
+    def reset_tiles_visit_status(self):
+        for tile in self.tiles:
+            tile.visited = False
+            

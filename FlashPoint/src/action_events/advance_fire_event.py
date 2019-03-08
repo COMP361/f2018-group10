@@ -39,7 +39,6 @@ class AdvanceFireEvent(ActionEvent):
 
 
     def advance_on_tile(self, target_tile: TileModel):
-        target_tile.visited = True
         tile_status = target_tile.space_status
         # Safe -> Smoke
         if tile_status == SpaceStatusEnum.SAFE:
