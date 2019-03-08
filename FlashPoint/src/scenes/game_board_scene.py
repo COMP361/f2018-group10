@@ -2,6 +2,7 @@ import json
 from datetime import datetime
 
 import pygame
+from src.controllers.tile_input_controller import TileInputController
 from src.constants.change_scene_enum import ChangeSceneEnum
 from src.controllers.choose_starting_position_controller import ChooseStartingPositionController
 from src.core.custom_event import CustomEvent
@@ -47,7 +48,8 @@ class GameBoardScene(object):
         self.menu = None
         self._init_sprites()
         # self.chat_box
-        self.choose_start_pos_controller = ChooseStartingPositionController(self.game_board, current_player)
+        self.tile_input_controller = TileInputController(self._current_player, self.game_board)
+        # self.choose_start_pos_controller = ChooseStartingPositionController(self.game_board, current_player)
 
     def _init_sprites(self):
         for i, player in enumerate(self._game.players):
@@ -131,4 +133,5 @@ class GameBoardScene(object):
 
         self.chat_box.update(event_queue)
         self.notify_turn_popup.update(event_queue)
-        self.choose_start_pos_controller.update(event_queue)
+        # self.choose_start_pos_controller.update(event_queue)
+        self.tile_input_controller.update(event_queue)

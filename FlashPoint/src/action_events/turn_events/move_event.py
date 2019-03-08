@@ -10,7 +10,7 @@ class MoveEvent(ActionEvent):
     def __init__(self, destination: TileModel):
         super().__init__()
         self.tile = destination
-        self.player = GameStateModel.instance().players_turn()
+        self.player = GameStateModel.instance().players_turn
 
     def execute(self):
         """Guessing what has to be done is to make everything sync up with the networking"""

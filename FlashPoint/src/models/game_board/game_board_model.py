@@ -172,4 +172,4 @@ class GameBoardModel(object):
 
     def reset_tiles_visit_status(self):
         for tile in self.tiles:
-            tile.visited = False
+            tile.visit_count = 0

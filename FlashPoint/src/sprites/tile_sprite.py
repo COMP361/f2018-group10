@@ -50,6 +50,7 @@ class TileSprite(Interactable,TileObserver):
             return False
 
     """TODO: is clicked"""
+
     def is_clicked(self):
 
         clicked = self.hover() and pygame.mouse.get_pressed()[0] # check if left click
@@ -105,6 +106,8 @@ class TileSprite(Interactable,TileObserver):
     def update(self, event_queue: EventQueue):
         self.sprite_grp.update(event_queue)
         self._scroll()
+        if self.is_clicked():
+            self.click()
 
     def tile_status_changed(self, status: SpaceStatusEnum):
         new_surf = pygame.Surface([self._non_highlight_image.get_width(), self._non_highlight_image.get_height()])

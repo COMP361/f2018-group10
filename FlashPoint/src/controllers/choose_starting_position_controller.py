@@ -22,7 +22,7 @@ class ChooseStartingPositionController(object):
         self.choose_prompt = RectLabel(500, 0, 350, 75, Color.GREY, 0,
                                        Text(pygame.font.SysFont('Agency FB', 30), "Choose Starting Position",
                                             Color.ORANGE))
-        self.wait_prompt = RectLabel(500, 400, 300, 300, Color.GREY, 0,
+        self.wait_prompt = RectLabel(500, 400, 300, 50, Color.GREY, 0,
                                                Text(pygame.font.SysFont('Agency FB', 30), "Wait for your turn!",
                                                     Color.ORANGE))
 
