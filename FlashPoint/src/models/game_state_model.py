@@ -115,6 +115,7 @@ class GameStateModel(Model):
     @players_turn.setter
     def players_turn(self, turn: int):
         self._players_turn_index = turn
+        self._notify_player_index()
 
     def next_player(self):
         """Rotate to the next player in the players list, round robin style."""
