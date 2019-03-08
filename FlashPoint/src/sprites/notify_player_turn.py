@@ -102,13 +102,27 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
         turn_event = EndTurnEvent()
         # send end turn, see ChatBox for example
         # Networking.get_instance().send_to_server(turn_event)
-        if Networking.get_instance().is_host:
-            Networking.get_instance().send_to_all_client(turn_event)
-        else:
-            Networking.get_instance().client.send(turn_event)
+
+        try:
+            if Networking.get_instance().is_host:
+                Networking.get_instance().send_to_all_client(turn_event)
+            else:
+                Networking.get_instance().client.send(turn_event)
+        except AttributeError as e:
+            print("Ignore this lol")
 
     def _end_turn(self):
 
         self._current_sprite.turn = False
         self.enabled = False
         self.running = False
+
+
+    def damage_changed(self, new_damage: int):
+        pass
+
+    def saved_victims(self, victims_saved: int):
+        pass
+
+    def dead_victims(self, victims_dead: int):
+        pass
