@@ -5,18 +5,22 @@ import time
 import pygame
 
 import src.constants.color as Color
+from src.constants.state_enums import PlayerStatusEnum
 from src.core.event_queue import EventQueue
 
 import time
 
 from src.models.game_state_model import GameStateModel
+from src.models.game_units.player_model import PlayerModel
 from src.observers.game_state_observer import GameStateObserver
+from src.observers.player_observer import PlayerObserver
 
 
-class CurrentPlayerState(pygame.sprite.Sprite,GameStateObserver):
+class CurrentPlayerState(pygame.sprite.Sprite,PlayerObserver):
 
-    def __init__(self, x: int, y: int, name: str, color: Color):
+    def __init__(self, x: int, y: int, name: str, color: Color,current:PlayerModel):
         super().__init__()
+        current.add_observer(self)
         #self.countdown_thread = Thread(target=self.countdown,args= (10,))
         bg = pygame.image.load('media/GameHud/wood2.png')
         self.bg = pygame.transform.scale(bg, (150, 150))
@@ -32,13 +36,15 @@ class CurrentPlayerState(pygame.sprite.Sprite,GameStateObserver):
         self.font_other = pygame.font.SysFont('Agency FB', 23)
         self.font_time = pygame.font.SysFont('Agency FB', 25)
         self.name = name
-        self.AP = f'AP: {4}'
-        self.SAP = f'Special AP:{4}'
+        self.ap = current.ap
+        self.AP = f'AP: {self.ap}'
+        self.sap = 0
+        self.SAP = f'Special AP:{self.sap}'
 
 
         self.text = self.font_name.render(self.name, True, Color.GREEN2)
-        self.text_AP = self.font_other.render(self.AP, True, Color.GREEN2)
-        self.text_SAP = self.font_other.render(self.SAP, True, Color.GREEN2)
+        self.text_AP = self.font_other.render(self.AP, True, Color.WHITE)
+        self.text_SAP = self.font_other.render(self.SAP, True, Color.WHITE)
         self.turn = False
         self.start = datetime.now()
         self.time_str = f"TOTAL TIME:"
@@ -76,6 +82,7 @@ class CurrentPlayerState(pygame.sprite.Sprite,GameStateObserver):
         }[color]
 
     def update(self, event_queue: EventQueue):
+
         self.image.blit(self.bg, self.image.get_rect())
         self.image.blit(self.player_im, self.image.get_rect().move(50, 0))
         self.image.blit(self.surface_for_text, self.image.get_rect())
@@ -91,17 +98,28 @@ class CurrentPlayerState(pygame.sprite.Sprite,GameStateObserver):
             self.image.blit(self.text_time_left, self.time_left_rect)
 
 
-    # def countdown(self, count):
-    #     while count:
-    #         mins,secs = divmod(count, 60)
-    #         temp = '{:02d}:{:02d}'.format(mins, secs)
-    #         self.time_str = f"TIME LEFT: {temp}"
-    #         self.text_time_left = self.font_time.render(self.time_str, True, Color.WHITE)
-    #         time.sleep(1)
-    #         count -= 1
-    #
-    #     self.turn = False
-
-    def notify_player_index(self, player_index: int):
+    def player_status_changed(self, status: PlayerStatusEnum):
         pass
+
+
+    def player_ap_changed(self, updated_ap: int):
+        self.ap = updated_ap
+        self.AP = f'AP: {self.ap}'
+        self.text_AP = self.font_other.render(self.AP, True, Color.GREEN2)
+
+    def player_special_ap_changed(self, updated_ap: int):
+        pass
+
+
+    def player_position_changed(self, x_pos: int, y_pos: int):
+        pass
+
+
+    def player_wins_changed(self, wins: int):
+        pass
+
+
+    def player_losses_changed(self, losses: int):
+        pass
+
 
