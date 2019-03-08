@@ -56,8 +56,8 @@ class WallSprite(pygame.sprite.Sprite, WallObserver):
     #     print("Francisdadasdad")
 
     def process_input(self):
-        # if self.check():
-        self.button_input.enable()
+        if self.check():
+            self.button_input.enable()
 
     def check(self) -> bool:
 

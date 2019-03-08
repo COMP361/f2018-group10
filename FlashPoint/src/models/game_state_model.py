@@ -162,6 +162,8 @@ class GameStateModel(Model):
     @victims_saved.setter
     def victims_saved(self, victims_saved: int):
         self._victims_saved = victims_saved
+        for obs in self.observers:
+            obs.saved_victims(victims_saved)
         if self._victims_saved == 7:
             self.state = GameStateEnum.WON
 
@@ -172,8 +174,11 @@ class GameStateModel(Model):
     @victims_lost.setter
     def victims_lost(self, victims_lost: int):
         self._victims_lost = victims_lost
+        for obs in self.observers:
+            obs.dead_victims(victims_lost)
         if self._victims_lost >= 4:
             self.state = GameStateEnum.LOST
+
 
     @property
     def damage(self) -> int:
@@ -182,6 +187,8 @@ class GameStateModel(Model):
     @damage.setter
     def damage(self, damage: int):
         self._damage = damage
+        for obs in self.observers:
+            obs.damage_changed(damage)
         if self._damage >= self.max_damage:
             self.state = GameStateEnum.LOST
 
