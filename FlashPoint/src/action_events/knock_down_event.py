@@ -33,12 +33,12 @@ class KnockDownEvent(ActionEvent):
         # player's location to that of the closest spot.
         # else, offer the user a choice from the list of
         # closest spots available.
-        player_tile = self.game.game_board.get_tile_at(self.player.x_pos, self.player.y_pos)
+        player_tile = self.game.game_board.get_tile_at(self.player.row, self.player.column)
         closest_ambulance_spots = self.game.game_board.find_closest_parking_spots("Ambulance", player_tile)
         if len(closest_ambulance_spots) == 1:
             amb_spot = closest_ambulance_spots[0]
-            self.player.x_pos = amb_spot.x_coord
-            self.player.y_pos = amb_spot.y_coord
+            self.player.row = amb_spot.row
+            self.player.column = amb_spot.column
 
         else:
             # TODO: how to handle choice for more than one closest spots?

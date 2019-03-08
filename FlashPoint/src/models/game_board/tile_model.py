@@ -14,10 +14,10 @@ from src.observers.tile_observer import TileObserver
 class TileModel(Model):
     """Logical state of a Tile object."""
 
-    def __init__(self, x_coord: int, y_coord: int, space_kind: SpaceKindEnum):
+    def __init__(self, row: int, column: int, space_kind: SpaceKindEnum):
         super().__init__()
-        self._x_coord = x_coord
-        self._y_coord = y_coord
+        self._row = row
+        self._column = column
         self._space_kind = space_kind
         self._space_status = SpaceStatusEnum.SAFE
         self._is_hotspot = False
@@ -39,7 +39,7 @@ class TileModel(Model):
         }
 
     def __str__(self):
-        return f"Tile at: ({self.x_coord}, {self.y_coord})."
+        return f"Tile at: ({self.row}, {self.column})."
 
     def _notify_status(self):
         for obs in self.observers:
@@ -54,12 +54,12 @@ class TileModel(Model):
         return self._observers
 
     @property
-    def x_coord(self):
-        return self._x_coord
+    def row(self):
+        return self._row
 
     @property
-    def y_coord(self):
-        return self._y_coord
+    def column(self):
+        return self._column
 
     @property
     def space_kind(self):

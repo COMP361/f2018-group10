@@ -16,4 +16,4 @@ class ChooseStartingPositionEvent(ActionEvent):
         """TODO: Fill execute method. Have to get to current game state and find reference to curr_player """
         """Other complication might be to get to reference of the current player. I added Enum for the game state"""
         self.tile.add_associated_model(self.player)
-        self.player.set_pos(self.tile.x_coord, self.tile.y_coord)
+        self.player.set_pos(self.tile.row, self.tile.column)
