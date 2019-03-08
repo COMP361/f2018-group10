@@ -90,10 +90,10 @@ class AdvanceFireEvent(ActionEvent):
         should_stop = False
         while not should_stop:
             # if there is no obstacle in the given direction -
-            #   if neighbouring tile is not on fire, set it to fire
-            #   and stop the shockwave.
-            #   else set the current tile to the neighbouring tile
-            #   and continue the shockwave.
+            #   1. if neighbouring tile is not on fire, set it to fire
+            #       and stop the shockwave.
+            #   2. else set the current tile to the neighbouring tile
+            #       and continue the shockwave.
             if not tile.has_obstacle_in_direction(direction):
                 nb_tile: TileModel = tile.get_tile_in_direction(direction)
                 if nb_tile.space_status != SpaceStatusEnum.FIRE:
@@ -103,24 +103,27 @@ class AdvanceFireEvent(ActionEvent):
                 else:
                     tile = nb_tile
 
-            # if there is an obstacle in the given direction,
-            # shockwave should stop.
+            # if there is an obstacle in the given direction
             else:
-                # 1. if obstacle is a wall, inflict damage on it and increment
-                #   game state damage.
-                # 2. if obstacle is a non-destroyed door, destroy it.
+                # 1. if obstacle is a wall, inflict damage on it, increment
+                #   game state damage and stop the shockwave.
+                # 2. if obstacle is an open door, continue the shockwave
+                #   and destroy the door.
+                # 3. if obstacle is a closed door, stop the shockwave
+                #   and destroy the door.
                 obstacle = tile.get_obstacle_in_direction(direction)
                 if isinstance(obstacle, WallModel):
                     obstacle.inflict_damage()
                     self.game_state.damage += 1
+                    should_stop = True
 
-                elif isinstance(obstacle, DoorModel) and obstacle.door_status != DoorStatusEnum.DESTROYED:
+                elif isinstance(obstacle, DoorModel):
+                    if obstacle.door_status == DoorStatusEnum.CLOSED:
+                        should_stop = True
                     obstacle.destroy_door()
 
                 else:
                     pass
-
-                should_stop = True
 
 
     def flashover(self):
