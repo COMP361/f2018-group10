@@ -26,6 +26,9 @@ class ExtinguishEvent(TurnEvent):
         if not self.has_required_AP(fireman.ap, 1):
             raise NotEnoughAPException("extinguish", 1)
 
+        if extinguish_space.space_status == SpaceStatusEnum.SAFE:
+            return False
+
         # TODO: End here
         if extinguish_space.space_status == SpaceStatusEnum.SMOKE:
             extinguish_space.space_status = SpaceStatusEnum.SAFE
