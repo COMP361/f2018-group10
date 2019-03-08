@@ -120,7 +120,7 @@ class TileSprite(Interactable,TileObserver):
         new_surf.fill((0, 0, 0, 0), None, pygame.BLEND_RGBA_MULT)
 
         if status == SpaceStatusEnum.FIRE:
-            image_file = FileImporter.import_image("media/All Markers/fireNew.png")
+            image_file = FileImporter.import_image("media/All Markers/fire.png")
             new_surf.blit(image_file, (0, 0))
         elif status == SpaceStatusEnum.SMOKE:
             image_file = FileImporter.import_image("media/All Markers/smoke.png")

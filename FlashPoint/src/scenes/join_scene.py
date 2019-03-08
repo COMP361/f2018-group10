@@ -2,6 +2,7 @@ import pygame
 
 import src.constants.color as Color
 import src.constants.fonts as Font
+from src.constants.state_enums import PlayerStatusEnum
 from src.core.custom_event import CustomEvent
 from src.core.event_queue import EventQueue
 from src.models.game_units.player_model import PlayerModel
@@ -42,6 +43,7 @@ class JoinScene(object):
         ip_addr = self.text_bar_msg
 
         try:
+            self._current_player.status = PlayerStatusEnum.NOT_READY
             Networking.get_instance().join_host(ip_addr, player=self._current_player)
             reply = Networking.wait_for_reply()
             if reply:

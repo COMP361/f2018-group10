@@ -8,10 +8,14 @@ from src.models.game_units.player_model import PlayerModel
 
 class ExtinguishEvent(TurnEvent):
 
-    def __init__(self):
+    def __init__(self, fireman: PlayerModel, extinguish_space: TileModel):
         super().__init__()
+        self.fireman = fireman
+        self.extinguish_space = extinguish_space
 
-    def execute(self, fireman: PlayerModel, extinguish_space: TileModel):
+    def execute(self):
+        fireman = self.fireman
+        extinguish_space = self.extinguish_space
         game: GameStateModel = GameStateModel.instance()
         # TODO: Start here - This is the precondition code - Move it to the GUI
         player_tile = game.game_board.get_tile_at(fireman.x_pos, fireman.y_pos)

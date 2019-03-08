@@ -6,6 +6,8 @@ from src.action_events.turn_events.move_event import MoveEvent
 from src.observers.observer import Observer
 from src.models.game_board.tile_model import TileModel
 from src.action_events.turn_events.choose_starting_position_event import ChooseStartingPositionEvent
+from src.action_events.turn_events.end_turn_event import EndTurnEvent
+from src.models.game_board.game_board_model import GameBoardModel
 from src.action_events.start_game_event import StartGameEvent
 from src.action_events.ready_event import ReadyEvent
 from src.action_events.chat_event import ChatEvent
@@ -75,7 +77,8 @@ class JSONSerializer(object):
     @staticmethod
     def _deserialize_ready_event(payload: Dict) -> ReadyEvent:
         player: PlayerModel = JSONSerializer.deserialize(payload['_player'])
-        return ReadyEvent(player)
+        ready: bool = payload['_ready']
+        return ReadyEvent(player, ready)
 
     @staticmethod
     def _deserialize_join_event(payload: Dict) -> JoinEvent:
@@ -105,6 +108,10 @@ class JSONSerializer(object):
         return tile
 
     @staticmethod
+    def _deserialize_end_turn_event(payload: Dict) -> EndTurnEvent:
+        return EndTurnEvent()
+
+    @staticmethod
     def deserialize(payload: Dict) -> object:
         """
         Grab an object and deserialize it.
@@ -131,6 +138,8 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_ready_event(payload)
         elif object_type == StartGameEvent.__name__:
             return StartGameEvent()
+        elif object_type == EndTurnEvent.__name__:
+            return JSONSerializer._deserialize_end_turn_event(payload)
         elif object_type == ChooseStartingPositionEvent.__name__:
             return JSONSerializer._deserialize_choose_position_event(payload)
         elif object_type == MoveEvent.__name__:
