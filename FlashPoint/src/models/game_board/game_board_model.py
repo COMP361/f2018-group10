@@ -2,6 +2,7 @@ import json
 import random
 from typing import List, Tuple, Dict
 
+from src.constants.main_constants import BOARD_DIMENSIONS
 from src.models.game_board.edge_obstacle_model import EdgeObstacleModel
 from src.models.game_board.null_model import NullModel
 from src.models.game_units.poi_model import POIModel
@@ -122,6 +123,31 @@ class GameBoardModel(object):
                 extended_grid[i][j].east_tile = extended_grid[i][j + 1]
                 extended_grid[i][j].west_tile = extended_grid[i][j - 1]
                 extended_grid[i][j].south_tile = extended_grid[i + 1][j]
+
+    def set_single_tile_adjacencies(self, tile: TileModel):
+        # set north tile
+        if tile.x_coord == 0:
+            tile.set_adjacent_tile("North", NullModel())
+        else:
+            tile.set_adjacent_tile("North", self.get_tile_at(tile.x_coord-1, tile.y_coord))
+
+        # set east tile
+        if tile.y_coord == BOARD_DIMENSIONS[1] - 1:
+            tile.set_adjacent_tile("East", NullModel())
+        else:
+            tile.set_adjacent_tile("East", self.get_tile_at(tile.x_coord, tile.y_coord+1))
+
+        # set west tile
+        if tile.y_coord == 0:
+            tile.set_adjacent_tile("West", NullModel())
+        else:
+            tile.set_adjacent_tile("West", self.get_tile_at(tile.x_coord, tile.y_coord-1))
+
+        # set south tile
+        if tile.x_coord == BOARD_DIMENSIONS[0] - 1:
+            tile.set_adjacent_tile("South", NullModel())
+        else:
+            tile.set_adjacent_tile("South", self.get_tile_at(tile.x_coord+1, tile.y_coord))
 
     def set_single_obstacle(self, tiles: List[List[TileModel]], adjacency: Dict, obstacle: EdgeObstacleModel):
         first_pair, second_pair = adjacency['first_pair'], adjacency['second_pair']
