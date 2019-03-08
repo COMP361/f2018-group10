@@ -63,8 +63,7 @@ class GameBoardScene(object):
         self._current_sprite = CurrentPlayerState(1130, 550, self._current_player.nickname,self._current_player.color,self._current_player)
         self.active_sprites.add(self._current_sprite)
         self.notify_turn_popup = NotifyPlayerTurn(self._current_player, self._current_sprite, self.active_sprites)
-        self.active_sprites.add(self._init_not_your_turn())
-        self.active_sprites.add(self.notify_turn_popup)
+        self.active_sprites.add(self.notify_turn_popup._init_not_your_turn())
         self.active_sprites.add(TimeBar(0, 0))
         self.ingame_states = InGameStates(250, 650, self._game.damage, self._game.victims_saved, self._game.victims_lost)
         self.active_sprites.add(self.ingame_states)
@@ -83,15 +82,6 @@ class GameBoardScene(object):
 
         self.menu.close()
 
-    def _init_not_your_turn(self):
-
-        rct = RectLabel(880, 600, 250, 50, background=Color.ORANGE,
-                        txt_obj=Text(pygame.font.SysFont('Agency FB', 30), "NOT YOUR TURN", Color.GREEN2))
-        rct.change_bg_image('media/GameHud/wood2.png')
-        rct.add_frame('media/GameHud/frame.png')
-        return rct
-
-
     def _quit_btn_on_click(self):
         Networking.get_instance().disconnect()
         EventQueue.post(CustomEvent(ChangeSceneEnum.STARTSCENE))
@@ -104,11 +94,6 @@ class GameBoardScene(object):
         #btn.on_click(self._game.next_player)
         btn.set_transparent_background(True)
         return btn
-
-    def _init_end_turn_button(self):
-        btn = RectButton(1130,500,150,50,background=Color.ORANGE,txt_obj=Text(pygame.font.SysFont('Arial', 23), "End Turn"))
-        btn.on_click(self._end_turn_controller.start_end_turn)
-
 
     def _click_action(self):
         menu = MenuWindow([self.active_sprites, self.game_board], 500, 500, (400, 150))

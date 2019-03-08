@@ -212,8 +212,8 @@ class LobbyScene(object):
                 self.start_button.enable()
                 self.start_button.change_color(Color.GREEN)
             else:
-                self.start_button.disable()
-                self.start_button.change_color(Color.GREY)
+               self.start_button.disable()
+               self.start_button.change_color(Color.GREY)
 
         self.chat_box.update(event_queue)
 

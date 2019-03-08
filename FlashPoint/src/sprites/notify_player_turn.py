@@ -25,7 +25,8 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
     def dead_victims(self, victims_dead: int):
         pass
 
-    def __init__(self, current_player: PlayerModel, current_sprite:pygame.sprite.Sprite,sprite_group:pygame.sprite.Group):
+    def __init__(self, current_player: PlayerModel, current_sprite: pygame.sprite.Sprite,
+                 sprite_group: pygame.sprite.Group):
         super().__init__()
         self.enabled = False
         self.running = True
