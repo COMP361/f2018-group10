@@ -2,6 +2,9 @@ import json
 from datetime import datetime
 
 import pygame
+
+from src.action_events.turn_events.move_event import MoveEvent
+from src.controllers.move_controller import MoveController
 from src.controllers.tile_input_controller import TileInputController
 from src.constants.change_scene_enum import ChangeSceneEnum
 from src.controllers.choose_starting_position_controller import ChooseStartingPositionController
@@ -35,7 +38,7 @@ class GameBoardScene(object):
         """
         self._save_games_file = "media/save_games.json"
         self.screen = screen
-        self._game = GameStateModel.instance()
+        self._game: GameStateModel = GameStateModel.instance()
         self._current_player = current_player
         self._current_sprite = None
 
@@ -48,8 +51,14 @@ class GameBoardScene(object):
         self.menu = None
         self._init_sprites()
         # self.chat_box
+        current_player.set_pos(2, 8)
+        # current_player.ap = 5
         self.tile_input_controller = TileInputController(self._current_player)
         # self.choose_start_pos_controller = ChooseStartingPositionController(self.game_board, current_player)
+        mc = MoveController.instance()
+        print("Before moving:")
+        print(current_player)
+        MoveEvent(current_player, self._game.game_board.get_tile_at(1, 6), mc.moveable_tiles).execute()
 
     def _init_sprites(self):
         for i, player in enumerate(self._game.players):

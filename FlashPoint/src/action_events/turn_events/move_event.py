@@ -18,6 +18,17 @@ class DijkstraTile(object):
         self.least_cost = 10000
         self.predecessor = NullModel()
 
+    def __str__(self):
+        # return f"{self.tile_model.__str__()}\nLeast cost: {self.least_cost}\nPredecessor: {self.predecessor.__str__()}\n"
+        dijkstra = "### Dijkstra Tile ###"
+        tile_info = "Self: " + self.tile_model.__str__()
+        least_cost = "Least cost: " + str(self.least_cost)
+        if isinstance(self.predecessor, NullModel):
+            pred_info = "Predecessor: " + self.predecessor.__str__() + "\n"
+        else:
+            pred_info = "Predecessor: ({row}, {column})\n".format(row=self.predecessor.tile_model.row, column=self.predecessor.tile_model.column)
+        return '\n'.join([dijkstra, tile_info, least_cost, pred_info])
+
 
 class PriorityQueue(object):
 
@@ -26,6 +37,9 @@ class PriorityQueue(object):
 
     def __str__(self):
         return ' '.join([str(i) for i in self._queue])
+
+    def get_tiles(self) -> List[DijkstraTile]:
+        return self._queue
 
     def is_empty(self) -> bool:
         if len(self._queue) == 0:
@@ -84,6 +98,9 @@ class MoveEvent(TurnEvent):
         self.moveable_tiles = moveable_tiles
         self.dijkstra_tiles: List[DijkstraTile] = []
         self._init_dijkstra_tiles(dest)
+        print("Dijkstra tiles set:")
+        # print([d_tile for d_tile in self.dijkstra_tiles])
+        [print(d_tile) for d_tile in self.dijkstra_tiles]
 
     def _init_dijkstra_tiles(self, dest: TileModel):
         """
@@ -117,13 +134,18 @@ class MoveEvent(TurnEvent):
         # those tiles.
         while not pq.is_empty():
             current_d_tile = pq.peek()
-            for d_tile in self.dijkstra_tiles:
-                if d_tile.tile_model in current_d_tile.tile_model.adjacent_tiles:
+            for d_tile in pq.get_tiles():
+                if d_tile.tile_model in current_d_tile.tile_model.adjacent_tiles.values():
                     self.relax_cost(current_d_tile, d_tile)
             pq.poll()
 
         shortest_path = self.shortest_path()
+        print("Path taken:")
+        [print(p_tile) for p_tile in shortest_path]
         self.traverse_shortest_path(shortest_path)
+        print("After moving:")
+        print(self.fireman)
+        return
 
     def relax_cost(self, first_tile: DijkstraTile, second_tile: DijkstraTile):
         """
@@ -157,6 +179,8 @@ class MoveEvent(TurnEvent):
         if second_tile.least_cost > first_tile.least_cost + cost_to_travel:
             second_tile.least_cost = first_tile.least_cost + cost_to_travel
             second_tile.predecessor = first_tile
+
+        return
 
     def shortest_path(self) -> List[DijkstraTile]:
         """
