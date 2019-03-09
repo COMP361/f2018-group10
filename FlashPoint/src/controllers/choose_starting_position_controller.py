@@ -28,7 +28,7 @@ class ChooseStartingPositionController(object):
                                             Color.ORANGE))
         self.wait_prompt = RectLabel(500, 400, 300, 50, Color.GREY, 0,
                                      Text(pygame.font.SysFont('Agency FB', 30), "Wait for your turn!",
-                                                    Color.ORANGE))
+                                          Color.ORANGE))
 
         self.game_board_sprite.add(self.choose_prompt)
         self.game_board_sprite.add(self.wait_prompt)
@@ -59,6 +59,7 @@ class ChooseStartingPositionController(object):
             return False
 
         if self.current_player != GameStateModel.instance().players_turn:
+            print("Not this players turn")
             return False
 
         # Check if any Players are in this tile
@@ -67,7 +68,6 @@ class ChooseStartingPositionController(object):
 
         if tile_model.space_kind == SpaceKindEnum.INDOOR:
             return False
-
         return True
 
     def process_input(self, tile_sprite: TileSprite):
