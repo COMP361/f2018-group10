@@ -1,4 +1,5 @@
 import pygame
+from src.models.game_units.player_model import PlayerModel
 from src.models.game_board.tile_model import TileModel
 from src.sprites.grid_sprite import GridSprite
 
@@ -12,13 +13,13 @@ import src.constants.color as Color
 class PlayerSprite(pygame.sprite.Sprite, PlayerObserver):
     """Visual representation of a Player and/or his fireman."""
 
-    def __init__(self, tile_model: TileModel, grid: GridSprite):
+    def __init__(self, player_model: PlayerModel, tile_model: TileModel, grid: GridSprite):
         super().__init__()
         self.grid = grid
         self.tile_model = tile_model
         self.tile_sprite = grid.grid[tile_model.y_coord][tile_model.x_coord]
         self.rect = self.tile_sprite.rect
-        self.associated_player = GameStateModel.instance().players_turn
+        self.associated_player = player_model
         self.associated_player.add_observer(self)
         self.associated_png = self._associate_image()
         self.image = FileImporter.import_image(self.associated_png)
