@@ -236,34 +236,6 @@ class GameBoardModel(object):
             self._active_pois.append(poi)
             self.get_tile_at(poi.x_pos, poi.y_pos).add_associated_model(poi)
 
-    def get_movable_tiles(self,x:int,y:int,ap:int,movable_tiles= []) -> List[TileModel]:
-
-        #ap = action points
-        currentTile = self.get_tile_at(x,y)
-        if ap >= 1:
-            for key in currentTile.adjacent_edge_objects.keys():
-                tile = currentTile.adjacent_tiles.get(key)
-                obstacle = currentTile.adjacent_edge_objects.get(key)
-
-                if isinstance(obstacle,NullModel):
-                    ap_deduct = 2 if tile.space_status == SpaceStatusEnum.FIRE else 1
-                    if tile.space_status == SpaceStatusEnum.FIRE:
-                        movable_tiles = self.get_movable_tiles(tile.x_coord, tile.y_coord, ap - ap_deduct, movable_tiles)
-                    else:
-                        movable_tiles.append(tile)
-                        movable_tiles = self.get_movable_tiles(tile.x_coord, tile.y_coord, ap - ap_deduct, movable_tiles)
-                elif isinstance(obstacle, WallModel):
-                    if tile.wall_status == WallStatusEnum.DESTROYED:
-                        movable_tiles.append(tile)
-                        movable_tiles = self.get_movable_tiles(tile.x_coord, tile.y_coord, ap - 1, movable_tiles)
-                elif isinstance(obstacle, DoorModel):
-                    if (tile.door_status == DoorStatusEnum.OPEN or tile.door_status == DoorStatusEnum.DESTROYED):
-                        movable_tiles.append(tile)
-                        movable_tiles = self.get_movable_tiles(tile.x_coord, tile.y_coord, ap - ap_deduct, movable_tiles)
-
-        output = list(dict.fromkeys(movable_tiles))
-        return output
-
     def distance_between_tiles(self, first_tile: TileModel, second_tile: TileModel) -> int:
         return abs(first_tile.x_coord - second_tile.x_coord) + abs(first_tile.y_coord - second_tile.y_coord)
 

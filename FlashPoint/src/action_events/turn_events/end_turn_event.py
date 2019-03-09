@@ -16,8 +16,7 @@ class EndTurnEvent(ActionEvent):
         # for testing
         # GameStateModel.instance().damage = 5
         # GameStateModel.instance().players_turn.ap =  GameStateModel.instance().players_turn.ap + 4
-        if GameStateModel.instance().state != GameStateEnum.PLACING:
-            GameStateModel.instance().next_player()
+        GameStateModel.instance().next_player()
         """
         1)
         2)start the AdvanceFire
