@@ -39,7 +39,10 @@ class TileModel(Model):
         }
 
     def __str__(self):
-        return f"Tile at: ({self.row}, {self.column})."
+        tile_pos = "Tile at: ({row}, {column})".format(row=self.row, column=self.column)
+        tile_state = "Space status: {status}".format(status=self.space_status)
+        tile_kind = "Space kind: {kind}\n".format(kind=self.space_kind)
+        return '\n'.join([tile_pos, tile_state, tile_kind])
 
     def _notify_status(self):
         for obs in self.observers:

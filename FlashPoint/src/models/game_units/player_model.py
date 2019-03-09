@@ -28,11 +28,13 @@ class PlayerModel(Model):
         x = [other.ip == self.ip, other.nickname == self.nickname, other.row == self.row, other.column == self.column]
         return all(x)
 
-    def info(self):
-        print("### Player ###")
-        print("Position: ({x}, {y})".format(x=self.row, y=self.column))
-        print("AP: {ap}".format(ap=self.ap))
-        print("Status: {status}".format(status=self.status))
+    def __str__(self):
+        player_pos = "Player position: ({row}, {column})".format(row=self.row, column=self.column)
+        player_ap = "Player AP: {ap}".format(ap=self.ap)
+        player_carrying_victim = "Victim with player: {victim}".format(victim=self.carrying_victim.__str__())
+        player_status = "Player status: {status}".format(status=self.status)
+        player_color = "Player color: {color}\n".format(color=self.color)
+        return '\n'.join([player_pos, player_ap, player_carrying_victim, player_status, player_color])
 
     def _notify_position(self):
         for obs in self.observers:

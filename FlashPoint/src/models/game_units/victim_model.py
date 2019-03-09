@@ -12,6 +12,11 @@ class VictimModel(Model):
         self._row = 0
         self._column = 0
 
+    def __str__(self):
+        victim_pos = "Victim position: ({row}, {column})".format(row=self.row, column=self.column)
+        victim_state = "Victim state: {state}\n".format(state=self.state)
+        return '\n'.join([victim_pos, victim_state])
+
     @property
     def state(self):
         return self._state
