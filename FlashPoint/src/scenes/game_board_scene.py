@@ -60,6 +60,9 @@ class GameBoardScene(object):
         print(current_player)
         MoveEvent(current_player, self._game.game_board.get_tile_at(1, 6), mc.moveable_tiles).execute()
 
+        #checks if can move and if can extinguish
+
+
     def _init_sprites(self):
         for i, player in enumerate(self._game.players):
             self.active_sprites.add(PlayerState(0, 30 + 64*i, player.nickname, player.color))

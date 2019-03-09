@@ -1,6 +1,7 @@
 from typing import List
 
 import src.constants.color as Color
+from src.action_events.action_event import ActionEvent
 from src.constants.state_enums import PlayerStatusEnum
 
 from src.models.game_units.victim_model import VictimModel
@@ -34,6 +35,8 @@ class MoveController(PlayerObserver):
         self.current_player.add_observer(self)
         GameStateModel.instance().game_board.reset_tiles_visit_count()
         MoveController._instance = self
+        self.move_to = None
+        self.is_moveable = False
 
     @classmethod
     def instance(cls):
@@ -114,15 +117,21 @@ class MoveController(PlayerObserver):
     def process_input(self, tile_sprite: TileSprite):
         tile_model = GameStateModel.instance().game_board.get_tile_at(tile_sprite.row, tile_sprite.column)
 
+        # close the menu when other tile is clicked
+        if self.move_to:
+            self.move_to.disable_move()
+            self.move_to.move_button.disable()
+            self.move_to = None
+
         if not self._run_checks(tile_model):
+            tile_sprite.disable_move()
+            self.is_moveable = False
             return
 
-        # TODO: Supply the required parameters for the MoveEvent
-        # event = MoveEvent(tile_model)
-        # if Networking.get_instance().is_host:
-        #     Networking.get_instance().send_to_all_client(event)
-        # else:
-        #     Networking.get_instance().client.send(event)
+        self.move_to = tile_sprite
+        self.move_to.enable_move()
+        self.move_to.move_button.enable()
+        self.is_moveable = True
 
     def update(self, event_queue: EventQueue):
         if GameStateModel.instance().state != GameStateEnum.MAIN_GAME:
