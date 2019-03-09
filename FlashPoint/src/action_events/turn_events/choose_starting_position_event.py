@@ -18,12 +18,9 @@ class ChooseStartingPositionEvent(ActionEvent):
         print(self.player.color)
 
     def execute(self):
-        """TODO: Fill execute method. Have to get to current game state and find reference to curr_player """
-        """Other complication might be to get to reference of the current player. I added Enum for the game state"""
         game: GameStateModel = GameStateModel.instance()
         self.tile.add_associated_model(self.player)
-        player_sprite = PlayerSprite(self.player,self.tile, GameBoard.instance().grid)
-        self.player.add_observer(player_sprite)
+        player_sprite = PlayerSprite(self.player, self.tile, GameBoard.instance().grid)
         GameBoard.instance().add(player_sprite)
         self.player.set_pos(self.tile.x_coord, self.tile.y_coord)
 

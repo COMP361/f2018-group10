@@ -1,4 +1,5 @@
 import pygame
+from src.models.game_units.player_model import PlayerModel
 from src.models.game_board.tile_model import TileModel
 from src.models.game_units.player_model import PlayerModel
 from src.sprites.grid_sprite import GridSprite
