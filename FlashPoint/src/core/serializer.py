@@ -35,6 +35,7 @@ class JSONSerializer(object):
         else:
             game = GameStateModel.instance()
 
+        game.game_board.set_adjacencies(game.game_board.get_tiles())
         for player in [x for x in payload['_players'] if x['_ip'] != host.ip]:
             player_obj: PlayerModel = JSONSerializer.deserialize(player)
             if player_obj not in game.players:
