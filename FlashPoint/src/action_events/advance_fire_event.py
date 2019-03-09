@@ -184,6 +184,7 @@ class AdvanceFireEvent(ActionEvent):
                     self.game_state.victims_lost += 1
                     model: VictimModel = model
                     model.state = VictimStateEnum.LOST
+                    self.board.remove_poi_or_victim(model)
 
                 elif isinstance(model, POIModel):
                     model.reveal()
