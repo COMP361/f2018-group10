@@ -8,7 +8,7 @@ from src.models.game_board.null_model import NullModel
 from src.models.game_units.poi_model import POIModel
 from src.models.game_board.tile_model import TileModel
 from src.constants.state_enums import GameKindEnum, SpaceKindEnum, SpaceStatusEnum, POIIdentityEnum, DirectionEnum, \
-    DoorStatusEnum
+    DoorStatusEnum, WallStatusEnum
 from src.models.game_board.wall_model import WallModel
 from src.models.game_board.door_model import DoorModel
 
@@ -235,34 +235,6 @@ class GameBoardModel(object):
             poi.y_pos = locations[i][1]
             self._active_pois.append(poi)
             self.get_tile_at(poi.row, poi.column).add_associated_model(poi)
-
-    def get_movable_tiles(self,x:int,y:int,ap:int,movable_tiles= []) -> List[TileModel]:
-
-        #ap = action points
-        currentTile = self.get_tile_at(x,y)
-        if ap >= 1:
-            for key in currentTile.adjacent_edge_objects.keys():
-                tile = currentTile.adjacent_tiles.get(key)
-                obstacle = currentTile.adjacent_edge_objects.get(key)
-
-                if isinstance(obstacle,NullModel):
-                    ap_deduct = 2 if tile.space_status == SpaceStatusEnum.FIRE else 1
-                    if tile.space_status == SpaceStatusEnum.FIRE:
-                        movable_tiles = self.get_movable_tiles(tile.row, tile.column, ap - ap_deduct, movable_tiles)
-                    else:
-                        movable_tiles.append(tile)
-                        movable_tiles = self.get_movable_tiles(tile.row, tile.column, ap - ap_deduct, movable_tiles)
-                elif isinstance(obstacle, WallModel):
-                    if tile.wall_status == WallStatusEnum.DESTROYED:
-                        movable_tiles.append(tile)
-                        movable_tiles = self.get_movable_tiles(tile.row, tile.column, ap - 1, movable_tiles)
-                elif isinstance(obstacle, DoorModel):
-                    if (tile.door_status == DoorStatusEnum.OPEN or tile.door_status == DoorStatusEnum.DESTROYED):
-                        movable_tiles.append(tile)
-                        movable_tiles = self.get_movable_tiles(tile.row, tile.column, ap - ap_deduct, movable_tiles)
-
-        output = list(dict.fromkeys(movable_tiles))
-        return output
 
     def distance_between_tiles(self, first_tile: TileModel, second_tile: TileModel) -> int:
         return abs(first_tile.row - second_tile.row) + abs(first_tile.column - second_tile.column)
