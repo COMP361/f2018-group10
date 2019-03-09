@@ -23,7 +23,8 @@ class ExtinguishController(object):
             raise Exception("ExtinguishController is a singleton")
         self.game_board_sprite = GameBoard.instance()
         self.current_player = current_player
-        GameStateModel.instance().game_board.reset_tiles_visit_status()
+        game: GameStateModel = GameStateModel.instance()
+        game.game_board.reset_tiles_visit_count()
         ExtinguishController._instance = self
 
     @classmethod
@@ -31,7 +32,7 @@ class ExtinguishController(object):
         return cls._instance
 
     def _run_checks(self, tile_model: TileModel) -> bool:
-        player_tile = GameStateModel.instance().game_board.get_tile_at(self.current_player.x_pos, self.current_player.y_pos)
+        player_tile = GameStateModel.instance().game_board.get_tile_at(self.current_player.row, self.current_player.column)
         valid_to_extinguish = tile_model == player_tile or tile_model in player_tile.adjacent_tiles
         if not valid_to_extinguish:
             return False

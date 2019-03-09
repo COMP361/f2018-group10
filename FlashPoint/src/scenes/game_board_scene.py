@@ -50,16 +50,10 @@ class GameBoardScene(object):
         self.chat_box = ChatBox(self._current_player)
         self.menu = None
         self._init_sprites()
+        # TODO: Haw: I've removed my testing code from here. You can change it back to whatever you want
         # self.chat_box
-        current_player.set_pos(2, 8)
-        # current_player.ap = 5
         self.tile_input_controller = TileInputController(self._current_player)
         # self.choose_start_pos_controller = ChooseStartingPositionController(self.game_board, current_player)
-        mc = MoveController.instance()
-        print("Before moving:")
-        print(current_player)
-        MoveEvent(current_player, self._game.game_board.get_tile_at(1, 6), mc.moveable_tiles).execute()
-
         #checks if can move and if can extinguish
 
 

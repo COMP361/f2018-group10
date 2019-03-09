@@ -23,7 +23,7 @@ class ChooseStartingPositionEvent(ActionEvent):
         player_sprite = PlayerSprite(self.tile, GameBoard.instance().grid)
         self.player.add_observer(player_sprite)
         GameBoard.instance().add(player_sprite)
-        self.player.set_pos(self.tile.x_coord, self.tile.y_coord)
+        self.player.set_pos(self.tile.row, self.tile.column)
 
         if game.players_turn_index + 1 == len(game.players):
             # If the last player has chosen a location, move the game into the next phase.

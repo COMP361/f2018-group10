@@ -16,7 +16,7 @@ class PlayerSprite(pygame.sprite.Sprite, PlayerObserver):
         super().__init__()
         self.grid = grid
         self.tile_model = tile_model
-        self.tile_sprite = grid.grid[tile_model.y_coord][tile_model.x_coord]
+        self.tile_sprite = grid.grid[tile_model.column][tile_model.row]
         self.rect = self.tile_sprite.rect
         self.associated_player = GameStateModel.instance().players_turn
         self.associated_player.add_observer(self)
@@ -47,7 +47,7 @@ class PlayerSprite(pygame.sprite.Sprite, PlayerObserver):
         pass
 
     def player_position_changed(self, row: int, column: int):
-        self.tile_sprite = self.grid.grid[row][column]
+        self.tile_sprite = self.grid.grid[column][row]
         self.rect = self.tile_sprite.rect
 
     def player_wins_changed(self, wins: int):
