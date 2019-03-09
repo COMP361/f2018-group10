@@ -25,7 +25,7 @@ class PlayerModel(Model):
         self._carrying_victim = NullModel()
 
     def __eq__(self, other):
-        x = [other.ip == self.ip, other.nickname == self.nickname, other.x_pos == self.x_pos, other.y_pos == self.y_pos]
+        x = [other.ip == self.ip, other.nickname == self.nickname]
         return all(x)
 
     def _notify_position(self):

@@ -21,7 +21,7 @@ class LobbyScene(object):
         self._current_player = current_player
         self._game = GameStateModel.instance()
 
-        if self._game.host.ip == self._current_player.ip:
+        if Networking.get_instance().is_host:
             self._current_player.color = Color.BLUE
             self._game.host.color = Color.BLUE
 
