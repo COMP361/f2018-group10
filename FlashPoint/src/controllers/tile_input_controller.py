@@ -39,6 +39,7 @@ class TileInputController(GameStateObserver):
     def move_and_extinguish(self, tile: TileSprite):
         self.move_controller.process_input(tile)
         self.extinguish_controller.process_input(tile)
+        tile_model = GameStateModel.instance().game_board.get_tile_at(tile.row, tile.column)
         if self.move_controller.is_moveable:
             self.move_controller.move_to.move_button.on_click(self.execute_move_event, tile)
         if self.extinguish_controller.extinguishable:
