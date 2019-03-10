@@ -89,10 +89,10 @@ class PriorityQueue(object):
 
 class MoveEvent(TurnEvent):
 
-    def __init__(self, fireman: PlayerModel, dest: TileModel, moveable_tiles: List[TileModel]):
+    def __init__(self, dest: TileModel, moveable_tiles: List[TileModel]):
         super().__init__()
-        self.fireman = fireman
         self.game: GameStateModel = GameStateModel.instance()
+        self.fireman: PlayerModel = self.game.players_turn
         self.source_tile = NullModel()
         self.destination = NullModel()
         self.moveable_tiles = moveable_tiles

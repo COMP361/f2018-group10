@@ -43,7 +43,7 @@ class TileInputController(GameStateObserver):
     def execute_move_event(self, tile: TileModel):
         print("move_event created")
         self.move_controller.move_to.disable_move()
-        event = MoveEvent(tile)
+        event = MoveEvent(tile, self.move_controller.moveable_tiles)
         if Networking.get_instance().is_host:
             Networking.get_instance().send_to_all_client(event)
         else:

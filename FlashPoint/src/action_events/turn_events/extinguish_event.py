@@ -8,9 +8,9 @@ from src.models.game_units.player_model import PlayerModel
 
 class ExtinguishEvent(TurnEvent):
 
-    def __init__(self, fireman: PlayerModel, extinguish_space: TileModel):
+    def __init__(self, extinguish_space: TileModel):
         super().__init__()
-        self.fireman = fireman
+        self.fireman: PlayerModel = GameStateModel.instance().players_turn
         self.extinguish_space = extinguish_space
 
     def execute(self):

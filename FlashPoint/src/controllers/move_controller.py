@@ -1,14 +1,11 @@
 from typing import List
 
 import src.constants.color as Color
-from src.action_events.action_event import ActionEvent
 from src.constants.state_enums import PlayerStatusEnum
 
 from src.models.game_units.victim_model import VictimModel
 from src.observers.player_observer import PlayerObserver
 from src.core.event_queue import EventQueue
-from src.core.networking import Networking
-from src.action_events.turn_events.move_event import MoveEvent
 from src.models.game_board.edge_obstacle_model import EdgeObstacleModel
 from src.models.game_board.null_model import NullModel
 from src.sprites.tile_sprite import TileSprite
@@ -81,7 +78,6 @@ class MoveController(PlayerObserver):
                 if current_tile in movable_tiles:
                     movable_tiles.remove(current_tile)
                     return movable_tiles
-
 
         # Main recursive loop
         for key in current_tile.adjacent_edge_objects.keys():
