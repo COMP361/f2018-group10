@@ -1,3 +1,4 @@
+from src.constants.state_enums import GameStateEnum
 from src.action_events.action_event import ActionEvent
 from src.models.game_state_model import GameStateModel
 
@@ -12,11 +13,11 @@ class EndTurnEvent(ActionEvent):
         super().__init__()
 
     def execute(self):
-        #for testing
-        #GameStateModel.instance().damage = 5
-        #GameStateModel.instance().players_turn.ap =  GameStateModel.instance().players_turn.ap + 4
+        # for testing
+        # GameStateModel.instance().damage = 5
+        # GameStateModel.instance().players_turn.ap =  GameStateModel.instance().players_turn.ap + 4
         GameStateModel.instance().next_player()
-
+        print(GameStateModel.instance().players_turn_index)
         """
         1)
         2)start the AdvanceFire

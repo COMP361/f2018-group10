@@ -21,7 +21,7 @@ class TileModel(Model):
         self._space_status = SpaceStatusEnum.SAFE
         self._is_hotspot = False
         self._associated_models = []
-        self._visited = False
+        self._visit_count = 0
 
         self._adjacent_tiles = {
             "North": NullModel(),
@@ -39,9 +39,6 @@ class TileModel(Model):
 
     def __str__(self):
         return f"Tile at: ({self.x_coord}, {self.y_coord})."
-
-    def get_space_kind(self):
-        return self._space_kind
 
     @property
     def x_coord(self):
@@ -142,6 +139,9 @@ class TileModel(Model):
     def set_adjacent_edge_obstacle(self, direction: str, edge_obstacle: EdgeObstacleModel):
         self._adjacent_edge_objects[direction] = edge_obstacle
 
+    def set_adjacent_tile(self, direction: str, tile):
+        self._adjacent_tiles[direction] = tile
+
     def get_tile_in_direction(self, direction: str):
         """
         Get the TileModel in a specified direction.
@@ -191,12 +191,12 @@ class TileModel(Model):
         self._associated_models.remove(model)
 
     @property
-    def visited(self):
-        return self._visited
+    def visit_count(self):
+        return self._visit_count
 
-    @visited.setter
-    def visited(self, visit_status: bool):
-        self._visited = visit_status
+    @visit_count.setter
+    def visit_count(self, visit_count: int):
+        self._visit_count = visit_count
 
     def reset_adjacencies(self):
         self._adjacent_tiles = {}

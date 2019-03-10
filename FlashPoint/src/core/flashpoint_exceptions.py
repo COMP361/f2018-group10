@@ -23,8 +23,8 @@ class POINotRevealedYetException(FlashPointBaseException):
 class TilePositionOutOfBoundsException(FlashPointBaseException):
     """Class to tell you that you fucked up."""
 
-    def __init__(self, tile, direction: DirectionEnum):
-        message = f"{tile} has no adjacent tile in direction: {direction.value}."
+    def __init__(self, tile, direction: str):
+        message = f"{tile} has no adjacent tile in direction: {direction}."
         super().__init__(message)
 
 

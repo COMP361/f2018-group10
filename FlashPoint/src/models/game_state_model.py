@@ -49,6 +49,10 @@ class GameStateModel(Model):
         for obs in self._observers:
             obs.notify_player_index(self._players_turn_index)
 
+    def _notify_state(self):
+        for obs in self.observers:
+            obs.notify_game_state(self._state)
+
     @staticmethod
     def __del__():
         GameStateModel._instance = None
@@ -106,6 +110,10 @@ class GameStateModel(Model):
     def remove_player(self, player: PlayerModel):
         """Remove a player from the current game."""
         self._players.remove(player)
+
+    @property
+    def players_turn_index(self) -> int:
+        return self._players_turn_index
 
     @property
     def players_turn(self) -> PlayerModel:
@@ -207,6 +215,7 @@ class GameStateModel(Model):
     @state.setter
     def state(self, game_state: GameStateEnum):
         self._state = game_state
+        self._notify_state()
         if self._state == GameStateEnum.LOST:
             # TODO: More stuff here for what is supposed to happen when the game is lost.
             pass

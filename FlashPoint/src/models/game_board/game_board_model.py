@@ -2,6 +2,7 @@ import json
 import random
 from typing import List, Tuple, Dict
 
+from src.constants.main_constants import BOARD_DIMENSIONS
 from src.models.game_board.edge_obstacle_model import EdgeObstacleModel
 from src.models.game_board.null_model import NullModel
 from src.models.game_units.poi_model import POIModel
@@ -164,6 +165,31 @@ class GameBoardModel(object):
                 extended_grid[i][j].west_tile = extended_grid[i][j - 1]
                 extended_grid[i][j].south_tile = extended_grid[i + 1][j]
 
+    def set_single_tile_adjacencies(self, tile: TileModel):
+        # set north tile
+        if tile.x_coord == 0:
+            tile.set_adjacent_tile("North", NullModel())
+        else:
+            tile.set_adjacent_tile("North", self.get_tile_at(tile.x_coord-1, tile.y_coord))
+
+        # set east tile
+        if tile.y_coord == BOARD_DIMENSIONS[1] - 1:
+            tile.set_adjacent_tile("East", NullModel())
+        else:
+            tile.set_adjacent_tile("East", self.get_tile_at(tile.x_coord, tile.y_coord+1))
+
+        # set west tile
+        if tile.y_coord == 0:
+            tile.set_adjacent_tile("West", NullModel())
+        else:
+            tile.set_adjacent_tile("West", self.get_tile_at(tile.x_coord, tile.y_coord-1))
+
+        # set south tile
+        if tile.x_coord == BOARD_DIMENSIONS[0] - 1:
+            tile.set_adjacent_tile("South", NullModel())
+        else:
+            tile.set_adjacent_tile("South", self.get_tile_at(tile.x_coord+1, tile.y_coord))
+
     def set_single_obstacle(self, tiles: List[List[TileModel]], adjacency: Dict, obstacle: EdgeObstacleModel):
         first_pair, second_pair = adjacency['first_pair'], adjacency['second_pair']
         first_dirn, second_dirn = adjacency['first_dirn'], adjacency['second_dirn']
@@ -209,34 +235,6 @@ class GameBoardModel(object):
             poi.y_pos = locations[i][1]
             self._active_pois.append(poi)
             self.get_tile_at(poi.x_pos, poi.y_pos).add_associated_model(poi)
-
-    def get_movable_tiles(self,x:int,y:int,ap:int,movable_tiles= []) -> List[TileModel]:
-
-        #ap = action points
-        currentTile = self.get_tile_at(x,y)
-        if ap >= 1:
-            for key in currentTile.adjacent_edge_objects.keys():
-                tile = currentTile.adjacent_tiles.get(key)
-                obstacle = currentTile.adjacent_edge_objects.get(key)
-
-                if isinstance(obstacle,NullModel):
-                    ap_deduct = 2 if tile.space_status == SpaceStatusEnum.FIRE else 1
-                    if tile.space_status == SpaceStatusEnum.FIRE:
-                        movable_tiles = self.get_movable_tiles(tile.x_coord, tile.y_coord, ap - ap_deduct, movable_tiles)
-                    else:
-                        movable_tiles.append(tile)
-                        movable_tiles = self.get_movable_tiles(tile.x_coord, tile.y_coord, ap - ap_deduct, movable_tiles)
-                elif isinstance(obstacle, WallModel):
-                    if tile.wall_status == WallStatusEnum.DESTROYED:
-                        movable_tiles.append(tile)
-                        movable_tiles = self.get_movable_tiles(tile.x_coord, tile.y_coord, ap - 1, movable_tiles)
-                elif isinstance(obstacle, DoorModel):
-                    if (tile.door_status == DoorStatusEnum.OPEN or tile.door_status == DoorStatusEnum.DESTROYED):
-                        movable_tiles.append(tile)
-                        movable_tiles = self.get_movable_tiles(tile.x_coord, tile.y_coord, ap - ap_deduct, movable_tiles)
-
-        output = list(dict.fromkeys(movable_tiles))
-        return output
 
     def distance_between_tiles(self, first_tile: TileModel, second_tile: TileModel) -> int:
         return abs(first_tile.x_coord - second_tile.x_coord) + abs(first_tile.y_coord - second_tile.y_coord)
@@ -296,3 +294,7 @@ class GameBoardModel(object):
                 closest_spots.append(closer_tile_on_spot)
 
         return closest_spots
+
+    def reset_tiles_visit_status(self):
+        for tile in self.tiles:
+            tile.visit_count = 0

@@ -8,6 +8,7 @@ from src.UIComponents.rect_button import RectButton
 from src.action_events.turn_events.end_turn_event import EndTurnEvent
 from src.core.event_queue import EventQueue
 from src.core.networking import Networking
+from constants.state_enums import GameStateEnum
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 from src.observers.game_state_observer import GameStateObserver
@@ -64,8 +65,12 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
             #screen.blit(self.image, self.image.get_rect().move(880, 600))
 
     def notify_player_index(self, player_index: int):
+        print("Player index" + str(player_index))
+        for player in GameStateModel.instance().players:
+            print(player.nickname)
+        print(self._current_player.nickname)
+        self.enabled = (GameStateModel.instance().players[player_index] == self._current_player)
 
-        self.enabled = GameStateModel.instance().players[player_index] == self._current_player
         if self.enabled:
             self.your_turn = self._init_your_turn()
             self.btn = self._init_end_turn_button()
@@ -77,6 +82,11 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
 
             self.countdown_thread = Thread(target=self.countdown, args=(10,))
             self.countdown_thread.start()
+        else:
+            self._current_sprite.turn = False
+            self._active_sprites.remove(self.btn)
+            self._active_sprites.remove(self.your_turn)
+            self._active_sprites.add(self.not_your_turn)
 
     def _init_your_turn(self):
 
@@ -112,10 +122,7 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
         self.time_str = ""
         self.enabled = False
         self.running = False
-        self._current_sprite.turn = False
-        self._active_sprites.remove(self.btn)
-        self._active_sprites.remove(self.your_turn)
-        self._active_sprites.add(self.not_your_turn)
+
         turn_event = EndTurnEvent()
         # send end turn, see ChatBox for example
 
@@ -131,3 +138,6 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
 
         if self.countdown_thread != threading.current_thread() and self.countdown_thread.is_alive():
             self.countdown_thread.join()
+
+    def notify_game_state(self, game_state: GameStateEnum):
+        pass

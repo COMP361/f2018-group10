@@ -4,6 +4,7 @@ from datetime import datetime
 import pygame
 
 from src.UIComponents.rect_label import RectLabel
+from src.controllers.tile_input_controller import TileInputController
 from src.constants.change_scene_enum import ChangeSceneEnum
 from src.controllers.choose_starting_position_controller import ChooseStartingPositionController
 from src.core.custom_event import CustomEvent
@@ -15,7 +16,6 @@ from src.core.networking import Networking
 from src.core.serializer import JSONSerializer
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
-from src.observers.game_state_observer import GameStateObserver
 from src.sprites.game_board import GameBoard
 from src.sprites.hud.player_state import PlayerState
 from src.sprites.hud.current_player_state import CurrentPlayerState
@@ -49,10 +49,8 @@ class GameBoardScene(object):
         self.chat_box = ChatBox(self._current_player)
         self.menu = None
         self._init_sprites()
-        self.choose_start_pos_controller = ChooseStartingPositionController(
-                                            current_player, self.game_board, self.chat_box
-                                            )
-        self.choose_start_pos_controller.set_active_labels(self.active_sprites)
+        # self.chat_box
+        self.tile_input_controller = TileInputController(self._current_player)
 
         if Networking.get_instance().is_host:
             GameStateModel.instance()._notify_player_index()
@@ -63,6 +61,7 @@ class GameBoardScene(object):
         self._current_sprite = CurrentPlayerState(1130, 550, self._current_player.nickname,self._current_player.color,self._current_player)
         self.active_sprites.add(self._current_sprite)
         self.notify_turn_popup = NotifyPlayerTurn(self._current_player, self._current_sprite, self.active_sprites)
+        self.active_sprites.add(self.notify_turn_popup)
         self.active_sprites.add(self.notify_turn_popup._init_not_your_turn())
         self.active_sprites.add(TimeBar(0, 0))
         self.ingame_states = InGameStates(250, 650, self._game.damage, self._game.victims_saved, self._game.victims_lost)
@@ -140,4 +139,5 @@ class GameBoardScene(object):
 
         self.chat_box.update(event_queue)
         self.notify_turn_popup.update(event_queue)
-        self.choose_start_pos_controller.update(event_queue)
+        # self.choose_start_pos_controller.update(event_queue)
+        self.tile_input_controller.update(event_queue)

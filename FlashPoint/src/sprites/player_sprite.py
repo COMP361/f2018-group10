@@ -1,4 +1,7 @@
 import pygame
+from src.models.game_units.player_model import PlayerModel
+from src.models.game_board.tile_model import TileModel
+from src.models.game_units.player_model import PlayerModel
 from src.sprites.grid_sprite import GridSprite
 
 from src.UIComponents.file_importer import FileImporter
@@ -6,38 +9,37 @@ from src.constants.state_enums import PlayerStatusEnum
 from src.models.game_state_model import GameStateModel
 from src.observers.player_observer import PlayerObserver
 import src.constants.color as Color
-from src.sprites.tile_sprite import TileSprite
+
+
 
 
 class PlayerSprite(pygame.sprite.Sprite, PlayerObserver):
     """Visual representation of a Player and/or his fireman."""
 
-    def __init__(self, tile_sprite: TileSprite, grid: GridSprite):
+    def __init__(self, current_player:PlayerModel,tile_model: TileModel, grid: GridSprite):
         super().__init__()
         self.grid = grid
-        self.tile_sprite = tile_sprite
+        self.tile_model = tile_model
+        self.tile_sprite = grid.grid[tile_model.y_coord][tile_model.x_coord]
         self.rect = self.tile_sprite.rect
-        self.associated_player = GameStateModel.instance().players_turn
+        self.associated_player = current_player
         self.associated_player.add_observer(self)
-        self.associated_png = self._associate_image()
+        self.associated_png = self._associate_image(self.associated_player.color)
         self.image = FileImporter.import_image(self.associated_png)
 
-    def _associate_image(self):
+    def _associate_image(self,color:Color):
 
-        color = self.associated_player.color
+        return {
+            Color.WHITE: "media/all_markers/whiteFighter.png",
+            Color.BLUE: "media/all_markers/blueFighter.png",
+            Color.RED: "media/all_markers/redFighter.png",
+            Color.ORANGE: "media/all_markers/orangeFighter.png",
+            Color.YELLOW: "media/all_markers/yellowFighter.png",
+            Color.GREEN: "media/all_markers/greenFighter.png",
+        }[color]
 
-        if color is Color.BLUE:
-            return "media/all_markers/blueFighter.png"
-        elif color is Color.GREEN:
-            return "media/all_markers/greenFighter.png"
-        elif color is Color.ORANGE:
-            return "media/all_markers/orangeFighter.png"
-        elif color is Color.WHITE:
-            return "media/all_markers/whiteFighter.png"
-        elif color is Color.YELLOW:
-            return "media/all_markers/yellowFighter.png"
-        elif color is Color.RED:
-            return "media/all_markers/redFighter.png"
+
+
 
     def player_ap_changed(self, updated_ap: int):
         pass
@@ -46,7 +48,7 @@ class PlayerSprite(pygame.sprite.Sprite, PlayerObserver):
         pass
 
     def player_position_changed(self, x_pos: int, y_pos: int):
-        self.tile_sprite = self.grid.grid[x_pos][y_pos]
+        self.tile_sprite = self.grid.grid[y_pos][x_pos]
         self.rect = self.tile_sprite.rect
 
     def player_wins_changed(self, wins: int):

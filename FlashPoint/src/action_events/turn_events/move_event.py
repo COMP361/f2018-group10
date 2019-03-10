@@ -7,11 +7,11 @@ from src.models.game_state_model import GameStateModel
 
 class MoveEvent(ActionEvent):
 
-    def __init__(self):
+    def __init__(self, destination: TileModel):
         super().__init__()
-        self.is_valid = False
-        self.player = GameStateModel.instance().players_turn()
+        self.tile = destination
+        self.player = GameStateModel.instance().players_turn
 
     def execute(self):
         """Guessing what has to be done is to make everything sync up with the networking"""
-        pass
+        self.player.set_pos(self.tile.x_coord, self.tile.y_coord)
