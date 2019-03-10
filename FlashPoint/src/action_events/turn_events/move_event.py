@@ -93,7 +93,7 @@ class MoveEvent(TurnEvent):
         super().__init__()
         self.game: GameStateModel = GameStateModel.instance()
         self.fireman: PlayerModel = self.game.players_turn
-        self.source_tile = NullModel()
+        self.source_tile = self.game.game_board.get_tile_at(self.fireman.row, self.fireman.column)
         self.destination = dest
         self.moveable_tiles = moveable_tiles
         self.dijkstra_tiles: List[DijkstraTile] = []
@@ -106,15 +106,21 @@ class MoveEvent(TurnEvent):
 
         :return: initialized list of Dijkstra tiles
         """
+        d_source = DijkstraTile(self.source_tile)
+        d_source.least_cost = 0
+        self.source_tile = d_source
+        self.dijkstra_tiles.append(self.source_tile)
         for t in self.moveable_tiles:
             self.dijkstra_tiles.append(DijkstraTile(t))
 
         for d_tile in self.dijkstra_tiles:
-            if d_tile.tile_model.row == self.fireman.row and d_tile.tile_model.column == self.fireman.column:
-                self.source_tile = d_tile
-                self.source_tile.least_cost = 0
+            # if d_tile.tile_model.row == self.fireman.row and d_tile.tile_model.column == self.fireman.column:
+            #     print("Source tile set")
+            #     self.source_tile = d_tile
+            #     self.source_tile.least_cost = 0
             if d_tile.tile_model.row == dest.row and d_tile.tile_model.column == dest.column:
                 self.destination = d_tile
+                break
 
     def execute(self):
         # initialize the Dijkstra tiles

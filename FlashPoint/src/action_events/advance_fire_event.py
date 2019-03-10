@@ -15,22 +15,22 @@ from src.models.game_units.victim_model import VictimModel
 
 class AdvanceFireEvent(ActionEvent):
 
-    def __init__(self):
+    def __init__(self, red_dice: int = None, black_dice: int = None):
         super().__init__()
         self.game_state: GameStateModel = GameStateModel.instance()
         self.board: GameBoardModel = self.game_state.game_board
         self.initial_tile: TileModel = None
-        self.red_dice = None
-        self.black_dice = None
-        self.directions = ["North", "South", "East", "West"]
+        self.red_dice = red_dice
+        self.black_dice = black_dice
 
-    def execute(self, *args, **kwargs):
         # Pick random location: roll dice
         if not self.red_dice:
             self.red_dice = self.game_state.roll_red_dice()
         if not self.black_dice:
             self.black_dice = self.game_state.roll_black_dice()
+        self.directions = ["North", "South", "East", "West"]
 
+    def execute(self, *args, **kwargs):
         # Change state of tile depending on previous state
         self.initial_tile = self.board.get_tile_at(self.red_dice, self.black_dice)
         self.advance_on_tile(self.initial_tile)
