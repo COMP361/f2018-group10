@@ -65,7 +65,7 @@ class WallSprite(pygame.sprite.Sprite, WallObserver):
         if not valid_to_chop:
             return False
 
-        player_tile = self._game.game_board.get_tile_at(self.player.x_pos, self.player.y_pos)
+        player_tile = self._game.game_board.get_tile_at(self.player.row, self.player.column)
 
         if self.wall_model not in player_tile.adjacent_edge_objects.values():
             return False

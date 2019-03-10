@@ -13,8 +13,8 @@ class PlayerModel(Model):
     def __init__(self, ip: str, nickname: str):
         super().__init__()
         self._ip = ip
-        self._x_pos = 0
-        self._y_pos = 0
+        self._row = 0
+        self._column = 0
         self._nickname = nickname
         self._color = Color.WHITE  # White by default (not racist I swear)
         self._status = PlayerStatusEnum.NOT_READY
@@ -25,12 +25,20 @@ class PlayerModel(Model):
         self._carrying_victim = NullModel()
 
     def __eq__(self, other):
-        x = [other.ip == self.ip, other.nickname == self.nickname]
+        x = [other.ip == self.ip, other.nickname == self.nickname, other.row == self.row, other.column == self.column]
         return all(x)
+
+    def __str__(self):
+        player_pos = "Player position: ({row}, {column})".format(row=self.row, column=self.column)
+        player_ap = "Player AP: {ap}".format(ap=self.ap)
+        player_carrying_victim = "Victim with player: {victim}".format(victim=self.carrying_victim.__str__())
+        player_status = "Player status: {status}".format(status=self.status)
+        player_color = "Player color: {color}\n".format(color=self.color)
+        return '\n'.join([player_pos, player_ap, player_carrying_victim, player_status, player_color])
 
     def _notify_position(self):
         for obs in self.observers:
-            obs.player_position_changed(self.x_pos, self.y_pos)
+            obs.player_position_changed(self.row, self.column)
 
     def _notify_ap(self):
         for obs in self.observers:
@@ -57,17 +65,17 @@ class PlayerModel(Model):
         return self._observers
 
     @property
-    def x_pos(self) -> int:
-        return self._x_pos
+    def row(self) -> int:
+        return self._row
 
-    def set_pos(self, x_pos: int, y_pos: int):
-        self._x_pos = x_pos
-        self._y_pos = y_pos
+    def set_pos(self, row: int, column: int):
+        self._row = row
+        self._column = column
         self._notify_position()
 
     @property
-    def y_pos(self) -> int:
-        return self._y_pos
+    def column(self) -> int:
+        return self._column
 
     @property
     def ip(self) -> str:

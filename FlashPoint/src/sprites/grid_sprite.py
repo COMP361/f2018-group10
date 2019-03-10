@@ -53,6 +53,7 @@ class GridSprite(pygame.sprite.Group):
                 grid[i].append(tile_sprite)
 
                 tile_model = GameStateModel.instance().game_board.get_tile_at(int(y_offset / 128), int(x_offset / 128))
+                tile_model.add_observer(tile_sprite)
                 east_obstacle = tile_model.get_obstacle_in_direction("East")
                 south_obstacle = tile_model.get_obstacle_in_direction("South")
 

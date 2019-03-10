@@ -21,7 +21,7 @@ class GameStateModel(Model):
         if not GameStateModel._instance:
             super().__init__()
             self._host = host
-            self._max_desired_players = 2
+            self._max_desired_players = 1
             self._players = [self._host]
             self._players_turn_index = 0
             self._difficulty_level = None
@@ -160,7 +160,7 @@ class GameStateModel(Model):
         return random.randint(1, 8)
 
     def roll_red_dice(self) -> int:
-        """Roll the black dice to get a random number between 1-6"""
+        """Roll the red dice to get a random number between 1-6"""
         return random.randint(1, 6)
 
     @property
