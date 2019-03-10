@@ -37,7 +37,6 @@ class GameStateModel(Model):
             self._max_damage = 24
             self._chat_history = []
             self._state = GameStateEnum.READY_TO_JOIN
-            self._game_board = GameBoardModel(self._rules)
 
             GameStateModel._instance = self
 

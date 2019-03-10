@@ -26,6 +26,7 @@ class GameBoardModel(object):
         self._tiles = self._init_all_tiles_family_classic() if game_type == GameKindEnum.FAMILY else None
         self._poi_bank = GameBoardModel._init_pois()
         self._active_pois = []
+        self.set_initial_poi_family()
 
     def get_tiles(self) -> List[List[TileModel]]:
         return self._tiles
@@ -231,10 +232,11 @@ class GameBoardModel(object):
         for i in range(3):
             poi = self.get_random_poi_from_bank()
             # Location indices are inverted cause i wrote the list wrong lel
-            poi.x_pos = locations[i][0]
-            poi.y_pos = locations[i][1]
+            row = locations[i][0]
+            column = locations[i][1]
+            poi.set_position(row, column)
             self._active_pois.append(poi)
-            self.get_tile_at(poi.row, poi.column).add_associated_model(poi)
+            self.get_tile_at(row, column).add_associated_model(poi)
 
     def distance_between_tiles(self, first_tile: TileModel, second_tile: TileModel) -> int:
         return abs(first_tile.row - second_tile.row) + abs(first_tile.column - second_tile.column)
