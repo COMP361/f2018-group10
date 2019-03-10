@@ -1,30 +1,30 @@
-from src.constants.state_enums import GameStateEnum
-from src.action_events.action_event import ActionEvent
+from src.action_events.turn_events.turn_event import TurnEvent
 from src.models.game_state_model import GameStateModel
+from src.models.game_units.player_model import PlayerModel
 
+class EndTurnEvent(TurnEvent):
 
-class GameBoardState(object):
-    pass
-
-
-class EndTurnEvent(ActionEvent):
-
-    def __init__(self):
+    def __init__(self, player: PlayerModel):
         super().__init__()
+        self.player = player
 
     def execute(self):
-        # for testing
-        # GameStateModel.instance().damage = 5
-        # GameStateModel.instance().players_turn.ap =  GameStateModel.instance().players_turn.ap + 4
-        GameStateModel.instance().next_player()
-        print(GameStateModel.instance().players_turn_index)
         """
-        1)
-        2)start the AdvanceFire
-        3)knockdown event
-        4)replenish POI
+        Steps:
+        1)start the AdvanceFire
+        2)knockdown event
+        3)replenish POI
+        4)retain and replenish player's AP
         5)call player_next
         :return:
         """
+        # retain upto a maximum of 4 AP
+        # as the turn is ending and
+        # replenish player's AP by 4
+        if self.player.ap > 4:
+            self.player.ap = 4
 
+        self.player.ap += 4
 
+        # call next player
+        GameStateModel.instance().next_player()

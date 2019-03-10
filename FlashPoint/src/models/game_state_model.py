@@ -160,7 +160,7 @@ class GameStateModel(Model):
         return random.randint(1, 8)
 
     def roll_red_dice(self) -> int:
-        """Roll the black dice to get a random number between 1-6"""
+        """Roll the red dice to get a random number between 1-6"""
         return random.randint(1, 6)
 
     @property

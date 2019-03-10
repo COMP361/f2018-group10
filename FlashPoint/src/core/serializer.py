@@ -59,7 +59,7 @@ class JSONSerializer(object):
         nickname = payload['_nickname']
 
         player = PlayerModel(ip, nickname)
-        player.set_pos(payload['_x_pos'], payload['_y_pos'])
+        player.set_pos(payload['_row'], payload['_column'])
         player.color = tuple(payload['_color'])
         player.status = PlayerStatusEnum(payload["_status"]["value"])
         player.ap = payload['_ap']
@@ -89,22 +89,30 @@ class JSONSerializer(object):
     @staticmethod
     def _deserialize_choose_position_event(payload: Dict):
         tile_dict = payload['tile']
-        tile: TileModel = GameStateModel.instance().game_board.get_tile_at(tile_dict['_x_coord'], tile_dict['_y_coord'])
+        tile: TileModel = GameStateModel.instance().game_board.get_tile_at(tile_dict['_row'], tile_dict['_column'])
         GameStateModel.instance().game_board.set_single_tile_adjacencies(tile)
         event = ChooseStartingPositionEvent(tile)
         return event
 
     @staticmethod
     def _deserialize_move_event(payload: Dict):
-        tile_dict = payload['tile']
-        tile: TileModel = GameStateModel.instance().game_board.get_tile_at(tile_dict['_x_coord'], tile_dict['_y_coord'])
-        GameStateModel.instance().game_board.set_single_tile_adjacencies(tile)
-        event = MoveEvent(tile)
+        game_board = GameStateModel.instance().game_board
+        destination = payload['destination']
+        tile_list = payload['moveable_tiles']
+        moveable_tiles = []
+        for tile in tile_list:
+            tile_model: TileModel = game_board.get_tile_at(tile['_row'], tile['_column'])
+            moveable_tiles.append(tile_model)
+            game_board.set_single_tile_adjacencies(tile_model)
+
+        destination_model: TileModel = game_board.get_tile_at(destination['_row'], destination['_column'])
+        game_board.set_single_tile_adjacencies(destination_model)
+        event = MoveEvent(destination_model, moveable_tiles)
         return event
 
     @staticmethod
     def _deserialize_tile(payload: Dict) -> TileModel:
-        tile: TileModel = TileModel(payload['_x_coord'], payload['_y_coord'], payload['_space_kind'])
+        tile: TileModel = TileModel(payload['_row'], payload['_column'], payload['_space_kind'])
         GameStateModel.instance().game_board.set_single_tile_adjacencies(tile)
         return tile
 

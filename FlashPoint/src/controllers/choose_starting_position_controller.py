@@ -6,6 +6,7 @@ from src.UIComponents.rect_label import RectLabel
 from src.action_events.turn_events.choose_starting_position_event import ChooseStartingPositionEvent
 from src.constants.state_enums import SpaceKindEnum, GameStateEnum
 from src.core.event_queue import EventQueue
+from src.models.game_board.tile_model import TileModel
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 from src.sprites.game_board import GameBoard

@@ -12,5 +12,5 @@ class POISprite(pygame.sprite.Sprite, POIObserver):
     def poi_status_changed(self, status: POIStatusEnum):
         pass
 
-    def poi_position_changed(self, x_pos: int, y_pos: int):
+    def poi_position_changed(self, row: int, column: int):
         pass
