@@ -22,9 +22,9 @@ class ReplenishPOIEvent(ActionEvent):
 
         num_pois_to_add = 3 - num_active_pois
         for x in range(num_pois_to_add):
-            new_poi_x = self.game.roll_red_dice()
-            new_poi_y = self.game.roll_black_dice()
-            tile = self.board.get_tile_at(new_poi_x, new_poi_y)
+            new_poi_row = self.game.roll_red_dice()
+            new_poi_column = self.game.roll_black_dice()
+            tile = self.board.get_tile_at(new_poi_row, new_poi_column)
             new_poi = self.board.get_random_poi_from_bank()
             is_added = False
 

@@ -5,8 +5,6 @@ from src.observers.observer import Observer
 
 class WallObserver(Observer, ABC):
 
-
     @abstractmethod
-    def wall_status_changed(self,status:WallStatusEnum):
+    def wall_status_changed(self, status:WallStatusEnum):
         pass
-

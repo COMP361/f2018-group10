@@ -8,7 +8,7 @@ from src.models.game_board.null_model import NullModel
 from src.models.game_units.poi_model import POIModel
 from src.models.game_board.tile_model import TileModel
 from src.constants.state_enums import GameKindEnum, SpaceKindEnum, SpaceStatusEnum, POIIdentityEnum, DirectionEnum, \
-    DoorStatusEnum
+    DoorStatusEnum, WallStatusEnum
 from src.models.game_board.wall_model import WallModel
 from src.models.game_board.door_model import DoorModel
 
@@ -167,28 +167,28 @@ class GameBoardModel(object):
 
     def set_single_tile_adjacencies(self, tile: TileModel):
         # set north tile
-        if tile.x_coord == 0:
+        if tile.row == 0:
             tile.set_adjacent_tile("North", NullModel())
         else:
-            tile.set_adjacent_tile("North", self.get_tile_at(tile.x_coord-1, tile.y_coord))
+            tile.set_adjacent_tile("North", self.get_tile_at(tile.row - 1, tile.column))
 
         # set east tile
-        if tile.y_coord == BOARD_DIMENSIONS[1] - 1:
+        if tile.column == BOARD_DIMENSIONS[1] - 1:
             tile.set_adjacent_tile("East", NullModel())
         else:
-            tile.set_adjacent_tile("East", self.get_tile_at(tile.x_coord, tile.y_coord+1))
+            tile.set_adjacent_tile("East", self.get_tile_at(tile.row, tile.column + 1))
 
         # set west tile
-        if tile.y_coord == 0:
+        if tile.column == 0:
             tile.set_adjacent_tile("West", NullModel())
         else:
-            tile.set_adjacent_tile("West", self.get_tile_at(tile.x_coord, tile.y_coord-1))
+            tile.set_adjacent_tile("West", self.get_tile_at(tile.row, tile.column - 1))
 
         # set south tile
-        if tile.x_coord == BOARD_DIMENSIONS[0] - 1:
+        if tile.row == BOARD_DIMENSIONS[0] - 1:
             tile.set_adjacent_tile("South", NullModel())
         else:
-            tile.set_adjacent_tile("South", self.get_tile_at(tile.x_coord+1, tile.y_coord))
+            tile.set_adjacent_tile("South", self.get_tile_at(tile.row + 1, tile.column))
 
     def set_single_obstacle(self, tiles: List[List[TileModel]], adjacency: Dict, obstacle: EdgeObstacleModel):
         first_pair, second_pair = adjacency['first_pair'], adjacency['second_pair']
@@ -234,10 +234,10 @@ class GameBoardModel(object):
             poi.x_pos = locations[i][0]
             poi.y_pos = locations[i][1]
             self._active_pois.append(poi)
-            self.get_tile_at(poi.x_pos, poi.y_pos).add_associated_model(poi)
+            self.get_tile_at(poi.row, poi.column).add_associated_model(poi)
 
     def distance_between_tiles(self, first_tile: TileModel, second_tile: TileModel) -> int:
-        return abs(first_tile.x_coord - second_tile.x_coord) + abs(first_tile.y_coord - second_tile.y_coord)
+        return abs(first_tile.row - second_tile.row) + abs(first_tile.column - second_tile.column)
 
     def find_closest_parking_spots(self, parking_type: str, current_tile: TileModel) -> List[TileModel]:
         """
@@ -295,6 +295,7 @@ class GameBoardModel(object):
 
         return closest_spots
 
-    def reset_tiles_visit_status(self):
+    def reset_tiles_visit_count(self):
         for tile in self.tiles:
             tile.visit_count = 0
+            

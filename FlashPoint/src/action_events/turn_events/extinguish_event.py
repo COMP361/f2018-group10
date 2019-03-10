@@ -8,9 +8,9 @@ from src.models.game_units.player_model import PlayerModel
 
 class ExtinguishEvent(TurnEvent):
 
-    def __init__(self, fireman: PlayerModel, extinguish_space: TileModel):
+    def __init__(self, extinguish_space: TileModel):
         super().__init__()
-        self.fireman = fireman
+        self.fireman: PlayerModel = GameStateModel.instance().players_turn
         self.extinguish_space = extinguish_space
 
     def execute(self):
@@ -18,13 +18,16 @@ class ExtinguishEvent(TurnEvent):
         extinguish_space = self.extinguish_space
         game: GameStateModel = GameStateModel.instance()
         # TODO: Start here - This is the precondition code - Move it to the GUI
-        player_tile = game.game_board.get_tile_at(fireman.x_pos, fireman.y_pos)
+        player_tile = game.game_board.get_tile_at(fireman.row, fireman.column)
         valid_to_extinguish = extinguish_space == player_tile or extinguish_space in player_tile.adjacent_tiles
         if not valid_to_extinguish:
-            raise ModelNotAdjacentException("tile", fireman.x_pos, fireman.y_pos)
+            raise ModelNotAdjacentException("tile", fireman.row, fireman.column)
 
         if not self.has_required_AP(fireman.ap, 1):
             raise NotEnoughAPException("extinguish", 1)
+
+        if extinguish_space.space_status == SpaceStatusEnum.SAFE:
+            return False
 
         # TODO: End here
         if extinguish_space.space_status == SpaceStatusEnum.SMOKE:

@@ -1,11 +1,11 @@
 from typing import List
 
 import src.constants.color as Color
-from constants.state_enums import PlayerStatusEnum
+from src.constants.state_enums import PlayerStatusEnum
+
+from src.models.game_units.victim_model import VictimModel
 from src.observers.player_observer import PlayerObserver
 from src.core.event_queue import EventQueue
-from src.core.networking import Networking
-from src.action_events.turn_events.move_event import MoveEvent
 from src.models.game_board.edge_obstacle_model import EdgeObstacleModel
 from src.models.game_board.null_model import NullModel
 from src.sprites.tile_sprite import TileSprite
@@ -28,10 +28,12 @@ class MoveController(PlayerObserver):
         self.game_board_sprite = GameBoard.instance()
         self.current_player = current_player
         self.moveable_tiles = self._determine_reachable_tiles(
-            self.current_player.x_pos, self.current_player.y_pos, self.current_player.ap, [])
+            self.current_player.row, self.current_player.column, self.current_player.ap, [])
         self.current_player.add_observer(self)
-        GameStateModel.instance().game_board.reset_tiles_visit_status()
+        GameStateModel.instance().game_board.reset_tiles_visit_count()
         MoveController._instance = self
+        self.move_to = None
+        self.is_moveable = False
 
     @classmethod
     def instance(cls):
@@ -41,12 +43,28 @@ class MoveController(PlayerObserver):
 
         current_tile: TileModel = GameStateModel.instance().game_board.get_tile_at(row, column)
         current_tile.visit_count += 1
+        is_carrying_victim = False
+        ap_multiplier = 1
+        if isinstance(self.current_player.carrying_victim, VictimModel):
+            is_carrying_victim = True
+            ap_multiplier = 2
+        else:
+            is_carrying_victim = False
+
+        # Base case where carrying victim and on fire.
+        if is_carrying_victim and current_tile.space_status == SpaceStatusEnum.FIRE:
+            if current_tile in movable_tiles:
+                movable_tiles.remove(current_tile)
+            return movable_tiles
+
+        # Base case where you run out of AP
         if ap < 1:
             if current_tile.space_status == SpaceStatusEnum.FIRE:
                 if current_tile in movable_tiles:
                     movable_tiles.remove(current_tile)
             return movable_tiles
 
+        # Base case where you have less AP and are standing on fire, you cannot move to a place on fire.
         if ap < 3 and current_tile.space_status == SpaceStatusEnum.FIRE:
             open_tiles = []
             for direction, tile in current_tile.adjacent_tiles.items():
@@ -61,6 +79,7 @@ class MoveController(PlayerObserver):
                     movable_tiles.remove(current_tile)
                     return movable_tiles
 
+        # Main recursive loop
         for key in current_tile.adjacent_edge_objects.keys():
             tile: TileModel = current_tile.adjacent_tiles.get(key)
             obstacle: EdgeObstacleModel = current_tile.adjacent_edge_objects.get(key)
@@ -72,17 +91,17 @@ class MoveController(PlayerObserver):
             if isinstance(obstacle, NullModel):
 
                 movable_tiles.append(tile)
-                movable_tiles += self._determine_reachable_tiles(tile.x_coord, tile.y_coord, ap - ap_deduct,
+                movable_tiles += self._determine_reachable_tiles(tile.row, tile.column, ap - ap_deduct*ap_multiplier,
                                                                  movable_tiles)
             elif isinstance(obstacle, WallModel):
                 if obstacle.wall_status == WallStatusEnum.DESTROYED:
                     movable_tiles.append(tile)
-                    movable_tiles += self._determine_reachable_tiles(tile.x_coord, tile.y_coord, ap - ap_deduct,
+                    movable_tiles += self._determine_reachable_tiles(tile.row, tile.column, ap - ap_deduct*ap_multiplier,
                                                                      movable_tiles)
             elif isinstance(obstacle, DoorModel):
                 if obstacle.door_status == DoorStatusEnum.OPEN or obstacle.door_status == DoorStatusEnum.DESTROYED:
                     movable_tiles.append(tile)
-                    movable_tiles += self._determine_reachable_tiles(tile.x_coord, tile.y_coord, ap - ap_deduct,
+                    movable_tiles += self._determine_reachable_tiles(tile.row, tile.column, ap - ap_deduct*ap_multiplier,
                                                                      movable_tiles)
         # Remove duplicates
         output = list(set(movable_tiles))
@@ -96,14 +115,21 @@ class MoveController(PlayerObserver):
     def process_input(self, tile_sprite: TileSprite):
         tile_model = GameStateModel.instance().game_board.get_tile_at(tile_sprite.row, tile_sprite.column)
 
+        # close the menu when other tile is clicked
+        if self.move_to:
+            self.move_to.disable_move()
+            self.move_to.move_button.disable()
+            self.move_to = None
+
         if not self._run_checks(tile_model):
+            tile_sprite.disable_move()
+            self.is_moveable = False
             return
 
-        event = MoveEvent(tile_model)
-        if Networking.get_instance().is_host:
-            Networking.get_instance().send_to_all_client(event)
-        else:
-            Networking.get_instance().client.send(event)
+        self.move_to = tile_sprite
+        self.move_to.enable_move()
+        self.move_to.move_button.enable()
+        self.is_moveable = True
 
     def update(self, event_queue: EventQueue):
         if GameStateModel.instance().state != GameStateEnum.MAIN_GAME:
@@ -129,10 +155,10 @@ class MoveController(PlayerObserver):
 
     def player_position_changed(self, x_pos: int, y_pos: int):
 
-        GameStateModel.instance().game_board.reset_tiles_visit_status()
+        GameStateModel.instance().game_board.reset_tiles_visit_count()
         self.moveable_tiles = self._determine_reachable_tiles(
-            self.current_player.x_pos, self.current_player.y_pos, self.current_player.ap, [])
-        GameStateModel.instance().game_board.reset_tiles_visit_status()
+            self.current_player.row, self.current_player.column, self.current_player.ap, [])
+        GameStateModel.instance().game_board.reset_tiles_visit_count()
 
     def player_wins_changed(self, wins: int):
         pass

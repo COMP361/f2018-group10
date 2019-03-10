@@ -3,7 +3,8 @@ from datetime import datetime
 
 import pygame
 
-from src.UIComponents.rect_label import RectLabel
+from src.action_events.turn_events.move_event import MoveEvent
+from src.controllers.move_controller import MoveController
 from src.controllers.tile_input_controller import TileInputController
 from src.constants.change_scene_enum import ChangeSceneEnum
 from src.controllers.choose_starting_position_controller import ChooseStartingPositionController
@@ -37,7 +38,7 @@ class GameBoardScene(object):
         """
         self._save_games_file = "media/save_games.json"
         self.screen = screen
-        self._game = GameStateModel.instance()
+        self._game: GameStateModel = GameStateModel.instance()
         self._current_player = current_player
         self._current_sprite = None
 
@@ -49,11 +50,12 @@ class GameBoardScene(object):
         self.chat_box = ChatBox(self._current_player)
         self.menu = None
         self._init_sprites()
+        # TODO: Haw: I've removed my testing code from here. You can change it back to whatever you want
         # self.chat_box
         self.tile_input_controller = TileInputController(self._current_player)
+        # self.choose_start_pos_controller = ChooseStartingPositionController(self.game_board, current_player)
+        #checks if can move and if can extinguish
 
-        if Networking.get_instance().is_host:
-            GameStateModel.instance()._notify_player_index()
 
     def _init_sprites(self):
         for i, player in enumerate(self._game.players):
