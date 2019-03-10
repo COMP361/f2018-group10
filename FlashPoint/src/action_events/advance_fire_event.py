@@ -75,8 +75,6 @@ class AdvanceFireEvent(ActionEvent):
                     else:
                         nb_tile.space_status = SpaceStatusEnum.FIRE
 
-
-
     def shockwave(self, tile: TileModel, direction: str):
         """
         Send shockwave along a direction.

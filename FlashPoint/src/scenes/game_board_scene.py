@@ -53,9 +53,9 @@ class GameBoardScene(object):
         # TODO: Haw: I've removed my testing code from here. You can change it back to whatever you want
         # self.chat_box
         self.tile_input_controller = TileInputController(self._current_player)
-        # self.choose_start_pos_controller = ChooseStartingPositionController(self.game_board, current_player)
-        #checks if can move and if can extinguish
 
+        if Networking.get_instance().is_host:
+            GameStateModel.instance()._notify_player_index()
 
     def _init_sprites(self):
         for i, player in enumerate(self._game.players):

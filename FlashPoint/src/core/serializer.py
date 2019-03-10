@@ -118,11 +118,17 @@ class JSONSerializer(object):
 
     @staticmethod
     def _deserialize_end_turn_event(payload: Dict) -> EndTurnEvent:
-        return EndTurnEvent()
+        player: PlayerModel = JSONSerializer.deserialize(payload['player'])
+        return EndTurnEvent(player)
 
     @staticmethod
     def _deserialize_advance_fire_event(payload: Dict) -> AdvanceFireEvent:
-        return AdvanceFireEvent()
+        red_dice: int = payload['red_dice']
+        black_dice: int = payload['black_dice']
+        event = AdvanceFireEvent(red_dice, black_dice)
+        board = GameStateModel.instance().game_board
+        board.set_adjacencies(board.get_tiles())
+        return event
 
     @staticmethod
     def deserialize(payload: Dict) -> object:
