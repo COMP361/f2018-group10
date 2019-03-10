@@ -94,13 +94,9 @@ class MoveEvent(TurnEvent):
         self.game: GameStateModel = GameStateModel.instance()
         self.fireman: PlayerModel = self.game.players_turn
         self.source_tile = NullModel()
-        self.destination = NullModel()
+        self.destination = dest
         self.moveable_tiles = moveable_tiles
         self.dijkstra_tiles: List[DijkstraTile] = []
-        self._init_dijkstra_tiles(dest)
-        print("Dijkstra tiles set:")
-        # print([d_tile for d_tile in self.dijkstra_tiles])
-        [print(d_tile) for d_tile in self.dijkstra_tiles]
 
     def _init_dijkstra_tiles(self, dest: TileModel):
         """
@@ -121,6 +117,10 @@ class MoveEvent(TurnEvent):
                 self.destination = d_tile
 
     def execute(self):
+        # initialize the Dijkstra tiles
+        self._init_dijkstra_tiles(self.destination)
+        print("Dijkstra tiles set:")
+        [print(d_tile) for d_tile in self.dijkstra_tiles]
         # Insert the Dijkstra tiles
         # into the priority queue
         pq = PriorityQueue()
