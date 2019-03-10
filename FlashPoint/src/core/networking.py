@@ -6,6 +6,7 @@ import threading
 import logging
 import time
 
+from src.action_events.advance_fire_event import AdvanceFireEvent
 from src.action_events.turn_events.choose_starting_position_event import ChooseStartingPositionEvent
 from src.action_events.turn_events.end_turn_event import EndTurnEvent
 from src.action_events.chat_event import ChatEvent
@@ -366,7 +367,7 @@ class Networking:
             print(f"Client at {connection_object.address} sent a message: {data.__class__}")
             if isinstance(data, TurnEvent) or isinstance(data, ActionEvent):
                 if isinstance(data, ChatEvent) or isinstance(data, EndTurnEvent) \
-                        or isinstance(data, ChooseStartingPositionEvent):
+                        or isinstance(data, ChooseStartingPositionEvent) or isinstance(data, AdvanceFireEvent):
                     Networking.get_instance().send_to_all_client(data)
                     return super(MastermindServerUDP, self).callback_client_handle(connection_object, data)
 

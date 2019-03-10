@@ -2,7 +2,9 @@ import threading
 import pygame
 import time
 from threading import Thread
+
 import src.constants.color as Color
+from src.action_events.advance_fire_event import AdvanceFireEvent
 from src.UIComponents.rect_label import RectLabel
 from src.UIComponents.rect_button import RectButton
 from src.action_events.turn_events.end_turn_event import EndTurnEvent
@@ -129,8 +131,10 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
         try:
             if Networking.get_instance().is_host:
                 Networking.get_instance().send_to_all_client(turn_event)
+                Networking.get_instance().send_to_all_client(AdvanceFireEvent())
             else:
                 Networking.get_instance().client.send(turn_event)
+                Networking.get_instance().client.send(AdvanceFireEvent())
         except AttributeError as e:
             pass
         

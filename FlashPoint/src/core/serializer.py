@@ -2,12 +2,12 @@ import enum
 import json
 from typing import Dict
 
+from src.action_events.advance_fire_event import AdvanceFireEvent
 from src.action_events.turn_events.move_event import MoveEvent
 from src.observers.observer import Observer
 from src.models.game_board.tile_model import TileModel
 from src.action_events.turn_events.choose_starting_position_event import ChooseStartingPositionEvent
 from src.action_events.turn_events.end_turn_event import EndTurnEvent
-from src.models.game_board.game_board_model import GameBoardModel
 from src.action_events.start_game_event import StartGameEvent
 from src.action_events.ready_event import ReadyEvent
 from src.action_events.chat_event import ChatEvent
@@ -113,6 +113,10 @@ class JSONSerializer(object):
         return EndTurnEvent()
 
     @staticmethod
+    def _deserialize_advance_fire_event(payload: Dict) -> AdvanceFireEvent:
+        return AdvanceFireEvent()
+
+    @staticmethod
     def deserialize(payload: Dict) -> object:
         """
         Grab an object and deserialize it.
@@ -141,6 +145,8 @@ class JSONSerializer(object):
             return StartGameEvent()
         elif object_type == EndTurnEvent.__name__:
             return JSONSerializer._deserialize_end_turn_event(payload)
+        elif object_type == AdvanceFireEvent.__name__:
+            return JSONSerializer._deserialize_advance_fire_event(payload)
         elif object_type == ChooseStartingPositionEvent.__name__:
             return JSONSerializer._deserialize_choose_position_event(payload)
         elif object_type == MoveEvent.__name__:

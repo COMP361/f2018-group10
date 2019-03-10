@@ -37,7 +37,6 @@ class AdvanceFireEvent(ActionEvent):
         self.flashover()
         self.affect_damages()
 
-
     def advance_on_tile(self, target_tile: TileModel):
         target_tile.visited = True
         tile_status = target_tile.space_status
@@ -52,7 +51,6 @@ class AdvanceFireEvent(ActionEvent):
         # Fire -> Explosion
         else:
             self.explosion(target_tile)
-
 
     def explosion(self, origin_tile: TileModel):
         for direction, obstacle in origin_tile.adjacent_edge_objects.items():
