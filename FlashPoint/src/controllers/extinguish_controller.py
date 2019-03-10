@@ -26,6 +26,8 @@ class ExtinguishController(object):
         game: GameStateModel = GameStateModel.instance()
         game.game_board.reset_tiles_visit_count()
         ExtinguishController._instance = self
+        self.extinguishable = False
+        self.fire_tile = None # this is the previously opened menu for extinguish
 
     @classmethod
     def instance(cls):
@@ -48,14 +50,22 @@ class ExtinguishController(object):
     def process_input(self, tile_sprite: TileSprite):
         tile_model = GameStateModel.instance().game_board.get_tile_at(tile_sprite.row, tile_sprite.column)
 
+        if self.fire_tile:
+            self.fire_tile.disable_move()
+            self.fire_tile.move_button.disable()
+            self.fire_tile = None
+
         if not self._run_checks(tile_model):
+            tile_sprite.disable_extinguish()
+            self.extinguishable = False
             return
 
-        event = ExtinguishEvent(self.current_player, tile_model)
-        if Networking.get_instance().is_host:
-            Networking.get_instance().send_to_all_client(event)
-        else:
-            Networking.get_instance().client.send(event)
+        self.extinguishable = True
+        tile_sprite.enable_extinguish()
+        self.fire_tile = tile_sprite
+        self.fire_tile.extinguish_button.enable()
+
+
 
     def update(self, event_queue: EventQueue):
         if GameStateModel.instance().state != GameStateEnum.MAIN_GAME:
