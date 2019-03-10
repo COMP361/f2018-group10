@@ -26,6 +26,7 @@ class TileInputController(GameStateObserver):
         self.move_controller = MoveController(current_player)
         self.choose_starting_controller = ChooseStartingPositionController(current_player)
         GameStateModel.instance().add_observer(self)
+        self.fireman = current_player
         current_player.ap = 4
         GameStateModel.instance().state = GameStateEnum.PLACING
         TileInputController._instance = self
