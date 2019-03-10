@@ -4,6 +4,7 @@ from datetime import datetime
 import pygame
 
 from src.action_events.turn_events.move_event import MoveEvent
+from src.controllers.chop_controller import ChopController
 from src.controllers.move_controller import MoveController
 from src.controllers.tile_input_controller import TileInputController
 from src.constants.change_scene_enum import ChangeSceneEnum
@@ -53,6 +54,7 @@ class GameBoardScene(object):
         # TODO: Haw: I've removed my testing code from here. You can change it back to whatever you want
         # self.chat_box
         self.tile_input_controller = TileInputController(self._current_player)
+        self.chop_controller = ChopController(self._current_player)
         # self.choose_start_pos_controller = ChooseStartingPositionController(self.game_board, current_player)
         #checks if can move and if can extinguish
 
@@ -141,3 +143,4 @@ class GameBoardScene(object):
         self.notify_turn_popup.update(event_queue)
         # self.choose_start_pos_controller.update(event_queue)
         self.tile_input_controller.update(event_queue)
+        self.chop_controller.update(event_queue)

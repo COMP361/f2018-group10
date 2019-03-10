@@ -15,7 +15,6 @@ from src.sprites.game_board import GameBoard
 
 
 class ExtinguishController(object):
-
     _instance = None
 
     def __init__(self, current_player: PlayerModel):
@@ -27,14 +26,15 @@ class ExtinguishController(object):
         game.game_board.reset_tiles_visit_count()
         ExtinguishController._instance = self
         self.extinguishable = False
-        self.fire_tile = None # this is the previously opened menu for extinguish
+        self.fire_tile = None  # this is the previously opened menu for extinguish
 
     @classmethod
     def instance(cls):
         return cls._instance
 
     def _run_checks(self, tile_model: TileModel) -> bool:
-        player_tile = GameStateModel.instance().game_board.get_tile_at(self.current_player.row, self.current_player.column)
+        player_tile = GameStateModel.instance().game_board.get_tile_at(self.current_player.row,
+                                                                       self.current_player.column)
         valid_to_extinguish = tile_model == player_tile or tile_model in player_tile.adjacent_tiles
         if not valid_to_extinguish:
             return False
@@ -64,8 +64,6 @@ class ExtinguishController(object):
         tile_sprite.enable_extinguish()
         self.fire_tile = tile_sprite
         self.fire_tile.extinguish_button.enable()
-
-
 
     def update(self, event_queue: EventQueue):
         if GameStateModel.instance().state != GameStateEnum.MAIN_GAME:

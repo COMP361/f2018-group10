@@ -7,6 +7,7 @@ import logging
 import time
 
 from src.action_events.chat_event import ChatEvent
+from src.action_events.turn_events.chop_event import ChopEvent
 from src.core.custom_event import CustomEvent
 from src.core.serializer import JSONSerializer
 from src.core.event_queue import EventQueue
@@ -362,7 +363,7 @@ class Networking:
 
             print(f"Client at {connection_object.address} sent a message: {data.__class__}")
             if isinstance(data, TurnEvent) or isinstance(data, ActionEvent):
-                if isinstance(data, ChatEvent):
+                if isinstance(data, ChatEvent) or isinstance(data, ChopEvent):
                     Networking.get_instance().send_to_all_client(data)
                     return super(MastermindServerUDP, self).callback_client_handle(connection_object, data)
 
