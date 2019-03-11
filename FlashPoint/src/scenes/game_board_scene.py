@@ -49,11 +49,8 @@ class GameBoardScene(object):
         self.menu = None
         self._init_sprites()
         self.tile_input_controller = TileInputController(self._current_player)
-        # self.choose_start_pos_controller = ChooseStartingPositionController(self.game_board, current_player)
-        # checks if can move and if can extinguish
 
         for poi in self._game.game_board.active_pois:
-            print("Adding poi")
             poi_sprite = POISprite(poi.row, poi.column)
             self.game_board_sprite.add(poi_sprite)
 
