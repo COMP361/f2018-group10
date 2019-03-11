@@ -13,7 +13,13 @@ class WallModel(EdgeObstacleModel):
         self._id = (row, column, direction)
 
     def __str__(self):
-        return f"Wall at ({self.id[0]}, {self.id[1]}) in direction {self.id[2]}."
+        if self.wall_status == WallStatusEnum.INTACT:
+            stat = "Intact"
+        elif self.wall_status == WallStatusEnum.DAMAGED:
+            stat = "Damaged"
+        else:
+            stat = "Destroyed"
+        return f"{stat} wall at ({self.id[0]}, {self.id[1]}) in direction {self.id[2]}."
 
     @property
     def wall_status(self):

@@ -19,7 +19,6 @@ class DijkstraTile(object):
         self.predecessor = NullModel()
 
     def __str__(self):
-        # return f"{self.tile_model.__str__()}\nLeast cost: {self.least_cost}\nPredecessor: {self.predecessor.__str__()}\n"
         dijkstra = "### Dijkstra Tile ###"
         tile_info = "Self: " + self.tile_model.__str__()
         least_cost = "Least cost: " + str(self.least_cost)
@@ -146,11 +145,7 @@ class MoveEvent(TurnEvent):
             pq.poll()
 
         shortest_path = self.shortest_path()
-        print("Path taken:")
-        [print(p_tile) for p_tile in shortest_path]
         self.traverse_shortest_path(shortest_path)
-        print("After moving:")
-        print(self.fireman)
 
         GameStateModel.lock.release()
 
@@ -285,84 +280,3 @@ class MoveEvent(TurnEvent):
                         d_tile.tile_model.remove_associated_model(assoc_model)
                         self.game.game_board.remove_poi_or_victim(assoc_model)
                     # TODO: do something if POI is Victim
-
-
-# class MoveEvent(TurnEvent):
-#
-#     def __init__(self, fireman: PlayerModel, destination: TileModel, moveable_tiles: List[TileModel]):
-#         super().__init__()
-#         self.fireman = fireman
-#         self.game: GameStateModel = GameStateModel.instance()
-#         self.source_tile = DijkstraTile(self.game.game_board.get_tile_at(self.fireman.row, self.fireman.column))
-#         self.destination = DijkstraTile(destination)
-#         moveable_tiles.remove(self.source_tile)
-#         self.moveable_tiles = moveable_tiles
-#
-#     def execute(self):
-#         """Guessing what has to be done is to make everything sync up with the networking"""
-#         # initialize the Djikstra tiles and
-#         # insert them into the priority queue
-#         dijkstra_tiles = self._init_dijkstra_tiles()
-#         pq = PriorityQueue()
-#         for d_tile in dijkstra_tiles:
-#             pq.insert(d_tile)
-#
-#         while not pq.is_empty():
-#             current_d_tile = pq.peek()
-#             for d_tile in dijkstra_tiles:
-#                 if d_tile in current_d_tile.tile_model.adjacent_tiles:
-#                     self.relax_cost(current_d_tile, d_tile, pq)
-#
-#             pq.poll()
-#
-#
-    # def _init_dijkstra_tiles(self):
-    #     """
-    #     Initialization of the DjikstraTile objects.
-    #     The source tile will have distance 0 from source
-    #     while others are initialized with large distance.
-    #
-    #     :return: initialized list of Dijkstra tiles
-    #     """
-    #     dijkstra_tiles = []
-    #     source_tile = DijkstraTile(self.source_tile)
-    #     source_tile.least_cost = 0
-    #     dijkstra_tiles.append(source_tile)
-    #
-    #     for t in self.moveable_tiles:
-    #         dijkstra_tiles.append(DijkstraTile(t))
-    #
-    #     return dijkstra_tiles
-#
-#     def relax_cost(self, first_tile: DijkstraTile, second_tile: DijkstraTile, pq: PriorityQueue):
-#         """
-#         If there is a cheaper way to get to the second tile
-#         from the first tile, the least cost of the second
-#         tile is changed to reflect that.
-#
-#         :param first_tile:
-#         :param second_tile:
-#         :return:
-#         """
-#         cost_to_travel = 0
-#         # Two separate cases depending on whether
-#         # fireman is carrying a victim or not
-#
-#         # fireman is carrying a victim
-#         if isinstance(self.fireman.carrying_victim, VictimModel):
-#             if second_tile.tile_model.space_status != SpaceStatusEnum.FIRE:
-#                 cost_to_travel = 2
-#
-#         # fireman is not carrying a victim
-#         else:
-#             if second_tile.tile_model.space_status != SpaceStatusEnum.FIRE:
-#                 cost_to_travel = 1
-#             else:
-#                 cost_to_travel = 2
-#
-#         if second_tile.least_cost > first_tile.least_cost + cost_to_travel:
-#             second_tile.least_cost = first_tile.least_cost + cost_to_travel
-#             second_tile.predecessor = first_tile
-#
-#     def shortest_path(self):
-
