@@ -108,6 +108,8 @@ class MoveController(PlayerObserver):
         return output
 
     def _run_checks(self, tile_model: TileModel) -> bool:
+        if self.current_player != GameStateModel.instance().players_turn:
+            return False
         return tile_model in self.moveable_tiles
 
     def process_input(self, tile_sprite: TileSprite):

@@ -16,15 +16,14 @@ class ChooseStartingPositionEvent(ActionEvent):
         self.player: PlayerModel = GameStateModel.instance().players_turn
 
     def execute(self):
-        """TODO: Fill execute method. Have to get to current game state and find reference to curr_player """
-        """Other complication might be to get to reference of the current player. I added Enum for the game state"""
+        print("Executing ChooseStartingPositionEvent")
         game: GameStateModel = GameStateModel.instance()
         self.tile.add_associated_model(self.player)
-        player_sprite = PlayerSprite(self.tile, GameBoard.instance().grid)
-        self.player.add_observer(player_sprite)
+        player_sprite = PlayerSprite(self.player, self.tile, GameBoard.instance().grid)
         GameBoard.instance().add(player_sprite)
         self.player.set_pos(self.tile.row, self.tile.column)
 
         if game.players_turn_index + 1 == len(game.players):
             # If the last player has chosen a location, move the game into the next phase.
             game.state = GameStateEnum.MAIN_GAME
+

@@ -16,6 +16,15 @@ from src.observers.game_state_observer import GameStateObserver
 
 class TileInputController(GameStateObserver):
 
+    def damage_changed(self, new_damage: int):
+        pass
+
+    def saved_victims(self, victims_saved: int):
+        pass
+
+    def dead_victims(self, victims_dead: int):
+        pass
+
     _instance = None
 
     def __init__(self, current_player: PlayerModel):

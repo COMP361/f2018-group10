@@ -1,4 +1,5 @@
 import src.constants.color as Color
+from src.constants.state_enums import PlayerStatusEnum
 from src.models.game_state_model import GameStateModel
 from src.action_events.action_event import ActionEvent
 from src.models.game_units.player_model import PlayerModel
@@ -14,11 +15,12 @@ class JoinEvent(ActionEvent):
 
         colors = {
             "blue": Color.BLUE,
-            "red": Color.RED,
+            "white": Color.WHITE,
             "orange": Color.ORANGE,
             "yellow": Color.YELLOW,
             "green": Color.GREEN,
-            "white": Color.WHITE,
+
+            "red": Color.RED,
         }
 
         list_players = GameStateModel.instance().players

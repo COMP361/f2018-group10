@@ -9,6 +9,7 @@ from src.scenes.host_menu_scene import HostMenuScene
 from src.scenes.join_scene import JoinScene
 from src.scenes.load_game_scene import LoadGame
 from src.scenes.start_scene import StartScene
+from src.scenes.set_max_players_scene import SetMaxPlayers
 from src.scenes.create_game_menu import CreateGameMenu
 from src.core.event_queue import EventQueue
 from src.scenes.character_scene import CharacterScene
@@ -87,6 +88,8 @@ class SceneManager(object):
             for event in event_queue:
                 if event.type == ChangeSceneEnum.STARTSCENE:
                     self.next(StartScene)
+                elif event.type == ChangeSceneEnum.SETMAXPLAYERSCENE:
+                    self.next(SetMaxPlayers, self._current_player)
                 elif event.type == ChangeSceneEnum.CHARACTERSCENE:
                     self.next(CharacterScene, self._current_player)
                 elif event.type == ChangeSceneEnum.CREATEGAMEMENU:

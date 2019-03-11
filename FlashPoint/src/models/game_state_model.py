@@ -21,7 +21,7 @@ class GameStateModel(Model):
         if not GameStateModel._instance:
             super().__init__()
             self._host = host
-            self._max_desired_players = 2
+            self._max_desired_players = 1
             self._players = [self._host]
             self._players_turn_index = 0
             self._difficulty_level = None
@@ -40,12 +40,13 @@ class GameStateModel(Model):
             self._game_board = GameBoardModel(self._rules)
 
             GameStateModel._instance = self
+
         else:
             print("Attempted to instantiate another singleton")
             raise Exception("GameStateModel is a Singleton")
 
     def _notify_player_index(self):
-        for obs in self.observers:
+        for obs in self._observers:
             obs.notify_player_index(self._players_turn_index)
 
     def _notify_state(self):
@@ -122,6 +123,7 @@ class GameStateModel(Model):
     @players_turn.setter
     def players_turn(self, turn: int):
         self._players_turn_index = turn
+        self._notify_player_index()
 
     def next_player(self):
         """Rotate to the next player in the players list, round robin style."""
@@ -168,6 +170,8 @@ class GameStateModel(Model):
     @victims_saved.setter
     def victims_saved(self, victims_saved: int):
         self._victims_saved = victims_saved
+        for obs in self.observers:
+            obs.saved_victims(victims_saved)
         if self._victims_saved == 7:
             self.state = GameStateEnum.WON
 
@@ -178,8 +182,11 @@ class GameStateModel(Model):
     @victims_lost.setter
     def victims_lost(self, victims_lost: int):
         self._victims_lost = victims_lost
+        for obs in self.observers:
+            obs.dead_victims(victims_lost)
         if self._victims_lost >= 4:
             self.state = GameStateEnum.LOST
+
 
     @property
     def damage(self) -> int:
@@ -188,6 +195,8 @@ class GameStateModel(Model):
     @damage.setter
     def damage(self, damage: int):
         self._damage = damage
+        for obs in self.observers:
+            obs.damage_changed(damage)
         if self._damage >= self.max_damage:
             self.state = GameStateEnum.LOST
 

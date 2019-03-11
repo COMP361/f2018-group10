@@ -1,5 +1,7 @@
 import pygame
+from src.models.game_units.player_model import PlayerModel
 from src.models.game_board.tile_model import TileModel
+from src.models.game_units.player_model import PlayerModel
 from src.sprites.grid_sprite import GridSprite
 
 from src.UIComponents.file_importer import FileImporter
@@ -9,36 +11,35 @@ from src.observers.player_observer import PlayerObserver
 import src.constants.color as Color
 
 
+
+
 class PlayerSprite(pygame.sprite.Sprite, PlayerObserver):
     """Visual representation of a Player and/or his fireman."""
 
-    def __init__(self, tile_model: TileModel, grid: GridSprite):
+    def __init__(self, current_player:PlayerModel,tile_model: TileModel, grid: GridSprite):
         super().__init__()
         self.grid = grid
         self.tile_model = tile_model
         self.tile_sprite = grid.grid[tile_model.column][tile_model.row]
         self.rect = self.tile_sprite.rect
-        self.associated_player = GameStateModel.instance().players_turn
+        self.associated_player = current_player
         self.associated_player.add_observer(self)
-        self.associated_png = self._associate_image()
+        self.associated_png = self._associate_image(self.associated_player.color)
         self.image = FileImporter.import_image(self.associated_png)
 
-    def _associate_image(self):
+    def _associate_image(self,color:Color):
 
-        color = self.associated_player.color
+        return {
+            Color.WHITE: "media/all_markers/whiteFighter.png",
+            Color.BLUE: "media/all_markers/blueFighter.png",
+            Color.RED: "media/all_markers/redFighter.png",
+            Color.ORANGE: "media/all_markers/orangeFighter.png",
+            Color.YELLOW: "media/all_markers/yellowFighter.png",
+            Color.GREEN: "media/all_markers/greenFighter.png",
+        }[color]
 
-        if color is Color.BLUE:
-            return "media/all_markers/blueFighter.png"
-        elif color is Color.GREEN:
-            return "media/all_markers/greenFighter.png"
-        elif color is Color.ORANGE:
-            return "media/all_markers/orangeFighter.png"
-        elif color is Color.WHITE:
-            return "media/all_markers/whiteFighter.png"
-        elif color is Color.YELLOW:
-            return "media/all_markers/yellowFighter.png"
-        elif color is Color.RED:
-            return "media/all_markers/redFighter.png"
+
+
 
     def player_ap_changed(self, updated_ap: int):
         pass

@@ -12,11 +12,5 @@ class CloseDoorEvent(TurnEvent):
         self.fireman = fireman
 
     def execute(self):
-        door = self.door
-        fireman = self.fireman
-        # TODO: Start here - This is the precondition code - Move it to the GUI
-        if not self.has_required_AP(fireman.ap, 1):
-            raise NotEnoughAPException("close the door", 1)
-        # End here
-
-        door.close_door()
+        self.door.close_door()
+        self.fireman.ap -= 1
