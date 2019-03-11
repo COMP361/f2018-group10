@@ -465,6 +465,7 @@ class Networking:
             print(f"Received {data.__class__} object from host.")
             if isinstance(data, GameStateModel):
                 GameStateModel.set_game(data)
+                return
             if isinstance(data, TurnEvent) or isinstance(data, ActionEvent):
                 data.execute()
                 if isinstance(data, DisconnectEvent):
