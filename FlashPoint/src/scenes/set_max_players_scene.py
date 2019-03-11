@@ -23,8 +23,8 @@ class SetMaxPlayers(object):
         self._init_back_box((int)(1280/2-250), 130, "", Color.GREY, Color.GREEN)
 
         # COMMENT THIS OUT LATER
-        self._init_solo(520, 400, "I'm alone :'(", Color.STANDARDBTN, Color.BLACK)
-        self._init_duo(600, 400, "Duo :'(", Color.STANDARDBTN, Color.BLACK)
+        self._init_solo(410, 400, "I'm alone :'(", Color.STANDARDBTN, Color.BLACK)
+        self._init_duo(740, 400, "Duo :'(", Color.STANDARDBTN, Color.BLACK)
         self._init_button3(410, 200, "3", Color.STANDARDBTN, Color.BLACK)
         self._init_button4(740, 200, "4", Color.STANDARDBTN, Color.BLACK)
         self._init_button5(410, 300, "5", Color.STANDARDBTN, Color.BLACK)

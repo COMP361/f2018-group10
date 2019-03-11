@@ -169,7 +169,6 @@ class MoveController(PlayerObserver):
         # close the menu when other tile is clicked
         if self.move_to:
             self.move_to.disable_move()
-            self.move_to.move_button.disable()
             self.move_to = None
 
         if not self._run_checks(tile_model):
@@ -179,7 +178,6 @@ class MoveController(PlayerObserver):
 
         self.move_to = tile_sprite
         self.move_to.enable_move()
-        self.move_to.move_button.enable()
         self.is_moveable = True
 
     def update(self, event_queue: EventQueue):
