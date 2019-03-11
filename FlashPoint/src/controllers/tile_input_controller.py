@@ -77,9 +77,6 @@ class TileInputController(GameStateObserver):
         else:
             Networking.get_instance().client.send(event)
 
-        print("Tile is now: ")
-        print(tile.space_status)
-
     def execute_move_event(self, tile: TileModel):
         print("move_event created")
         self.move_controller.move_to.disable_move()
