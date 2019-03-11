@@ -56,7 +56,7 @@ class GameBoardModel(object):
             self._active_pois.remove(poi_or_victim)
 
     def get_random_poi_from_bank(self) -> POIModel:
-        number = random.randint(0, len(self._poi_bank))
+        number = random.randint(0, len(self._poi_bank)-1)
         poi = self._poi_bank.pop(number)
         return poi
 

@@ -52,7 +52,7 @@ class GameBoardScene(object):
         self.menu = None
         self._init_sprites()
         self.tile_input_controller = TileInputController(self._current_player)
-
+        self.chop_controller = ChopController(self._current_player)
         for poi in self._game.game_board.active_pois:
             poi_sprite = POISprite(poi.row, poi.column)
             self.game_board_sprite.add(poi_sprite)
