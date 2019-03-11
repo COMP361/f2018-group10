@@ -1,6 +1,7 @@
 from typing import List
 
 import src.constants.color as Color
+from src.action_events.turn_events.move_event import DijkstraTile, PriorityQueue
 from src.constants.state_enums import PlayerStatusEnum
 
 from src.models.game_units.victim_model import VictimModel
@@ -28,7 +29,7 @@ class MoveController(PlayerObserver):
         self.game_board_sprite = GameBoard.instance()
         self.current_player = current_player
         self.moveable_tiles = self._determine_reachable_tiles(
-            self.current_player.row, self.current_player.column, self.current_player.ap, [])
+            self.current_player.row, self.current_player.column, self.current_player.ap)
         self.current_player.add_observer(self)
         GameStateModel.instance().game_board.reset_tiles_visit_count()
         MoveController._instance = self
@@ -39,73 +40,115 @@ class MoveController(PlayerObserver):
     def instance(cls):
         return cls._instance
 
-    def _determine_reachable_tiles(self, row: int, column: int, ap: int, movable_tiles: List[TileModel]) -> List[TileModel]:
+    def _determine_reachable_tiles(self, row: int, column: int, ap: int) -> List[TileModel]:
+        """
+        Determines the list of tiles the player can
+        move to based on their position and AP.
 
-        current_tile: TileModel = GameStateModel.instance().game_board.get_tile_at(row, column)
-        current_tile.visit_count += 1
+        :param row: Current row of the player.
+        :param column: Current column of the player.
+        :param ap: Current AP of the player.
+        :return: The list of tiles the player can move to based on their position and AP.
+        """
+        # Convention followed:
+        # d_tile refers to a DijkstraTile
+        # tile refers to a TileModel
+
+        # If the player is carring a victim,
+        # every move will cost 2 AP instead of 1.
+        # Use a multiplier to keep track of that.
+        moveable_tiles = []
+        pq = PriorityQueue()
         is_carrying_victim = False
-        ap_multiplier = 1
         if isinstance(self.current_player.carrying_victim, VictimModel):
             is_carrying_victim = True
-            ap_multiplier = 2
-        else:
-            is_carrying_victim = False
 
-        # Base case where carrying victim and on fire.
-        if is_carrying_victim and current_tile.space_status == SpaceStatusEnum.FIRE:
-            if current_tile in movable_tiles:
-                movable_tiles.remove(current_tile)
-            return movable_tiles
+        # Get the tiles of the board. Remove the source tile
+        # from the list since it has to be initialised as a
+        # Dijkstra tile with least_cost = 0.
+        game: GameStateModel = GameStateModel.instance()
+        tiles = game.game_board.tiles
+        tiles.remove(game.game_board.get_tile_at(row, column))
+        dijkstra_tiles = {}
+        for tile in tiles:
+            dijkstra_tiles[str(tile.row) + ", " + str(tile.column)] = DijkstraTile(tile)
 
-        # Base case where you run out of AP
+        src: TileModel = GameStateModel.instance().game_board.get_tile_at(row, column)
+        moveable_tiles.append(src)
+        source_tile = DijkstraTile(src)
+        source_tile.least_cost = 0
+        # dijkstra_tiles.append(source_tile)
+        dijkstra_tiles[str(src.row) + ", " + str(src.column)] = source_tile
+        pq.insert(source_tile)
+
+        # Insert tiles into the PriorityQueue and keep
+        # relaxing the cost to move between them until
+        # the PriorityQueue is empty.
+        while not pq.is_empty():
+            current_d_tile = pq.peek()
+            # Get the tiles adjacent to the current tile
+            # and check if they can be relaxed.
+            for direction, tile in current_d_tile.tile_model.adjacent_tiles.items():
+                # d_tile = self.find_dijkstra_tile(tile.row, tile.column, dijkstra_tiles)
+                if isinstance(tile, NullModel):
+                    continue
+                d_tile = dijkstra_tiles.get(str(tile.row) + ", " + str(tile.column))
+                can_travel_to = self._check_and_relax(direction, current_d_tile, d_tile, is_carrying_victim, ap-current_d_tile.least_cost)
+                # If it is possible to travel to the second tile,
+                # add it to the moveable tiles and insert it into
+                # the Priority Queue
+                if can_travel_to:
+                    moveable_tiles.append(d_tile.tile_model)
+                    pq.insert(d_tile)
+
+            pq.poll()
+
+        print("#Moveable tiles:", str(len(moveable_tiles)))
+        [print(tile) for tile in moveable_tiles]
+        return moveable_tiles
+
+    def _check_and_relax(self, direction: str, first_tile: DijkstraTile, second_tile: DijkstraTile, is_carrying_victim: bool, ap: int) -> bool:
+        """
+        Check if the player can move from the first tile
+        to the second depending on whether they are carrying
+        a victim or not and the AP they have. Update the costs
+        to get to the second tile accordingly.
+
+        :param first_tile:
+        :param second_tile:
+        :return:
+        """
         if ap < 1:
-            if current_tile.space_status == SpaceStatusEnum.FIRE:
-                if current_tile in movable_tiles:
-                    movable_tiles.remove(current_tile)
-            return movable_tiles
+            return False
 
-        # Base case where you have less AP and are standing on fire, you cannot move to a place on fire.
-        if ap < 3 and current_tile.space_status == SpaceStatusEnum.FIRE:
-            open_tiles = []
-            for direction, tile in current_tile.adjacent_tiles.items():
-                obstacle = current_tile.adjacent_edge_objects[direction]
-                if isinstance(obstacle, NullModel) or \
-                   (isinstance(obstacle, DoorModel) and (obstacle.door_status == DoorStatusEnum.OPEN or obstacle.door_status == DoorStatusEnum.DESTROYED))\
-                    or (isinstance(obstacle, WallModel) and obstacle.wall_status == WallStatusEnum.DESTROYED):
-                        open_tiles.append(tile)
+        has_obstacle = first_tile.tile_model.has_obstacle_in_direction(direction)
+        obstacle = first_tile.tile_model.get_obstacle_in_direction(direction)
+        # If the path from the first tile to the second is not hindered by anything
+        # (i.e. there is a destroyed door or a destroyed wall or an open door or no obstacle)
+        # then there exists the **possibility** of moving to the second tile.
+        # Two cases then depending on whether the player is carrying a victim or not.
+        if not has_obstacle or (isinstance(obstacle, DoorModel) and obstacle.door_status == DoorStatusEnum.OPEN):
+            second_tile_status = second_tile.tile_model.space_status
+            # carrying a victim
+            if is_carrying_victim:
+                if second_tile_status != SpaceStatusEnum.FIRE and ap - 2 >= 0:
+                    if second_tile.least_cost > first_tile.least_cost + 2:
+                        second_tile.least_cost = first_tile.least_cost + 2
+                        return True
 
-            if not [tile for tile in open_tiles if tile.space_status != SpaceStatusEnum.FIRE]:
-                if current_tile in movable_tiles:
-                    movable_tiles.remove(current_tile)
-                    return movable_tiles
+            # not carrying a victim
+            else:
+                if second_tile_status != SpaceStatusEnum.FIRE and ap - 1 >= 0:
+                    if second_tile.least_cost > first_tile.least_cost + 1:
+                        second_tile.least_cost = first_tile.least_cost + 1
+                        return True
 
-        # Main recursive loop
-        for key in current_tile.adjacent_edge_objects.keys():
-            tile: TileModel = current_tile.adjacent_tiles.get(key)
-            obstacle: EdgeObstacleModel = current_tile.adjacent_edge_objects.get(key)
-            if isinstance(tile, NullModel) or tile.visit_count > 3:
-                continue
+                if second_tile_status == SpaceStatusEnum.FIRE and ap - 2 >= 0:
+                    if second_tile.least_cost > first_tile.least_cost + 2:
+                        second_tile.least_cost = first_tile.least_cost + 2
+                        return True
 
-            ap_deduct = 2 if tile.space_status == SpaceStatusEnum.FIRE else 1
-
-            if isinstance(obstacle, NullModel):
-
-                movable_tiles.append(tile)
-                movable_tiles += self._determine_reachable_tiles(tile.row, tile.column, ap - ap_deduct*ap_multiplier,
-                                                                 movable_tiles)
-            elif isinstance(obstacle, WallModel):
-                if obstacle.wall_status == WallStatusEnum.DESTROYED:
-                    movable_tiles.append(tile)
-                    movable_tiles += self._determine_reachable_tiles(tile.row, tile.column, ap - ap_deduct*ap_multiplier,
-                                                                     movable_tiles)
-            elif isinstance(obstacle, DoorModel):
-                if obstacle.door_status == DoorStatusEnum.OPEN or obstacle.door_status == DoorStatusEnum.DESTROYED:
-                    movable_tiles.append(tile)
-                    movable_tiles += self._determine_reachable_tiles(tile.row, tile.column, ap - ap_deduct*ap_multiplier,
-                                                                     movable_tiles)
-        # Remove duplicates
-        output = list(set(movable_tiles))
-        return output
+        return False
 
     def _run_checks(self, tile_model: TileModel) -> bool:
         if self.current_player != GameStateModel.instance().players_turn:
@@ -157,7 +200,7 @@ class MoveController(PlayerObserver):
 
         GameStateModel.instance().game_board.reset_tiles_visit_count()
         self.moveable_tiles = self._determine_reachable_tiles(
-            self.current_player.row, self.current_player.column, self.current_player.ap, [])
+            self.current_player.row, self.current_player.column, self.current_player.ap)
         GameStateModel.instance().game_board.reset_tiles_visit_count()
 
     def player_wins_changed(self, wins: int):
