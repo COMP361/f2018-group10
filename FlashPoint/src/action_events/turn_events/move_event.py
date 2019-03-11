@@ -284,6 +284,7 @@ class MoveEvent(TurnEvent):
                     if assoc_model.identity == POIIdentityEnum.FALSE_ALARM:
                         d_tile.tile_model.remove_associated_model(assoc_model)
                         self.game.game_board.remove_poi_or_victim(assoc_model)
+                    # TODO: do something if POI is Victim
 
 
 # class MoveEvent(TurnEvent):
