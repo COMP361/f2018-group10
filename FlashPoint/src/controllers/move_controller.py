@@ -7,14 +7,12 @@ from src.constants.state_enums import PlayerStatusEnum
 from src.models.game_units.victim_model import VictimModel
 from src.observers.player_observer import PlayerObserver
 from src.core.event_queue import EventQueue
-from src.models.game_board.edge_obstacle_model import EdgeObstacleModel
 from src.models.game_board.null_model import NullModel
 from src.sprites.tile_sprite import TileSprite
 from src.models.game_units.player_model import PlayerModel
-from src.constants.state_enums import DoorStatusEnum, WallStatusEnum, SpaceStatusEnum, GameStateEnum
+from src.constants.state_enums import DoorStatusEnum, SpaceStatusEnum, GameStateEnum
 from src.models.game_board.door_model import DoorModel
 from src.models.game_board.tile_model import TileModel
-from src.models.game_board.wall_model import WallModel
 from src.models.game_state_model import GameStateModel
 from src.sprites.game_board import GameBoard
 
@@ -44,6 +42,8 @@ class MoveController(PlayerObserver):
         """
         Determines the list of tiles the player can
         move to based on their position and AP.
+        (Includes the tile the player is located
+        at presently i.e. the source tile)
 
         :param row: Current row of the player.
         :param column: Current column of the player.
@@ -54,9 +54,8 @@ class MoveController(PlayerObserver):
         # d_tile refers to a DijkstraTile
         # tile refers to a TileModel
 
-        # If the player is carring a victim,
-        # every move will cost 2 AP instead of 1.
-        # Use a multiplier to keep track of that.
+        # moveable_tiles will be the
+        # final list returned.
         moveable_tiles = []
         pq = PriorityQueue()
         is_carrying_victim = False
@@ -69,6 +68,8 @@ class MoveController(PlayerObserver):
         game: GameStateModel = GameStateModel.instance()
         tiles = game.game_board.tiles
         tiles.remove(game.game_board.get_tile_at(row, column))
+        # A dictionary to keep track of all the Dijkstra tiles.
+        # The row, column acts as the key.
         dijkstra_tiles = {}
         for tile in tiles:
             dijkstra_tiles[str(tile.row) + ", " + str(tile.column)] = DijkstraTile(tile)
@@ -77,7 +78,6 @@ class MoveController(PlayerObserver):
         moveable_tiles.append(src)
         source_tile = DijkstraTile(src)
         source_tile.least_cost = 0
-        # dijkstra_tiles.append(source_tile)
         dijkstra_tiles[str(src.row) + ", " + str(src.column)] = source_tile
         pq.insert(source_tile)
 
@@ -89,7 +89,6 @@ class MoveController(PlayerObserver):
             # Get the tiles adjacent to the current tile
             # and check if they can be relaxed.
             for direction, tile in current_d_tile.tile_model.adjacent_tiles.items():
-                # d_tile = self.find_dijkstra_tile(tile.row, tile.column, dijkstra_tiles)
                 if isinstance(tile, NullModel):
                     continue
                 d_tile = dijkstra_tiles.get(str(tile.row) + ", " + str(tile.column))
@@ -103,20 +102,20 @@ class MoveController(PlayerObserver):
 
             pq.poll()
 
-        # print("#Moveable tiles:", str(len(moveable_tiles)))
-        # [print(tile) for tile in moveable_tiles]
         return moveable_tiles
 
     def _check_and_relax(self, direction: str, first_tile: DijkstraTile, second_tile: DijkstraTile, is_carrying_victim: bool, ap: int) -> bool:
         """
         Check if the player can move from the first tile
         to the second depending on whether they are carrying
-        a victim or not and the AP they have. Update the costs
-        to get to the second tile accordingly.
+        a victim or not and the AP they have. Update the least
+        cost to get to the second tile accordingly.
 
         :param first_tile:
         :param second_tile:
-        :return:
+        :return: A boolean indicating whether it is possible to
+        reach the second tile from the first, keeping in mind
+        all the restrictions.
         """
         if ap < 1:
             return False
@@ -143,7 +142,11 @@ class MoveController(PlayerObserver):
                         second_tile.least_cost = first_tile.least_cost + 1
                         return True
 
-                # TODO: have to modify this properly so that player may not end turn on fire
+                # If moving to a tile with fire, determine the reachable tiles
+                # from this tile itself. Since the source tile is included in
+                # the moveable tiles list, if the length of the list < 2, then
+                # we cannot go anywhere from this fire tile and therefore it
+                # would not be valid to add it to the list. Return False.
                 if second_tile_status == SpaceStatusEnum.FIRE and ap - 2 >= 0:
                     moveable_tiles_from_fire = self._determine_reachable_tiles(second_tile.tile_model.row, second_tile.tile_model.column, ap-2)
                     if len(moveable_tiles_from_fire) < 2:
@@ -154,12 +157,6 @@ class MoveController(PlayerObserver):
                         return True
 
         return False
-
-    # def is_fire_space_okay(self, origin_fire_tile: TileModel) -> bool:
-    #     north_okay, east_okay, west_okay, south_okay = [False * 4]
-    #     directions_okay = [north_okay, east_okay, west_okay, south_okay]
-    #
-    #     return north_okay or east_okay or west_okay or south_okay
 
     def _run_checks(self, tile_model: TileModel) -> bool:
         if self.current_player != GameStateModel.instance().players_turn:
