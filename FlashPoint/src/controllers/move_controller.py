@@ -143,7 +143,7 @@ class MoveController(PlayerObserver):
                         second_tile.least_cost = first_tile.least_cost + 1
                         return True
 
-                if second_tile_status == SpaceStatusEnum.FIRE and ap - 2 >= 0:
+                if second_tile_status == SpaceStatusEnum.FIRE and ap - 2 > 0:
                     if second_tile.least_cost > first_tile.least_cost + 2:
                         second_tile.least_cost = first_tile.least_cost + 2
                         return True
