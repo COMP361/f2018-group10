@@ -367,7 +367,7 @@ class Networking:
             print(f"Client at {connection_object.address} sent a message: {data.__class__}")
             if isinstance(data, TurnEvent) or isinstance(data, ActionEvent):
                 if isinstance(data, ChatEvent) or isinstance(data, EndTurnEvent) \
-                        or isinstance(data, ChooseStartingPositionEvent):
+                        or isinstance(data, ChooseStartingPositionEvent) or isinstance(data, ChopEvent):
                     Networking.get_instance().send_to_all_client(data)
                     return super(MastermindServerUDP, self).callback_client_handle(connection_object, data)
 

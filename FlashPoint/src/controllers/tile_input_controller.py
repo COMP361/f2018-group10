@@ -50,9 +50,9 @@ class TileInputController(GameStateObserver):
         self.extinguish_controller.process_input(tile)
         tile_model = GameStateModel.instance().game_board.get_tile_at(tile.row, tile.column)
         if self.move_controller.is_moveable:
-            self.move_controller.move_to.move_button.on_click(self.execute_move_event, tile)
+            self.move_controller.move_to.move_button.on_click(self.execute_move_event, tile_model)
         if self.extinguish_controller.extinguishable:
-            self.extinguish_controller.fire_tile.on_click(self.execute_extinguish_event, tile)
+            self.extinguish_controller.fire_tile.on_click(self.execute_extinguish_event, tile_model)
 
     def execute_extinguish_event(self, tile: TileModel):
         print("Extinguish event created")

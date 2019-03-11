@@ -148,7 +148,10 @@ class MoveController(PlayerObserver):
         pass
 
     def player_ap_changed(self, updated_ap: int):
-        pass
+        GameStateModel.instance().game_board.reset_tiles_visit_count()
+        self.moveable_tiles = self._determine_reachable_tiles(
+            self.current_player.row, self.current_player.column, self.current_player.ap, [])
+        GameStateModel.instance().game_board.reset_tiles_visit_count()
 
     def player_special_ap_changed(self, updated_ap: int):
         pass
