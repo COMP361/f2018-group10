@@ -2,7 +2,8 @@ from abc import ABC
 from typing import List
 
 from src.action_events.turn_events.turn_event import TurnEvent
-from src.constants.state_enums import SpaceStatusEnum, POIIdentityEnum, SpaceKindEnum
+from src.constants.state_enums import SpaceStatusEnum, POIIdentityEnum, SpaceKindEnum, DoorStatusEnum
+from src.models.game_board.door_model import DoorModel
 from src.models.game_board.null_model import NullModel
 from src.models.game_board.tile_model import TileModel
 from src.models.game_state_model import GameStateModel
@@ -114,7 +115,6 @@ class MoveEvent(TurnEvent):
 
         for d_tile in self.dijkstra_tiles:
             if d_tile.tile_model.row == self.fireman.row and d_tile.tile_model.column == self.fireman.column:
-                print("Source tile set")
                 self.source_tile = d_tile
                 self.source_tile.least_cost = 0
             if d_tile.tile_model.row == dest.row and d_tile.tile_model.column == dest.column:
@@ -124,8 +124,6 @@ class MoveEvent(TurnEvent):
         # initialize the Dijkstra tiles
         GameStateModel.lock.acquire()
         self._init_dijkstra_tiles(self.destination)
-        print("Dijkstra tiles set:")
-        [print(d_tile) for d_tile in self.dijkstra_tiles]
         # Insert the Dijkstra tiles
         # into the priority queue
         pq = PriorityQueue()
@@ -139,9 +137,14 @@ class MoveEvent(TurnEvent):
         # those tiles.
         while not pq.is_empty():
             current_d_tile = pq.peek()
+            adjacent_tiles = current_d_tile.tile_model.adjacent_tiles
             for d_tile in pq.get_tiles():
-                if d_tile.tile_model in current_d_tile.tile_model.adjacent_tiles.values():
-                    self.relax_cost(current_d_tile, d_tile)
+                for direction, tile in adjacent_tiles.items():
+                    if isinstance(tile, NullModel):
+                        continue
+                    if d_tile.tile_model.row == tile.row and d_tile.tile_model.column == tile.column:
+                        self.relax_cost(direction, current_d_tile, d_tile)
+
             pq.poll()
 
         shortest_path = self.shortest_path()
@@ -149,7 +152,7 @@ class MoveEvent(TurnEvent):
 
         GameStateModel.lock.release()
 
-    def relax_cost(self, first_tile: DijkstraTile, second_tile: DijkstraTile):
+    def relax_cost(self, direction: str, first_tile: DijkstraTile, second_tile: DijkstraTile):
         """
         If there is a cheaper way to get to the second tile
         from the first tile, the least cost of the second
@@ -159,6 +162,14 @@ class MoveEvent(TurnEvent):
         :param second_tile:
         :return:
         """
+        has_obstacle = first_tile.tile_model.has_obstacle_in_direction(direction)
+        obstacle = first_tile.tile_model.get_obstacle_in_direction(direction)
+
+        if not has_obstacle or (isinstance(obstacle, DoorModel) and obstacle.door_status == DoorStatusEnum.OPEN):
+            pass
+        else:
+            return
+
         cost_to_travel = 0
         # Two separate cases depending on whether
         # fireman is carrying a victim or not.
