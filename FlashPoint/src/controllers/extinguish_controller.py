@@ -1,11 +1,4 @@
-from typing import List
-
-import src.constants.color as Color
-from src.constants.state_enums import PlayerStatusEnum
-from src.observers.player_observer import PlayerObserver
 from src.core.event_queue import EventQueue
-from src.core.networking import Networking
-from src.action_events.turn_events.extinguish_event import ExtinguishEvent
 from src.sprites.tile_sprite import TileSprite
 from src.models.game_units.player_model import PlayerModel
 from src.constants.state_enums import SpaceStatusEnum, GameStateEnum
@@ -55,20 +48,17 @@ class ExtinguishController(object):
 
         if self.fire_tile:
             self.fire_tile.disable_extinguish()
-            self.fire_tile.extinguish_button.disable()
             self.fire_tile = None
 
         if not self._run_checks(tile_model):
             print("cannot extinguish")
             tile_sprite.disable_extinguish()
-            tile_sprite.extinguish_button.disable()
             self.extinguishable = False
             return
 
         self.extinguishable = True
         tile_sprite.enable_extinguish()
         self.fire_tile = tile_sprite
-        self.fire_tile.extinguish_button.enable()
 
     def update(self, event_queue: EventQueue):
         if GameStateModel.instance().state != GameStateEnum.MAIN_GAME:

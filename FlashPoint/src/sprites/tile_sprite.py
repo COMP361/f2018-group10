@@ -44,8 +44,6 @@ class TileSprite(Interactable, TileObserver):
 
         # ------- POP-UP MENU -------- #
         self.menu_shown = False
-        self.can_move = False
-        self.can_extinguish = False
         self.move_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
                                       Text(pygame.font.SysFont('Arial', 15), "MoVe HeRe", Color.ORANGE))
         self.extinguish_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
@@ -122,39 +120,29 @@ class TileSprite(Interactable, TileObserver):
 
     def draw(self, screen: pygame.Surface):
         screen.blit(self.image, self.rect)
-        if self.can_move:
-            screen.blit(self.move_button.image, self.move_button.rect)
 
-        else:
-            self.move_button.disable()
+        if self.menu_shown:
+            offset = 0
+            if self.move_button.enabled:
+                screen.blit(self.move_button.image, self.move_button.rect)
+                self.move_button.rect.x = self.rect.x
+                self.move_button.rect.y = self.rect.y + offset
+                # self.move_button.change_pos(self.rect.x, self.rect.y + offset)
+                offset += 20
 
-        if self.can_extinguish:
-            screen.blit(self.extinguish_button.image, self.extinguish_button.rect)
-
-        else:
-            self.extinguish_button.disable()
+            if self.extinguish_button.enabled:
+                screen.blit(self.extinguish_button.image, self.extinguish_button.rect)
+                self.extinguish_button.rect.x = self.rect.x
+                self.extinguish_button.rect.y = self.rect.y + offset
+                # self.extinguish_button.change_pos(self.rect.x, self.rect.y + offset)
+                offset += 20
 
     def update(self, event_queue: EventQueue):
         self.sprite_grp.update(event_queue)
+
         self._scroll()
         if self.is_clicked():
             self.click()
-
-        offset = 0
-        if self.can_move:
-            self.move_button.enable()
-            self.move_button.rect.x = self.rect.x
-            self.move_button.rect.y = self.rect.y + offset
-            # self.move_button.change_pos(self.rect.x, self.rect.y + offset)
-            offset += 15
-        self.move_button.update(event_queue)
-        if self.can_extinguish:
-            self.extinguish_button.enable()
-            self.extinguish_button.rect.x = self.rect.x
-            self.extinguish_button.rect.y = self.rect.y + offset
-            # self.extinguish_button.change_pos(self.rect.x, self.rect.y + offset)
-            offset += 15
-        self.extinguish_button.update(event_queue)
 
     def tile_status_changed(self, status: SpaceStatusEnum):
         new_surf = pygame.Surface([self._non_highlight_image.get_width(), self._non_highlight_image.get_height()])
@@ -173,13 +161,13 @@ class TileSprite(Interactable, TileObserver):
         self._non_highlight_image.blit(new_surf, (0, 0))
 
     def enable_move(self):
-        self.can_move = True
+        self.move_button.enable()
 
     def disable_move(self):
-        self.can_move = False
+        self.move_button.disable()
 
     def enable_extinguish(self):
-        self.can_extinguish = True
+        self.extinguish_button.enable()
 
     def disable_extinguish(self):
-        self.can_extinguish = False
+        self.extinguish_button.disable()
