@@ -67,7 +67,7 @@ class TileInputController(GameStateObserver):
             self.last_tile = tile
 
     def execute_extinguish_event(self, tile: TileModel):
-        print("Extinguish event created")
+        print(f"Extinguish event created")
         event = ExtinguishEvent(tile)
         if Networking.get_instance().is_host:
             Networking.get_instance().send_to_all_client(event)

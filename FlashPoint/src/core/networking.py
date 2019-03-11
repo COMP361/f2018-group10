@@ -398,6 +398,7 @@ class Networking:
             :return:
             """
             # define override here
+            print(f"Serializing: {data}")
             data = JSONSerializer.serialize(data)
             print(f"Sending message to client at {connection_object.address} : {data['class']}")
             return super(MastermindServerUDP, self).callback_client_send(connection_object, data, compression)
