@@ -3,6 +3,9 @@ from datetime import datetime
 
 import pygame
 
+from src.action_events.turn_events.move_event import MoveEvent
+from src.controllers.chop_controller import ChopController
+from src.controllers.move_controller import MoveController
 from src.sprites.poi_sprite import POISprite
 from src.controllers.tile_input_controller import TileInputController
 from src.constants.change_scene_enum import ChangeSceneEnum
@@ -141,3 +144,4 @@ class GameBoardScene(object):
         self.notify_turn_popup.update(event_queue)
         # self.choose_start_pos_controller.update(event_queue)
         self.tile_input_controller.update(event_queue)
+        self.chop_controller.update(event_queue)

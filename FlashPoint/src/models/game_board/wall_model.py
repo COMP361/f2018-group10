@@ -1,6 +1,5 @@
 from typing import List
 
-from src.core.flashpoint_exceptions import WallAlreadyDestroyedException
 from src.models.game_board.edge_obstacle_model import EdgeObstacleModel
 from src.constants.state_enums import WallStatusEnum
 from src.observers.wall_observer import WallObserver
@@ -19,6 +18,10 @@ class WallModel(EdgeObstacleModel):
     @property
     def wall_status(self):
         return self._wall_status
+
+    @wall_status.setter
+    def wall_status(self, status: WallStatusEnum):
+        self._wall_status = status
 
     @property
     def id(self):

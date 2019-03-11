@@ -2,7 +2,9 @@ import enum
 import json
 from typing import Dict
 
+from src.action_events.turn_events.chop_event import ChopEvent
 from src.action_events.turn_events.move_event import MoveEvent
+from src.models.game_board.wall_model import WallModel
 from src.observers.observer import Observer
 from src.models.game_board.tile_model import TileModel
 from src.action_events.turn_events.choose_starting_position_event import ChooseStartingPositionEvent
@@ -13,7 +15,7 @@ from src.action_events.ready_event import ReadyEvent
 from src.action_events.chat_event import ChatEvent
 from src.action_events.dummy_event import DummyEvent
 from src.action_events.join_event import JoinEvent
-from src.constants.state_enums import DifficultyLevelEnum, GameKindEnum, PlayerStatusEnum
+from src.constants.state_enums import DifficultyLevelEnum, GameKindEnum, PlayerStatusEnum, WallStatusEnum
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 
@@ -98,6 +100,7 @@ class JSONSerializer(object):
     def _deserialize_move_event(payload: Dict):
         game_board = GameStateModel.instance().game_board
         destination = payload['destination']
+        # dest_model = game_board.get_tile_at(destination['_row'], destination['_column'])
         tile_list = payload['moveable_tiles']
         moveable_tiles = []
         for tile in tile_list:
@@ -114,6 +117,18 @@ class JSONSerializer(object):
         tile: TileModel = TileModel(payload['_row'], payload['_column'], payload['_space_kind'])
         GameStateModel.instance().game_board.set_single_tile_adjacencies(tile)
         return tile
+
+    @staticmethod
+    def _deserialize_wall(payload: Dict) -> WallModel:
+        id = payload['_id']
+        wall = WallModel(id[0], id[1], id[2])
+        wall.wall_status = WallStatusEnum(payload['_wall_status']['value'])
+        return wall
+
+    @staticmethod
+    def _deserialize_chop_event(payload: Dict) -> ChopEvent:
+        wall = JSONSerializer.deserialize(payload['wall'])
+        return ChopEvent(wall)
 
     @staticmethod
     def _deserialize_end_turn_event(payload: Dict) -> EndTurnEvent:
@@ -150,6 +165,10 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_end_turn_event(payload)
         elif object_type == ChooseStartingPositionEvent.__name__:
             return JSONSerializer._deserialize_choose_position_event(payload)
+        elif object_type == ChopEvent.__name__:
+            return JSONSerializer._deserialize_chop_event(payload)
+        elif object_type == WallModel.__name__:
+            return JSONSerializer._deserialize_wall(payload)
         elif object_type == MoveEvent.__name__:
             return JSONSerializer._deserialize_move_event(payload)
         elif object_type == DummyEvent.__name__:

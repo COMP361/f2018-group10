@@ -1,3 +1,4 @@
+from src.action_events.turn_events.extinguish_event import ExtinguishEvent
 from src.action_events.turn_events.move_event import MoveEvent
 from src.core.event_queue import EventQueue
 from src.core.networking import Networking
@@ -35,6 +36,7 @@ class TileInputController(GameStateObserver):
         self.move_controller = MoveController(current_player)
         self.choose_starting_controller = ChooseStartingPositionController(current_player)
         GameStateModel.instance().add_observer(self)
+        self.fireman = current_player
         current_player.ap = 4
         GameStateModel.instance().state = GameStateEnum.PLACING
         TileInputController._instance = self
@@ -48,7 +50,18 @@ class TileInputController(GameStateObserver):
         self.extinguish_controller.process_input(tile)
         tile_model = GameStateModel.instance().game_board.get_tile_at(tile.row, tile.column)
         if self.move_controller.is_moveable:
-            self.move_controller.move_to.move_button.on_click(self.execute_move_event, tile_model)
+            self.move_controller.move_to.move_button.on_click(self.execute_move_event, tile)
+        if self.extinguish_controller.extinguishable:
+            self.extinguish_controller.fire_tile.on_click(self.execute_extinguish_event, tile)
+
+    def execute_extinguish_event(self, tile: TileModel):
+        print("Extinguish event created")
+
+        event = ExtinguishEvent(tile)
+        if Networking.get_instance().is_host:
+            Networking.get_instance().send_to_all_client(event)
+        else:
+            Networking.get_instance().client.send(event)
 
     def execute_move_event(self, tile: TileModel):
         print("move_event created")

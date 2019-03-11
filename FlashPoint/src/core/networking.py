@@ -9,6 +9,7 @@ import time
 from src.action_events.turn_events.choose_starting_position_event import ChooseStartingPositionEvent
 from src.action_events.turn_events.end_turn_event import EndTurnEvent
 from src.action_events.chat_event import ChatEvent
+from src.action_events.turn_events.chop_event import ChopEvent
 from src.core.custom_event import CustomEvent
 from src.core.serializer import JSONSerializer
 from src.core.event_queue import EventQueue
