@@ -103,8 +103,8 @@ class MoveController(PlayerObserver):
 
             pq.poll()
 
-        print("#Moveable tiles:", str(len(moveable_tiles)))
-        [print(tile) for tile in moveable_tiles]
+        # print("#Moveable tiles:", str(len(moveable_tiles)))
+        # [print(tile) for tile in moveable_tiles]
         return moveable_tiles
 
     def _check_and_relax(self, direction: str, first_tile: DijkstraTile, second_tile: DijkstraTile, is_carrying_victim: bool, ap: int) -> bool:
@@ -143,12 +143,23 @@ class MoveController(PlayerObserver):
                         second_tile.least_cost = first_tile.least_cost + 1
                         return True
 
-                if second_tile_status == SpaceStatusEnum.FIRE and ap - 2 > 0:
+                # TODO: have to modify this properly so that player may not end turn on fire
+                if second_tile_status == SpaceStatusEnum.FIRE and ap - 2 >= 0:
+                    moveable_tiles_from_fire = self._determine_reachable_tiles(second_tile.tile_model.row, second_tile.tile_model.column, ap-2)
+                    if len(moveable_tiles_from_fire) < 2:
+                        return False
+
                     if second_tile.least_cost > first_tile.least_cost + 2:
                         second_tile.least_cost = first_tile.least_cost + 2
                         return True
 
         return False
+
+    # def is_fire_space_okay(self, origin_fire_tile: TileModel) -> bool:
+    #     north_okay, east_okay, west_okay, south_okay = [False * 4]
+    #     directions_okay = [north_okay, east_okay, west_okay, south_okay]
+    #
+    #     return north_okay or east_okay or west_okay or south_okay
 
     def _run_checks(self, tile_model: TileModel) -> bool:
         if self.current_player != GameStateModel.instance().players_turn:
