@@ -123,6 +123,7 @@ class MoveEvent(TurnEvent):
 
     def execute(self):
         # initialize the Dijkstra tiles
+        GameStateModel.lock.acquire()
         self._init_dijkstra_tiles(self.destination)
         print("Dijkstra tiles set:")
         [print(d_tile) for d_tile in self.dijkstra_tiles]
@@ -150,6 +151,8 @@ class MoveEvent(TurnEvent):
         self.traverse_shortest_path(shortest_path)
         print("After moving:")
         print(self.fireman)
+
+        GameStateModel.lock.release()
 
     def relax_cost(self, first_tile: DijkstraTile, second_tile: DijkstraTile):
         """

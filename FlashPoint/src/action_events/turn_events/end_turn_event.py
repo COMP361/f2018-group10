@@ -22,6 +22,7 @@ class EndTurnEvent(TurnEvent):
         # retain upto a maximum of 4 AP
         # as the turn is ending and
         # replenish player's AP by 4
+        GameStateModel.lock.acquire()
         if self.player.ap > 4:
             self.player.ap = 4
 
@@ -29,3 +30,4 @@ class EndTurnEvent(TurnEvent):
 
         # call next player
         GameStateModel.instance().next_player()
+        GameStateModel.lock.release()
