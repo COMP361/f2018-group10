@@ -21,10 +21,10 @@ from src.sprites.hud.player_state import PlayerState
 from src.sprites.hud.current_player_state import CurrentPlayerState
 from src.sprites.hud.time_bar import TimeBar
 from src.sprites.hud.ingame_states import InGameStates
-import src.constants.color as Color
 from src.UIComponents.rect_button import RectButton
 from src.UIComponents.text import Text
 from src.sprites.notify_player_turn import NotifyPlayerTurn
+import src.constants.color as Color
 
 
 class GameBoardScene(object):
@@ -45,7 +45,10 @@ class GameBoardScene(object):
                                    Text(pygame.font.SysFont('Arial', 20), "Quit", Color.BLACK))
 
         self.active_sprites = pygame.sprite.Group()   # Maybe add separate groups for different things later
-        self.game_board = GameBoard(current_player)
+        if not GameBoard.instance():
+            self.game_board = GameBoard(current_player)
+        else:
+            self.game_board = GameBoard.instance()
         self.chat_box = ChatBox(self._current_player)
         self.menu = None
         self._init_sprites()
@@ -54,6 +57,8 @@ class GameBoardScene(object):
 
         if Networking.get_instance().is_host:
             GameStateModel.instance()._notify_player_index()
+
+        GameStateModel.instance().game_board.notify_all_observers()
 
     def _init_sprites(self):
         for i, player in enumerate(self._game.players):
@@ -69,7 +74,7 @@ class GameBoardScene(object):
         self.active_sprites.add(self._init_menu_button())
 
     def _save(self):
-        """Save the current game state to the hosts machine"""
+
         with open(self._save_games_file, mode='r+', encoding='utf-8') as myFile:
             temp = json.load(myFile)
             game_data = JSONSerializer.serialize(self._game)

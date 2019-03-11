@@ -1,3 +1,5 @@
+from typing import Optional, List
+
 import pygame
 
 import src.constants.color as Color
@@ -17,13 +19,22 @@ from src.action_events.start_game_event import StartGameEvent
 
 
 class LobbyScene(object):
-    def __init__(self, screen, current_player: PlayerModel):
+    def __init__(self, screen, current_player: PlayerModel,saved_game: Optional[List] = None):
+
+
         self._current_player = current_player
+
+
+        # if saved_game:
+        #     self._game = self.init_game_state()
+        # else:
+        #     self._game = GameStateModel.instance()
+
         self._game = GameStateModel.instance()
 
         if Networking.get_instance().is_host:
             self._current_player.color = Color.BLUE
-            self._game.host.color = Color.BLUE
+
 
         self._player_count = len(self._game.players)
         self.isReady = False

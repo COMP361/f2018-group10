@@ -1,6 +1,6 @@
 import enum
 import json
-from typing import Dict
+from typing import Dict, List
 
 from src.action_events.turn_events.move_event import MoveEvent
 from src.observers.observer import Observer
@@ -16,6 +16,7 @@ from src.action_events.join_event import JoinEvent
 from src.constants.state_enums import DifficultyLevelEnum, GameKindEnum, PlayerStatusEnum
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
+from src.sprites.hud.player_state import PlayerState
 
 
 class JSONSerializer(object):
@@ -29,13 +30,21 @@ class JSONSerializer(object):
         host: PlayerModel = JSONSerializer.deserialize(payload['_host'])
         num_players = payload['_max_desired_players']
         rules = GameKindEnum(payload['_rules']["value"])
+        # observers = payload["_observers"]
+
+        # for obs in observers:
+        #     obs_class = obs['class']
+        #     if obs_class == PlayerState.__class__:
+        #         # get params
+        #         game.add_observer(PlayerState())
 
         if not GameStateModel.instance():
             game = GameStateModel(host, num_players, rules)
         else:
             game = GameStateModel.instance()
 
-        game.game_board.set_adjacencies(game.game_board.get_tiles())
+        game.game_board = JSONSerializer.deserialize(payload['_game_board'])
+
         for player in [x for x in payload['_players'] if x['_ip'] != host.ip]:
             player_obj: PlayerModel = JSONSerializer.deserialize(player)
             if player_obj not in game.players:
@@ -53,6 +62,20 @@ class JSONSerializer(object):
         GameStateModel.lock.release()
         return game
 
+
+    @staticmethod
+    def _deserialize_gameboard(payload: Dict) -> GameBoardModel:
+        game_board = GameBoardModel(GameStateModel.instance().rules)
+        tiles: List[List[TileModel]] = [[]]
+        for row in range(len(payload['_tiles'])):
+            tiles[row].append([])
+            for column in range(len(payload['_tiles'][row])):
+                tiles[row][column].append(JSONSerializer.deserialize(payload['_tiles'][row][column]))
+
+        game_board.tiles = tiles
+        game_board.set_adjacencies(game_board.get_tiles())
+
+
     @staticmethod
     def _deserialize_player(payload: Dict) -> PlayerModel:
         ip = payload["_ip"]
@@ -66,7 +89,6 @@ class JSONSerializer(object):
         player.special_ap = payload['_special_ap']
         player.wins = payload['_wins']
         player.losses = payload['_losses']
-
         return player
 
     @staticmethod

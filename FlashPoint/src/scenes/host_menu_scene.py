@@ -1,7 +1,7 @@
 import pygame
 
 import src.constants.color as Color
-from core.custom_event import CustomEvent
+from src.core.custom_event import CustomEvent
 from src.core.event_queue import EventQueue
 from src.models.game_units.player_model import PlayerModel
 from src.UIComponents.rect_button import RectButton
@@ -21,6 +21,7 @@ class HostMenuScene(Scene):
         self._init_btn_new_game(575, 481, "New Game", Color.STANDARDBTN, Color.BLACK)
         self._init_btn_login(575, 371, "Load Game", Color.STANDARDBTN, Color.BLACK)
         self._init_btn_back(20, 20, "Back", Color.STANDARDBTN, Color.BLACK)
+
 
         self.buttonNewGame.on_click(EventQueue.post, CustomEvent(ChangeSceneEnum.CREATEGAMEMENU))
         self.buttonLogin.on_click(EventQueue.post, CustomEvent(ChangeSceneEnum.LOADGAME))

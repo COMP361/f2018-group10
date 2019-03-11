@@ -21,15 +21,13 @@ class GameStateModel(Model):
         if not GameStateModel._instance:
             super().__init__()
             self._host = host
-            self._max_desired_players = 2
+            self._max_desired_players = 1
             self._players = [self._host]
             self._players_turn_index = 0
             self._difficulty_level = None
             self._rules = game_kind
             self._red_dice = 0
             self._black_dice = 0
-
-            self._game_board = GameBoardModel(self._rules)
 
             self._victims_saved = 0
             self._victims_lost = 0
@@ -38,19 +36,23 @@ class GameStateModel(Model):
             self._chat_history = []
             self._state = GameStateEnum.READY_TO_JOIN
             self._game_board = GameBoardModel(self._rules)
-
             GameStateModel._instance = self
 
         else:
             print("Attempted to instantiate another singleton")
             raise Exception("GameStateModel is a Singleton")
 
+    def notify_all_observers(self):
+        self._notify_state()
+        self._game_board.notify_all_observers()
+
+
     def _notify_player_index(self):
         for obs in self._observers:
             obs.notify_player_index(self._players_turn_index)
 
     def _notify_state(self):
-        for obs in self.observers:
+        for obs in self._observers:
             obs.notify_game_state(self._state)
 
     @staticmethod
@@ -94,6 +96,10 @@ class GameStateModel(Model):
     @property
     def players(self)-> List[PlayerModel]:
         return self._players
+
+    @players.setter
+    def players(self,list:List[PlayerModel]):
+        self._players = list
 
     def add_player(self, player: PlayerModel):
         """Add a player to the current game."""
@@ -191,6 +197,8 @@ class GameStateModel(Model):
     @property
     def damage(self) -> int:
         return self._damage
+
+
 
     @damage.setter
     def damage(self, damage: int):

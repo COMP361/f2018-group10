@@ -13,6 +13,7 @@ class WallModel(EdgeObstacleModel):
         self._wall_status = WallStatusEnum.INTACT
         self._id = (x, y, direction)
 
+
     @property
     def wall_status(self):
         return self._wall_status
