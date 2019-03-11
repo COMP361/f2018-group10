@@ -21,7 +21,7 @@ class GameStateModel(Model):
         if not GameStateModel._instance:
             super().__init__()
             self._host = host
-            self._max_desired_players = 1
+            self._max_desired_players = num_players
             self._players = [self._host]
             self._players_turn_index = 0
             self._difficulty_level = None

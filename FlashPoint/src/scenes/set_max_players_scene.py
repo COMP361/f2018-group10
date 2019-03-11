@@ -52,7 +52,7 @@ class SetMaxPlayers(object):
         box_size = (130, 48)
         self.button_solo = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
                                      Text(pygame.font.SysFont('Arial', 20), text, color_text))
-        self.button_solo.on_click(self.set_and_continue, 1)
+        self.button_solo.on_click(self.set_and_continue, 2)
         self.sprite_grp.add(self.button_solo)
 
     def _init_button3(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):

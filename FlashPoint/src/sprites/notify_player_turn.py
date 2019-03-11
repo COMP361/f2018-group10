@@ -123,7 +123,7 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
         self.enabled = False
         self.running = False
 
-        turn_event = EndTurnEvent()
+        turn_event = EndTurnEvent(self._current_player)
         # send end turn, see ChatBox for example
 
         try:
