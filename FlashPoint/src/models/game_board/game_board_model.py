@@ -195,15 +195,6 @@ class GameBoardModel(object):
         first_pair, second_pair = adjacency['first_pair'], adjacency['second_pair']
         first_dirn, second_dirn = adjacency['first_dirn'], adjacency['second_dirn']
         for coord, direction in [(first_pair, first_dirn), (second_pair, second_dirn)]:
-            if direction == 'NORTH':
-                direction = "North"
-            elif direction == 'EAST':
-                direction = "East"
-            elif direction == 'WEST':
-                direction = "West"
-            else:
-                direction = "South"
-
             tiles[coord[0]][coord[1]].set_adjacent_edge_obstacle(direction, obstacle)
 
     def _init_all_tiles_experienced_classic(self):
