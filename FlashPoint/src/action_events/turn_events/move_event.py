@@ -150,7 +150,6 @@ class MoveEvent(TurnEvent):
         self.traverse_shortest_path(shortest_path)
         print("After moving:")
         print(self.fireman)
-        return
 
     def relax_cost(self, first_tile: DijkstraTile, second_tile: DijkstraTile):
         """

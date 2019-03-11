@@ -132,7 +132,8 @@ class JSONSerializer(object):
 
     @staticmethod
     def _deserialize_end_turn_event(payload: Dict) -> EndTurnEvent:
-        return EndTurnEvent()
+        player = JSONSerializer.deserialize(payload['player'])
+        return EndTurnEvent(player)
 
     @staticmethod
     def deserialize(payload: Dict) -> object:

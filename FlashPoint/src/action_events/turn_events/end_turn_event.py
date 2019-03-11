@@ -2,11 +2,12 @@ from src.action_events.turn_events.turn_event import TurnEvent
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 
+
 class EndTurnEvent(TurnEvent):
 
     def __init__(self, player: PlayerModel):
         super().__init__()
-        self.player = player
+        self.player = GameStateModel.instance().players_turn
 
     def execute(self):
         """

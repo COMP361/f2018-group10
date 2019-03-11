@@ -23,8 +23,8 @@ class SetMaxPlayers(object):
         self._init_back_box((int)(1280/2-250), 130, "", Color.GREY, Color.GREEN)
 
         # COMMENT THIS OUT LATER
-        self._init_solo(580, 400, "I'm alone :'(", Color.STANDARDBTN, Color.BLACK)
-
+        self._init_solo(520, 400, "I'm alone :'(", Color.STANDARDBTN, Color.BLACK)
+        self._init_duo(600, 400, "Duo :'(", Color.STANDARDBTN, Color.BLACK)
         self._init_button3(410, 200, "3", Color.STANDARDBTN, Color.BLACK)
         self._init_button4(740, 200, "4", Color.STANDARDBTN, Color.BLACK)
         self._init_button5(410, 300, "5", Color.STANDARDBTN, Color.BLACK)
@@ -100,4 +100,11 @@ class SetMaxPlayers(object):
 
     def update(self, event_queue):
         self.sprite_grp.update(event_queue)
+
+    def _init_duo(self, x_pos, y_pos, text,color, color_text):
+        box_size = (130, 48)
+        self.button_duo= RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
+                                      Text(pygame.font.SysFont('Arial', 20), text, color_text))
+        self.button_duo.on_click(self.set_and_continue, 2)
+        self.sprite_grp.add(self.button_duo)
 
