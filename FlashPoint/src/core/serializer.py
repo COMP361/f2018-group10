@@ -134,7 +134,9 @@ class JSONSerializer(object):
 
     @staticmethod
     def _deserialize_extinguish_event(payload: Dict) -> ExtinguishEvent:
-        tile: TileModel = JSONSerializer.deserialize(payload['tile'])
+
+        tile_dict = payload['extinguish_space']
+        tile: TileModel = GameStateModel.instance().game_board.get_tile_at(tile_dict['_row'], tile_dict['_column'])
         return ExtinguishEvent(tile)
 
     @staticmethod
