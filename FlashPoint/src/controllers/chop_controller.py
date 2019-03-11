@@ -38,6 +38,7 @@ class ChopController(object):
         player_tile = self.board.get_tile_at(self.current_player.row, self.current_player.column)
 
         if wall not in player_tile.adjacent_edge_objects.values():
+
             return False
 
         wall_status = wall.wall_status
@@ -82,7 +83,17 @@ class ChopController(object):
         for wall in walls:
             for event in event_queue:
                 if event.type == pygame.MOUSEBUTTONUP:
-                    if wall.button.rect.x <= pygame.mouse.get_pos()[0] <= wall.button.rect.x + 100 and wall.button.rect.y <= \
-                            pygame.mouse.get_pos()[1] <= wall.button.rect.y + 25:
-                        # means the user is pressing on the wall
-                        self.process_input(wall)
+                    if wall.direction == 'North' or wall.direction == 'South': # means the wall is horizontal
+                        if wall.button.rect.x <= pygame.mouse.get_pos()[0] <= wall.button.rect.x + 100 and wall.button.rect.y <= \
+                                pygame.mouse.get_pos()[1] <= wall.button.rect.y + 25:
+                            # means the user is pressing on the wall
+                            print("wall detected")
+                            self.process_input(wall)
+
+
+                    else: # means the wall is vertical
+                        if wall.button.rect.x <= pygame.mouse.get_pos()[0] <= wall.button.rect.x + 25 and wall.button.rect.y <= \
+                                pygame.mouse.get_pos()[1] <= wall.button.rect.y + 100:
+                            # means the user is pressing on the wall
+                            print("wall detected")
+                            self.process_input(wall)

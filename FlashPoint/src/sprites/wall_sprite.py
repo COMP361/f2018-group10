@@ -41,6 +41,9 @@ class WallSprite(pygame.sprite.Sprite, WallObserver):
         # self.button_input.on_click(self.wall_chop)
 
     @property
+    def direction(self) -> str:
+        return self.id[2]
+    @property
     def wall(self):
         return self.wall_model
 

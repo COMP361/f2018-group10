@@ -3,6 +3,7 @@ import json
 from typing import Dict
 
 from src.action_events.turn_events.chop_event import ChopEvent
+from src.action_events.turn_events.extinguish_event import ExtinguishEvent
 from src.action_events.turn_events.move_event import MoveEvent
 from src.models.game_board.wall_model import WallModel
 from src.observers.observer import Observer
@@ -130,6 +131,12 @@ class JSONSerializer(object):
         wall: WallModel = JSONSerializer.deserialize(payload['wall'])
         return ChopEvent(wall)
 
+
+    @staticmethod
+    def _deserialize_extinguish_event(payload: Dict) -> ExtinguishEvent:
+        tile: TileModel = JSONSerializer.deserialize(payload['tile'])
+        return ExtinguishEvent(tile)
+
     @staticmethod
     def _deserialize_end_turn_event(payload: Dict) -> EndTurnEvent:
         player: PlayerModel = JSONSerializer.deserialize(payload['player'])
@@ -174,6 +181,8 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_move_event(payload)
         elif object_type == DummyEvent.__name__:
             return DummyEvent()
+        elif object_type == ExtinguishEvent.__name__:
+            return JSONSerializer._deserialize_extinguish_event(payload)
 
         print(f"WARNING: Could not deserialize object {object_type}, not of recognized type.")
 

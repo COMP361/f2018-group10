@@ -4,6 +4,7 @@ from src.core.flashpoint_exceptions import ModelNotAdjacentException, NotEnoughA
 from src.models.game_board.tile_model import TileModel
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
+from src.models.game_board.game_board_model import GameBoardModel
 
 
 class ExtinguishEvent(TurnEvent):
@@ -11,7 +12,8 @@ class ExtinguishEvent(TurnEvent):
     def __init__(self, extinguish_space: TileModel):
         super().__init__()
         self.fireman: PlayerModel = GameStateModel.instance().players_turn
-        self.extinguish_space = extinguish_space
+        self.board: GameBoardModel = GameStateModel.game_board
+        self.extinguish_space: TileModel = extinguish_space
 
     def execute(self):
         fireman = self.fireman

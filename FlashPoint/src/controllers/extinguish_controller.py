@@ -35,7 +35,10 @@ class ExtinguishController(object):
     def _run_checks(self, tile_model: TileModel) -> bool:
         player_tile = GameStateModel.instance().game_board.get_tile_at(self.current_player.row,
                                                                        self.current_player.column)
-        valid_to_extinguish = tile_model == player_tile or tile_model in player_tile.adjacent_tiles
+
+        valid_to_extinguish = tile_model == player_tile or tile_model == player_tile.north_tile \
+                              or tile_model == player_tile.east_tile or tile_model == player_tile.west_tile \
+                              or tile_model == player_tile.south_tile
         if not valid_to_extinguish:
             return False
 
@@ -51,11 +54,12 @@ class ExtinguishController(object):
         tile_model = GameStateModel.instance().game_board.get_tile_at(tile_sprite.row, tile_sprite.column)
 
         if self.fire_tile:
-            self.fire_tile.disable_move()
-            self.fire_tile.move_button.disable()
+            self.fire_tile.disable_extinguish()
+            self.fire_tile.extinguish_button.disable()
             self.fire_tile = None
 
         if not self._run_checks(tile_model):
+            print("cannot extinguish")
             tile_sprite.disable_extinguish()
             self.extinguishable = False
             return
