@@ -182,10 +182,11 @@ class MoveController(PlayerObserver):
             for row in range(len(self.game_board_sprite.grid.grid[column])):
 
                 tile_model = GameStateModel.instance().game_board.get_tile_at(row, column)
-                if self._run_checks(tile_model):
-                    self.game_board_sprite.grid.grid[column][row].hover_color = Color.GREEN
-                else:
-                    self.game_board_sprite.grid.grid[column][row].hover_color = Color.RED
+                tile = self.game_board_sprite.grid.grid[column][row]
+                if self._run_checks(tile_model) and not tile.highlight_color:
+                    tile.highlight_color = Color.GREEN
+                elif not self._run_checks(tile_model):
+                    tile.highlight_color = None
 
     def player_status_changed(self, status: PlayerStatusEnum):
         pass

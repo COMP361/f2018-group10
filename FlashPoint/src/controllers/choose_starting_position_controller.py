@@ -45,15 +45,12 @@ class ChooseStartingPositionController(object):
                 tile_model = GameStateModel.instance().game_board.get_tile_at(j, i)
                 tile_sprite = self.game_board_sprite.grid.grid[i][j]
 
-                if not tile_sprite.hover():
-                    continue
+                success = self._run_checks(tile_sprite, tile_model)
 
-                if self._run_checks(tile_sprite, tile_model):
-                    tile_sprite.hover_color = Color.GREEN
-                    tile_sprite.highlight()
-                else:
-                    tile_sprite.hover_color = Color.RED
-                    tile_sprite.highlight()
+                if success and not tile_sprite.highlight_color :
+                    tile_sprite.highlight_color = Color.GREEN
+                elif not success:
+                    tile_sprite.hover_color = None
 
     def _run_checks(self, tile_sprite: TileSprite, tile_model: TileModel) -> bool:
         if GameStateModel.instance().state != GameStateEnum.PLACING:

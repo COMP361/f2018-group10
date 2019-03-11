@@ -68,12 +68,3 @@ class ExtinguishController(object):
     def update(self, event_queue: EventQueue):
         if GameStateModel.instance().state != GameStateEnum.MAIN_GAME:
             return
-
-        # for column in range(len(self.game_board_sprite.grid.grid)):  # First make them all hover_color to red
-        #     for row in range(len(self.game_board_sprite.grid.grid[column])):
-        #
-        #         tile_model = GameStateModel.instance().game_board.get_tile_at(row, column)
-        #         if self._run_checks(tile_model):
-        #             self.game_board_sprite.grid.grid[column][row].hover_color = Color.GREEN
-        #         else:
-        #             self.game_board_sprite.grid.grid[column][row].hover_color = Color.RED

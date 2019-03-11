@@ -1,3 +1,4 @@
+from src.constants.state_enums import GameStateEnum
 from src.action_events.turn_events.turn_event import TurnEvent
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
@@ -23,10 +24,11 @@ class EndTurnEvent(TurnEvent):
         # as the turn is ending and
         # replenish player's AP by 4
         GameStateModel.lock.acquire()
-        if self.player.ap > 4:
-            self.player.ap = 4
+        if GameStateModel.instance().state == GameStateEnum.MAIN_GAME:
+            if self.player.ap > 4:
+                self.player.ap = 4
 
-        self.player.ap += 4
+            self.player.ap += 4
 
         # call next player
         GameStateModel.instance().next_player()
