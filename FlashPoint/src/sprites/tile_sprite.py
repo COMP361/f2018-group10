@@ -47,9 +47,9 @@ class TileSprite(Interactable, TileObserver):
         self.can_move = False
         self.can_extinguish = False
         self.move_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
-                                      Text(pygame.font.SysFont('Arial', 20), "MoVe HeRe", Color.ORANGE))
+                                      Text(pygame.font.SysFont('Arial', 15), "MoVe HeRe", Color.ORANGE))
         self.extinguish_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
-                                            Text(pygame.font.SysFont('Arial', 20), "ExTiNgUiSh FiRe", Color.ORANGE))
+                                            Text(pygame.font.SysFont('Arial', 15), "ExTiNgUiSh FiRe", Color.ORANGE))
         self.move_button.disable()
         self.extinguish_button.disable()
 
@@ -67,7 +67,7 @@ class TileSprite(Interactable, TileObserver):
             hover.set_alpha(10)
             self.image.blit(hover, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
         else:
-            self.image.blit(self._non_highlight_image, (0,0))
+            self.image.blit(self._non_highlight_image, (0, 0))
 
     def hover(self):
         if self._is_enabled:
@@ -124,8 +124,15 @@ class TileSprite(Interactable, TileObserver):
         screen.blit(self.image, self.rect)
         if self.can_move:
             screen.blit(self.move_button.image, self.move_button.rect)
+
+        else:
+            self.move_button.disable()
+
         if self.can_extinguish:
             screen.blit(self.extinguish_button.image, self.extinguish_button.rect)
+
+        else:
+            self.extinguish_button.disable()
 
     def update(self, event_queue: EventQueue):
         self.sprite_grp.update(event_queue)

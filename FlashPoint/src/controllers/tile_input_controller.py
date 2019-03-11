@@ -52,6 +52,7 @@ class TileInputController(GameStateObserver):
 
         if self.move_controller.is_moveable:
             self.move_controller.move_to.move_button.on_click(self.execute_move_event, tile_model)
+
         if self.extinguish_controller.extinguishable:
             self.extinguish_controller.fire_tile.on_click(self.execute_extinguish_event, tile_model)
 

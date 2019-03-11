@@ -61,6 +61,7 @@ class ExtinguishController(object):
         if not self._run_checks(tile_model):
             print("cannot extinguish")
             tile_sprite.disable_extinguish()
+            tile_sprite.extinguish_button.disable()
             self.extinguishable = False
             return
 
