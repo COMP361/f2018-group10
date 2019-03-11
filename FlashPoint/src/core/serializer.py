@@ -96,15 +96,15 @@ class JSONSerializer(object):
     def _deserialize_move_event(payload: Dict):
         game_board = GameStateModel.instance().game_board
         destination = payload['destination']
+        # dest_model = game_board.get_tile_at(destination['_row'], destination['_column'])
         tile_list = payload['moveable_tiles']
         moveable_tiles = []
         for tile in tile_list:
             tile_model: TileModel = game_board.get_tile_at(tile['_row'], tile['_column'])
             moveable_tiles.append(tile_model)
-            game_board.set_single_tile_adjacencies(tile_model)
 
         destination_model: TileModel = game_board.get_tile_at(destination['_row'], destination['_column'])
-        game_board.set_single_tile_adjacencies(destination_model)
+        game_board.set_adjacencies(game_board.get_tiles())
         event = MoveEvent(destination_model, moveable_tiles)
         return event
 
@@ -159,8 +159,8 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_chop_event(payload)
         elif object_type == WallModel.__name__:
             return JSONSerializer._deserialize_wall(payload)
-        # elif object_type == MoveEvent.__name__:
-            # return JSONSerializer._deserialize_move_event(payload)
+        elif object_type == MoveEvent.__name__:
+            return JSONSerializer._deserialize_move_event(payload)
         elif object_type == DummyEvent.__name__:
             return DummyEvent()
 
