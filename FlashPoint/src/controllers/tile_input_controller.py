@@ -68,11 +68,17 @@ class TileInputController(GameStateObserver):
 
     def execute_extinguish_event(self, tile: TileModel):
         print(f"Extinguish event created")
+        print("tile was: ")
+        print(tile.space_status)
         event = ExtinguishEvent(tile)
+
         if Networking.get_instance().is_host:
             Networking.get_instance().send_to_all_client(event)
         else:
             Networking.get_instance().client.send(event)
+
+        print("Tile is now: ")
+        print(tile.space_status)
 
     def execute_move_event(self, tile: TileModel):
         print("move_event created")
