@@ -3,8 +3,11 @@ import json
 from typing import Dict
 
 from src.action_events.turn_events.chop_event import ChopEvent
+from src.action_events.turn_events.close_door_event import CloseDoorEvent
 from src.action_events.turn_events.extinguish_event import ExtinguishEvent
 from src.action_events.turn_events.move_event import MoveEvent
+from src.action_events.turn_events.open_door_event import OpenDoorEvent
+from src.models.game_board.door_model import DoorModel
 from src.models.game_board.wall_model import WallModel
 from src.observers.observer import Observer
 from src.models.game_board.tile_model import TileModel
@@ -16,7 +19,8 @@ from src.action_events.ready_event import ReadyEvent
 from src.action_events.chat_event import ChatEvent
 from src.action_events.dummy_event import DummyEvent
 from src.action_events.join_event import JoinEvent
-from src.constants.state_enums import DifficultyLevelEnum, GameKindEnum, PlayerStatusEnum, WallStatusEnum
+from src.constants.state_enums import DifficultyLevelEnum, GameKindEnum, PlayerStatusEnum, WallStatusEnum, \
+    DoorStatusEnum
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 
@@ -120,6 +124,12 @@ class JSONSerializer(object):
         return tile
 
     @staticmethod
+    def _deserialize_door(payload: Dict) -> DoorModel:
+        id = payload['_id']
+        door = DoorModel(id[0], id[1], id[2], DoorStatusEnum(payload['_door_status']['value']))
+        return door
+
+    @staticmethod
     def _deserialize_wall(payload: Dict) -> WallModel:
         id = payload['_id']
         wall = WallModel(id[0], id[1], id[2])
@@ -145,6 +155,16 @@ class JSONSerializer(object):
         return EndTurnEvent(player)
 
     @staticmethod
+    def _deserialize_open_door_event(payload: Dict) -> OpenDoorEvent:
+        door: DoorModel = JSONSerializer.deserialize(payload['door'])
+        return OpenDoorEvent(door)
+
+    @staticmethod
+    def _deserialize_close_door_event(payload: Dict) -> CloseDoorEvent:
+        door: DoorModel = JSONSerializer.deserialize(payload['door'])
+        return CloseDoorEvent(door)
+
+    @staticmethod
     def deserialize(payload: Dict) -> object:
         """
         Grab an object and deserialize it.
@@ -162,6 +182,10 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_tile(payload)
         elif object_type == GameStateModel.__name__:
             return JSONSerializer._deserialize_game_state(payload)
+        elif object_type == DoorModel.__name__:
+            return JSONSerializer._deserialize_door(payload)
+        elif object_type == WallModel.__name__:
+            return JSONSerializer._deserialize_wall(payload)
         # --------------EVENTS------------------
         elif object_type == JoinEvent.__name__:
             return JSONSerializer._deserialize_join_event(payload)
@@ -177,14 +201,17 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_choose_position_event(payload)
         elif object_type == ChopEvent.__name__:
             return JSONSerializer._deserialize_chop_event(payload)
-        elif object_type == WallModel.__name__:
-            return JSONSerializer._deserialize_wall(payload)
         elif object_type == MoveEvent.__name__:
             return JSONSerializer._deserialize_move_event(payload)
         elif object_type == DummyEvent.__name__:
             return DummyEvent()
         elif object_type == ExtinguishEvent.__name__:
             return JSONSerializer._deserialize_extinguish_event(payload)
+        elif object_type == OpenDoorEvent.__name__:
+            return JSONSerializer._deserialize_open_door_event(payload)
+
+        elif object_type == CloseDoorEvent.__name__:
+            return JSONSerializer._deserialize_close_door_event(payload)
 
         print(f"WARNING: Could not deserialize object {object_type}, not of recognized type.")
 
