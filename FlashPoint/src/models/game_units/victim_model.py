@@ -6,11 +6,11 @@ from src.observers.victim_observer import VictimObserver
 
 class VictimModel(Model):
 
-    def __init__(self, victim_state: VictimStateEnum):
+    def __init__(self, victim_state: VictimStateEnum, row: int, column: int):
         super().__init__()
         self._state = victim_state
-        self._row = 0
-        self._column = 0
+        self._row = row
+        self._column = column
 
     def __str__(self):
         victim_pos = "Victim position: ({row}, {column})".format(row=self.row, column=self.column)

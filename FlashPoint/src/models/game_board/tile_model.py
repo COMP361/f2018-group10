@@ -201,11 +201,19 @@ class TileModel(Model):
         return self._associated_models
 
     def add_associated_model(self, model: Model):
+        # The model's observers will take care
+        # of redrawing the model in the new location
+        model.set_position(self.row, self.column)
         self._associated_models.append(model)
         self._notify_assoc_models()
 
     def remove_associated_model(self, model: Model):
         """CAUTION: YOUR MODEL MUST HAVE AN __EQ__ METHOD DEFINED FOR THIS TO WORK AS EXPECTED"""
+        # The model's observers will check if
+        # the position of the model is negative
+        # and then will stop drawing it.
+        if model.row >= 0 and model.column >= 0:
+            model.set_position(-7, -7)
         self._associated_models.remove(model)
         self._notify_assoc_models()
 
