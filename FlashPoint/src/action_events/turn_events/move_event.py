@@ -1,5 +1,6 @@
 from abc import ABC
 from typing import List
+import time
 
 from src.action_events.turn_events.turn_event import TurnEvent
 from src.constants.state_enums import SpaceStatusEnum, POIIdentityEnum, SpaceKindEnum, DoorStatusEnum
@@ -270,6 +271,7 @@ class MoveEvent(TurnEvent):
                     if d_tile.tile_model.space_kind != SpaceKindEnum.INDOOR:
                         self.game.victims_saved += 1
                         self.fireman.carrying_victim = NullModel()
+                        # TODO: disassociate victim from list of active POIs of board?
 
             # fireman is not carrying a victim
             else:
@@ -291,3 +293,5 @@ class MoveEvent(TurnEvent):
                         d_tile.tile_model.remove_associated_model(assoc_model)
                         self.game.game_board.remove_poi_or_victim(assoc_model)
                     # TODO: do something if POI is Victim
+
+            time.sleep(0.75)
