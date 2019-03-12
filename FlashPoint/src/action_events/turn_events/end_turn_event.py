@@ -9,6 +9,8 @@ class EndTurnEvent(TurnEvent):
     def __init__(self, player: PlayerModel):
         super().__init__()
         self.player = GameStateModel.instance().players_turn
+        for player in GameStateModel.instance().players:
+            print(f"{player.row}, {player.column}")
 
     def execute(self):
         """
@@ -31,5 +33,8 @@ class EndTurnEvent(TurnEvent):
             self.player.ap += 4
 
         # call next player
+        for player in GameStateModel.instance().players:
+            print(f"{player.row}, {player.column}")
+
         GameStateModel.instance().next_player()
         GameStateModel.lock.release()

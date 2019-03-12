@@ -22,7 +22,7 @@ class DoorController(object):
 
     def __init__(self, current_player: PlayerModel):
         if DoorController._instance:
-            raise Exception("TileInputController is a singleton")
+            raise Exception("DoorController is a singleton")
 
         DoorController._instance = self
         self.board = GameStateModel.instance().game_board

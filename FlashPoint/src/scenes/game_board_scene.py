@@ -88,6 +88,9 @@ class GameBoardScene(object):
 
     def _quit_btn_on_click(self):
         Networking.get_instance().disconnect()
+        TileInputController.__del__()
+        ChopController._instance = None
+        DoorController._instance = None
         EventQueue.post(CustomEvent(ChangeSceneEnum.STARTSCENE))
 
     # Example of how to use the MenuClass YOU NEED TO MAKE ALL YOUR BUTTONS EXTEND INTERACTABLE!!!!!!!!!!!!!!!!!

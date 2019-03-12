@@ -209,10 +209,6 @@ class Networking:
             :return:
             """
             if self.client is not None:
-                logger.info("Disconnecting client")
-                self.client.disconnect()
-                self.client.__del__()
-                self.client = None
             if self.host is not None:
                 logger.info("Disconnecting host")
                 # Kill the broadcast
@@ -226,7 +222,11 @@ class Networking:
                 self.host.disconnect()
                 self.host.__del__()
                 self.host = None
-            EventQueue.post(CustomEvent(ChangeSceneEnum.STARTSCENE))
+            if self.client is not None:
+                logger.info("Disconnecting client")
+                self.client.disconnect()
+                self.client.__del__()
+                self.client = None
 
         def send_to_server(self, data, compress=True):
             """
@@ -507,4 +507,5 @@ class Networking:
             """
             print("It seems that client is not connected...")
             Networking.get_instance().disconnect()
+            EventQueue.post(CustomEvent(ChangeSceneEnum.STARTSCENE))
 

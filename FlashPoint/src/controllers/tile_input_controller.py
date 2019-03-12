@@ -46,6 +46,13 @@ class TileInputController(GameStateObserver):
     def instance(cls):
         return cls._instance
 
+    @staticmethod
+    def __del__():
+        ExtinguishController._instance = None
+        MoveController._instance = None
+        ChooseStartingPositionController._instance = None
+        TileInputController._instance = None
+
     def move_and_extinguish(self, tile: TileSprite):
         self.move_controller.process_input(tile)
         self.extinguish_controller.process_input(tile)
