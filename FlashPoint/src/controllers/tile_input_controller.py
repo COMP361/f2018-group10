@@ -113,15 +113,12 @@ class TileInputController(GameStateObserver):
 
     def choose_and_end_turn(self, tile):
         self.choose_starting_controller.process_input(tile)
-        advance_fire_event = AdvanceFireEvent()
         turn_event = EndTurnEvent(GameStateModel.instance().players_turn)
         # send end turn, see ChatBox for example
         try:
             if Networking.get_instance().is_host:
-                Networking.get_instance().send_to_all_client(advance_fire_event)
                 Networking.get_instance().send_to_all_client(turn_event)
             else:
-                Networking.get_instance().client.send(advance_fire_event)
                 Networking.get_instance().client.send(turn_event)
         except AttributeError as e:
             pass
