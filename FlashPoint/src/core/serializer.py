@@ -2,6 +2,7 @@ import enum
 import json
 from typing import Dict
 
+from src.action_events.end_turn_advance_fire import EndTurnAdvanceFireEvent
 from src.action_events.turn_events.chop_event import ChopEvent
 from src.action_events.turn_events.close_door_event import CloseDoorEvent
 from src.action_events.turn_events.extinguish_event import ExtinguishEvent
@@ -174,6 +175,16 @@ class JSONSerializer(object):
         return event
 
     @staticmethod
+    def _deserialize_end_turn_advance_fire_event(payload: Dict) -> EndTurnAdvanceFireEvent:
+        player: PlayerModel = JSONSerializer.deserialize(payload['player'])
+        red_dice: int = payload['red_dice']
+        black_dice: int = payload['black_dice']
+        event = EndTurnAdvanceFireEvent(player, red_dice, black_dice)
+        board = GameStateModel.instance().game_board
+        board.set_adjacencies(board.get_tiles())
+        return event
+
+    @staticmethod
     def deserialize(payload: Dict) -> object:
         """
         Grab an object and deserialize it.
@@ -220,7 +231,8 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_extinguish_event(payload)
         elif object_type == OpenDoorEvent.__name__:
             return JSONSerializer._deserialize_open_door_event(payload)
-
+        elif object_type == EndTurnAdvanceFireEvent.__name__:
+            return JSONSerializer._deserialize_end_turn_advance_fire_event(payload)
         elif object_type == CloseDoorEvent.__name__:
             return JSONSerializer._deserialize_close_door_event(payload)
 

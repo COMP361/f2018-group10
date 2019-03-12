@@ -1,5 +1,4 @@
-from src.action_events.advance_fire_event import AdvanceFireEvent
-from src.action_events.turn_events.end_turn_event import EndTurnEvent
+from action_events.end_turn_advance_fire import EndTurnAdvanceFireEvent
 from src.action_events.turn_events.extinguish_event import ExtinguishEvent
 from src.action_events.turn_events.move_event import MoveEvent
 from src.core.event_queue import EventQueue
@@ -113,7 +112,7 @@ class TileInputController(GameStateObserver):
 
     def choose_and_end_turn(self, tile):
         self.choose_starting_controller.process_input(tile)
-        turn_event = EndTurnEvent(GameStateModel.instance().players_turn)
+        turn_event = EndTurnAdvanceFireEvent(GameStateModel.instance().players_turn)
         # send end turn, see ChatBox for example
         try:
             if Networking.get_instance().is_host:
