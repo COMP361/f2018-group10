@@ -208,7 +208,6 @@ class Networking:
             Disconnects the current machine. If the current machine is a host, it ends the game as well.
             :return:
             """
-            if self.client is not None:
             if self.host is not None:
                 logger.info("Disconnecting host")
                 # Kill the broadcast
