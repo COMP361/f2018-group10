@@ -37,7 +37,6 @@ class AdvanceFireEvent(ActionEvent):
         self.flashover()
         self.affect_damages()
 
-
     def advance_on_tile(self, target_tile: TileModel):
         tile_status = target_tile.space_status
         # Safe -> Smoke
@@ -51,7 +50,6 @@ class AdvanceFireEvent(ActionEvent):
         # Fire -> Explosion
         else:
             self.explosion(target_tile)
-
 
     def explosion(self, origin_tile: TileModel):
         for direction, obstacle in origin_tile.adjacent_edge_objects.items():
@@ -76,8 +74,6 @@ class AdvanceFireEvent(ActionEvent):
                         self.shockwave(nb_tile, direction)
                     else:
                         nb_tile.space_status = SpaceStatusEnum.FIRE
-
-
 
     def shockwave(self, tile: TileModel, direction: str):
         """

@@ -2,7 +2,9 @@ import threading
 import pygame
 import time
 from threading import Thread
+
 import src.constants.color as Color
+from src.action_events.advance_fire_event import AdvanceFireEvent
 from src.UIComponents.rect_label import RectLabel
 from src.UIComponents.rect_button import RectButton
 from src.action_events.turn_events.end_turn_event import EndTurnEvent
@@ -65,10 +67,9 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
             #screen.blit(self.image, self.image.get_rect().move(880, 600))
 
     def notify_player_index(self, player_index: int):
-        print("Player index" + str(player_index))
         for player in GameStateModel.instance().players:
             print(player.nickname)
-        print(self._current_player.nickname)
+
         self.enabled = (GameStateModel.instance().players[player_index] == self._current_player)
 
         if self.enabled:
@@ -123,12 +124,15 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
         self.enabled = False
         self.running = False
 
+        advance_fire_event = AdvanceFireEvent()
         turn_event = EndTurnEvent(self._current_player)
         # send end turn, see ChatBox for example
         try:
             if Networking.get_instance().is_host:
+                Networking.get_instance().send_to_all_client(advance_fire_event)
                 Networking.get_instance().send_to_all_client(turn_event)
             else:
+                Networking.get_instance().client.send(advance_fire_event)
                 Networking.get_instance().client.send(turn_event)
         except AttributeError as e:
             pass
