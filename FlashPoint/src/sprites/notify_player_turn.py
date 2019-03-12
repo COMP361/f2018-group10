@@ -90,7 +90,6 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
             self._active_sprites.add(self.not_your_turn)
 
     def _init_your_turn(self):
-
         rct = RectLabel(880, 600, 250, 50, background=Color.ORANGE,
                         txt_obj=Text(pygame.font.SysFont('Agency FB', 30), "YOUR TURN", Color.GREEN2))
         rct.change_bg_image('media/GameHud/wood2.png')
