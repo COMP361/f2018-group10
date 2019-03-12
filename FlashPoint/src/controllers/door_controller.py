@@ -35,7 +35,7 @@ class DoorController(object):
         return cls._instance
 
     def check(self, door_model: DoorModel) -> bool:
-        valid_to_open_close = TurnEvent.has_required_AP(self.current_player.ap, 2)
+        valid_to_open_close = TurnEvent.has_required_AP(self.current_player.ap, 1)
         if not valid_to_open_close:
             return False
 
@@ -72,6 +72,8 @@ class DoorController(object):
 
     def instantiate_event(self, door_model: DoorModel):
         event: TurnEvent = None
+        self.door.menu_shown = False
+        self.door.button_input.disable()
         if door_model.door_status == DoorStatusEnum.OPEN:
             event = CloseDoorEvent(door_model)
 
@@ -83,6 +85,7 @@ class DoorController(object):
                 Networking.get_instance().send_to_all_client(event)
             else:
                 Networking.get_instance().client.send(event)
+
 
     def update(self, queue: EventQueue):
         if GameStateModel.instance().state != GameStateEnum.MAIN_GAME:
