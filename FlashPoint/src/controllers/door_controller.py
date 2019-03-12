@@ -78,7 +78,6 @@ class DoorController(object):
         elif door_model.door_status == DoorStatusEnum.CLOSED:
             event = OpenDoorEvent(door_model)
 
-
         if event:
             if Networking.get_instance().is_host:
                 Networking.get_instance().send_to_all_client(event)
