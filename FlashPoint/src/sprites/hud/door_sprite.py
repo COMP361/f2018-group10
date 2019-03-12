@@ -74,8 +74,8 @@ class DoorSprite(pygame.sprite.Sprite, DoorObserver):
         self._button.rect.move_ip((diff_x, diff_y))
         self._prev_x = self.tile_sprite.rect.x
         self._prev_y = self.tile_sprite.rect.y
-        self.button_input.rect.x = self.tile_sprite.rect.x + 14
-        self.button_input.rect.y = self.tile_sprite.rect.y + 50
+        self.button_input.rect.x = self.tile_sprite.rect.x + 100
+        self.button_input.rect.y = self.tile_sprite.rect.y + 100
 
         for event in event_queue:
             if event.type == pygame.MOUSEBUTTONUP:
@@ -110,8 +110,6 @@ class DoorSprite(pygame.sprite.Sprite, DoorObserver):
         if self.menu_shown:
             if self.button_input.enabled:
                 screen.blit(self.button_input.image, self.button_input.rect)
-                self.button_input.rect.x = self.tile_sprite.rect.x + 100
-                self.button_input.rect.y = self.tile_sprite.rect.y + 100
 
         if self.orientation == "vertical":
             x_offset1 = -22
