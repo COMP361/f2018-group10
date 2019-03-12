@@ -34,7 +34,11 @@ class CreateGameMenu(Scene):
 
         self.buttonExp.on_click(self.create_new_game, GameKindEnum.EXPERIENCED)
         self.buttonFamily.on_click(self.create_new_game, GameKindEnum.FAMILY)
-        self.buttonBack.on_click(Networking.get_instance().disconnect)
+        self.buttonBack.on_click(self.go_back)
+
+    def go_back(self):
+        Networking.get_instance().disconnect()
+        EventQueue.post(CustomEvent(ChangeSceneEnum.STARTSCENE))
 
     # ------------- GAME CREATE/LOAD STUFF ---------- #
 

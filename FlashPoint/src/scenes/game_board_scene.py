@@ -135,17 +135,17 @@ class GameBoardScene(object):
 
     def update(self, event_queue: EventQueue):
         """Call the update() function of everything in this class."""
-        self.notify_turn_popup.update(event_queue)
-        # self.choose_start_pos_controller.update(event_queue)
-        self.tile_input_controller.update(event_queue)
-        self.chop_controller.update(event_queue)
-        self.door_controller.update(event_queue)
-
         # self.chat_box.update(event_queue)
         self.game_board_sprite.update(event_queue)
         self.active_sprites.update(event_queue)
 
         if self.menu and not self.menu.is_closed:
             self.menu.update(event_queue)
+
+        self.notify_turn_popup.update(event_queue)
+        # self.choose_start_pos_controller.update(event_queue)
+        self.tile_input_controller.update(event_queue)
+        self.chop_controller.update(event_queue)
+        self.door_controller.update(event_queue)
 
         self.chat_box.update(event_queue)
