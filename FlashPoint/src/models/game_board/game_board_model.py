@@ -12,7 +12,6 @@ from src.constants.state_enums import GameKindEnum, SpaceKindEnum, SpaceStatusEn
 from src.models.game_board.wall_model import WallModel
 from src.models.game_board.door_model import DoorModel
 
-
 class GameBoardModel(object):
     """
     Class for aggregating all objects related to the game board itself, this means TileModels, PlayerModels
@@ -47,12 +46,18 @@ class GameBoardModel(object):
     def engine_spots(self) -> List[Tuple[TileModel]]:
         return self._engine_spots
 
+    # TODO: Add notification and observers for the active POIs
     @property
     def active_pois(self):
         return self._active_pois
 
+    def add_poi_or_victim(self, poi_or_victim):
+        self._active_pois.append(poi_or_victim)
+
     def remove_poi_or_victim(self, poi_or_victim):
         if poi_or_victim in self._active_pois:
+            if poi_or_victim.row >= 0 and poi_or_victim.column >= 0:
+                poi_or_victim.set_position(-7, -7)
             self._active_pois.remove(poi_or_victim)
 
     def get_random_poi_from_bank(self) -> POIModel:
@@ -63,10 +68,12 @@ class GameBoardModel(object):
     @staticmethod
     def _init_pois():
         pois = []
+        # POIs initialized with negative coordinates
+        # since they are not on the board
         for i in range(5):
-            pois.append(POIModel(POIIdentityEnum.VICTIM))
+            pois.append(POIModel(POIIdentityEnum.VICTIM, -7, -7))
         for i in range(5):
-            pois.append(POIModel(POIIdentityEnum.FALSE_ALARM))
+            pois.append(POIModel(POIIdentityEnum.FALSE_ALARM, -7, -7))
         return pois
 
     @staticmethod
@@ -91,7 +98,6 @@ class GameBoardModel(object):
                 tile = TileModel(i, j, tile_kind)
                 tiles[i].append(tile)
 
-        # TODO: Abhijay: setting adjacency and creating walls/doors.
         # setting tile adjacencies
         self.set_adjacencies(tiles)
 
