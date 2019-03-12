@@ -26,5 +26,3 @@ class ChooseStartingPositionEvent(ActionEvent):
         if game.players_turn_index + 1 == len(game.players):
             # If the last player has chosen a location, move the game into the next phase.
             game.state = GameStateEnum.MAIN_GAME
-        else:
-            game.state = GameStateEnum.DONE_PLACING

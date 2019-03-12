@@ -1,3 +1,5 @@
+from src.action_events.advance_fire_event import AdvanceFireEvent
+from src.action_events.turn_events.end_turn_event import EndTurnEvent
 from src.action_events.turn_events.extinguish_event import ExtinguishEvent
 from src.action_events.turn_events.move_event import MoveEvent
 from src.core.event_queue import EventQueue
@@ -99,7 +101,7 @@ class TileInputController(GameStateObserver):
     def notify_game_state(self, state: GameStateEnum):
         on_click = None
         if state == GameStateEnum.PLACING:
-            on_click = self.choose_starting_controller.process_input
+            on_click = self.choose_and_end_turn
         elif state == GameStateEnum.MAIN_GAME:
             on_click = self.move_and_extinguish
 
@@ -108,6 +110,21 @@ class TileInputController(GameStateObserver):
             for row in range(len(grid[column])):
                 tile = grid[column][row]
                 tile.on_click(on_click, tile)
+
+    def choose_and_end_turn(self, tile):
+        self.choose_starting_controller.process_input(tile)
+        advance_fire_event = AdvanceFireEvent()
+        turn_event = EndTurnEvent(GameStateModel.instance().players_turn)
+        # send end turn, see ChatBox for example
+        try:
+            if Networking.get_instance().is_host:
+                Networking.get_instance().send_to_all_client(advance_fire_event)
+                Networking.get_instance().send_to_all_client(turn_event)
+            else:
+                Networking.get_instance().client.send(advance_fire_event)
+                Networking.get_instance().client.send(turn_event)
+        except AttributeError as e:
+            pass
 
     def update(self, event_queue: EventQueue):
         self.move_controller.update(event_queue)
