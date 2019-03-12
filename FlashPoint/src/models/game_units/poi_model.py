@@ -8,12 +8,12 @@ from src.models.model import Model
 
 class POIModel(Model):
 
-    def __init__(self, identity: POIIdentityEnum, row: int, column: int):
+    def __init__(self, identity: POIIdentityEnum):
         super().__init__()
         self._identity = identity
         self._status = POIStatusEnum.HIDDEN
-        self._row = row
-        self._column = column
+        self._row = -7
+        self._column = -7
 
     def reveal(self):
         if self._status is POIStatusEnum.HIDDEN:
