@@ -28,6 +28,7 @@ class GameKindEnum(Enum):
 class GameStateEnum(Enum):
     READY_TO_JOIN = auto()
     PLACING = auto()
+    DONE_PLACING = auto()
     MAIN_GAME = auto()
     KNOCKED_DOWN_PLACEMENT = auto()
     LOST = auto()
