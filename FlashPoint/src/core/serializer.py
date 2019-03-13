@@ -169,13 +169,13 @@ class JSONSerializer(object):
 
     @staticmethod
     def _deserialize_drop_event(payload: Dict) -> DropVictimEvent:
-        victim: VictimModel = JSONSerializer.deserialize(payload['victim'])
+        victim: VictimModel = JSONSerializer.deserialize(payload['victim_tile'])
         return DropVictimEvent(victim)
 
 
     @staticmethod
     def _deserialize_pickup_event(payload: Dict) -> PickupVictimEvent:
-        victim: VictimModel = JSONSerializer.deserialize(payload['victim'])
+        victim: VictimModel = JSONSerializer.deserialize(payload['victim_tile'])
         return PickupVictimEvent(victim)
 
     @staticmethod
