@@ -208,7 +208,6 @@ class MoveController(PlayerObserver):
         pass
 
     def player_position_changed(self, x_pos: int, y_pos: int):
-
         GameStateModel.instance().game_board.reset_tiles_visit_count()
         self.moveable_tiles = self._determine_reachable_tiles(
             self.current_player.row, self.current_player.column, self.current_player.ap)
