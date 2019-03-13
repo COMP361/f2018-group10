@@ -7,7 +7,7 @@ from src.models.game_units.victim_model import VictimModel
 from src.models.game_board.tile_model import TileModel
 from src.models.game_board.game_board_model import GameBoardModel
 from src.constants.state_enums import GameStateEnum, SpaceStatusEnum, WallStatusEnum, DoorStatusEnum, VictimStateEnum, \
-    POIStatusEnum, SpaceKindEnum
+    POIStatusEnum, SpaceKindEnum, POIIdentityEnum
 from src.action_events.turn_events.turn_event import TurnEvent
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
@@ -87,7 +87,7 @@ class EndTurnAdvanceFireEvent(TurnEvent):
             # damaging wall present along the tile
             if isinstance(obstacle, WallModel) and obstacle.wall_status != WallStatusEnum.DESTROYED:
                 obstacle.inflict_damage()
-                self.game_state.damage += 1
+                self.game_state.damage = self.game_state.damage + 1
 
             # fire does not move to the neighbouring tile
             # removing door that borders the tile
@@ -140,15 +140,17 @@ class EndTurnAdvanceFireEvent(TurnEvent):
                 obstacle = tile.get_obstacle_in_direction(direction)
                 if isinstance(obstacle, WallModel):
                     obstacle.inflict_damage()
-                    self.game_state.damage += 1
+                    self.game_state.damage = self.game_state.damage + 1
                     should_stop = True
 
                 elif isinstance(obstacle, DoorModel):
                     if obstacle.door_status == DoorStatusEnum.CLOSED:
                         should_stop = True
                     obstacle.destroy_door()
+
                 else:
                     pass
+
 
     def flashover(self):
         """
@@ -200,22 +202,38 @@ class EndTurnAdvanceFireEvent(TurnEvent):
                 continue
 
             for model in assoc_models:
-                if isinstance(model, PlayerModel):
-                    KnockDownEvent(model).execute()
-
-                elif isinstance(model, VictimModel):
-                    self.game_state.victims_lost += 1
+                if isinstance(model, VictimModel):
+                    self.game_state.victims_lost = self.game_state.victims_lost + 1
                     model: VictimModel = model
                     model.state = VictimStateEnum.LOST
+                    tile.remove_associated_model(model)
                     self.board.remove_poi_or_victim(model)
 
                 elif isinstance(model, POIModel):
-                    model.reveal()
-                    model.status = POIStatusEnum.LOST
+                    # Reveal the POI and remove it regardless
+                    # of False Alarm or Victim identity.
+                    # If it is a Victim, put a Victim model
+                    # there, sleep (inside remove_poi_or_victim)
+                    # so that the victim can be seen briefly, then
+                    # remove it and increment the game state damage.
+                    new_victim = None
+                    tile.remove_associated_model(model)
                     self.board.remove_poi_or_victim(model)
+                    if model.identity == POIIdentityEnum.VICTIM:
+                        new_victim = VictimModel(VictimStateEnum.ON_BOARD)
+                        tile.add_associated_model(new_victim)
+                        self.board.add_poi_or_victim(new_victim)
+                        tile.remove_associated_model(new_victim)
+                        self.board.remove_poi_or_victim(new_victim)
+                        self.game_state.victims_lost = self.game_state.victims_lost + 1
 
+                    model.reveal(new_victim)
                 else:
                     pass
+
+            players_on_tile = self.game_state.get_players_on_tile(tile.row, tile.column)
+            for player in players_on_tile:
+                KnockDownEvent(player.ip).execute()
 
         # removing any fire markers that were
         # placed outside of the building

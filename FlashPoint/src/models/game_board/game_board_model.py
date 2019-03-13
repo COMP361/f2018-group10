@@ -1,5 +1,6 @@
 import json
 import random
+import time
 from typing import List, Tuple, Dict
 
 from src.constants.main_constants import BOARD_DIMENSIONS
@@ -7,11 +8,11 @@ from src.models.game_board.edge_obstacle_model import EdgeObstacleModel
 from src.models.game_board.null_model import NullModel
 from src.models.game_units.poi_model import POIModel
 from src.models.game_board.tile_model import TileModel
-from src.constants.state_enums import GameKindEnum, SpaceKindEnum, SpaceStatusEnum, POIIdentityEnum, DirectionEnum, \
-    DoorStatusEnum, WallStatusEnum
+from src.constants.state_enums import GameKindEnum, SpaceKindEnum, SpaceStatusEnum, POIIdentityEnum, \
+    DoorStatusEnum, POIStatusEnum, VictimStateEnum
 from src.models.game_board.wall_model import WallModel
 from src.models.game_board.door_model import DoorModel
-
+from src.models.game_units.victim_model import VictimModel
 
 class GameBoardModel(object):
     """
@@ -51,8 +52,20 @@ class GameBoardModel(object):
     def active_pois(self):
         return self._active_pois
 
+    def add_poi_or_victim(self, poi_or_victim):
+        self._active_pois.append(poi_or_victim)
+
     def remove_poi_or_victim(self, poi_or_victim):
+        # Put to sleep briefly so that POI or
+        # victim can be seen before it is removed.
+        time.sleep(0.5)
         if poi_or_victim in self._active_pois:
+            if isinstance(poi_or_victim, POIModel):
+                poi_or_victim.status = POIStatusEnum.LOST
+            elif isinstance(poi_or_victim, VictimModel):
+                poi_or_victim.state = VictimStateEnum.LOST
+            else:
+                pass
             self._active_pois.remove(poi_or_victim)
 
     def get_random_poi_from_bank(self) -> POIModel:
@@ -63,6 +76,8 @@ class GameBoardModel(object):
     @staticmethod
     def _init_pois():
         pois = []
+        # POIs initialized with negative coordinates
+        # since they are not on the board
         for i in range(5):
             pois.append(POIModel(POIIdentityEnum.VICTIM))
         for i in range(5):
@@ -91,7 +106,6 @@ class GameBoardModel(object):
                 tile = TileModel(i, j, tile_kind)
                 tiles[i].append(tile)
 
-        # TODO: Abhijay: setting adjacency and creating walls/doors.
         # setting tile adjacencies
         self.set_adjacencies(tiles)
 
@@ -291,4 +305,3 @@ class GameBoardModel(object):
     def reset_tiles_visit_count(self):
         for tile in self.tiles:
             tile.visit_count = 0
-            

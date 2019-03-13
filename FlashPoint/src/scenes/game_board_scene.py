@@ -54,7 +54,7 @@ class GameBoardScene(object):
         self.chop_controller = ChopController(self._current_player)
         self.door_controller = DoorController(self._current_player)
         for poi in self._game.game_board.active_pois:
-            poi_sprite = POISprite(poi.row, poi.column)
+            poi_sprite = POISprite(poi)
             self.game_board_sprite.add(poi_sprite)
 
         if Networking.get_instance().is_host:

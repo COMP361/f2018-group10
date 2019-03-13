@@ -68,6 +68,32 @@ class DoorSprite(pygame.sprite.Sprite, DoorObserver):
     #     self.button_input.disable()
     #     print("Francisdadasdad")
 
+    def process_input(self):
+        # if self.check():
+        self.button_input.enable()
+
+    def check(self) -> bool:
+        valid_to_open_close = TurnEvent.has_required_AP(self.player.ap, 1)
+        if not valid_to_open_close:
+            return False
+
+        player_tile = self._game.game_board.get_tile_at(self.player.row, self.player.column)
+
+        if self.door_model not in player_tile.adjacent_edge_objects.values():
+            return False
+
+        door_status = self.door_model.door_status
+        if door_status == DoorStatusEnum.DESTROYED:
+            return False
+
+        return True
+
+    def instantiate_event(self):
+        if self.door_model.door_status == DoorStatusEnum.OPEN:
+            CloseDoorEvent(self.door_model, self.player).execute()
+        elif self.door_model.door_status == DoorStatusEnum.CLOSED:
+            OpenDoorEvent(self.door_model, self.player).execute()
+
     def update(self, event_queue):
         diff_x = self.tile_sprite.rect.x - self._prev_x
         diff_y = self.tile_sprite.rect.y - self._prev_y

@@ -48,8 +48,14 @@ class TileSprite(Interactable, TileObserver):
                                       Text(pygame.font.SysFont('Arial', 15), "MoVe HeRe", Color.ORANGE))
         self.extinguish_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
                                             Text(pygame.font.SysFont('Arial', 15), "ExTiNgUiSh FiRe", Color.ORANGE))
+        self.pickup_victim_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
+                                               Text(pygame.font.SysFont('Arial', 15), "PiCkUp ViCtIm", Color.ORANGE))
+        self.drop_victim_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
+                                             Text(pygame.font.SysFont('Arial', 15), "DrOp ViCtIm", Color.ORANGE))
         self.move_button.disable()
         self.extinguish_button.disable()
+        self.pickup_victim_button.disable()
+        self.drop_victim_button.disable()
 
     def _draw_hightlight(self):
         self.image.blit(self._non_highlight_image, (0, 0))
@@ -147,6 +153,17 @@ class TileSprite(Interactable, TileObserver):
                 self.extinguish_button.rect.y = self.rect.y + offset
                 # self.extinguish_button.change_pos(self.rect.x, self.rect.y + offset)
                 offset += 20
+            if self.pickup_victim_button.enabled:
+                screen.blit(self.pickup_victim_button.image, self.pickup_victim_button.rect)
+                self.pickup_victim_button.rect.x = self.rect.x
+                self.pickup_victim_button.rect.y = self.rect.y + offset
+                offset += 20
+
+            elif self.drop_victim_button.enabled:
+                screen.blit(self.drop_victim_button.image, self.drop_victim_button.rect)
+                self.drop_victim_button.rect.x = self.rect.x
+                self.drop_victim_button.rect.y = self.rect.y + offset
+                offset += 20
 
     def update(self, event_queue: EventQueue):
         self.sprite_grp.update(event_queue)
@@ -182,3 +199,15 @@ class TileSprite(Interactable, TileObserver):
 
     def disable_extinguish(self):
         self.extinguish_button.disable()
+
+    def enable_pickup(self):
+        self.pickup_victim_button.enable()
+
+    def disable_pickup(self):
+        self.pickup_victim_button.disable()
+
+    def enable_drop(self):
+        self.drop_victim_button.enable()
+
+    def disable_drop(self):
+        self.drop_victim_button.disable()

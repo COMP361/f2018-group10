@@ -8,16 +8,12 @@ class OpenDoorEvent(TurnEvent):
 
     def __init__(self, door: DoorModel):
         super().__init__()
-        self.door = GameStateModel.instance().game_board.get_tile_at(door.id[0], door.id[1]).get_obstacle_in_direction(door.id[2])
-        self.fireman: PlayerModel = GameStateModel.instance().players_turn
+        game: GameStateModel = GameStateModel.instance()
+        self.door = game.game_board.get_tile_at(door.id[0], door.id[1]).get_obstacle_in_direction(door.id[2])
+        self.fireman = game.players_turn
 
     def execute(self):
         door = self.door
         fireman = self.fireman
-        # TODO: Start here - This is the precondition code - Move it to the GUI
-        # if not self.has_required_AP(fireman.ap, 1):
-        #     raise NotEnoughAPException("open the door", 1)
-        # End here
-
         door.open_door()
-        fireman.ap -= 1
+        fireman.ap = fireman.ap - 1

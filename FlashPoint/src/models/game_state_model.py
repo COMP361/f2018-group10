@@ -224,3 +224,21 @@ class GameStateModel(Model):
 
     def game_lost(self):
         self._state = GameStateEnum.LOST
+
+    def get_players_on_tile(self, row: int, column) -> List[PlayerModel]:
+        """
+        Returns a list containing the players
+        located on a given tile.
+
+        :param row: target tile's row
+        :param column: target tile's column
+        :return: A list containing all the players on
+                a given tile
+        """
+        players_on_tile = []
+        tile = self.game_board.get_tile_at(row, column)
+        for player in self.players:
+            if player.row == tile.row and player.column == tile.column:
+                players_on_tile.append(player)
+
+        return players_on_tile

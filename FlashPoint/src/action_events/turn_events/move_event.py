@@ -1,7 +1,8 @@
 from typing import List
+import time
 
 from src.action_events.turn_events.turn_event import TurnEvent
-from src.constants.state_enums import SpaceStatusEnum, POIIdentityEnum, SpaceKindEnum, DoorStatusEnum
+from src.constants.state_enums import SpaceStatusEnum, POIIdentityEnum, SpaceKindEnum, DoorStatusEnum, VictimStateEnum
 from src.models.game_board.door_model import DoorModel
 from src.models.game_board.null_model import NullModel
 from src.models.game_board.tile_model import TileModel
@@ -14,9 +15,10 @@ from src.models.game_units.victim_model import VictimModel
 class DijkstraTile(object):
 
     def __init__(self, tile_model: TileModel):
-        self.tile_model = tile_model
+        game: GameStateModel = GameStateModel.instance()
+        self.tile_model = game.game_board.get_tile_at(tile_model.row, tile_model.column)
         self.least_cost = 10000
-        self.predecessor = NullModel()
+        self.predecessor: DijkstraTile = NullModel()
 
     def __str__(self):
         dijkstra = "### Dijkstra Tile ###"
@@ -93,8 +95,10 @@ class MoveEvent(TurnEvent):
         self.game: GameStateModel = GameStateModel.instance()
         self.fireman: PlayerModel = self.game.players_turn
         self.source_tile = None
-        self.destination = dest
-        self.moveable_tiles = moveable_tiles
+        self.destination = self.game.game_board.get_tile_at(dest.row, dest.column)
+        self.moveable_tiles = []
+        for m_tile in moveable_tiles:
+            self.moveable_tiles.append(self.game.game_board.get_tile_at(m_tile.row, m_tile.column))
         self.dijkstra_tiles: List[DijkstraTile] = []
 
     def _init_dijkstra_tiles(self, dest: TileModel):
@@ -157,6 +161,7 @@ class MoveEvent(TurnEvent):
         from the first tile, the least cost of the second
         tile is changed to reflect that.
 
+        :param direction: Direction from the first tile to the second
         :param first_tile:
         :param second_tile:
         :return:
@@ -265,28 +270,47 @@ class MoveEvent(TurnEvent):
             # state and dissociate victim from player.
             if isinstance(self.fireman.carrying_victim, VictimModel):
                 if d_tile.tile_model.space_status != SpaceStatusEnum.FIRE:
-                    self.fireman.ap -= 2
+                    self.fireman.ap = self.fireman.ap - 2
                     if d_tile.tile_model.space_kind != SpaceKindEnum.INDOOR:
-                        self.game.victims_saved += 1
+                        self.fireman.carrying_victim.state = VictimStateEnum.RESCUED
+                        self.game.victims_saved = self.game.victims_saved + 1
+                        # remove the victim from the list of active POIs on the board
+                        # and disassociate the victim from the player
+                        self.game.game_board.remove_poi_or_victim(self.fireman.carrying_victim)
                         self.fireman.carrying_victim = NullModel()
 
             # fireman is not carrying a victim
             else:
                 if d_tile.tile_model.space_status != SpaceStatusEnum.FIRE:
-                    self.fireman.ap -= 1
+                    self.fireman.ap = self.fireman.ap - 1
                 else:
-                    self.fireman.ap -= 2
+                    self.fireman.ap = self.fireman.ap - 2
 
             # update the position of the fireman
             self.fireman.set_pos(d_tile.tile_model.row, d_tile.tile_model.column)
 
             # Check the associated models of the tile.
             # If it contains any POIs, flip them over.
-            # If the POI is a False Alarm, remove it.
             for assoc_model in d_tile.tile_model.associated_models:
                 if isinstance(assoc_model, POIModel):
-                    assoc_model.reveal()
-                    if assoc_model.identity == POIIdentityEnum.FALSE_ALARM:
-                        d_tile.tile_model.remove_associated_model(assoc_model)
-                        self.game.game_board.remove_poi_or_victim(assoc_model)
-                    # TODO: do something if POI is Victim
+                    # If the POI is a False Alarm, simply remove it
+                    # from the board and the tile. If it is a Victim,
+                    # remove the POI from the board, tile and
+                    # add a Victim in its place.
+                    new_victim = None
+
+                    # If the POI is a Victim, instantiate a VictimModel
+                    # and add it to the tile, board.
+                    if assoc_model.identity == POIIdentityEnum.VICTIM:
+                        new_victim = VictimModel(VictimStateEnum.ON_BOARD)
+                        d_tile.tile_model.add_associated_model(new_victim)
+                        self.game.game_board.add_poi_or_victim(new_victim)
+
+                    assoc_model.reveal(new_victim)
+
+                    d_tile.tile_model.remove_associated_model(assoc_model)
+                    self.game.game_board.remove_poi_or_victim(assoc_model)
+
+            # Put to sleep so that we can see the
+            # player move through the individual tiles
+            time.sleep(0.75)

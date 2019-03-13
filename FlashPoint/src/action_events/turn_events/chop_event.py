@@ -14,6 +14,6 @@ class ChopEvent(TurnEvent):
         GameStateModel.lock.acquire()
         game: GameStateModel = GameStateModel.instance()
         self.wall.inflict_damage()
-        self.player.ap -= 2
-        game.damage += 1
+        self.player.ap = self.player.ap - 2
+        game.damage = game.damage + 1
         GameStateModel.lock.release()

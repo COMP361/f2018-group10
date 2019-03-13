@@ -5,12 +5,15 @@ from typing import Dict
 from src.action_events.end_turn_advance_fire import EndTurnAdvanceFireEvent
 from src.action_events.turn_events.chop_event import ChopEvent
 from src.action_events.turn_events.close_door_event import CloseDoorEvent
+from src.action_events.turn_events.drop_victim_event import DropVictimEvent
 from src.action_events.turn_events.extinguish_event import ExtinguishEvent
 from src.action_events.advance_fire_event import AdvanceFireEvent
 from src.action_events.turn_events.move_event import MoveEvent
+from src.action_events.turn_events.pick_up_victim_event import PickupVictimEvent
 from src.action_events.turn_events.open_door_event import OpenDoorEvent
 from src.models.game_board.door_model import DoorModel
 from src.models.game_board.wall_model import WallModel
+from src.models.game_units.victim_model import VictimModel
 from src.observers.observer import Observer
 from src.models.game_board.tile_model import TileModel
 from src.action_events.turn_events.choose_starting_position_event import ChooseStartingPositionEvent
@@ -76,6 +79,14 @@ class JSONSerializer(object):
         player.losses = payload['_losses']
 
         return player
+
+    @staticmethod
+    def _deserialize_victim(payload) -> VictimModel:
+        victim_state = payload['_state']
+        serialized_victim: VictimModel = VictimModel(victim_state)
+        serialized_victim.set_position(payload['_row'], payload['_column'])
+
+        return serialized_victim
 
     @staticmethod
     def _deserialize_chat_event(payload: Dict) -> ChatEvent:
@@ -185,6 +196,17 @@ class JSONSerializer(object):
         return event
 
     @staticmethod
+    def _deserialize_drop_event(payload: Dict) -> DropVictimEvent:
+        victim: VictimModel = JSONSerializer.deserialize(payload['victim'])
+        return DropVictimEvent(victim)
+
+
+    @staticmethod
+    def _deserialize_pickup_event(payload: Dict) -> PickupVictimEvent:
+        victim: VictimModel = JSONSerializer.deserialize(payload['victim'])
+        return PickupVictimEvent(victim)
+
+    @staticmethod
     def deserialize(payload: Dict) -> object:
         """
         Grab an object and deserialize it.
@@ -194,6 +216,8 @@ class JSONSerializer(object):
         Add to this case statement to be able to deserialize your object type.
         """
         object_type = payload["class"]
+        if GameStateModel.instance():
+            GameStateModel.instance().game_board.set_adjacencies(GameStateModel.instance().game_board.get_tiles())
 
         # --------------MODELS----------------
         if object_type == PlayerModel.__name__:
@@ -206,6 +230,8 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_door(payload)
         elif object_type == WallModel.__name__:
             return JSONSerializer._deserialize_wall(payload)
+        elif object_type == VictimModel.__name__:
+            return JSONSerializer._deserialize_victim(payload)
         # --------------EVENTS------------------
         elif object_type == JoinEvent.__name__:
             return JSONSerializer._deserialize_join_event(payload)
@@ -235,6 +261,10 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_end_turn_advance_fire_event(payload)
         elif object_type == CloseDoorEvent.__name__:
             return JSONSerializer._deserialize_close_door_event(payload)
+        elif object_type == DropVictimEvent.__name__:
+            return JSONSerializer._deserialize_drop_event(payload)
+        elif object_type == PickupVictimEvent.__name__:
+            return JSONSerializer._deserialize_pickup_event(payload)
 
         print(f"WARNING: Could not deserialize object {object_type}, not of recognized type.")
 
