@@ -1,6 +1,7 @@
 from src.action_events.turn_events.turn_event import TurnEvent
 from src.models.game_board.tile_model import TileModel
 from src.models.game_state_model import GameStateModel
+from src.models.game_units.player_model import PlayerModel
 from src.models.game_units.victim_model import VictimModel
 
 
@@ -15,7 +16,7 @@ class PickupVictimEvent(TurnEvent):
                 self.victim = assoc_model
                 break
 
-        self.player = game.players_turn
+        self.player: PlayerModel = game.players_turn
 
     #### Use this check in the GUI to determine
     #### whether or not to show a pick up victim option

@@ -73,8 +73,6 @@ class VictimController(object):
             tile.pickup_victim_button.disable()
             tile.drop_victim_button.disable()
 
-
-
     def update(self, event_queue: EventQueue):
 
         if GameStateModel.instance().state != GameStateEnum.MAIN_GAME:
