@@ -103,7 +103,7 @@ class EndTurnAdvanceFireEvent(TurnEvent):
             # else it is just set on fire.
             else:
                 nb_tile = origin_tile.get_tile_in_direction(direction)
-                if nb_tile:
+                if not isinstance(nb_tile, NullModel):
                     if nb_tile.space_status == SpaceStatusEnum.FIRE:
                         self.shockwave(nb_tile, direction)
                     else:

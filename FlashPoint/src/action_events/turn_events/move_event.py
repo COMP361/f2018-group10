@@ -152,7 +152,6 @@ class MoveEvent(TurnEvent):
 
         shortest_path = self.shortest_path()
         self.traverse_shortest_path(shortest_path)
-
         GameStateModel.lock.release()
 
     def relax_cost(self, direction: str, first_tile: DijkstraTile, second_tile: DijkstraTile):
