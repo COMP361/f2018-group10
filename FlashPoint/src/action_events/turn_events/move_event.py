@@ -125,7 +125,6 @@ class MoveEvent(TurnEvent):
 
     def execute(self):
         # initialize the Dijkstra tiles
-        GameStateModel.lock.acquire()
         self._init_dijkstra_tiles(self.destination)
         # Insert the Dijkstra tiles
         # into the priority queue
@@ -152,7 +151,6 @@ class MoveEvent(TurnEvent):
 
         shortest_path = self.shortest_path()
         self.traverse_shortest_path(shortest_path)
-        GameStateModel.lock.release()
 
     def relax_cost(self, direction: str, first_tile: DijkstraTile, second_tile: DijkstraTile):
         """
