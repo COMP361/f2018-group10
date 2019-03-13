@@ -1,3 +1,4 @@
+from action_events.end_turn_advance_fire import EndTurnAdvanceFireEvent
 from src.action_events.turn_events.drop_victim_event import DropVictimEvent
 from src.action_events.turn_events.extinguish_event import ExtinguishEvent
 from src.action_events.turn_events.move_event import MoveEvent
@@ -51,6 +52,13 @@ class TileInputController(GameStateObserver):
     @classmethod
     def instance(cls):
         return cls._instance
+
+    @staticmethod
+    def __del__():
+        ExtinguishController._instance = None
+        MoveController._instance = None
+        ChooseStartingPositionController._instance = None
+        TileInputController._instance = None
 
     def move_extinguish_victim(self, tile: TileSprite):
         self.move_controller.process_input(tile)
@@ -119,7 +127,7 @@ class TileInputController(GameStateObserver):
         if Networking.get_instance().is_host:
             Networking.get_instance().send_to_all_client(event)
         else:
-            Networking.get_instance().client.send(event)
+            Networking.get_instance().send_to_server(event)
 
     def execute_move_event(self, tile: TileModel):
         print("move_event created")
@@ -128,7 +136,7 @@ class TileInputController(GameStateObserver):
         if Networking.get_instance().is_host:
             Networking.get_instance().send_to_all_client(event)
         else:
-            Networking.get_instance().client.send(event)
+            Networking.get_instance().send_to_server(event)
 
     def notify_player_index(self, player_index: int):
         pass

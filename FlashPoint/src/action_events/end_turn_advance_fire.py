@@ -1,20 +1,23 @@
-from src.action_events.action_event import ActionEvent
 from src.action_events.knock_down_event import KnockDownEvent
-from src.constants.state_enums import WallStatusEnum, SpaceStatusEnum, SpaceKindEnum, VictimStateEnum, DoorStatusEnum, POIIdentityEnum
 from src.models.game_board.door_model import DoorModel
-from src.models.game_board.game_board_model import GameBoardModel
 from src.models.game_board.null_model import NullModel
-from src.models.game_board.tile_model import TileModel
 from src.models.game_board.wall_model import WallModel
-from src.models.game_state_model import GameStateModel
 from src.models.game_units.poi_model import POIModel
 from src.models.game_units.victim_model import VictimModel
+from src.models.game_board.tile_model import TileModel
+from src.models.game_board.game_board_model import GameBoardModel
+from src.constants.state_enums import GameStateEnum, SpaceStatusEnum, WallStatusEnum, DoorStatusEnum, VictimStateEnum, \
+    POIStatusEnum, SpaceKindEnum
+from src.action_events.turn_events.turn_event import TurnEvent
+from src.models.game_state_model import GameStateModel
+from src.models.game_units.player_model import PlayerModel
 
 
-class AdvanceFireEvent(ActionEvent):
+class EndTurnAdvanceFireEvent(TurnEvent):
 
     def __init__(self, red_dice: int = None, black_dice: int = None):
         super().__init__()
+        self.player = GameStateModel.instance().players_turn
         self.game_state: GameStateModel = GameStateModel.instance()
         self.board: GameBoardModel = self.game_state.game_board
         self.initial_tile: TileModel = None
@@ -28,12 +31,41 @@ class AdvanceFireEvent(ActionEvent):
             self.black_dice = self.game_state.roll_black_dice()
         self.directions = ["North", "South", "East", "West"]
 
-    def execute(self, *args, **kwargs):
-        # Change state of tile depending on previous state
-        self.initial_tile = self.board.get_tile_at(self.red_dice, self.black_dice)
-        self.advance_on_tile(self.initial_tile)
-        self.flashover()
-        self.affect_damages()
+    def execute(self):
+        """
+        Steps:
+        1)start the AdvanceFire
+        2)knockdown event
+        3)replenish POI
+        4)retain and replenish player's AP
+        5)call player_next
+        :return:
+        """
+        # retain up to a maximum of 4 AP
+        # as the turn is ending and
+        # replenish player's AP by 4
+        GameStateModel.lock.acquire()
+        if GameStateModel.instance().state == GameStateEnum.MAIN_GAME:
+
+            # ------ AdvanceFire ------ #
+            # Change state of tile depending on previous state
+            self.initial_tile = self.board.get_tile_at(self.red_dice, self.black_dice)
+            self.advance_on_tile(self.initial_tile)
+            self.flashover()
+            self.affect_damages()
+
+            if self.player.ap > 4:
+                self.player.ap = 4
+
+            self.player.ap += 4
+
+        elif GameStateModel.instance().players_turn_index + 1 == len(GameStateModel.instance().players):
+                # If the last player has chosen a location, move the game into the next phase.
+                GameStateModel.instance().state = GameStateEnum.MAIN_GAME
+
+        # call next player
+        GameStateModel.instance().next_player()
+        GameStateModel.lock.release()
 
     def advance_on_tile(self, target_tile: TileModel):
         tile_status = target_tile.space_status
@@ -55,7 +87,7 @@ class AdvanceFireEvent(ActionEvent):
             # damaging wall present along the tile
             if isinstance(obstacle, WallModel) and obstacle.wall_status != WallStatusEnum.DESTROYED:
                 obstacle.inflict_damage()
-                self.game_state.damage = self.game_state.damage + 1
+                self.game_state.damage += 1
 
             # fire does not move to the neighbouring tile
             # removing door that borders the tile
@@ -108,17 +140,15 @@ class AdvanceFireEvent(ActionEvent):
                 obstacle = tile.get_obstacle_in_direction(direction)
                 if isinstance(obstacle, WallModel):
                     obstacle.inflict_damage()
-                    self.game_state.damage = self.game_state.damage + 1
+                    self.game_state.damage += 1
                     should_stop = True
 
                 elif isinstance(obstacle, DoorModel):
                     if obstacle.door_status == DoorStatusEnum.CLOSED:
                         should_stop = True
                     obstacle.destroy_door()
-
                 else:
                     pass
-
 
     def flashover(self):
         """
@@ -170,41 +200,26 @@ class AdvanceFireEvent(ActionEvent):
                 continue
 
             for model in assoc_models:
-                if isinstance(model, VictimModel):
-                    self.game_state.victims_lost = self.game_state.victims_lost + 1
+                if isinstance(model, PlayerModel):
+                    KnockDownEvent(model).execute()
+
+                elif isinstance(model, VictimModel):
+                    self.game_state.victims_lost += 1
                     model: VictimModel = model
                     model.state = VictimStateEnum.LOST
-                    tile.remove_associated_model(model)
                     self.board.remove_poi_or_victim(model)
 
                 elif isinstance(model, POIModel):
-                    # Reveal the POI and remove it regardless
-                    # of False Alarm or Victim identity.
-                    # If it is a Victim, put a Victim model
-                    # there, sleep (inside remove_poi_or_victim)
-                    # so that the victim can be seen briefly, then
-                    # remove it and increment the game state damage.
                     model.reveal()
-                    tile.remove_associated_model(model)
+                    model.status = POIStatusEnum.LOST
                     self.board.remove_poi_or_victim(model)
-                    if model.identity == POIIdentityEnum.VICTIM:
-                        new_victim = VictimModel(VictimStateEnum.ON_BOARD)
-                        tile.add_associated_model(new_victim)
-                        self.board.add_poi_or_victim(new_victim)
-                        tile.remove_associated_model(new_victim)
-                        self.board.remove_poi_or_victim(new_victim)
-                        self.game_state.victims_lost = self.game_state.victims_lost + 1
-
 
                 else:
                     pass
-
-            players_on_tile = self.game_state.get_players_on_tile(tile.row, tile.column)
-            for player in players_on_tile:
-                KnockDownEvent(player.ip).execute()
 
         # removing any fire markers that were
         # placed outside of the building
         for tile in self.board.tiles:
             if tile.space_kind != SpaceKindEnum.INDOOR and tile.space_status == SpaceStatusEnum.FIRE:
                 tile.space_status = SpaceStatusEnum.SAFE
+
