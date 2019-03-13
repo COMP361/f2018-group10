@@ -49,7 +49,6 @@ class POIIdentityEnum(Enum):
     VICTIM = auto()
     FALSE_ALARM = auto()
 
-
 class SpaceKindEnum(Enum):
     INDOOR = auto()
     OUTDOOR = auto()
@@ -73,6 +72,7 @@ class VictimStateEnum(Enum):
     TREATED = auto()
     RESCUED = auto()
     LOST = auto()
+    ON_BOARD = auto()
 
 
 class WallStatusEnum(Enum):

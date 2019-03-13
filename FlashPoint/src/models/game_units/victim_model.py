@@ -9,8 +9,8 @@ class VictimModel(Model):
     def __init__(self, victim_state: VictimStateEnum):
         super().__init__()
         self._state = victim_state
-        self._row = 0
-        self._column = 0
+        self._row = -7
+        self._column = -7
 
     def __str__(self):
         victim_pos = "Victim position: ({row}, {column})".format(row=self.row, column=self.column)

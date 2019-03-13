@@ -69,8 +69,12 @@ class PlayerModel(Model):
         return self._row
 
     def set_pos(self, row: int, column: int):
+        # If the player is carrying a victim,
+        # update their position as well
         self._row = row
         self._column = column
+        if isinstance(self.carrying_victim, VictimModel):
+            self.carrying_victim.set_position(row, column)
         self._notify_position()
 
     @property
@@ -147,7 +151,7 @@ class PlayerModel(Model):
         self._notify_status()
 
     @property
-    def carrying_victim(self):
+    def carrying_victim(self) -> VictimModel:
         return self._carrying_victim
 
     @carrying_victim.setter

@@ -12,7 +12,6 @@ from src.constants.state_enums import GameKindEnum, SpaceKindEnum, SpaceStatusEn
 from src.models.game_board.wall_model import WallModel
 from src.models.game_board.door_model import DoorModel
 
-
 class GameBoardModel(object):
     """
     Class for aggregating all objects related to the game board itself, this means TileModels, PlayerModels
@@ -51,8 +50,13 @@ class GameBoardModel(object):
     def active_pois(self):
         return self._active_pois
 
+    def add_poi_or_victim(self, poi_or_victim):
+        self._active_pois.append(poi_or_victim)
+
     def remove_poi_or_victim(self, poi_or_victim):
         if poi_or_victim in self._active_pois:
+            if poi_or_victim.row >= 0 and poi_or_victim.column >= 0:
+                poi_or_victim.set_position(-7, -7)
             self._active_pois.remove(poi_or_victim)
 
     def get_random_poi_from_bank(self) -> POIModel:
@@ -63,6 +67,8 @@ class GameBoardModel(object):
     @staticmethod
     def _init_pois():
         pois = []
+        # POIs initialized with negative coordinates
+        # since they are not on the board
         for i in range(5):
             pois.append(POIModel(POIIdentityEnum.VICTIM))
         for i in range(5):
@@ -91,7 +97,6 @@ class GameBoardModel(object):
                 tile = TileModel(i, j, tile_kind)
                 tiles[i].append(tile)
 
-        # TODO: Abhijay: setting adjacency and creating walls/doors.
         # setting tile adjacencies
         self.set_adjacencies(tiles)
 
@@ -291,4 +296,3 @@ class GameBoardModel(object):
     def reset_tiles_visit_count(self):
         for tile in self.tiles:
             tile.visit_count = 0
-            

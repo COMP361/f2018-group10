@@ -12,8 +12,9 @@ class ExtinguishEvent(TurnEvent):
 
     def __init__(self, extinguish_space: TileModel):
         super().__init__()
-        self.fireman: PlayerModel = GameStateModel.instance().players_turn
-        self.extinguish_space: TileModel = extinguish_space
+        game: GameStateModel = GameStateModel.instance()
+        self.fireman: PlayerModel = game.players_turn
+        self.extinguish_space: TileModel = game.game_board.get_tile_at(extinguish_space.row, extinguish_space.column)
 
     def execute(self):
         fireman = self.fireman
@@ -31,7 +32,5 @@ class ExtinguishEvent(TurnEvent):
 
         fireman.ap = fireman.ap - 1
 
-        print("Tile is now: ")
-        print(extinguish_space.space_status)
-
+        print(extinguish_space)
         return

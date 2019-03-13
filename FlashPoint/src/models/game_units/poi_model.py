@@ -12,12 +12,13 @@ class POIModel(Model):
         super().__init__()
         self._identity = identity
         self._status = POIStatusEnum.HIDDEN
-        self._row = 0
-        self._column = 0
+        self._row = -7
+        self._column = -7
 
     def reveal(self):
         if self._status is POIStatusEnum.HIDDEN:
             self._status = POIStatusEnum.REVEALED
+            self._notify_status()
 
     def _notify_status(self):
         for obs in self.observers:
@@ -61,7 +62,3 @@ class POIModel(Model):
 
         else:
             return self._identity
-
-    @property
-    def observers(self) -> List[POIObserver]:
-        return self._observers

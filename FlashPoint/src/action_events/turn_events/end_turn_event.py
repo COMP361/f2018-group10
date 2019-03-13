@@ -28,7 +28,7 @@ class EndTurnEvent(TurnEvent):
             if self.player.ap > 4:
                 self.player.ap = 4
 
-            self.player.ap += 4
+            self.player.ap = self.player.ap + 4
 
         # call next player
         GameStateModel.instance().next_player()
