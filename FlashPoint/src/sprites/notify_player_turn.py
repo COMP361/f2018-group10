@@ -49,6 +49,8 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
         self._current_sprite = current_sprite
         self._active_sprites = sprite_group
         self._should_advance_fire = False
+        self.btn = None
+        self.your_turn = None
 
         GameStateModel.instance().add_observer(self)
 
