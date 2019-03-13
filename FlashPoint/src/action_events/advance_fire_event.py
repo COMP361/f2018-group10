@@ -1,7 +1,7 @@
 from src.action_events.action_event import ActionEvent
 from src.action_events.knock_down_event import KnockDownEvent
 from src.constants.state_enums import WallStatusEnum, SpaceStatusEnum, SpaceKindEnum, VictimStateEnum, DoorStatusEnum, \
-    POIStatusEnum
+    POIStatusEnum, POIIdentityEnum
 from src.models.game_board.door_model import DoorModel
 from src.models.game_board.game_board_model import GameBoardModel
 from src.models.game_board.null_model import NullModel
@@ -163,7 +163,6 @@ class AdvanceFireEvent(ActionEvent):
             if num_converted == 0:
                 all_smokes_converted = True
 
-
     def affect_damages(self):
         """
         Affect any valid damages to firemen,
@@ -185,6 +184,9 @@ class AdvanceFireEvent(ActionEvent):
 
                 elif isinstance(model, POIModel):
                     model.reveal()
+                    if model.identity == POIIdentityEnum.VICTIM:
+                        self.game_state.victims_lost = self.game_state.victims_lost + 1
+
                     model.status = POIStatusEnum.LOST
                     tile.remove_associated_model(model)
                     self.board.remove_poi_or_victim(model)

@@ -11,10 +11,8 @@ class DropVictimEvent(TurnEvent):
         game: GameStateModel = GameStateModel.instance()
         self.victim_tile = game.game_board.get_tile_at(victim.row, victim.column)
         self.player = game.players_turn
-
     #### Use this check in the GUI to determine
     #### whether or not to show a drop victim option
-
 
     def execute(self):
         self.victim_tile.add_associated_model(self.player.carrying_victim)

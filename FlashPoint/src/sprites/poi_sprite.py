@@ -1,25 +1,44 @@
+import time
+
 import pygame
+from src.sprites.false_alarm_sprite import FalseAlarmSprite
+from src.sprites.victim_sprite import VictimSprite
+from src.models.game_units.poi_model import POIModel
 from src.sprites.game_board import GameBoard
 from src.core.event_queue import EventQueue
 
 from src.UIComponents.file_importer import FileImporter
-from src.constants.state_enums import POIStatusEnum
+from src.constants.state_enums import POIStatusEnum, POIIdentityEnum
 from src.observers.poi_observer import POIObserver
 
 
 class POISprite(pygame.sprite.Sprite, POIObserver):
     """Visual representation of a POI."""
 
-    def __init__(self, row: int, column: int):
+    def __init__(self, poi: POIModel):
         super().__init__()
         self.image = FileImporter.import_image("media/all_markers/poi.png")
         self.rect = self.image.get_rect()
-        self.row = row
-        self.column = column
-        self.tile_sprite = GameBoard.instance().grid.grid[column][row]
+        self.poi_model = poi
+        self.row = poi.row
+        self.column = poi.column
+        self.tile_sprite = GameBoard.instance().grid.grid[poi.column][poi.row]
 
     def poi_status_changed(self, status: POIStatusEnum):
-        pass
+        if status == POIStatusEnum.REVEALED:
+            if self.poi_model.identity == POIIdentityEnum.VICTIM:
+                # Replace this sprite with a victim sprite.
+                victim_sprite = VictimSprite(self.row, self.column)
+                for group in self.groups():
+                    group.add(victim_sprite)
+            elif self.poi_model.identity == POIIdentityEnum.FALSE_ALARM:
+                # Show the false alarm for a few seconds, then remove it.
+                false_alarm_sprite = FalseAlarmSprite(self.poi_model)
+                for group in self.groups():
+                    group.add(false_alarm_sprite)
+                time.sleep(2)
+                false_alarm_sprite.kill()
+            self.kill()
 
     def poi_position_changed(self, row: int, column: int):
         self.tile_sprite = GameBoard.instance().grid.grid[column][row]

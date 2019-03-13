@@ -62,7 +62,7 @@ class TileInputController(GameStateObserver):
                 self.extinguish_controller.fire_tile.extinguish_button.on_click(self.execute_extinguish_event, tile_model)
                 self.extinguish_controller.fire_tile.extinguish_button.update(EventQueue.get_instance())
 
-            if self.victim_controller.can_drop:
+            # if self.victim_controller.can_drop:
 
 
         if not tile.menu_shown:

@@ -12,17 +12,24 @@ class VictimSprite(pygame.sprite.Sprite, VictimObserver):
 
     def __init__(self, row: int, column: int):
         super().__init__()
-        self.image = FileImporter.import_image("media/all_markers/poi.png")
+        self.image = FileImporter.import_image("media/all_markers/victim.png")
         self.rect = self.image.get_rect()
         self.row = row
         self.column = column
         self.tile_sprite = GameBoard.instance().grid.grid[column][row]
 
     def victim_state_changed(self, state: VictimStateEnum):
-        pass
+        if state == VictimStateEnum.LOST:
+            # TODO: Maybe make lost victims show up on the side
+            self.kill()
+        elif state == VictimStateEnum.RESCUED:
+            # TODO: Maybe put lost victims show up on the side
+            self.kill()
 
     def victim_position_changed(self, row: int, column: int):
-        pass
+        self.tile_sprite = GameBoard.instance().grid.grid[column][row]
+        self.row = row
+        self.column = column
 
     def update(self, event_queue: EventQueue):
         new_x = self.tile_sprite.rect.x
