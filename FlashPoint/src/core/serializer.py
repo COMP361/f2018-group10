@@ -110,10 +110,10 @@ class JSONSerializer(object):
         tile_list = payload['moveable_tiles']
         moveable_tiles = []
         for tile in tile_list:
-            tile_model: TileModel = game_board.get_tile_at(tile['_row'], tile['_column'])
+            tile_model: TileModel = game_board.get_tile_at(tile['_column'], tile['_row'])
             moveable_tiles.append(tile_model)
 
-        destination_model: TileModel = game_board.get_tile_at(destination['_row'], destination['_column'])
+        destination_model: TileModel = game_board.get_tile_at(destination['_column'], destination['_row'])
         game_board.set_adjacencies(game_board.get_tiles())
         event = MoveEvent(destination_model, moveable_tiles)
         return event
