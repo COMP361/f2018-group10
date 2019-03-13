@@ -4,7 +4,7 @@ import pygame
 import os.path
 
 import src.constants.color as color
-from src.models.game_state_model import GameStateModel
+from src.models.game_board.null_model import NullModel
 from src.core.custom_event import CustomEvent
 from src.core.networking import Networking
 from src.core.serializer import JSONSerializer
@@ -105,6 +105,10 @@ class StartScene(object):
             temp = json.load(myFile)
             for i, user in enumerate(temp):
                 player: PlayerModel = JSONSerializer.deserialize(user)
+                player.set_pos(-1, -1)
+                player.ap = 0
+                player.special_ap = 0
+                player.carrying_victim = NullModel()
                 self.profile.set_profile(
                     i, player.nickname, player.wins, player.losses, EventQueue.post,
                     CustomEvent(ChangeSceneEnum.HOSTJOINSCENE, player=player)
