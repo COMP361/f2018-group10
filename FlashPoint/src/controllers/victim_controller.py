@@ -28,7 +28,13 @@ class VictimController(object):
 
     def check_pickup(self, tile: TileModel) -> bool:
         game: GameStateModel = GameStateModel.instance()
+
         victim_tile = game.game_board.get_tile_at(tile.row, tile.column)
+        player = game.players_turn
+
+        if not game.game_board.get_tile_at(player.row, player.column) == victim_tile:
+            return False
+
         for assoc_model in victim_tile.associated_models:
             if isinstance(assoc_model, VictimModel):
                 return True
