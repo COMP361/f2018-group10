@@ -189,7 +189,7 @@ class MoveController(PlayerObserver):
 
                 tile_model = GameStateModel.instance().game_board.get_tile_at(row, column)
                 tile = self.game_board_sprite.grid.grid[column][row]
-                if self._run_checks(tile_model) and not tile.highlight_color:
+                if self._run_checks(tile_model):
                     tile.highlight_color = Color.GREEN
                 elif not self._run_checks(tile_model):
                     tile.highlight_color = None

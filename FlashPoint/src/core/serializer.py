@@ -137,6 +137,7 @@ class JSONSerializer(object):
 
         tile_dict = payload['extinguish_space']
         tile: TileModel = GameStateModel.instance().game_board.get_tile_at(tile_dict['_row'], tile_dict['_column'])
+        GameStateModel.instance().game_board.set_single_tile_adjacencies(tile)
         return ExtinguishEvent(tile)
 
     @staticmethod
