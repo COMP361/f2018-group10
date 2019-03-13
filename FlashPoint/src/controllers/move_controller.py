@@ -161,7 +161,7 @@ class MoveController(PlayerObserver):
     def _run_checks(self, tile_model: TileModel) -> bool:
         if self.current_player != GameStateModel.instance().players_turn:
             return False
-        self._determine_reachable_tiles(self.current_player.row, self.current_player.column, self.current_player.ap)
+        # self._determine_reachable_tiles(self.current_player.row, self.current_player.column, self.current_player.ap)
         return tile_model in self.moveable_tiles
 
     def process_input(self, tile_sprite: TileSprite):

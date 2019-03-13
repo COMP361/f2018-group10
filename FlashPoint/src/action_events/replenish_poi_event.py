@@ -23,6 +23,7 @@ class ReplenishPOIEvent(ActionEvent):
 
     def execute(self):
         if not self.check():
+            print("Don't need to replenish poi")
             return
 
         num_pois_to_add = 3 - len(self.board.active_pois)
@@ -31,6 +32,7 @@ class ReplenishPOIEvent(ActionEvent):
             new_poi_column = self.game.roll_black_dice()
             tile = self.board.get_tile_at(new_poi_row, new_poi_column)
             new_poi = self.board.get_random_poi_from_bank()
+            new_poi.set_pos(tile.row, tile.column)
 
             # if the tile already has a POI on it, reroll.
             # (do this by decrementing x so that one more
@@ -43,6 +45,7 @@ class ReplenishPOIEvent(ActionEvent):
                     break
 
             if do_reroll:
+                print("rerolled")
                 continue
 
             # if tile has smoke/fire, remove it
@@ -52,12 +55,13 @@ class ReplenishPOIEvent(ActionEvent):
 
             tile.add_associated_model(new_poi)
             self.game.game_board.add_poi_or_victim(new_poi)
+            print("New poi added")
 
             # if tile has a fireman on it, immediately flip
             # the POI and remove it if it is a False Alarm
             players_on_tile = self.game.get_players_on_tile(tile.row, tile.column)
             if len(players_on_tile) > 0:
-                new_poi.reveal()
+                new_victim = None
                 tile.remove_associated_model(new_poi)
                 self.game.game_board.remove_poi_or_victim(new_poi)
                 if new_poi.identity == POIIdentityEnum.FALSE_ALARM:
@@ -69,3 +73,5 @@ class ReplenishPOIEvent(ActionEvent):
                     new_victim = VictimModel(VictimStateEnum.ON_BOARD)
                     tile.add_associated_model(new_victim)
                     self.game.game_board.add_poi_or_victim(new_victim)
+                    print("Victim added")
+                new_poi.reveal(new_victim)
