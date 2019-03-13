@@ -1,4 +1,3 @@
-from abc import ABC
 from typing import List
 import time
 
@@ -96,8 +95,10 @@ class MoveEvent(TurnEvent):
         self.game: GameStateModel = GameStateModel.instance()
         self.fireman: PlayerModel = self.game.players_turn
         self.source_tile = None
-        self.destination = dest
-        self.moveable_tiles = moveable_tiles
+        self.destination = self.game.game_board.get_tile_at(dest.row, dest.column)
+        self.moveable_tiles = []
+        for m_tile in moveable_tiles:
+            self.moveable_tiles.append(self.game.game_board.get_tile_at(m_tile.row, m_tile.column))
         self.dijkstra_tiles: List[DijkstraTile] = []
 
     def _init_dijkstra_tiles(self, dest: TileModel):
@@ -160,6 +161,7 @@ class MoveEvent(TurnEvent):
         from the first tile, the least cost of the second
         tile is changed to reflect that.
 
+        :param direction: Direction from the first tile to the second
         :param first_tile:
         :param second_tile:
         :return:

@@ -28,8 +28,7 @@ class KnockDownEvent(ActionEvent):
         # get the closest ambulance spots to the player.
         # if there is only one closest spot, set the
         # player's location to that of the closest spot.
-        # else, offer the user a choice from the list of
-        # closest spots available.
+        # else, assign a random closest spot to the player.
         player_tile = self.game.game_board.get_tile_at(self.player.row, self.player.column)
         closest_ambulance_spots = self.game.game_board.find_closest_parking_spots("Ambulance", player_tile)
         if len(closest_ambulance_spots) == 1:
