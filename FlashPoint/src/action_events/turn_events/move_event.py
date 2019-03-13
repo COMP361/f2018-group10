@@ -303,6 +303,7 @@ class MoveEvent(TurnEvent):
                     # and add it to the tile, board.
                     if assoc_model.identity == POIIdentityEnum.VICTIM:
                         new_victim = VictimModel(VictimStateEnum.ON_BOARD)
+                        new_victim.set_position(d_tile.tile_model.row, d_tile.tile_model.column)
                         d_tile.tile_model.add_associated_model(new_victim)
                         self.game.game_board.add_poi_or_victim(new_victim)
 
