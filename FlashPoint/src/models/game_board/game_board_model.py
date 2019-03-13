@@ -239,7 +239,7 @@ class GameBoardModel(object):
             # Location indices are inverted cause i wrote the list wrong lel
             row = locations[i][0]
             column = locations[i][1]
-            poi.set_position(row, column)
+            poi.set_pos(row, column)
             self._active_pois.append(poi)
             self.get_tile_at(row, column).add_associated_model(poi)
 

@@ -1,4 +1,4 @@
-from typing import Tuple, List
+from typing import Tuple, List, Union
 
 import src.constants.color as Color
 from src.models.game_board.null_model import NullModel
@@ -74,7 +74,7 @@ class PlayerModel(Model):
         self._row = row
         self._column = column
         if isinstance(self.carrying_victim, VictimModel):
-            self.carrying_victim.set_position(row, column)
+            self.carrying_victim.set_pos(row, column)
         self._notify_position()
 
     @property
@@ -155,10 +155,9 @@ class PlayerModel(Model):
         self._notify_status()
 
     @property
-    def carrying_victim(self) -> VictimModel:
+    def carrying_victim(self) -> Union[VictimModel, NullModel]:
         return self._carrying_victim
 
     @carrying_victim.setter
     def carrying_victim(self, victim: VictimModel):
         self._carrying_victim = victim
-        
