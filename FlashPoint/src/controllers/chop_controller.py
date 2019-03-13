@@ -64,9 +64,14 @@ class ChopController(object):
         wall_sprite.enable_chop()
         self.to_chop = wall_sprite
         self.to_chop.button_input.enable()
-        self.to_chop.button_input.on_click(self.instantiate_event, self.to_chop.wall)
+        self.to_chop.button_input.on_click(self.instantiate_event, self.to_chop)
 
-    def instantiate_event(self, wall: WallModel):
+    def instantiate_event(self, wall_sprite: WallSprite):
+
+        wall = wall_sprite.wall
+        if not self.check(wall):
+            return
+
         event = ChopEvent(wall)
         if Networking.get_instance().is_host:
             Networking.get_instance().send_to_all_client(event)
