@@ -12,8 +12,8 @@ class ReplenishPOIEvent(ActionEvent):
         self.game: GameStateModel = GameStateModel.instance()
         self.board = self.game.game_board
 
-    #### Use this method to check whether
-    #### the POIs should be replenished or not
+    # Use this method to check whether
+    # the POIs should be replenished or not
     def check(self):
         num_active_pois = len(self.board.active_pois)
         if num_active_pois >= 3:
@@ -22,6 +22,9 @@ class ReplenishPOIEvent(ActionEvent):
         return True
 
     def execute(self):
+        if not self.check():
+            return
+
         num_pois_to_add = 3 - len(self.board.active_pois)
         for x in range(num_pois_to_add):
             new_poi_row = self.game.roll_red_dice()

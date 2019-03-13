@@ -210,7 +210,6 @@ class GameStateModel(Model):
             if self._victims_lost >= 4:
                 self.state = GameStateEnum.LOST
 
-
     @property
     def damage(self) -> int:
         with GameStateModel.lock:
