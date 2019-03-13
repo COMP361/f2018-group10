@@ -171,7 +171,7 @@ class GameStateModel(Model):
         self._victims_saved = victims_saved
         for obs in self.observers:
             obs.saved_victims(victims_saved)
-        if self._victims_saved == 7:
+        if self._victims_saved >= 7:
             self.state = GameStateEnum.WON
 
     @property
