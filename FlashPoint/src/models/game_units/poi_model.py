@@ -41,7 +41,7 @@ class POIModel(Model):
     def column(self) -> int:
         return self._column
 
-    def set_position(self, row: int, column: int):
+    def set_pos(self, row: int, column: int):
         self._row = row
         self._column = column
         self._notify_position()

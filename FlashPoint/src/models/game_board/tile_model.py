@@ -203,7 +203,7 @@ class TileModel(Model):
     def add_associated_model(self, model: Model):
         # The model's observers will take care
         # of redrawing the model in the new location
-        model.set_position(self.row, self.column)
+        model.set_pos(self.row, self.column)
         self._associated_models.append(model)
         self._notify_assoc_models()
 
