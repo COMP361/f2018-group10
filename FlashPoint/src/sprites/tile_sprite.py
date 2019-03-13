@@ -45,13 +45,13 @@ class TileSprite(Interactable, TileObserver):
         # ------- POP-UP MENU -------- #
         self.menu_shown = False
         self.move_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
-                                      Text(pygame.font.SysFont('Arial', 15), "MoVe HeRe", Color.ORANGE))
+                                      Text(pygame.font.SysFont('Arial', 15), "Move Here", Color.ORANGE))
         self.extinguish_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
-                                            Text(pygame.font.SysFont('Arial', 15), "ExTiNgUiSh FiRe", Color.ORANGE))
+                                            Text(pygame.font.SysFont('Arial', 15), "Extinguish Fire", Color.ORANGE))
         self.pickup_victim_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
-                                               Text(pygame.font.SysFont('Arial', 15), "PiCkUp ViCtIm", Color.ORANGE))
+                                               Text(pygame.font.SysFont('Arial', 15), "Pickup Victim", Color.ORANGE))
         self.drop_victim_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
-                                             Text(pygame.font.SysFont('Arial', 15), "DrOp ViCtIm", Color.ORANGE))
+                                             Text(pygame.font.SysFont('Arial', 15), "Drop Victim", Color.ORANGE))
         self.move_button.disable()
         self.extinguish_button.disable()
         self.pickup_victim_button.disable()

@@ -1,4 +1,5 @@
 from src.action_events.knock_down_event import KnockDownEvent
+from src.action_events.replenish_poi_event import ReplenishPOIEvent
 from src.models.game_board.door_model import DoorModel
 from src.models.game_board.null_model import NullModel
 from src.models.game_board.wall_model import WallModel
@@ -7,10 +8,9 @@ from src.models.game_units.victim_model import VictimModel
 from src.models.game_board.tile_model import TileModel
 from src.models.game_board.game_board_model import GameBoardModel
 from src.constants.state_enums import GameStateEnum, SpaceStatusEnum, WallStatusEnum, DoorStatusEnum, VictimStateEnum, \
-    POIStatusEnum, SpaceKindEnum, POIIdentityEnum
+    SpaceKindEnum, POIIdentityEnum
 from src.action_events.turn_events.turn_event import TurnEvent
 from src.models.game_state_model import GameStateModel
-from src.models.game_units.player_model import PlayerModel
 
 
 class EndTurnAdvanceFireEvent(TurnEvent):
@@ -53,6 +53,10 @@ class EndTurnAdvanceFireEvent(TurnEvent):
             self.advance_on_tile(self.initial_tile)
             self.flashover()
             self.affect_damages()
+
+            # ------ ReplenishPOI ------ #
+            rp_event = ReplenishPOIEvent()
+            rp_event.execute()
 
             if self.player.ap > 4:
                 self.player.ap = 4
