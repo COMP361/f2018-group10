@@ -4,6 +4,12 @@ import pygame
 import os.path
 
 import src.constants.color as color
+from src.controllers.chop_controller import ChopController
+from src.controllers.door_controller import DoorController
+from src.controllers.tile_input_controller import TileInputController
+from src.models.game_state_model import GameStateModel
+from src.sprites.game_board import GameBoard
+
 from src.models.game_board.null_model import NullModel
 from src.core.custom_event import CustomEvent
 from src.core.networking import Networking
@@ -32,8 +38,15 @@ class StartScene(object):
 
         self._init_btn_register(((self.resolution[0]/2)-(500/2))+400, 592, "Create Profile",
                                 color.STANDARDBTN, color.BLACK)
-
         self.update_profiles()
+
+        if GameStateModel.instance():
+            GameStateModel.__del__()
+        if GameBoard.instance():
+            GameBoard._instance = None
+            TileInputController.__del__()
+            ChopController._instance = None
+            DoorController._instance = None
 
     def _init_background(self):
         box_size = (self.resolution[0], self.resolution[1])
