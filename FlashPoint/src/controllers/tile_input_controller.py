@@ -1,4 +1,3 @@
-from action_events.end_turn_advance_fire import EndTurnAdvanceFireEvent
 from src.action_events.turn_events.drop_victim_event import DropVictimEvent
 from src.action_events.turn_events.extinguish_event import ExtinguishEvent
 from src.action_events.turn_events.move_event import MoveEvent
