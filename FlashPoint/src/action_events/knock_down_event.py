@@ -19,10 +19,11 @@ class KnockDownEvent(ActionEvent):
         # victim from the player and increment the
         # number of victims lost.
         if isinstance(self.player.carrying_victim, VictimModel):
-            # TODO: do we have to remove the victim from the list of active POIs of the board?
+            # TODO: do we have to remove the victim from the list of active POIs of the board? - done
             self.player.carrying_victim.state = VictimStateEnum.LOST
+            self.game.game_board.remove_poi_or_victim(self.player.carrying_victim)
             self.player.carrying_victim = NullModel()
-            self.game.victims_lost += 1
+            self.game.victims_lost = self.game.victims_lost + 1
 
         # get the closest ambulance spots to the player.
         # if there is only one closest spot, set the

@@ -31,7 +31,5 @@ class ExtinguishEvent(TurnEvent):
 
         fireman.ap = fireman.ap - 1
 
-        print("Tile is now: ")
-        print(extinguish_space.space_status)
-
+        print(extinguish_space)
         return

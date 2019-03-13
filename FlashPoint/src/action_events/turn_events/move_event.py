@@ -270,7 +270,7 @@ class MoveEvent(TurnEvent):
                     self.fireman.ap -= 2
                     if d_tile.tile_model.space_kind != SpaceKindEnum.INDOOR:
                         self.fireman.carrying_victim.state = VictimStateEnum.RESCUED
-                        self.game.victims_saved += 1
+                        self.game.victims_saved = self.game.victims_saved + 1
                         # TODO: disassociate victim from list of active POIs of board - Done
                         # remove the victim from the list of active POIs on the board
                         # and disassociate the victim from the player

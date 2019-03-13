@@ -8,7 +8,6 @@ from src.models.game_board.null_model import NullModel
 from src.models.game_board.tile_model import TileModel
 from src.models.game_board.wall_model import WallModel
 from src.models.game_state_model import GameStateModel
-from src.models.game_units.player_model import PlayerModel
 from src.models.game_units.poi_model import POIModel
 from src.models.game_units.victim_model import VictimModel
 
@@ -59,7 +58,7 @@ class AdvanceFireEvent(ActionEvent):
             # damaging wall present along the tile
             if isinstance(obstacle, WallModel) and obstacle.wall_status != WallStatusEnum.DESTROYED:
                 obstacle.inflict_damage()
-                self.game_state.damage += 1
+                self.game_state.damage = self.game_state.damage + 1
 
             # fire does not move to the neighbouring tile
             # removing door that borders the tile
@@ -114,7 +113,7 @@ class AdvanceFireEvent(ActionEvent):
                 obstacle = tile.get_obstacle_in_direction(direction)
                 if isinstance(obstacle, WallModel):
                     obstacle.inflict_damage()
-                    self.game_state.damage += 1
+                    self.game_state.damage = self.game_state.damage + 1
                     should_stop = True
 
                 elif isinstance(obstacle, DoorModel):
@@ -177,11 +176,8 @@ class AdvanceFireEvent(ActionEvent):
                 continue
 
             for model in assoc_models:
-                if isinstance(model, PlayerModel):
-                    KnockDownEvent(model).execute()
-
-                elif isinstance(model, VictimModel):
-                    self.game_state.victims_lost += 1
+                if isinstance(model, VictimModel):
+                    self.game_state.victims_lost = self.game_state.victims_lost + 1
                     model: VictimModel = model
                     model.state = VictimStateEnum.LOST
                     self.board.remove_poi_or_victim(model)
@@ -193,6 +189,10 @@ class AdvanceFireEvent(ActionEvent):
 
                 else:
                     pass
+
+            players_on_tile = self.game_state.get_players_on_tile(tile.row, tile.column)
+            for player in players_on_tile:
+                KnockDownEvent(player).execute()
 
         # removing any fire markers that were
         # placed outside of the building
