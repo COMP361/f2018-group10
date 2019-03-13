@@ -151,7 +151,6 @@ class EndTurnAdvanceFireEvent(TurnEvent):
                 else:
                     pass
 
-
     def flashover(self):
         """
         Convert all smokes adjacent to fires

@@ -31,7 +31,6 @@ class GameBoard(pygame.sprite.Group):
         return cls._instance
 
     def draw(self, screen: pygame.Surface):
-
         self.image.blit(self.background, (0, 0))
         self.grid.draw(self.image)
         for sprite in self:

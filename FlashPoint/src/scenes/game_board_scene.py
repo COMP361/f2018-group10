@@ -39,7 +39,7 @@ class GameBoardScene(object):
         self._save_games_file = "media/save_games.json"
         self.screen = screen
         self._game: GameStateModel = GameStateModel.instance()
-        self._current_player = current_player
+        self._current_player = [player for player in self._game.players if player == current_player][0]
         self._current_sprite = None
 
         self.quit_btn = RectButton(200, 250, 100, 50, Color.STANDARDBTN, 0,

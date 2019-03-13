@@ -12,6 +12,7 @@ class ChooseStartingPositionEvent(ActionEvent):
 
     def __init__(self, tile: TileModel):
         super().__init__()
+        print(f"{tile.row}, {tile.column}")
         game: GameStateModel = GameStateModel.instance()
         self.tile = game.game_board.get_tile_at(tile.row, tile.column)
         self.player: PlayerModel = game.players_turn

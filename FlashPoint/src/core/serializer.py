@@ -84,7 +84,7 @@ class JSONSerializer(object):
     def _deserialize_victim(payload) -> VictimModel:
         victim_state = payload['_state']
         serialized_victim: VictimModel = VictimModel(victim_state)
-        serialized_victim.set_position(payload['_row'], payload['_column'])
+        serialized_victim.set_pos(payload['_row'], payload['_column'])
 
         return serialized_victim
 
