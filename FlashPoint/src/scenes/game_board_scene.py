@@ -59,6 +59,9 @@ class GameBoardScene(object):
         self.tile_input_controller = TileInputController(self._current_player)
         self.chop_controller = ChopController(self._current_player)
         self.door_controller = DoorController(self._current_player)
+        for poi in self._game.game_board.active_pois:
+            poi_sprite = POISprite(poi)
+            self.game_board_sprite.add(poi_sprite)
 
         if Networking.get_instance().is_host:
             GameStateModel.instance()._notify_player_index()
@@ -141,11 +144,6 @@ class GameBoardScene(object):
         """Call the update() function of everything in this class."""
         self.active_sprites.update(event_queue)
         self.chat_box.update(event_queue)
-
-        for poi in self._game.game_board.active_pois:
-            poi_sprite = POISprite(poi)
-            if poi_sprite not in self.game_board_sprite:
-                self.game_board_sprite.add(poi_sprite)
 
         if not self.ignore_area():
             self.game_board_sprite.update(event_queue)
