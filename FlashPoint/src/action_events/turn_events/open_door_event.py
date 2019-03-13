@@ -9,7 +9,7 @@ class OpenDoorEvent(TurnEvent):
     def __init__(self, door: DoorModel, fireman: PlayerModel):
         super().__init__()
         game: GameStateModel = GameStateModel.instance()
-        self.door = game.game_board.get_tile_at(door.id[0], door.id[1]).get_obstacle_in_direction(door[2])
+        self.door = game.game_board.get_tile_at(door.id[0], door.id[1]).get_obstacle_in_direction(door.id[2])
         self.fireman = game.players_turn
 
     def execute(self):
