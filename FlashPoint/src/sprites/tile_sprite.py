@@ -22,7 +22,7 @@ class TileSprite(Interactable, TileObserver):
         self.index = 0
         self.sprite_grp = pygame.sprite.Group()
         self.image = image
-        self.hover_color = None
+        self._highlight_color = None
         self.row = row
         self.column = column
 
@@ -44,14 +44,37 @@ class TileSprite(Interactable, TileObserver):
 
         # ------- POP-UP MENU -------- #
         self.menu_shown = False
-        self.can_move = False
-        self.can_extinguish = False
         self.move_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
-                                      Text(pygame.font.SysFont('Arial', 20), "MoVe HeRe", Color.ORANGE))
+                                      Text(pygame.font.SysFont('Arial', 15), "MoVe HeRe", Color.ORANGE))
         self.extinguish_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
-                                            Text(pygame.font.SysFont('Arial', 20), "ExTiNgUiSh FiRe", Color.ORANGE))
+                                            Text(pygame.font.SysFont('Arial', 15), "ExTiNgUiSh FiRe", Color.ORANGE))
         self.move_button.disable()
         self.extinguish_button.disable()
+
+    def _draw_hightlight(self):
+        self.image.blit(self._non_highlight_image, (0, 0))
+        hover = pygame.Surface(
+            (self._non_highlight_image.get_width(), self._non_highlight_image.get_height())).convert_alpha()
+        if self._highlight_color:
+            hover.fill(self._highlight_color)
+            hover.set_alpha(10)
+            self.image.blit(hover, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
+
+    @property
+    def highlight_color(self):
+        return self._highlight_color
+
+    @highlight_color.setter
+    def highlight_color(self, color: Tuple[int, int, int]):
+        self._highlight_color = color
+        # hover = pygame.Surface(
+        #     (self._non_highlight_image.get_width(), self._non_highlight_image.get_height())).convert_alpha()
+        # if self._highlight_color:
+        #     hover.fill(self._highlight_color)
+        #     hover.set_alpha(10)
+        #     self.image.blit(hover, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
+        # else:
+        #     self.image.blit(self._non_highlight_image, (0, 0))
 
     def hover(self):
         if self._is_enabled:
@@ -64,8 +87,6 @@ class TileSprite(Interactable, TileObserver):
             return x_max > mouse[0] > x_min and y_max > mouse[1] > y_min
         else:
             return False
-
-    """TODO: is clicked"""
 
     def tile_assoc_models_changed(self, assoc_models: List[Model]):
         pass
@@ -93,19 +114,6 @@ class TileSprite(Interactable, TileObserver):
         """
         self._is_enabled = False
 
-    def highlight(self):
-        if self.hover() and self._is_enabled:
-            if not self._is_hovered:
-                self._is_hovered = True
-                hover = pygame.Surface(
-                    (self._non_highlight_image.get_width(), self._non_highlight_image.get_height()), pygame.SRCALPHA)
-                if self.hover_color:
-                    hover.fill(self.hover_color)
-                self.image.blit(hover, (0, 0))
-        else:
-            self.image.blit(self._non_highlight_image, (0, 0))
-            self._is_hovered = False
-
     def _scroll(self):
         """Move this Sprite in the direction of the scroll."""
         current_mouse_pos = pygame.mouse.get_pos()
@@ -120,40 +128,31 @@ class TileSprite(Interactable, TileObserver):
         self._mouse_pos = current_mouse_pos
 
     def draw(self, screen: pygame.Surface):
-        self.highlight()
-
-        # self.sprite_grp.draw(self.image)
-        # self.image.blit(self.move_button.image, self.move_button.rect)
-
+        self._draw_hightlight()
         screen.blit(self.image, self.rect)
-        if self.can_move:
-            screen.blit(self.move_button.image, self.move_button.rect)
+
+        if self.menu_shown:
+            offset = 0
+            if self.move_button.enabled:
+                screen.blit(self.move_button.image, self.move_button.rect)
+                self.move_button.rect.x = self.rect.x
+                self.move_button.rect.y = self.rect.y + offset
+                # self.move_button.change_pos(self.rect.x, self.rect.y + offset)
+                offset += 20
+
+            if self.extinguish_button.enabled:
+                screen.blit(self.extinguish_button.image, self.extinguish_button.rect)
+                self.extinguish_button.rect.x = self.rect.x
+                self.extinguish_button.rect.y = self.rect.y + offset
+                # self.extinguish_button.change_pos(self.rect.x, self.rect.y + offset)
+                offset += 20
 
     def update(self, event_queue: EventQueue):
         self.sprite_grp.update(event_queue)
+
         self._scroll()
         if self.is_clicked():
             self.click()
-
-        offset = 0
-        if self.can_move:
-            self.move_button.enable()
-            self.move_button.rect.x = self.rect.x
-            self.move_button.rect.y = self.rect.y + offset
-            # self.move_button.change_pos(self.rect.x, self.rect.y + offset)
-            offset += 15
-        self.move_button.update(event_queue)
-        if self.can_extinguish:
-            self.extinguish_button.enable()
-            self.extinguish_button.rect.x = self.rect.x
-            self.extinguish_button.rect.y = self.rect.y + offset
-            # self.extinguish_button.change_pos(self.rect.x, self.rect.y + offset)
-            offset += 15
-        # if self.can_move:
-        # self.move_button.enable()
-        # print("move_button addddedddeddeded")
-        # self.sprite_grp.add(self.move_button)
-        # self.disable_move()
 
     def tile_status_changed(self, status: SpaceStatusEnum):
         new_surf = pygame.Surface([self._non_highlight_image.get_width(), self._non_highlight_image.get_height()])
@@ -172,13 +171,13 @@ class TileSprite(Interactable, TileObserver):
         self._non_highlight_image.blit(new_surf, (0, 0))
 
     def enable_move(self):
-        self.can_move = True
+        self.move_button.enable()
 
     def disable_move(self):
-        self.can_move = False
+        self.move_button.disable()
 
     def enable_extinguish(self):
-        self.can_extinguish = True
+        self.extinguish_button.enable()
 
     def disable_extinguish(self):
-        self.can_extinguish = False
+        self.extinguish_button.disable()

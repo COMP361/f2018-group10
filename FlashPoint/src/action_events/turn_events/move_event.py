@@ -2,7 +2,8 @@ from abc import ABC
 from typing import List
 
 from src.action_events.turn_events.turn_event import TurnEvent
-from src.constants.state_enums import SpaceStatusEnum, POIIdentityEnum, SpaceKindEnum
+from src.constants.state_enums import SpaceStatusEnum, POIIdentityEnum, SpaceKindEnum, DoorStatusEnum
+from src.models.game_board.door_model import DoorModel
 from src.models.game_board.null_model import NullModel
 from src.models.game_board.tile_model import TileModel
 from src.models.game_state_model import GameStateModel
@@ -19,7 +20,6 @@ class DijkstraTile(object):
         self.predecessor = NullModel()
 
     def __str__(self):
-        # return f"{self.tile_model.__str__()}\nLeast cost: {self.least_cost}\nPredecessor: {self.predecessor.__str__()}\n"
         dijkstra = "### Dijkstra Tile ###"
         tile_info = "Self: " + self.tile_model.__str__()
         least_cost = "Least cost: " + str(self.least_cost)
@@ -115,7 +115,6 @@ class MoveEvent(TurnEvent):
 
         for d_tile in self.dijkstra_tiles:
             if d_tile.tile_model.row == self.fireman.row and d_tile.tile_model.column == self.fireman.column:
-                print("Source tile set")
                 self.source_tile = d_tile
                 self.source_tile.least_cost = 0
             if d_tile.tile_model.row == dest.row and d_tile.tile_model.column == dest.column:
@@ -123,9 +122,8 @@ class MoveEvent(TurnEvent):
 
     def execute(self):
         # initialize the Dijkstra tiles
+        GameStateModel.lock.acquire()
         self._init_dijkstra_tiles(self.destination)
-        print("Dijkstra tiles set:")
-        [print(d_tile) for d_tile in self.dijkstra_tiles]
         # Insert the Dijkstra tiles
         # into the priority queue
         pq = PriorityQueue()
@@ -139,20 +137,22 @@ class MoveEvent(TurnEvent):
         # those tiles.
         while not pq.is_empty():
             current_d_tile = pq.peek()
+            adjacent_tiles = current_d_tile.tile_model.adjacent_tiles
             for d_tile in pq.get_tiles():
-                if d_tile.tile_model in current_d_tile.tile_model.adjacent_tiles.values():
-                    self.relax_cost(current_d_tile, d_tile)
+                for direction, tile in adjacent_tiles.items():
+                    if isinstance(tile, NullModel):
+                        continue
+                    if d_tile.tile_model.row == tile.row and d_tile.tile_model.column == tile.column:
+                        self.relax_cost(direction, current_d_tile, d_tile)
+
             pq.poll()
 
         shortest_path = self.shortest_path()
-        print("Path taken:")
-        [print(p_tile) for p_tile in shortest_path]
         self.traverse_shortest_path(shortest_path)
-        print("After moving:")
-        print(self.fireman)
-        return
 
-    def relax_cost(self, first_tile: DijkstraTile, second_tile: DijkstraTile):
+        GameStateModel.lock.release()
+
+    def relax_cost(self, direction: str, first_tile: DijkstraTile, second_tile: DijkstraTile):
         """
         If there is a cheaper way to get to the second tile
         from the first tile, the least cost of the second
@@ -162,6 +162,14 @@ class MoveEvent(TurnEvent):
         :param second_tile:
         :return:
         """
+        has_obstacle = first_tile.tile_model.has_obstacle_in_direction(direction)
+        obstacle = first_tile.tile_model.get_obstacle_in_direction(direction)
+
+        if not has_obstacle or (isinstance(obstacle, DoorModel) and obstacle.door_status == DoorStatusEnum.OPEN):
+            pass
+        else:
+            return
+
         cost_to_travel = 0
         # Two separate cases depending on whether
         # fireman is carrying a victim or not.
@@ -282,84 +290,4 @@ class MoveEvent(TurnEvent):
                     if assoc_model.identity == POIIdentityEnum.FALSE_ALARM:
                         d_tile.tile_model.remove_associated_model(assoc_model)
                         self.game.game_board.remove_poi_or_victim(assoc_model)
-
-
-# class MoveEvent(TurnEvent):
-#
-#     def __init__(self, fireman: PlayerModel, destination: TileModel, moveable_tiles: List[TileModel]):
-#         super().__init__()
-#         self.fireman = fireman
-#         self.game: GameStateModel = GameStateModel.instance()
-#         self.source_tile = DijkstraTile(self.game.game_board.get_tile_at(self.fireman.row, self.fireman.column))
-#         self.destination = DijkstraTile(destination)
-#         moveable_tiles.remove(self.source_tile)
-#         self.moveable_tiles = moveable_tiles
-#
-#     def execute(self):
-#         """Guessing what has to be done is to make everything sync up with the networking"""
-#         # initialize the Djikstra tiles and
-#         # insert them into the priority queue
-#         dijkstra_tiles = self._init_dijkstra_tiles()
-#         pq = PriorityQueue()
-#         for d_tile in dijkstra_tiles:
-#             pq.insert(d_tile)
-#
-#         while not pq.is_empty():
-#             current_d_tile = pq.peek()
-#             for d_tile in dijkstra_tiles:
-#                 if d_tile in current_d_tile.tile_model.adjacent_tiles:
-#                     self.relax_cost(current_d_tile, d_tile, pq)
-#
-#             pq.poll()
-#
-#
-    # def _init_dijkstra_tiles(self):
-    #     """
-    #     Initialization of the DjikstraTile objects.
-    #     The source tile will have distance 0 from source
-    #     while others are initialized with large distance.
-    #
-    #     :return: initialized list of Dijkstra tiles
-    #     """
-    #     dijkstra_tiles = []
-    #     source_tile = DijkstraTile(self.source_tile)
-    #     source_tile.least_cost = 0
-    #     dijkstra_tiles.append(source_tile)
-    #
-    #     for t in self.moveable_tiles:
-    #         dijkstra_tiles.append(DijkstraTile(t))
-    #
-    #     return dijkstra_tiles
-#
-#     def relax_cost(self, first_tile: DijkstraTile, second_tile: DijkstraTile, pq: PriorityQueue):
-#         """
-#         If there is a cheaper way to get to the second tile
-#         from the first tile, the least cost of the second
-#         tile is changed to reflect that.
-#
-#         :param first_tile:
-#         :param second_tile:
-#         :return:
-#         """
-#         cost_to_travel = 0
-#         # Two separate cases depending on whether
-#         # fireman is carrying a victim or not
-#
-#         # fireman is carrying a victim
-#         if isinstance(self.fireman.carrying_victim, VictimModel):
-#             if second_tile.tile_model.space_status != SpaceStatusEnum.FIRE:
-#                 cost_to_travel = 2
-#
-#         # fireman is not carrying a victim
-#         else:
-#             if second_tile.tile_model.space_status != SpaceStatusEnum.FIRE:
-#                 cost_to_travel = 1
-#             else:
-#                 cost_to_travel = 2
-#
-#         if second_tile.least_cost > first_tile.least_cost + cost_to_travel:
-#             second_tile.least_cost = first_tile.least_cost + cost_to_travel
-#             second_tile.predecessor = first_tile
-#
-#     def shortest_path(self):
-
+                    # TODO: do something if POI is Victim

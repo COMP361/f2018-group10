@@ -80,7 +80,7 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
             self._current_sprite.turn = True
             self.running = True
 
-            self.countdown_thread = Thread(target=self.countdown, args=(10,))
+            self.countdown_thread = Thread(target=self.countdown, args=(120,))
             self.countdown_thread.start()
         else:
             self._current_sprite.turn = False
@@ -123,9 +123,8 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
         self.enabled = False
         self.running = False
 
-        turn_event = EndTurnEvent()
+        turn_event = EndTurnEvent(self._current_player)
         # send end turn, see ChatBox for example
-
         try:
             if Networking.get_instance().is_host:
                 Networking.get_instance().send_to_all_client(turn_event)

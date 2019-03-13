@@ -4,10 +4,11 @@ from datetime import datetime
 import pygame
 
 from src.action_events.turn_events.move_event import MoveEvent
+from src.controllers.chop_controller import ChopController
 from src.controllers.move_controller import MoveController
+from src.sprites.poi_sprite import POISprite
 from src.controllers.tile_input_controller import TileInputController
 from src.constants.change_scene_enum import ChangeSceneEnum
-from src.controllers.choose_starting_position_controller import ChooseStartingPositionController
 from src.core.custom_event import CustomEvent
 
 from src.UIComponents.chat_box import ChatBox
@@ -46,16 +47,18 @@ class GameBoardScene(object):
                                    Text(pygame.font.SysFont('Arial', 20), "Quit", Color.BLACK))
 
         self.active_sprites = pygame.sprite.Group()   # Maybe add separate groups for different things later
-        self.game_board = GameBoard(current_player)
+        self.game_board_sprite = GameBoard(current_player)
         self.chat_box = ChatBox(self._current_player)
         self.menu = None
         self._init_sprites()
-        # TODO: Haw: I've removed my testing code from here. You can change it back to whatever you want
-        # self.chat_box
         self.tile_input_controller = TileInputController(self._current_player)
-        # self.choose_start_pos_controller = ChooseStartingPositionController(self.game_board, current_player)
-        #checks if can move and if can extinguish
+        self.chop_controller = ChopController(self._current_player)
+        for poi in self._game.game_board.active_pois:
+            poi_sprite = POISprite(poi.row, poi.column)
+            self.game_board_sprite.add(poi_sprite)
 
+        if Networking.get_instance().is_host:
+            GameStateModel.instance()._notify_player_index()
 
     def _init_sprites(self):
         for i, player in enumerate(self._game.players):
@@ -90,14 +93,12 @@ class GameBoardScene(object):
     # Example of how to use the MenuClass YOU NEED TO MAKE ALL YOUR BUTTONS EXTEND INTERACTABLE!!!!!!!!!!!!!!!!!
     def _init_menu_button(self):
         btn = RectButton(0, 0, 30, 30, background=Color.GREEN, txt_obj=Text(pygame.font.SysFont('Arial', 23), ""))
-        # TODO CHANGE THIS BACK TO self._click_action
         btn.on_click(self._click_action)
-        #btn.on_click(self._game.next_player)
         btn.set_transparent_background(True)
         return btn
 
     def _click_action(self):
-        menu = MenuWindow([self.active_sprites, self.game_board], 500, 500, (400, 150))
+        menu = MenuWindow([self.active_sprites, self.game_board_sprite], 500, 500, (400, 150))
 
         save_btn = RectButton(200, 150, 100, 50, Color.STANDARDBTN, 0,
                               Text(pygame.font.SysFont('Agency FB', 20), "Save", Color.BLACK))
@@ -122,7 +123,7 @@ class GameBoardScene(object):
 
     def draw(self, screen: pygame.display):
         """Draw all currently active sprites."""
-        self.game_board.draw(screen)
+        self.game_board_sprite.draw(screen)
         self.chat_box.draw(screen)
         self.active_sprites.draw(screen)
 
@@ -133,7 +134,7 @@ class GameBoardScene(object):
         """Call the update() function of everything in this class."""
 
         # self.chat_box.update(event_queue)
-        self.game_board.update(event_queue)
+        self.game_board_sprite.update(event_queue)
         self.active_sprites.update(event_queue)
 
         if self.menu and not self.menu.is_closed:
@@ -143,3 +144,4 @@ class GameBoardScene(object):
         self.notify_turn_popup.update(event_queue)
         # self.choose_start_pos_controller.update(event_queue)
         self.tile_input_controller.update(event_queue)
+        self.chop_controller.update(event_queue)

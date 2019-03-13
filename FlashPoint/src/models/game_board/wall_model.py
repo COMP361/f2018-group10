@@ -1,6 +1,5 @@
 from typing import List
 
-from src.core.flashpoint_exceptions import WallAlreadyDestroyedException
 from src.models.game_board.edge_obstacle_model import EdgeObstacleModel
 from src.constants.state_enums import WallStatusEnum
 from src.observers.wall_observer import WallObserver
@@ -14,11 +13,21 @@ class WallModel(EdgeObstacleModel):
         self._id = (row, column, direction)
 
     def __str__(self):
-        return f"Wall at ({self.id[0]}, {self.id[1]}) in direction {self.id[2]}."
+        if self.wall_status == WallStatusEnum.INTACT:
+            stat = "Intact"
+        elif self.wall_status == WallStatusEnum.DAMAGED:
+            stat = "Damaged"
+        else:
+            stat = "Destroyed"
+        return f"{stat} wall at ({self.id[0]}, {self.id[1]}) in direction {self.id[2]}."
 
     @property
     def wall_status(self):
         return self._wall_status
+
+    @wall_status.setter
+    def wall_status(self, status: WallStatusEnum):
+        self._wall_status = status
 
     @property
     def id(self):

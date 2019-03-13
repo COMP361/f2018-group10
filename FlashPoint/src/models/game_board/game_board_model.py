@@ -26,6 +26,7 @@ class GameBoardModel(object):
         self._tiles = self._init_all_tiles_family_classic() if game_type == GameKindEnum.FAMILY else None
         self._poi_bank = GameBoardModel._init_pois()
         self._active_pois = []
+        self.set_initial_poi_family()
 
     def get_tiles(self) -> List[List[TileModel]]:
         return self._tiles
@@ -55,7 +56,7 @@ class GameBoardModel(object):
             self._active_pois.remove(poi_or_victim)
 
     def get_random_poi_from_bank(self) -> POIModel:
-        number = random.randint(0, len(self._poi_bank))
+        number = random.randint(0, len(self._poi_bank)-1)
         poi = self._poi_bank.pop(number)
         return poi
 
@@ -194,15 +195,6 @@ class GameBoardModel(object):
         first_pair, second_pair = adjacency['first_pair'], adjacency['second_pair']
         first_dirn, second_dirn = adjacency['first_dirn'], adjacency['second_dirn']
         for coord, direction in [(first_pair, first_dirn), (second_pair, second_dirn)]:
-            if direction == 'NORTH':
-                direction = "North"
-            elif direction == 'EAST':
-                direction = "East"
-            elif direction == 'WEST':
-                direction = "West"
-            else:
-                direction = "South"
-
             tiles[coord[0]][coord[1]].set_adjacent_edge_obstacle(direction, obstacle)
 
     def _init_all_tiles_experienced_classic(self):
@@ -231,10 +223,11 @@ class GameBoardModel(object):
         for i in range(3):
             poi = self.get_random_poi_from_bank()
             # Location indices are inverted cause i wrote the list wrong lel
-            poi.x_pos = locations[i][0]
-            poi.y_pos = locations[i][1]
+            row = locations[i][0]
+            column = locations[i][1]
+            poi.set_position(row, column)
             self._active_pois.append(poi)
-            self.get_tile_at(poi.row, poi.column).add_associated_model(poi)
+            self.get_tile_at(row, column).add_associated_model(poi)
 
     def distance_between_tiles(self, first_tile: TileModel, second_tile: TileModel) -> int:
         return abs(first_tile.row - second_tile.row) + abs(first_tile.column - second_tile.column)
