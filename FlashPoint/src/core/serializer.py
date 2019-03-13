@@ -3,9 +3,12 @@ import json
 from typing import Dict
 
 from src.action_events.turn_events.chop_event import ChopEvent
+from src.action_events.turn_events.drop_victim_event import DropVictimEvent
 from src.action_events.turn_events.extinguish_event import ExtinguishEvent
 from src.action_events.turn_events.move_event import MoveEvent
+from src.action_events.turn_events.pick_up_victim_event import PickupVictimEvent
 from src.models.game_board.wall_model import WallModel
+from src.models.game_units.victim_model import VictimModel
 from src.observers.observer import Observer
 from src.models.game_board.tile_model import TileModel
 from src.action_events.turn_events.choose_starting_position_event import ChooseStartingPositionEvent
@@ -71,6 +74,14 @@ class JSONSerializer(object):
         player.losses = payload['_losses']
 
         return player
+
+    @staticmethod
+    def _deserialize_victim(payload) -> VictimModel:
+        victim_state = payload['_state']
+        serialized_victim: VictimModel = VictimModel(victim_state)
+        serialized_victim.set_position(payload['_row'], payload['_column'])
+
+        return serialized_victim
 
     @staticmethod
     def _deserialize_chat_event(payload: Dict) -> ChatEvent:
@@ -146,6 +157,17 @@ class JSONSerializer(object):
         return EndTurnEvent(player)
 
     @staticmethod
+    def _deserialize_drop_event(payload: Dict) -> DropVictimEvent:
+        victim: VictimModel = JSONSerializer.deserialize(payload['victim'])
+        return DropVictimEvent(victim)
+
+
+    @staticmethod
+    def _deserialize_pickup_event(payload: Dict) -> PickupVictimEvent:
+        victim: VictimModel = JSONSerializer.deserialize(payload['victim'])
+        return PickupVictimEvent(victim)
+
+    @staticmethod
     def deserialize(payload: Dict) -> object:
         """
         Grab an object and deserialize it.
@@ -163,6 +185,8 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_tile(payload)
         elif object_type == GameStateModel.__name__:
             return JSONSerializer._deserialize_game_state(payload)
+        elif object_type == VictimModel.__name__:
+            return JSONSerializer._deserialize_victim(payload)
         # --------------EVENTS------------------
         elif object_type == JoinEvent.__name__:
             return JSONSerializer._deserialize_join_event(payload)
@@ -186,6 +210,10 @@ class JSONSerializer(object):
             return DummyEvent()
         elif object_type == ExtinguishEvent.__name__:
             return JSONSerializer._deserialize_extinguish_event(payload)
+        elif object_type == DropVictimEvent.__name__:
+            return JSONSerializer._deserialize_drop_event(payload)
+        elif object_type == PickupVictimEvent.__name__:
+            return JSONSerializer._deserialize_pickup_event(payload)
 
         print(f"WARNING: Could not deserialize object {object_type}, not of recognized type.")
 

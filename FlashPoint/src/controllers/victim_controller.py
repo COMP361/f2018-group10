@@ -1,32 +1,24 @@
-import pygame
 
-from src.action_events.turn_events.turn_event import TurnEvent
-from src.constants.state_enums import WallStatusEnum, GameStateEnum
-from src.core.event_queue import EventQueue
-from src.core.networking import Networking
-from src.action_events.turn_events.chop_event import ChopEvent
 from src.models.game_board.tile_model import TileModel
-from src.models.game_board.wall_model import WallModel
 from src.models.game_state_model import GameStateModel
-from src.models.game_units.player_model import PlayerModel
 from src.models.game_units.victim_model import VictimModel
-from src.sprites.game_board import GameBoard
-from src.sprites.wall_sprite import WallSprite
+from src.sprites.tile_sprite import TileSprite
 
 
 class VictimController(object):
-
     _instance = None
+
     def __init__(self):
 
         if VictimController._instance:
             raise Exception("Chop Controller is a singleton")
 
         VictimController._instance = self
+        self.fireman = GameStateModel.instance().players_turn
 
+        self.action_tile: TileSprite = None
         self.can_drop = False
         self.can_pickup = False
-
 
     @classmethod
     def instance(cls):
@@ -49,6 +41,30 @@ class VictimController(object):
 
         return False
 
+    def process_input_(self, tile: TileSprite):
 
-    def process_input_(self):
-        pass
+        if self.action_tile:
+            self.action_tile.disable_drop()
+            self.action_tile.disable_pickup()
+            self.action_tile = None
+
+        tile_model: TileModel = GameStateModel.instance().game_board.get_tile_at(tile.row, tile.column)
+
+        if self.check_drop():
+            self.can_drop = True
+            self.can_pickup = False
+            self.action_tile = tile
+            self.action_tile.drop_victim_button.enable()
+            return
+
+        elif self.check_pickup(tile_model):
+            self.can_pickup = True
+            self.can_drop = False
+            self.action_tile = tile
+            self.action_tile.pickup_victim_button.enable()
+
+        else:
+            self.can_drop = False
+            self.can_pickup = False
+            tile.pickup_victim_button.disable()
+            tile.drop_victim_button.disable()
