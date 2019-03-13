@@ -129,7 +129,6 @@ class TileSprite(Interactable, TileObserver):
 
     def draw(self, screen: pygame.Surface):
         self._draw_hightlight()
-        # self.draw_menu(screen)
         screen.blit(self.image, self.rect)
 
     def draw_menu(self, screen: pygame.Surface):
