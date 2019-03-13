@@ -83,7 +83,7 @@ class TileInputController(GameStateObserver):
         if Networking.get_instance().is_host:
             Networking.get_instance().send_to_all_client(event)
         else:
-            Networking.get_instance().client.send(event)
+            Networking.get_instance().send_to_server(event)
 
     def execute_move_event(self, tile: TileModel):
         print("move_event created")
@@ -92,7 +92,7 @@ class TileInputController(GameStateObserver):
         if Networking.get_instance().is_host:
             Networking.get_instance().send_to_all_client(event)
         else:
-            Networking.get_instance().client.send(event)
+            Networking.get_instance().send_to_server(event)
 
     def notify_player_index(self, player_index: int):
         pass

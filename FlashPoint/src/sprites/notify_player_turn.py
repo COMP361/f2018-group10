@@ -129,7 +129,7 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
             if Networking.get_instance().is_host:
                 Networking.get_instance().send_to_all_client(turn_event)
             else:
-                Networking.get_instance().client.send(turn_event)
+                Networking.get_instance().send_to_server(turn_event)
         except AttributeError as e:
             pass
 

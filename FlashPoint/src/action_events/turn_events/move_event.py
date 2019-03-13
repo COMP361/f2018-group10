@@ -1,4 +1,3 @@
-from abc import ABC
 from typing import List
 
 from src.action_events.turn_events.turn_event import TurnEvent

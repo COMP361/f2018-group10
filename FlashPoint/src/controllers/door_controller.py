@@ -84,7 +84,7 @@ class DoorController(object):
             if Networking.get_instance().is_host:
                 Networking.get_instance().send_to_all_client(event)
             else:
-                Networking.get_instance().client.send(event)
+                Networking.get_instance().send_to_server(event)
 
 
     def update(self, queue: EventQueue):

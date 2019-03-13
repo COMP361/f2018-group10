@@ -77,7 +77,7 @@ class LobbyScene(object):
                 event.execute()
                 Networking.get_instance().send_to_all_client(event)
             else:
-                Networking.get_instance().client.send(event)
+                Networking.get_instance().send_to_server(event)
         else:
             self.isReady = False
             self.buttonReady.change_color(Color.GREY)
@@ -87,7 +87,7 @@ class LobbyScene(object):
                 event.execute()
                 Networking.get_instance().send_to_all_client(event)
             else:
-                Networking.get_instance().client.send(event)
+                Networking.get_instance().send_to_server(event)
 
     def _init_all(self, reuse=False):
         self._init_background()
