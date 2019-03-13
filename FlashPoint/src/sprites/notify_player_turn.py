@@ -85,8 +85,10 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
             self.countdown_thread.start()
         else:
             self._current_sprite.turn = False
-            self._active_sprites.remove(self.btn)
-            self._active_sprites.remove(self.your_turn)
+            if self.btn:
+                self._active_sprites.remove(self.btn)
+            if self.your_turn:
+                self._active_sprites.remove(self.your_turn)
             self._active_sprites.add(self.not_your_turn)
 
     def _init_your_turn(self):
