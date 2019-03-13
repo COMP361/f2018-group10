@@ -16,4 +16,4 @@ class OpenDoorEvent(TurnEvent):
         door = self.door
         fireman = self.fireman
         door.open_door()
-        fireman.ap -= 1
+        fireman.ap = fireman.ap - 1

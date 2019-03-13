@@ -268,7 +268,7 @@ class MoveEvent(TurnEvent):
             # state and dissociate victim from player.
             if isinstance(self.fireman.carrying_victim, VictimModel):
                 if d_tile.tile_model.space_status != SpaceStatusEnum.FIRE:
-                    self.fireman.ap -= 2
+                    self.fireman.ap = self.fireman.ap - 2
                     if d_tile.tile_model.space_kind != SpaceKindEnum.INDOOR:
                         self.fireman.carrying_victim.state = VictimStateEnum.RESCUED
                         self.game.victims_saved = self.game.victims_saved + 1
@@ -280,9 +280,9 @@ class MoveEvent(TurnEvent):
             # fireman is not carrying a victim
             else:
                 if d_tile.tile_model.space_status != SpaceStatusEnum.FIRE:
-                    self.fireman.ap -= 1
+                    self.fireman.ap = self.fireman.ap - 1
                 else:
-                    self.fireman.ap -= 2
+                    self.fireman.ap = self.fireman.ap - 2
 
             # update the position of the fireman
             self.fireman.set_pos(d_tile.tile_model.row, d_tile.tile_model.column)

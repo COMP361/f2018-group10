@@ -15,4 +15,4 @@ class CloseDoorEvent(TurnEvent):
 
     def execute(self):
         self.door.close_door()
-        self.fireman.ap -= 1
+        self.fireman.ap = self.fireman.ap - 1

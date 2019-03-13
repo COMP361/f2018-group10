@@ -229,9 +229,11 @@ class GameStateModel(Model):
         """
         Returns a list containing the players
         located on a given tile.
+
         :param row: target tile's row
         :param column: target tile's column
-        :return:
+        :return: A list containing all the players on
+                a given tile
         """
         players_on_tile = []
         tile = self.game_board.get_tile_at(row, column)
