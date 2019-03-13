@@ -1,7 +1,6 @@
 from src.action_events.action_event import ActionEvent
 from src.action_events.knock_down_event import KnockDownEvent
-from src.constants.state_enums import WallStatusEnum, SpaceStatusEnum, SpaceKindEnum, VictimStateEnum, DoorStatusEnum, \
-    POIStatusEnum
+from src.constants.state_enums import WallStatusEnum, SpaceStatusEnum, SpaceKindEnum, VictimStateEnum, DoorStatusEnum, POIIdentityEnum
 from src.models.game_board.door_model import DoorModel
 from src.models.game_board.game_board_model import GameBoardModel
 from src.models.game_board.null_model import NullModel
@@ -184,10 +183,23 @@ class AdvanceFireEvent(ActionEvent):
                     self.board.remove_poi_or_victim(model)
 
                 elif isinstance(model, POIModel):
+                    # Reveal the POI and remove it regardless
+                    # of False Alarm or Victim identity.
+                    # If it is a Victim, put a Victim model
+                    # there, sleep (inside remove_poi_or_victim)
+                    # so that the victim can be seen briefly, then
+                    # remove it and increment the game state damage.
                     model.reveal()
-                    model.status = POIStatusEnum.LOST
                     tile.remove_associated_model(model)
                     self.board.remove_poi_or_victim(model)
+                    if model.identity == POIIdentityEnum.VICTIM:
+                        new_victim = VictimModel(VictimStateEnum.ON_BOARD)
+                        tile.add_associated_model(new_victim)
+                        self.board.add_poi_or_victim(new_victim)
+                        tile.remove_associated_model(new_victim)
+                        self.board.remove_poi_or_victim(new_victim)
+                        self.game_state.victims_lost = self.game_state.victims_lost + 1
+
 
                 else:
                     pass

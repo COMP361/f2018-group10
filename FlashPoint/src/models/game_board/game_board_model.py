@@ -1,5 +1,6 @@
 import json
 import random
+import time
 from typing import List, Tuple, Dict
 
 from src.constants.main_constants import BOARD_DIMENSIONS
@@ -54,6 +55,9 @@ class GameBoardModel(object):
         self._active_pois.append(poi_or_victim)
 
     def remove_poi_or_victim(self, poi_or_victim):
+        # Put to sleep briefly so that POI or
+        # victim can be seen before it is removed.
+        time.sleep(0.5)
         if poi_or_victim in self._active_pois:
             if poi_or_victim.row >= 0 and poi_or_victim.column >= 0:
                 poi_or_victim.set_position(-7, -7)
