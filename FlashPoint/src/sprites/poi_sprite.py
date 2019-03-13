@@ -27,7 +27,7 @@ class POISprite(pygame.sprite.Sprite, POIObserver):
         self.column = column
 
     def update(self, event_queue: EventQueue):
-        new_x = self.tile_sprite.rect.x
+        new_x = self.tile_sprite.rect.x+70
         new_y = self.tile_sprite.rect.y
         self.rect.x = new_x
         self.rect.y = new_y

@@ -92,9 +92,8 @@ class TileInputController(GameStateObserver):
 
     def execute_drop_event(self, victim: VictimModel):
         print(f"Drop event created")
-
         event = DropVictimEvent(victim)
-
+        self.victim_controller.process_input_(GameBoard.instance().grid.grid[victim.row][victim.column])
         if Networking.get_instance().is_host:
             Networking.get_instance().send_to_all_client(event)
         else:
@@ -102,9 +101,8 @@ class TileInputController(GameStateObserver):
 
     def execute_pickup_event(self, victim: VictimModel):
         print(f"Pickup event created")
-
         event = PickupVictimEvent(victim)
-
+        self.victim_controller.process_input_(GameBoard.instance().grid.grid[victim.row][victim.column])
         if Networking.get_instance().is_host:
             Networking.get_instance().send_to_all_client(event)
         else:
