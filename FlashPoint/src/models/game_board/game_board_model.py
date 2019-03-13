@@ -27,7 +27,7 @@ class GameBoardModel(object):
         self._tiles = self._init_all_tiles_family_classic() if game_type == GameKindEnum.FAMILY else None
         self._poi_bank = GameBoardModel._init_pois()
         self._active_pois = []
-        self.set_initial_poi_family()
+        # self.set_initial_poi_family()
 
     def get_tiles(self) -> List[List[TileModel]]:
         return self._tiles
@@ -72,6 +72,9 @@ class GameBoardModel(object):
         number = random.randint(0, len(self._poi_bank)-1)
         poi = self._poi_bank.pop(number)
         return poi
+
+    def get_poi_from_bank_by_index(self, index: int) -> POIModel:
+        return self._poi_bank[index]
 
     @staticmethod
     def _init_pois():
@@ -232,16 +235,16 @@ class GameBoardModel(object):
         Returns the locations that were randomly chosen for reuse in the PlacePOIEvent
         """
 
-        locations = [[2, 4], [5, 1], [5, 8]]
-
-        for i in range(3):
-            poi = self.get_random_poi_from_bank()
-            # Location indices are inverted cause i wrote the list wrong lel
-            row = locations[i][0]
-            column = locations[i][1]
-            poi.set_pos(row, column)
-            self._active_pois.append(poi)
-            self.get_tile_at(row, column).add_associated_model(poi)
+        # locations = [[2, 4], [5, 1], [5, 8]]
+        #
+        # for i in range(3):
+        #     poi = self.get_random_poi_from_bank()
+        #     # Location indices are inverted cause i wrote the list wrong lel
+        #     row = locations[i][0]
+        #     column = locations[i][1]
+        #     poi.set_pos(row, column)
+        #     self._active_pois.append(poi)
+        #     self.get_tile_at(row, column).add_associated_model(poi)
 
     def distance_between_tiles(self, first_tile: TileModel, second_tile: TileModel) -> int:
         return abs(first_tile.row - second_tile.row) + abs(first_tile.column - second_tile.column)

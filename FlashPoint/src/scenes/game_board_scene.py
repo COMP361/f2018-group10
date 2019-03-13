@@ -3,6 +3,7 @@ from datetime import datetime
 
 import pygame
 
+from src.action_events.set_initial_poi_family_event import SetInitialPOIFamilyEvent
 from src.controllers.chop_controller import ChopController
 from src.controllers.door_controller import DoorController
 from src.sprites.poi_sprite import POISprite
@@ -50,6 +51,7 @@ class GameBoardScene(object):
 
         self.active_sprites = pygame.sprite.Group()   # Maybe add separate groups for different things later
         self.game_board_sprite = GameBoard(current_player)
+        self.set_initial_poi_family()
         self.chat_box = ChatBox(self._current_player)
         self.menu = None
         self._init_sprites()
@@ -166,3 +168,10 @@ class GameBoardScene(object):
                                 sprite.rect.y < mouse_pos[1] < sprite.rect.y + sprite.rect.height)
 
         return ignore
+
+    def set_initial_poi_family(self):
+        event = SetInitialPOIFamilyEvent()
+        if Networking.get_instance().is_host:
+            Networking.get_instance().send_to_all_client(event)
+        else:
+            Networking.get_instance().client.send(event)

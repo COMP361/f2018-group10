@@ -3,6 +3,7 @@ import json
 from typing import Dict
 
 from src.action_events.end_turn_advance_fire import EndTurnAdvanceFireEvent
+from src.action_events.set_initial_poi_family_event import SetInitialPOIFamilyEvent
 from src.action_events.turn_events.chop_event import ChopEvent
 from src.action_events.turn_events.close_door_event import CloseDoorEvent
 from src.action_events.turn_events.drop_victim_event import DropVictimEvent
@@ -207,6 +208,13 @@ class JSONSerializer(object):
         return PickupVictimEvent(victim)
 
     @staticmethod
+    def _deserialize_set_initial_poi_family_event(payload: Dict) -> SetInitialPOIFamilyEvent:
+        random_num1 = payload['random_num1']
+        random_num2 = payload['random_num2']
+        random_num3 = payload['random_num3']
+        return SetInitialPOIFamilyEvent(random_num1, random_num2, random_num3)
+
+    @staticmethod
     def deserialize(payload: Dict) -> object:
         """
         Grab an object and deserialize it.
@@ -216,6 +224,7 @@ class JSONSerializer(object):
         Add to this case statement to be able to deserialize your object type.
         """
         object_type = payload["class"]
+        print(object_type)
         if GameStateModel.instance():
             GameStateModel.instance().game_board.set_adjacencies(GameStateModel.instance().game_board.get_tiles())
 
@@ -265,6 +274,8 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_end_turn_advance_fire_event(payload)
         elif object_type == CloseDoorEvent.__name__:
             return JSONSerializer._deserialize_close_door_event(payload)
+        elif object_type == SetInitialPOIFamilyEvent.__name__:
+            return JSONSerializer._deserialize_set_initial_poi_family_event(payload)
 
         print(f"WARNING: Could not deserialize object {object_type}, not of recognized type.")
 
