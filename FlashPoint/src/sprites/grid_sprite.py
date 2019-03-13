@@ -19,9 +19,10 @@ from src.sprites.wall_sprite import WallSprite
 
 class GridSprite(pygame.sprite.Group):
     """Class to Group Tile objects together, and implement Grid logic in to what will form the GameBoard."""
+
     def __init__(self, *sprites: pygame.sprite.Sprite,
                  x_coord: int, y_coord: int,
-                 tile_size: int=128, tiles_x: int=10, tiles_y: int=8, current_player: PlayerModel):
+                 tile_size: int = 128, tiles_x: int = 10, tiles_y: int = 8, current_player: PlayerModel):
         super().__init__(*sprites)
         self.current_player = current_player
         self._fire_image = Spritesheet("media/All Markers/fire.png", 1, 1).cell_images[0][0]
@@ -30,7 +31,7 @@ class GridSprite(pygame.sprite.Group):
         self.contains_player = False
         self.height = tiles_y
         self.width = tiles_x
-        self.image = pygame.Surface((tile_size*tiles_x, tile_size*tiles_y)).convert_alpha()
+        self.image = pygame.Surface((tile_size * tiles_x, tile_size * tiles_y)).convert_alpha()
         self.rect = self.image.get_rect().move((x_coord, y_coord))
         self.walls = []
         self.wall_buttons = []
@@ -49,10 +50,12 @@ class GridSprite(pygame.sprite.Group):
             y_offset = 0
             for j in range(0, self.height):
                 image = tile_images[j][i]
-                tile_sprite = TileSprite(image, self._fire_image, self._smoke_image, self.rect.x, self.rect.y, x_offset, y_offset, j, i)
+                tile_sprite = TileSprite(image, self._fire_image, self._smoke_image, self.rect.x, self.rect.y, x_offset,
+                                         y_offset, j, i)
                 grid[i].append(tile_sprite)
 
                 tile_model = GameStateModel.instance().game_board.get_tile_at(int(y_offset / 128), int(x_offset / 128))
+                tile_model.add_observer(tile_sprite)
                 east_obstacle = tile_model.get_obstacle_in_direction("East")
                 south_obstacle = tile_model.get_obstacle_in_direction("South")
 
@@ -66,10 +69,10 @@ class GridSprite(pygame.sprite.Group):
 
                     if isinstance(east_obstacle, WallModel):
                         wall = WallSprite(east_obstacle, "vertical", tile_sprite, tile_model, (j, i, "East"))
-                        wall.button = RectButton(x_offset + 128-5, y_offset, 14, 125, Color.BLACK)
+                        wall.button = RectButton(x_offset + 128 - 5, y_offset, 14, 125, Color.BLACK)
                         # wall.button.set_transparent_background(True)
-                        wall.button.on_click(wall.process_input)
-                        self.wall_buttons.append(wall.button_input)
+                       # wall.button.on_click(wall.process_input)
+                        self.wall_buttons.append(wall.button)
                         self.walls.append(wall)
 
                 if south_obstacle:
@@ -83,9 +86,9 @@ class GridSprite(pygame.sprite.Group):
                     if isinstance(south_obstacle, WallModel):
                         wall = WallSprite(south_obstacle, "horizontal", tile_sprite, tile_model, (j, i, "South"))
                         wall.button = RectButton(x_offset, y_offset + 128 - 5, 125, 14, Color.BLACK)
-                        wall.button.on_click(wall.process_input)
+                        #wall.button.on_click(wall.process_input)
                         # wall.button.set_transparent_background(True)
-                        self.wall_buttons.append(wall.button_input)
+                        self.wall_buttons.append(wall.button)
                         self.walls.append(wall)
 
                 self.add(grid[i][j])
@@ -124,3 +127,7 @@ class GridSprite(pygame.sprite.Group):
 
         for door in self.doors:
             door.update(event_queue)
+
+    @property
+    def get_walls(self) -> List[WallSprite]:
+        return self.walls

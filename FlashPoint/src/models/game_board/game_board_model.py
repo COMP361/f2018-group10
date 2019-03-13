@@ -8,13 +8,12 @@ from src.models.game_board.null_model import NullModel
 from src.models.game_units.poi_model import POIModel
 from src.models.game_board.tile_model import TileModel
 from src.constants.state_enums import GameKindEnum, SpaceKindEnum, SpaceStatusEnum, POIIdentityEnum, DirectionEnum, \
-    DoorStatusEnum
+    DoorStatusEnum, WallStatusEnum
 from src.models.game_board.wall_model import WallModel
 from src.models.game_board.door_model import DoorModel
 from src.models.model import Model
 
-
-class GameBoardModel(Model):
+class GameBoardModel(object):
     """
     Class for aggregating all objects related to the game board itself, this means TileModels, PlayerModels
     etc. This class is created inside of GameStateModel.
@@ -27,7 +26,8 @@ class GameBoardModel(Model):
         self._engine_spots = []
         self._tiles: List[TileModel] = self._init_all_tiles_family_classic() if game_type == GameKindEnum.FAMILY else None
         self._poi_bank = GameBoardModel._init_pois()
-        self._active_pois: List[POIModel]= []
+        self._active_pois = []
+        self.set_initial_poi_family()
 
 
     def notify_all_observers(self):
@@ -84,18 +84,25 @@ class GameBoardModel(Model):
     def active_pois(self):
         return self._active_pois
 
+    def add_poi_or_victim(self, poi_or_victim):
+        self._active_pois.append(poi_or_victim)
+
     def remove_poi_or_victim(self, poi_or_victim):
         if poi_or_victim in self._active_pois:
+            if poi_or_victim.row >= 0 and poi_or_victim.column >= 0:
+                poi_or_victim.set_position(-7, -7)
             self._active_pois.remove(poi_or_victim)
 
     def get_random_poi_from_bank(self) -> POIModel:
-        number = random.randint(0, len(self._poi_bank))
+        number = random.randint(0, len(self._poi_bank)-1)
         poi = self._poi_bank.pop(number)
         return poi
 
     @staticmethod
     def _init_pois():
         pois = []
+        # POIs initialized with negative coordinates
+        # since they are not on the board
         for i in range(5):
             pois.append(POIModel(POIIdentityEnum.VICTIM))
         for i in range(5):
@@ -124,7 +131,6 @@ class GameBoardModel(Model):
                 tile = TileModel(i, j, tile_kind)
                 tiles[i].append(tile)
 
-        # TODO: Abhijay: setting adjacency and creating walls/doors.
         # setting tile adjacencies
         self.set_adjacencies(tiles)
 
@@ -201,42 +207,33 @@ class GameBoardModel(Model):
 
     def set_single_tile_adjacencies(self, tile: TileModel):
         # set north tile
-        if tile.x_coord == 0:
+        if tile.row == 0:
             tile.set_adjacent_tile("North", NullModel())
         else:
-            tile.set_adjacent_tile("North", self.get_tile_at(tile.x_coord-1, tile.y_coord))
+            tile.set_adjacent_tile("North", self.get_tile_at(tile.row - 1, tile.column))
 
         # set east tile
-        if tile.y_coord == BOARD_DIMENSIONS[1] - 1:
+        if tile.column == BOARD_DIMENSIONS[1] - 1:
             tile.set_adjacent_tile("East", NullModel())
         else:
-            tile.set_adjacent_tile("East", self.get_tile_at(tile.x_coord, tile.y_coord+1))
+            tile.set_adjacent_tile("East", self.get_tile_at(tile.row, tile.column + 1))
 
         # set west tile
-        if tile.y_coord == 0:
+        if tile.column == 0:
             tile.set_adjacent_tile("West", NullModel())
         else:
-            tile.set_adjacent_tile("West", self.get_tile_at(tile.x_coord, tile.y_coord-1))
+            tile.set_adjacent_tile("West", self.get_tile_at(tile.row, tile.column - 1))
 
         # set south tile
-        if tile.x_coord == BOARD_DIMENSIONS[0] - 1:
+        if tile.row == BOARD_DIMENSIONS[0] - 1:
             tile.set_adjacent_tile("South", NullModel())
         else:
-            tile.set_adjacent_tile("South", self.get_tile_at(tile.x_coord+1, tile.y_coord))
+            tile.set_adjacent_tile("South", self.get_tile_at(tile.row + 1, tile.column))
 
     def set_single_obstacle(self, tiles: List[List[TileModel]], adjacency: Dict, obstacle: EdgeObstacleModel):
         first_pair, second_pair = adjacency['first_pair'], adjacency['second_pair']
         first_dirn, second_dirn = adjacency['first_dirn'], adjacency['second_dirn']
         for coord, direction in [(first_pair, first_dirn), (second_pair, second_dirn)]:
-            if direction == 'NORTH':
-                direction = "North"
-            elif direction == 'EAST':
-                direction = "East"
-            elif direction == 'WEST':
-                direction = "West"
-            else:
-                direction = "South"
-
             tiles[coord[0]][coord[1]].set_adjacent_edge_obstacle(direction, obstacle)
 
     def _init_all_tiles_experienced_classic(self):
@@ -265,13 +262,14 @@ class GameBoardModel(Model):
         for i in range(3):
             poi = self.get_random_poi_from_bank()
             # Location indices are inverted cause i wrote the list wrong lel
-            poi.x_pos = locations[i][0]
-            poi.y_pos = locations[i][1]
+            row = locations[i][0]
+            column = locations[i][1]
+            poi.set_position(row, column)
             self._active_pois.append(poi)
-            self.get_tile_at(poi.x_pos, poi.y_pos).add_associated_model(poi)
+            self.get_tile_at(row, column).add_associated_model(poi)
 
     def distance_between_tiles(self, first_tile: TileModel, second_tile: TileModel) -> int:
-        return abs(first_tile.x_coord - second_tile.x_coord) + abs(first_tile.y_coord - second_tile.y_coord)
+        return abs(first_tile.row - second_tile.row) + abs(first_tile.column - second_tile.column)
 
     def find_closest_parking_spots(self, parking_type: str, current_tile: TileModel) -> List[TileModel]:
         """
@@ -329,6 +327,6 @@ class GameBoardModel(Model):
 
         return closest_spots
 
-    def reset_tiles_visit_status(self):
+    def reset_tiles_visit_count(self):
         for tile in self.tiles:
             tile.visit_count = 0

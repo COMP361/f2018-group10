@@ -34,6 +34,8 @@ class LobbyScene(object):
 
         if Networking.get_instance().is_host:
             self._current_player.color = Color.BLUE
+            self._game.host.color = Color.BLUE
+            self._current_player.status = PlayerStatusEnum.READY
 
 
         self._player_count = len(self._game.players)
@@ -59,8 +61,8 @@ class LobbyScene(object):
         """Callback for when the host tries to start the game."""
         game = GameStateModel.instance()
         players_ready = len([player for player in game.players if player.status == PlayerStatusEnum.READY])
-        # TODO: change it back (==)
-        if not players_ready <= game.max_players:
+
+        if not players_ready == game.max_players:
             self.not_enough_players_ready_prompt()
             return
         # Perform the start game hook in Networking (ie. stop accepting new connections and kill broadcast)

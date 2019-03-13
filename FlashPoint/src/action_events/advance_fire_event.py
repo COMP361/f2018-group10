@@ -8,29 +8,28 @@ from src.models.game_board.null_model import NullModel
 from src.models.game_board.tile_model import TileModel
 from src.models.game_board.wall_model import WallModel
 from src.models.game_state_model import GameStateModel
-from src.models.game_units.player_model import PlayerModel
 from src.models.game_units.poi_model import POIModel
 from src.models.game_units.victim_model import VictimModel
 
 
 class AdvanceFireEvent(ActionEvent):
 
-    def __init__(self):
+    def __init__(self, red_dice: int = None, black_dice: int = None):
         super().__init__()
         self.game_state: GameStateModel = GameStateModel.instance()
         self.board: GameBoardModel = self.game_state.game_board
         self.initial_tile: TileModel = None
-        self.red_dice = None
-        self.black_dice = None
-        self.directions = ["North", "South", "East", "West"]
+        self.red_dice = red_dice
+        self.black_dice = black_dice
 
-    def execute(self, *args, **kwargs):
         # Pick random location: roll dice
         if not self.red_dice:
             self.red_dice = self.game_state.roll_red_dice()
         if not self.black_dice:
             self.black_dice = self.game_state.roll_black_dice()
+        self.directions = ["North", "South", "East", "West"]
 
+    def execute(self, *args, **kwargs):
         # Change state of tile depending on previous state
         self.initial_tile = self.board.get_tile_at(self.red_dice, self.black_dice)
         self.advance_on_tile(self.initial_tile)
@@ -39,7 +38,6 @@ class AdvanceFireEvent(ActionEvent):
 
 
     def advance_on_tile(self, target_tile: TileModel):
-        target_tile.visited = True
         tile_status = target_tile.space_status
         # Safe -> Smoke
         if tile_status == SpaceStatusEnum.SAFE:
@@ -60,7 +58,7 @@ class AdvanceFireEvent(ActionEvent):
             # damaging wall present along the tile
             if isinstance(obstacle, WallModel) and obstacle.wall_status != WallStatusEnum.DESTROYED:
                 obstacle.inflict_damage()
-                self.game_state.damage += 1
+                self.game_state.damage = self.game_state.damage + 1
 
             # fire does not move to the neighbouring tile
             # removing door that borders the tile
@@ -91,10 +89,10 @@ class AdvanceFireEvent(ActionEvent):
         should_stop = False
         while not should_stop:
             # if there is no obstacle in the given direction -
-            #   if neighbouring tile is not on fire, set it to fire
-            #   and stop the shockwave.
-            #   else set the current tile to the neighbouring tile
-            #   and continue the shockwave.
+            #   1. if neighbouring tile is not on fire, set it to fire
+            #       and stop the shockwave.
+            #   2. else set the current tile to the neighbouring tile
+            #       and continue the shockwave.
             if not tile.has_obstacle_in_direction(direction):
                 nb_tile: TileModel = tile.get_tile_in_direction(direction)
                 if nb_tile.space_status != SpaceStatusEnum.FIRE:
@@ -104,24 +102,27 @@ class AdvanceFireEvent(ActionEvent):
                 else:
                     tile = nb_tile
 
-            # if there is an obstacle in the given direction,
-            # shockwave should stop.
+            # if there is an obstacle in the given direction
             else:
-                # 1. if obstacle is a wall, inflict damage on it and increment
-                #   game state damage.
-                # 2. if obstacle is a non-destroyed door, destroy it.
+                # 1. if obstacle is a wall, inflict damage on it, increment
+                #   game state damage and stop the shockwave.
+                # 2. if obstacle is an open door, continue the shockwave
+                #   and destroy the door.
+                # 3. if obstacle is a closed door, stop the shockwave
+                #   and destroy the door.
                 obstacle = tile.get_obstacle_in_direction(direction)
                 if isinstance(obstacle, WallModel):
                     obstacle.inflict_damage()
-                    self.game_state.damage += 1
+                    self.game_state.damage = self.game_state.damage + 1
+                    should_stop = True
 
-                elif isinstance(obstacle, DoorModel) and obstacle.door_status != DoorStatusEnum.DESTROYED:
+                elif isinstance(obstacle, DoorModel):
+                    if obstacle.door_status == DoorStatusEnum.CLOSED:
+                        should_stop = True
                     obstacle.destroy_door()
 
                 else:
                     pass
-
-                should_stop = True
 
 
     def flashover(self):
@@ -175,21 +176,25 @@ class AdvanceFireEvent(ActionEvent):
                 continue
 
             for model in assoc_models:
-                if isinstance(model, PlayerModel):
-                    KnockDownEvent(model).execute()
-
-                elif isinstance(model, VictimModel):
-                    self.game_state.victims_lost += 1
+                if isinstance(model, VictimModel):
+                    self.game_state.victims_lost = self.game_state.victims_lost + 1
                     model: VictimModel = model
                     model.state = VictimStateEnum.LOST
+                    tile.remove_associated_model(model)
+                    self.board.remove_poi_or_victim(model)
 
                 elif isinstance(model, POIModel):
                     model.reveal()
                     model.status = POIStatusEnum.LOST
+                    tile.remove_associated_model(model)
                     self.board.remove_poi_or_victim(model)
 
                 else:
                     pass
+
+            players_on_tile = self.game_state.get_players_on_tile(tile.row, tile.column)
+            for player in players_on_tile:
+                KnockDownEvent(player.ip).execute()
 
         # removing any fire markers that were
         # placed outside of the building

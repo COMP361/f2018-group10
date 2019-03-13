@@ -7,10 +7,19 @@ from src.observers.door_observer import DoorObserver
 
 class DoorModel(EdgeObstacleModel):
 
-    def __init__(self, x: int, y: int, direction: str, door_status: DoorStatusEnum = DoorStatusEnum.CLOSED):
+    def __init__(self, row: int, column: int, direction: str, door_status: DoorStatusEnum = DoorStatusEnum.CLOSED):
         super().__init__()
         self._door_status = door_status
-        self._id = (x, y, direction)
+        self._id = (row, column, direction)
+
+    def __str__(self):
+        if self.door_status == DoorStatusEnum.OPEN:
+            stat = "Open"
+        elif self.door_status == DoorStatusEnum.CLOSED:
+            stat = "Closed"
+        else:
+            stat = "Destroyed"
+        return f"{stat} door at ({self.id[0]}, {self.id[1]}) in direction {self.id[2]}."
 
     @property
     def door_status(self):

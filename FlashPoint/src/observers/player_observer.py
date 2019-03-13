@@ -23,7 +23,7 @@ class PlayerObserver(Observer, ABC):
         pass
 
     @abstractmethod
-    def player_position_changed(self, x_pos: int, y_pos: int):
+    def player_position_changed(self, row: int, column: int):
         pass
 
     @abstractmethod

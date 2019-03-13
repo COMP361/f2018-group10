@@ -7,4 +7,3 @@ class DoorObserver(Observer, ABC):
     @abstractmethod
     def door_status_changed(self, status:DoorStatusEnum):
         pass
-

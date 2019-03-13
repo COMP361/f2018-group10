@@ -21,7 +21,7 @@ class GameStateModel(Model):
         if not GameStateModel._instance:
             super().__init__()
             self._host = host
-            self._max_desired_players = 1
+            self._max_desired_players = num_players
             self._players = [self._host]
             self._players_turn_index = 0
             self._difficulty_level = None
@@ -35,7 +35,7 @@ class GameStateModel(Model):
             self._max_damage = 24
             self._chat_history = []
             self._state = GameStateEnum.READY_TO_JOIN
-            self._game_board = GameBoardModel(self._rules)
+
             GameStateModel._instance = self
 
         else:
@@ -166,7 +166,7 @@ class GameStateModel(Model):
         return random.randint(1, 8)
 
     def roll_red_dice(self) -> int:
-        """Roll the black dice to get a random number between 1-6"""
+        """Roll the red dice to get a random number between 1-6"""
         return random.randint(1, 6)
 
     @property
@@ -233,3 +233,21 @@ class GameStateModel(Model):
 
     def game_lost(self):
         self._state = GameStateEnum.LOST
+
+    def get_players_on_tile(self, row: int, column) -> List[PlayerModel]:
+        """
+        Returns a list containing the players
+        located on a given tile.
+
+        :param row: target tile's row
+        :param column: target tile's column
+        :return: A list containing all the players on
+                a given tile
+        """
+        players_on_tile = []
+        tile = self.game_board.get_tile_at(row, column)
+        for player in self.players:
+            if player.row == tile.row and player.column == tile.column:
+                players_on_tile.append(player)
+
+        return players_on_tile

@@ -6,6 +6,7 @@ from src.UIComponents.rect_label import RectLabel
 from src.action_events.turn_events.choose_starting_position_event import ChooseStartingPositionEvent
 from src.constants.state_enums import SpaceKindEnum, GameStateEnum
 from src.core.event_queue import EventQueue
+from src.models.game_board.tile_model import TileModel
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 from src.sprites.game_board import GameBoard
@@ -44,15 +45,12 @@ class ChooseStartingPositionController(object):
                 tile_model = GameStateModel.instance().game_board.get_tile_at(j, i)
                 tile_sprite = self.game_board_sprite.grid.grid[i][j]
 
-                if not tile_sprite.hover():
-                    continue
+                success = self._run_checks(tile_sprite, tile_model)
 
-                if self._run_checks(tile_sprite, tile_model):
-                    tile_sprite.hover_color = Color.GREEN
-                    tile_sprite.highlight()
-                else:
-                    tile_sprite.hover_color = Color.RED
-                    tile_sprite.highlight()
+                if success and not tile_sprite.highlight_color :
+                    tile_sprite.highlight_color = Color.GREEN
+                elif not success:
+                    tile_sprite.hover_color = None
 
     def _run_checks(self, tile_sprite: TileSprite, tile_model: TileModel) -> bool:
         if GameStateModel.instance().state != GameStateEnum.PLACING:

@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 
 from src.models.game_board.door_model import DoorModel
 from src.models.game_board.wall_model import WallModel
@@ -8,15 +8,16 @@ from src.models.game_board.edge_obstacle_model import EdgeObstacleModel
 from src.models.game_board.null_model import NullModel
 from src.constants.state_enums import SpaceKindEnum, DoorStatusEnum, WallStatusEnum
 from src.constants.state_enums import SpaceStatusEnum
+from src.observers.tile_observer import TileObserver
 
 
 class TileModel(Model):
     """Logical state of a Tile object."""
 
-    def __init__(self, x_coord: int, y_coord: int, space_kind: SpaceKindEnum):
+    def __init__(self, row: int, column: int, space_kind: SpaceKindEnum):
         super().__init__()
-        self._x_coord = x_coord
-        self._y_coord = y_coord
+        self._row = row
+        self._column = column
         self._space_kind = space_kind
         self._space_status = SpaceStatusEnum.SAFE
         self._is_hotspot = False
@@ -38,15 +39,30 @@ class TileModel(Model):
         }
 
     def __str__(self):
-        return f"Tile at: ({self.x_coord}, {self.y_coord})."
+        tile_pos = "Tile at: ({row}, {column})".format(row=self.row, column=self.column)
+        tile_state = "Space status: {status}".format(status=self.space_status)
+        tile_kind = "Space kind: {kind}\n".format(kind=self.space_kind)
+        return '\n'.join([tile_pos, tile_state, tile_kind])
+
+    def _notify_status(self):
+        for obs in self.observers:
+            obs.tile_status_changed(self.space_status)
+
+    def _notify_assoc_models(self):
+        for obs in self.observers:
+            obs.tile_assoc_models_changed(self.associated_models)
 
     @property
-    def x_coord(self):
-        return self._x_coord
+    def observers(self) -> List[TileObserver]:
+        return self._observers
 
     @property
-    def y_coord(self):
-        return self._y_coord
+    def row(self):
+        return self._row
+
+    @property
+    def column(self):
+        return self._column
 
     @property
     def space_kind(self):
@@ -63,6 +79,7 @@ class TileModel(Model):
     @space_status.setter
     def space_status(self, space_status: SpaceStatusEnum):
         self._space_status = space_status
+        self._notify_status()
 
     @property
     def is_hotspot(self):
@@ -184,11 +201,17 @@ class TileModel(Model):
         return self._associated_models
 
     def add_associated_model(self, model: Model):
+        # The model's observers will take care
+        # of redrawing the model in the new location
+        model.set_position(self.row, self.column)
         self._associated_models.append(model)
+        self._notify_assoc_models()
 
     def remove_associated_model(self, model: Model):
         """CAUTION: YOUR MODEL MUST HAVE AN __EQ__ METHOD DEFINED FOR THIS TO WORK AS EXPECTED"""
-        self._associated_models.remove(model)
+        if model in self._associated_models:
+            self._associated_models.remove(model)
+        self._notify_assoc_models()
 
     @property
     def visit_count(self):

@@ -20,6 +20,9 @@ class CreateGameMenu(Scene):
         Scene.__init__(self, screen)
         self._current_player = current_player
 
+        if GameStateModel.instance():
+            GameStateModel.__del__()
+
         self._init_background()
         self._init_text_box(344, 387, 200, 32, "Choose Game Mode:", Color.STANDARDBTN, Color.BLACK)
         self._init_btn_back(20, 20, "Back", Color.STANDARDBTN, Color.BLACK)
@@ -35,7 +38,7 @@ class CreateGameMenu(Scene):
     def create_new_game(self, game_kind: GameKindEnum):
         """Instantiate a new family game and move to the lobby scene."""
         GameStateModel(self._current_player, 6, game_kind)
-        EventQueue.post(CustomEvent(ChangeSceneEnum.LOBBYSCENE))
+        EventQueue.post(CustomEvent(ChangeSceneEnum.SETMAXPLAYERSCENE))
 
     # ----------------------------------------------- #
 

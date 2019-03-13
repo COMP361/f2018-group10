@@ -1,6 +1,8 @@
+from src.core.event_queue import EventQueue
+from src.sprites.game_board import GameBoard
+from src.sprites.tile_sprite import TileSprite
 from src.action_events.turn_events.turn_event import TurnEvent
 from src.constants.state_enums import SpaceStatusEnum
-from src.core.flashpoint_exceptions import ModelNotAdjacentException, NotEnoughAPException
 from src.models.game_board.tile_model import TileModel
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
@@ -8,25 +10,17 @@ from src.models.game_units.player_model import PlayerModel
 
 class ExtinguishEvent(TurnEvent):
 
-    def __init__(self, fireman: PlayerModel, extinguish_space: TileModel):
+    def __init__(self, extinguish_space: TileModel):
         super().__init__()
-        self.fireman = fireman
-        self.extinguish_space = extinguish_space
+        game: GameStateModel = GameStateModel.instance()
+        self.fireman: PlayerModel = game.players_turn
+        self.extinguish_space: TileModel = game.game_board.get_tile_at(extinguish_space.row, extinguish_space.column)
 
     def execute(self):
         fireman = self.fireman
         extinguish_space = self.extinguish_space
-        game: GameStateModel = GameStateModel.instance()
-        # TODO: Start here - This is the precondition code - Move it to the GUI
-        player_tile = game.game_board.get_tile_at(fireman.x_pos, fireman.y_pos)
-        valid_to_extinguish = extinguish_space == player_tile or extinguish_space in player_tile.adjacent_tiles
-        if not valid_to_extinguish:
-            raise ModelNotAdjacentException("tile", fireman.x_pos, fireman.y_pos)
+        # tile_sprite: TileSprite = GameBoard.instance().grid.grid[extinguish_space.column][extinguish_space.row]
 
-        if not self.has_required_AP(fireman.ap, 1):
-            raise NotEnoughAPException("extinguish", 1)
-
-        # TODO: End here
         if extinguish_space.space_status == SpaceStatusEnum.SMOKE:
             extinguish_space.space_status = SpaceStatusEnum.SAFE
 
@@ -37,4 +31,6 @@ class ExtinguishEvent(TurnEvent):
             return
 
         fireman.ap = fireman.ap - 1
+
+        print(extinguish_space)
         return
