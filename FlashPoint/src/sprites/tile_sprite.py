@@ -28,8 +28,8 @@ class TileSprite(Interactable, TileObserver):
 
         self._fire_image = fire_image
         self._smoke_image = smoke_image
-        self._non_highlight_image = image
-        self._blank_image = image
+        self._non_highlight_image = image.copy()
+        self._blank_image = image.copy()
 
         # Initialize if place is Fire, Smoke or Safe
         status = GameStateModel.instance().game_board.get_tile_at(row, column).space_status
@@ -51,6 +51,15 @@ class TileSprite(Interactable, TileObserver):
         self.move_button.disable()
         self.extinguish_button.disable()
 
+    def _draw_hightlight(self):
+        self.image.blit(self._non_highlight_image, (0, 0))
+        hover = pygame.Surface(
+            (self._non_highlight_image.get_width(), self._non_highlight_image.get_height())).convert_alpha()
+        if self._highlight_color:
+            hover.fill(self._highlight_color)
+            hover.set_alpha(10)
+            self.image.blit(hover, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
+
     @property
     def highlight_color(self):
         return self._highlight_color
@@ -58,14 +67,14 @@ class TileSprite(Interactable, TileObserver):
     @highlight_color.setter
     def highlight_color(self, color: Tuple[int, int, int]):
         self._highlight_color = color
-        hover = pygame.Surface(
-            (self._non_highlight_image.get_width(), self._non_highlight_image.get_height())).convert_alpha()
-        if self._highlight_color:
-            hover.fill(self._highlight_color)
-            hover.set_alpha(10)
-            self.image.blit(hover, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
-        else:
-            self.image.blit(self._non_highlight_image, (0, 0))
+        # hover = pygame.Surface(
+        #     (self._non_highlight_image.get_width(), self._non_highlight_image.get_height())).convert_alpha()
+        # if self._highlight_color:
+        #     hover.fill(self._highlight_color)
+        #     hover.set_alpha(10)
+        #     self.image.blit(hover, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
+        # else:
+        #     self.image.blit(self._non_highlight_image, (0, 0))
 
     def hover(self):
         if self._is_enabled:
@@ -119,6 +128,7 @@ class TileSprite(Interactable, TileObserver):
         self._mouse_pos = current_mouse_pos
 
     def draw(self, screen: pygame.Surface):
+        self._draw_hightlight()
         screen.blit(self.image, self.rect)
 
         if self.menu_shown:
