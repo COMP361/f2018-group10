@@ -197,13 +197,13 @@ class JSONSerializer(object):
 
     @staticmethod
     def _deserialize_drop_event(payload: Dict) -> DropVictimEvent:
-        victim: VictimModel = JSONSerializer.deserialize(payload['victim'])
+        victim: VictimModel = JSONSerializer.deserialize(payload['victim_tile'])
         return DropVictimEvent(victim)
 
 
     @staticmethod
     def _deserialize_pickup_event(payload: Dict) -> PickupVictimEvent:
-        victim: VictimModel = JSONSerializer.deserialize(payload['victim'])
+        victim: VictimModel = JSONSerializer.deserialize(payload['victim_tile'])
         return PickupVictimEvent(victim)
 
     @staticmethod
@@ -255,16 +255,16 @@ class JSONSerializer(object):
             return DummyEvent()
         elif object_type == ExtinguishEvent.__name__:
             return JSONSerializer._deserialize_extinguish_event(payload)
+        elif object_type == DropVictimEvent.__name__:
+            return JSONSerializer._deserialize_drop_event(payload)
+        elif object_type == PickupVictimEvent.__name__:
+            return JSONSerializer._deserialize_pickup_event(payload)
         elif object_type == OpenDoorEvent.__name__:
             return JSONSerializer._deserialize_open_door_event(payload)
         elif object_type == EndTurnAdvanceFireEvent.__name__:
             return JSONSerializer._deserialize_end_turn_advance_fire_event(payload)
         elif object_type == CloseDoorEvent.__name__:
             return JSONSerializer._deserialize_close_door_event(payload)
-        elif object_type == DropVictimEvent.__name__:
-            return JSONSerializer._deserialize_drop_event(payload)
-        elif object_type == PickupVictimEvent.__name__:
-            return JSONSerializer._deserialize_pickup_event(payload)
 
         print(f"WARNING: Could not deserialize object {object_type}, not of recognized type.")
 

@@ -20,6 +20,7 @@ class VictimSprite(pygame.sprite.Sprite, VictimObserver):
 
     def victim_state_changed(self, state: VictimStateEnum):
         if state == VictimStateEnum.LOST:
+            print("victim killed")
             # TODO: Maybe make lost victims show up on the side
             self.kill()
         elif state == VictimStateEnum.RESCUED:
