@@ -69,11 +69,11 @@ class DoorSprite(pygame.sprite.Sprite, DoorObserver):
         self.button_input.enable()
 
     def check(self) -> bool:
-        valid_to_open_close = TurnEvent.has_required_AP(self.player.ap, 2)
+        valid_to_open_close = TurnEvent.has_required_AP(self.player.ap, 1)
         if not valid_to_open_close:
             return False
 
-        player_tile = self._game.game_board.get_tile_at(self.player.y_pos, self.player.x_pos)
+        player_tile = self._game.game_board.get_tile_at(self.player.row, self.player.column)
 
         if self.door_model not in player_tile.adjacent_edge_objects.values():
             return False
