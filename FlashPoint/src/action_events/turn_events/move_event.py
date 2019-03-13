@@ -16,7 +16,8 @@ from src.models.game_units.victim_model import VictimModel
 class DijkstraTile(object):
 
     def __init__(self, tile_model: TileModel):
-        self.tile_model = tile_model
+        game: GameStateModel = GameStateModel.instance()
+        self.tile_model = game.game_board.get_tile_at(tile_model.row, tile_model.column)
         self.least_cost = 10000
         self.predecessor: DijkstraTile = NullModel()
 
