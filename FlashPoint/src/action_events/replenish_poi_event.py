@@ -1,5 +1,5 @@
 from src.action_events.action_event import ActionEvent
-from src.constants.state_enums import SpaceStatusEnum, POIIdentityEnum
+from src.constants.state_enums import SpaceStatusEnum, POIIdentityEnum, VictimStateEnum
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.poi_model import POIModel
 from src.models.game_units.victim_model import VictimModel
@@ -55,9 +55,14 @@ class ReplenishPOIEvent(ActionEvent):
             players_on_tile = self.game.get_players_on_tile(tile.row, tile.column)
             if len(players_on_tile) > 0:
                 new_poi.reveal()
+                tile.remove_associated_model(new_poi)
+                self.game.game_board.remove_poi_or_victim(new_poi)
                 if new_poi.identity == POIIdentityEnum.FALSE_ALARM:
-                    tile.remove_associated_model(new_poi)
-                    self.game.game_board.remove_poi_or_victim(new_poi)
                     # Need one more iteration since we
                     # just removed the added POI
                     x -= 1
+                else:
+                    # Add a victim in place of the POI
+                    new_victim = VictimModel(VictimStateEnum.ON_BOARD)
+                    tile.add_associated_model(new_victim)
+                    self.game.game_board.add_poi_or_victim(new_victim)

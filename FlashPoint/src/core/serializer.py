@@ -177,6 +177,8 @@ class JSONSerializer(object):
         Add to this case statement to be able to deserialize your object type.
         """
         object_type = payload["class"]
+        if GameStateModel.instance():
+            GameStateModel.instance().game_board.set_adjacencies(GameStateModel.instance().game_board.get_tiles())
 
         # --------------MODELS----------------
         if object_type == PlayerModel.__name__:
