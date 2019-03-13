@@ -20,7 +20,6 @@ class PickupVictimEvent(TurnEvent):
     #### Use this check in the GUI to determine
     #### whether or not to show a pick up victim option
 
-
     def execute(self):
         self.player.carrying_victim = self.victim
         self.victim_tile.remove_associated_model(self.victim)

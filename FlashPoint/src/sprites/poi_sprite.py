@@ -9,7 +9,7 @@ from src.sprites.game_board import GameBoard
 from src.core.event_queue import EventQueue
 
 from src.UIComponents.file_importer import FileImporter
-from src.constants.state_enums import POIStatusEnum, POIIdentityEnum
+from src.constants.state_enums import POIStatusEnum, POIIdentityEnum, VictimStateEnum
 from src.observers.poi_observer import POIObserver
 
 
@@ -27,7 +27,7 @@ class POISprite(pygame.sprite.Sprite, POIObserver):
         self.tile_sprite = GameBoard.instance().grid.grid[poi.column][poi.row]
 
     def poi_status_changed(self, status: POIStatusEnum, victim: VictimModel):
-        if status == POIStatusEnum.REVEALED:
+        if status == POIStatusEnum.REVEALED and victim:
             if self.poi_model.identity == POIIdentityEnum.VICTIM:
                 # Replace this sprite with a victim sprite.
                 victim_sprite = VictimSprite(victim.row, victim.column)
@@ -41,7 +41,7 @@ class POISprite(pygame.sprite.Sprite, POIObserver):
                 print(false_alarm_sprite.row, false_alarm_sprite.column)
                 for group in self.groups():
                     group.add(false_alarm_sprite)
-            self.kill()
+        self.kill()
 
     def poi_position_changed(self, row: int, column: int):
         self.tile_sprite = GameBoard.instance().grid.grid[column][row]

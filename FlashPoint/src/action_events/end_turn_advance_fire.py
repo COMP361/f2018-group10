@@ -217,6 +217,7 @@ class EndTurnAdvanceFireEvent(TurnEvent):
                     # so that the victim can be seen briefly, then
                     # remove it and increment the game state damage.
                     new_victim = None
+                    model.reveal(new_victim)
                     tile.remove_associated_model(model)
                     self.board.remove_poi_or_victim(model)
                     if model.identity == POIIdentityEnum.VICTIM:
@@ -227,7 +228,7 @@ class EndTurnAdvanceFireEvent(TurnEvent):
                         self.board.remove_poi_or_victim(new_victim)
                         self.game_state.victims_lost = self.game_state.victims_lost + 1
 
-                    model.reveal(new_victim)
+
                 else:
                     pass
 
