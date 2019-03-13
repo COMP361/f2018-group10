@@ -272,7 +272,6 @@ class MoveEvent(TurnEvent):
                     if d_tile.tile_model.space_kind != SpaceKindEnum.INDOOR:
                         self.fireman.carrying_victim.state = VictimStateEnum.RESCUED
                         self.game.victims_saved = self.game.victims_saved + 1
-                        # TODO: disassociate victim from list of active POIs of board - Done
                         # remove the victim from the list of active POIs on the board
                         # and disassociate the victim from the player
                         self.game.game_board.remove_poi_or_victim(self.fireman.carrying_victim)
@@ -300,7 +299,6 @@ class MoveEvent(TurnEvent):
                     d_tile.tile_model.remove_associated_model(assoc_model)
                     self.game.game_board.remove_poi_or_victim(assoc_model)
 
-                    # TODO: do something if POI is Victim - done
                     # If the POI is a Victim, instantiate a VictimModel
                     # and add it to the tile, board.
                     if assoc_model.identity == POIIdentityEnum.VICTIM:

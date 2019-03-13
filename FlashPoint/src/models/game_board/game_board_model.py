@@ -46,7 +46,6 @@ class GameBoardModel(object):
     def engine_spots(self) -> List[Tuple[TileModel]]:
         return self._engine_spots
 
-    # TODO: Add notification and observers for the active POIs
     @property
     def active_pois(self):
         return self._active_pois
