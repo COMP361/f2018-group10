@@ -1,6 +1,7 @@
 import time
 
 import pygame
+from src.models.game_units.victim_model import VictimModel
 from src.sprites.false_alarm_sprite import FalseAlarmSprite
 from src.sprites.victim_sprite import VictimSprite
 from src.models.game_units.poi_model import POIModel
@@ -22,22 +23,24 @@ class POISprite(pygame.sprite.Sprite, POIObserver):
         self.poi_model = poi
         self.row = poi.row
         self.column = poi.column
+        self.poi_model.add_observer(self)
         self.tile_sprite = GameBoard.instance().grid.grid[poi.column][poi.row]
 
-    def poi_status_changed(self, status: POIStatusEnum):
+    def poi_status_changed(self, status: POIStatusEnum, victim: VictimModel):
         if status == POIStatusEnum.REVEALED:
             if self.poi_model.identity == POIIdentityEnum.VICTIM:
                 # Replace this sprite with a victim sprite.
-                victim_sprite = VictimSprite(self.row, self.column)
+                victim_sprite = VictimSprite(victim.row, victim.column)
+                victim.add_observer(victim_sprite)
+                print(victim_sprite.row, victim_sprite.column)
                 for group in self.groups():
                     group.add(victim_sprite)
             elif self.poi_model.identity == POIIdentityEnum.FALSE_ALARM:
                 # Show the false alarm for a few seconds, then remove it.
                 false_alarm_sprite = FalseAlarmSprite(self.poi_model)
+                print(false_alarm_sprite.row, false_alarm_sprite.column)
                 for group in self.groups():
                     group.add(false_alarm_sprite)
-                time.sleep(2)
-                false_alarm_sprite.kill()
             self.kill()
 
     def poi_position_changed(self, row: int, column: int):
