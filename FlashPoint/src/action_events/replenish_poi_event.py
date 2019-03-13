@@ -23,9 +23,10 @@ class ReplenishPOIEvent(ActionEvent):
 
     def execute(self):
         if not self.check():
-            print("Don't need to replenish poi")
+            print("Not going to replenish")
             return
 
+        print("Going to replenish")
         num_pois_to_add = 3 - len(self.board.active_pois)
         for x in range(num_pois_to_add):
             new_poi_row = self.game.roll_red_dice()
@@ -55,7 +56,7 @@ class ReplenishPOIEvent(ActionEvent):
 
             tile.add_associated_model(new_poi)
             self.game.game_board.add_poi_or_victim(new_poi)
-            print("New poi added")
+            print(str(x), "New POI tile:", tile)
 
             # if tile has a fireman on it, immediately flip
             # the POI and remove it if it is a False Alarm

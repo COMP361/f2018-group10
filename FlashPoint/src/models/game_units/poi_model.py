@@ -19,6 +19,7 @@ class POIModel(Model):
         if self._status == POIStatusEnum.HIDDEN:
             self._status = POIStatusEnum.REVEALED
             print("Revealed in model")
+            print("POI position: {row}, {column} Identity: {iden}".format(row=self.row, column=self.column, iden=self.identity))
             self._notify_status(victim_model)
 
     def _notify_status(self, victim_model: VictimModel):
