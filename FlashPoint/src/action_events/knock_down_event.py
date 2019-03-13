@@ -1,3 +1,4 @@
+import random
 from src.action_events.action_event import ActionEvent
 from src.constants.state_enums import VictimStateEnum
 from src.models.game_board.null_model import NullModel
@@ -37,5 +38,7 @@ class KnockDownEvent(ActionEvent):
             self.player.set_pos(amb_spot.row, amb_spot.column)
 
         else:
-            # TODO: how to handle choice for more than one closest spots?
-            pass
+            # TODO: how to handle choice for more than one closest spots - just return random closest spot
+            rand_index = random.randint(0, len(closest_ambulance_spots)-1)
+            amb_spot = closest_ambulance_spots[rand_index]
+            self.player.set_pos(amb_spot.row, amb_spot.column)
