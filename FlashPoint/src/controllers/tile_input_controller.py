@@ -79,7 +79,7 @@ class TileInputController(GameStateObserver):
                 victim: VictimModel = self.fireman.carrying_victim
                 if not isinstance(victim, NullModel):
                     self.victim_controller.action_tile.drop_victim_button.on_click(self.execute_drop_event, victim)
-                    self.victim_controller.action_tile.pickup_victim_button.update(EventQueue.get_instance())
+                    self.victim_controller.action_tile.drop_victim_button.update(EventQueue.get_instance())
 
             elif self.victim_controller.can_pickup:
                 victim: VictimModel = None
@@ -110,7 +110,7 @@ class TileInputController(GameStateObserver):
     def execute_pickup_event(self, victim: VictimModel):
         print(f"Pickup event created")
         event = PickupVictimEvent(victim)
-        self.victim_controller.process_input_(GameBoard.instance().grid.grid[victim.row][victim.column])
+        self.victim_controller.process_input_(GameBoard.instance().grid.grid[victim.column][victim.row])
         if Networking.get_instance().is_host:
             Networking.get_instance().send_to_all_client(event)
         else:

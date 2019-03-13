@@ -16,6 +16,5 @@ class DropVictimEvent(TurnEvent):
 
     def execute(self):
         self.victim_tile.add_associated_model(self.player.carrying_victim)
-        victim: VictimModel = self.player.carrying_victim
-        victim.set_position(self.player.row, self.player.column)
+
         self.player.carrying_victim = NullModel()
