@@ -20,7 +20,8 @@ from src.action_events.turn_events.turn_event import TurnEvent
 
 class DoorSprite(pygame.sprite.Sprite, DoorObserver):
 
-    def __init__(self, door_model: DoorModel, orientation: str, tile_sprite: TileSprite, tile_model: TileModel, id: Tuple[int, int, str]):
+    def __init__(self, door_model: DoorModel, orientation: str, tile_sprite: TileSprite, tile_model: TileModel,
+                 id: Tuple[int, int, str]):
         super().__init__()
         self.orientation = orientation
         self._game: GameStateModel = GameStateModel.instance()
@@ -38,16 +39,19 @@ class DoorSprite(pygame.sprite.Sprite, DoorObserver):
             self.door_model.open_door()
         else:
             self.door_model.close_door()
-        self.marker  = None
+        self.marker = None
         self.tile_sprite = tile_sprite
         self._prev_x = self.tile_sprite.rect.x
         self._prev_y = self.tile_sprite.rect.y
-        self.button_input = RectButton(self.tile_sprite.rect.x+100, self.tile_sprite.rect.y+100, 100, 25, Color.BLACK, 0, Text(pygame.font.SysFont('Arial', 20), "Interact", Color.ORANGE))
+        self.button_input = RectButton(self.tile_sprite.rect.x + 100, self.tile_sprite.rect.y + 100, 100, 25,
+                                       Color.BLACK, 0, Text(pygame.font.SysFont('Arial', 20), "Interact", Color.ORANGE))
         self.button_input.disable()
+        self.menu_shown = False
+        # self.button_input.on_click(self.wall_chop)
 
-        #self.button_input.on_click(self.wall_chop)
-
-
+    @property
+    def direction(self) -> str:
+        return self.id[2]
     @property
     def player(self) -> PlayerModel:
         return self._current_player
@@ -64,49 +68,21 @@ class DoorSprite(pygame.sprite.Sprite, DoorObserver):
     #     self.button_input.disable()
     #     print("Francisdadasdad")
 
-    def process_input(self):
-        # if self.check():
-        self.button_input.enable()
-
-    def check(self) -> bool:
-        valid_to_open_close = TurnEvent.has_required_AP(self.player.ap, 1)
-        if not valid_to_open_close:
-            return False
-
-        player_tile = self._game.game_board.get_tile_at(self.player.row, self.player.column)
-
-        if self.door_model not in player_tile.adjacent_edge_objects.values():
-            return False
-
-        door_status = self.door_model.door_status
-        if door_status == DoorStatusEnum.DESTROYED:
-            return False
-
-        return True
-
-    def instantiate_event(self):
-        if self.door_model.door_status == DoorStatusEnum.OPEN:
-            CloseDoorEvent(self.door_model, self.player).execute()
-        elif self.door_model.door_status == DoorStatusEnum.CLOSED:
-            OpenDoorEvent(self.door_model, self.player).execute()
-
     def update(self, event_queue):
-        if self.button_input.enabled:
-            self.button_input.on_click(self.instantiate_event)
-
         diff_x = self.tile_sprite.rect.x - self._prev_x
         diff_y = self.tile_sprite.rect.y - self._prev_y
         self._button.rect.move_ip((diff_x, diff_y))
         self._prev_x = self.tile_sprite.rect.x
         self._prev_y = self.tile_sprite.rect.y
-        self.button_input.rect.x = self.tile_sprite.rect.x + 14
-        self.button_input.rect.y = self.tile_sprite.rect.y + 50
+        self.button_input.rect.x = self.tile_sprite.rect.x + 100
+        self.button_input.rect.y = self.tile_sprite.rect.y + 100
 
         for event in event_queue:
             if event.type == pygame.MOUSEBUTTONUP:
                 if not ((self.button_input.rect.x <= pygame.mouse.get_pos()[0] <= self.button_input.rect.x + 100) and (
                         self.button_input.rect.y <= pygame.mouse.get_pos()[1] <= self.button_input.rect.y + 25)):
                     self.button_input.disable()
+
         self._button.update(event_queue)
         self.button_input.update(event_queue)
 
@@ -131,6 +107,10 @@ class DoorSprite(pygame.sprite.Sprite, DoorObserver):
         x_offset1 = 0
         y_offset1 = 0
 
+        if self.menu_shown:
+            if self.button_input.enabled:
+                screen.blit(self.button_input.image, self.button_input.rect)
+
         if self.orientation == "vertical":
             x_offset1 = -22
             y_offset1 = 40
@@ -140,14 +120,14 @@ class DoorSprite(pygame.sprite.Sprite, DoorObserver):
             y_offset1 = -18
 
         if self.destroyed:
-            self.marker = RectLabel(self.button.rect.x+x_offset1 , self.button.rect.y+y_offset1, 50, 50,
-                               "media/Threat_Markers/damageMarker.png")
+            self.marker = RectLabel(self.button.rect.x + x_offset1, self.button.rect.y + y_offset1, 50, 50,
+                                    "media/Threat_Markers/damageMarker.png")
             self.marker.draw(screen)
         if self.open:
-            self.marker = RectLabel(self.button.rect.x+x_offset1, self.button.rect.y+y_offset1, 50, 50,
-                               "media/Door_Markers/Open_Door.png")
+            self.marker = RectLabel(self.button.rect.x + x_offset1, self.button.rect.y + y_offset1, 50, 50,
+                                    "media/Door_Markers/Open_Door.png")
             self.marker.draw(screen)
         if self.closed:
-            self.marker = RectLabel(self.button.rect.x+x_offset1, self.button.rect.y+y_offset1, 50, 50,
-                               "media/Door_Markers/Closed_Door.png")
+            self.marker = RectLabel(self.button.rect.x + x_offset1, self.button.rect.y + y_offset1, 50, 50,
+                                    "media/Door_Markers/Closed_Door.png")
             self.marker.draw(screen)
