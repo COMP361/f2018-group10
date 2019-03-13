@@ -1,29 +1,20 @@
 import pygame
-
+from src.UIComponents.text import Text
 import src.constants.color as Color
-from core.custom_event import CustomEvent
-from src.core.event_queue import EventQueue
-from src.models.game_units.player_model import PlayerModel
 from src.UIComponents.rect_button import RectButton
 from src.UIComponents.rect_label import RectLabel
-from src.UIComponents.text import Text
 from src.UIComponents.scene import Scene
 from src.constants.change_scene_enum import ChangeSceneEnum
-from src.core.networking import Networking
+from src.core.custom_event import CustomEvent
+from src.core.event_queue import EventQueue
 
 
 class LoseScene(Scene):
     def __init__(self, screen: pygame.Surface):
         Scene.__init__(self, screen)
-
-
         self._init_background()
-        # self._init_btn_new_game(575, 481, "New Game", Color.STANDARDBTN, Color.BLACK)
-        # self._init_btn_login(575, 371, "Load Game", Color.STANDARDBTN, Color.BLACK)
-        # self._init_btn_back(20, 20, "Back", Color.STANDARDBTN, Color.BLACK)
-
-       # self._init_log_box()
         self._init_title_text()
+        self._init_continue_btn()
 
     def _init_background(self):
         box_size = (self.resolution[0], self.resolution[1])
@@ -41,7 +32,12 @@ class LoseScene(Scene):
 
     def _init_title_text(self):
             box_size = (400, 40)
-            self.text_title = RectButton(440, 350, box_size[0], box_size[1], "media/Win_Loose/LOST.png"
-                                         )
-
+            self.text_title = RectButton(440, 350, box_size[0], box_size[1], "media/Win_Loose/LOST.png")
             self.sprite_grp.add(self.text_title)
+
+    def _init_continue_btn(self):
+        box_size = (200,50)
+        ctn_btn = RectButton(550,500,box_size[0],box_size[1],Color.GREY,0,Text(pygame.font.SysFont('Agency FB', 20), "Continue", Color.GREEN2))
+        ctn_btn.add_frame('media/GameHud/frame.png')
+        ctn_btn.on_click(EventQueue.post, CustomEvent(ChangeSceneEnum.STARTSCENE))
+        self.sprite_grp.add(ctn_btn)

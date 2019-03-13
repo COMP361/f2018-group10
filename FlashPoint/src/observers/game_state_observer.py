@@ -24,3 +24,4 @@ class GameStateObserver(Observer):
     @abstractmethod
     def dead_victims(self,victims_dead:int):
         pass
+

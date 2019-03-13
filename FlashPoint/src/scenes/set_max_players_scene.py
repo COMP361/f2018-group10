@@ -33,13 +33,13 @@ class SetMaxPlayers(object):
 
     def _init_back_box(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
         user_box = RectLabel(x_pos, y_pos, 500, 500, color, 0,
-                             Text(pygame.font.SysFont('Arial', 20), text, color_text))
+                             Text(pygame.font.SysFont('Agency FB', 20), text, color_text))
         self.sprite_grp.add(user_box)
 
     def _init_title_text(self):
         box_size = (500, 50)
         self.text_title = RectButton((int)(1280/2-250), 60, box_size[0], box_size[1], Color.BLACK, 0,
-                                     Text(pygame.font.SysFont('Arial', 35), "Set Number of Max Players", Color.WHITE))
+                                     Text(pygame.font.SysFont('Agency FB', 35), "Set Number of Max Players", Color.WHITE))
 
         self.sprite_grp.add(self.text_title)
 
@@ -51,42 +51,42 @@ class SetMaxPlayers(object):
     def _init_solo(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
         box_size = (130, 48)
         self.button_solo = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
-                                     Text(pygame.font.SysFont('Arial', 20), text, color_text))
+                                     Text(pygame.font.SysFont('Agency FB', 20), text, color_text))
         self.button_solo.on_click(self.set_and_continue, 1)
         self.sprite_grp.add(self.button_solo)
 
     def _init_button3(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
         box_size = (130, 48)
         self.button_players3 = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
-                                     Text(pygame.font.SysFont('Arial', 20), text, color_text))
+                                     Text(pygame.font.SysFont('Agency FB', 20), text, color_text))
         self.button_players3.on_click(self.set_and_continue, 3)
         self.sprite_grp.add(self.button_players3)
 
     def _init_button4(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
         box_size = (130, 48)
         self.button_players4 = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
-                                     Text(pygame.font.SysFont('Arial', 20), text, color_text))
+                                     Text(pygame.font.SysFont('Agency FB', 20), text, color_text))
         self.button_players4.on_click(self.set_and_continue, 4)
         self.sprite_grp.add(self.button_players4)
 
     def _init_button5(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
         box_size = (130, 48)
         self.button_players5 = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
-                                     Text(pygame.font.SysFont('Arial', 20), text, color_text))
+                                     Text(pygame.font.SysFont('Agency FB', 20), text, color_text))
         self.button_players5.on_click(self.set_and_continue, 5)
         self.sprite_grp.add(self.button_players5)
 
     def _init_button6(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
         box_size = (130, 48)
         self.button_players6 = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
-                                     Text(pygame.font.SysFont('Arial', 20), text, color_text))
+                                     Text(pygame.font.SysFont('Agency FB', 20), text, color_text))
         self.button_players6.on_click(self.set_and_continue, 6)
         self.sprite_grp.add(self.button_players6)
 
     def _init_btn_back(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
         box_size = (130, 48)
         self.buttonBack = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
-                                     Text(pygame.font.SysFont('Arial', 20), text, color_text))
+                                     Text(pygame.font.SysFont('Agency FB', 20), text, color_text))
         self.buttonBack.on_click(EventQueue.post, CustomEvent(ChangeSceneEnum.CREATEGAMEMENU))
         self.sprite_grp.add(self.buttonBack)
 
@@ -104,7 +104,7 @@ class SetMaxPlayers(object):
     def _init_duo(self, x_pos, y_pos, text,color, color_text):
         box_size = (130, 48)
         self.button_duo= RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
-                                      Text(pygame.font.SysFont('Arial', 20), text, color_text))
+                                      Text(pygame.font.SysFont('Agency FB', 20), text, color_text))
         self.button_duo.on_click(self.set_and_continue, 2)
         self.sprite_grp.add(self.button_duo)
 
