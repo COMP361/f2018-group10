@@ -180,11 +180,13 @@ class AdvanceFireEvent(ActionEvent):
                     self.game_state.victims_lost = self.game_state.victims_lost + 1
                     model: VictimModel = model
                     model.state = VictimStateEnum.LOST
+                    tile.remove_associated_model(model)
                     self.board.remove_poi_or_victim(model)
 
                 elif isinstance(model, POIModel):
                     model.reveal()
                     model.status = POIStatusEnum.LOST
+                    tile.remove_associated_model(model)
                     self.board.remove_poi_or_victim(model)
 
                 else:
@@ -192,7 +194,7 @@ class AdvanceFireEvent(ActionEvent):
 
             players_on_tile = self.game_state.get_players_on_tile(tile.row, tile.column)
             for player in players_on_tile:
-                KnockDownEvent(player).execute()
+                KnockDownEvent(player.ip).execute()
 
         # removing any fire markers that were
         # placed outside of the building

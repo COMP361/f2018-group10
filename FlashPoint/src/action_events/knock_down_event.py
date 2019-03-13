@@ -9,10 +9,10 @@ from src.models.game_units.victim_model import VictimModel
 
 class KnockDownEvent(ActionEvent):
 
-    def __init__(self, player: PlayerModel):
+    def __init__(self, player_ip: str):
         super().__init__()
-        self.player = player
         self.game: GameStateModel = GameStateModel.instance()
+        self.player = self.game.get_player_by_ip(player_ip)
 
     def execute(self):
         # if the player was carrying a victim,
