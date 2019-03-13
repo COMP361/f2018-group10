@@ -1,6 +1,8 @@
-
+from src.constants.state_enums import GameStateEnum
+from src.core.event_queue import EventQueue
 from src.models.game_board.tile_model import TileModel
 from src.models.game_state_model import GameStateModel
+from src.models.game_units.player_model import PlayerModel
 from src.models.game_units.victim_model import VictimModel
 from src.sprites.tile_sprite import TileSprite
 
@@ -50,21 +52,40 @@ class VictimController(object):
 
         tile_model: TileModel = GameStateModel.instance().game_board.get_tile_at(tile.row, tile.column)
 
-        if self.check_drop():
-            self.can_drop = True
-            self.can_pickup = False
-            self.action_tile = tile
-            self.action_tile.drop_victim_button.enable()
-            return
+        player: PlayerModel = GameStateModel.instance().players_turn
 
-        elif self.check_pickup(tile_model):
-            self.can_pickup = True
-            self.can_drop = False
-            self.action_tile = tile
-            self.action_tile.pickup_victim_button.enable()
+        if GameStateModel.instance().game_board.get_tile_at(player.row, player.column)== tile_model:
+
+            if self.check_drop():
+                self.can_drop = True
+                self.can_pickup = False
+                self.action_tile = tile
+                self.action_tile.drop_victim_button.enable()
+                return
+
+            elif self.check_pickup(tile_model):
+                self.can_pickup = True
+                self.can_drop = False
+                self.action_tile = tile
+                self.action_tile.pickup_victim_button.enable()
+
+            else:
+                self.can_drop = False
+                self.can_pickup = False
+                tile.pickup_victim_button.disable()
+                tile.drop_victim_button.disable()
 
         else:
             self.can_drop = False
             self.can_pickup = False
             tile.pickup_victim_button.disable()
             tile.drop_victim_button.disable()
+
+    def update(self, event_queue: EventQueue):
+
+        if GameStateModel.instance().state != GameStateEnum.MAIN_GAME:
+            return
+
+
+
+

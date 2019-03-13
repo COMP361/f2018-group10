@@ -148,3 +148,4 @@ class TileInputController(GameStateObserver):
         self.move_controller.update(event_queue)
         self.choose_starting_controller.update(event_queue)
         self.extinguish_controller.update(event_queue)
+        self.victim_controller.update(event_queue)
