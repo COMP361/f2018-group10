@@ -21,8 +21,6 @@ from src.constants.change_scene_enum import ChangeSceneEnum
 
 class StartScene(object):
     def __init__(self, screen):
-        if GameStateModel.instance():
-            GameStateModel.__del__()
         self.profiles = "media/profiles.json"
         self.resolution = (1280, 700)
         self.sprite_grp = pygame.sprite.Group()

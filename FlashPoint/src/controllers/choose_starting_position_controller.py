@@ -57,7 +57,7 @@ class ChooseStartingPositionController(object):
             return False
 
         if self.current_player != GameStateModel.instance().players_turn:
-            print("Not this players turn")
+            # print("Not this players turn")
             return False
 
         # Check if any Players are in this tile

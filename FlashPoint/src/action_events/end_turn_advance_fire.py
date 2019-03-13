@@ -1,22 +1,23 @@
-from src.action_events.action_event import ActionEvent
 from src.action_events.knock_down_event import KnockDownEvent
-from src.constants.state_enums import WallStatusEnum, SpaceStatusEnum, SpaceKindEnum, VictimStateEnum, DoorStatusEnum, \
-    POIStatusEnum
 from src.models.game_board.door_model import DoorModel
-from src.models.game_board.game_board_model import GameBoardModel
 from src.models.game_board.null_model import NullModel
-from src.models.game_board.tile_model import TileModel
 from src.models.game_board.wall_model import WallModel
-from src.models.game_state_model import GameStateModel
-from src.models.game_units.player_model import PlayerModel
 from src.models.game_units.poi_model import POIModel
 from src.models.game_units.victim_model import VictimModel
+from src.models.game_board.tile_model import TileModel
+from src.models.game_board.game_board_model import GameBoardModel
+from src.constants.state_enums import GameStateEnum, SpaceStatusEnum, WallStatusEnum, DoorStatusEnum, VictimStateEnum, \
+    POIStatusEnum, SpaceKindEnum
+from src.action_events.turn_events.turn_event import TurnEvent
+from src.models.game_state_model import GameStateModel
+from src.models.game_units.player_model import PlayerModel
 
 
-class AdvanceFireEvent(ActionEvent):
+class EndTurnAdvanceFireEvent(TurnEvent):
 
-    def __init__(self, red_dice: int = None, black_dice: int = None):
+    def __init__(self, player: PlayerModel, red_dice: int = None, black_dice: int = None):
         super().__init__()
+        self.player = player
         self.game_state: GameStateModel = GameStateModel.instance()
         self.board: GameBoardModel = self.game_state.game_board
         self.initial_tile: TileModel = None
@@ -30,12 +31,37 @@ class AdvanceFireEvent(ActionEvent):
             self.black_dice = self.game_state.roll_black_dice()
         self.directions = ["North", "South", "East", "West"]
 
-    def execute(self, *args, **kwargs):
-        # Change state of tile depending on previous state
-        self.initial_tile = self.board.get_tile_at(self.red_dice, self.black_dice)
-        self.advance_on_tile(self.initial_tile)
-        self.flashover()
-        self.affect_damages()
+    def execute(self):
+        """
+        Steps:
+        1)start the AdvanceFire
+        2)knockdown event
+        3)replenish POI
+        4)retain and replenish player's AP
+        5)call player_next
+        :return:
+        """
+        # retain upto a maximum of 4 AP
+        # as the turn is ending and
+        # replenish player's AP by 4
+        GameStateModel.lock.acquire()
+        if GameStateModel.instance().state == GameStateEnum.MAIN_GAME:
+
+            # ------ AdvanceFire ------ #
+            # Change state of tile depending on previous state
+            self.initial_tile = self.board.get_tile_at(self.red_dice, self.black_dice)
+            self.advance_on_tile(self.initial_tile)
+            self.flashover()
+            self.affect_damages()
+
+            if self.player.ap > 4:
+                self.player.ap = 4
+
+            self.player.ap += 4
+
+        # call next player
+        GameStateModel.instance().next_player()
+        GameStateModel.lock.release()
 
     def advance_on_tile(self, target_tile: TileModel):
         tile_status = target_tile.space_status
@@ -117,10 +143,8 @@ class AdvanceFireEvent(ActionEvent):
                     if obstacle.door_status == DoorStatusEnum.CLOSED:
                         should_stop = True
                     obstacle.destroy_door()
-
                 else:
                     pass
-
 
     def flashover(self):
         """
@@ -160,7 +184,6 @@ class AdvanceFireEvent(ActionEvent):
             if num_converted == 0:
                 all_smokes_converted = True
 
-
     def affect_damages(self):
         """
         Affect any valid damages to firemen,
@@ -195,3 +218,4 @@ class AdvanceFireEvent(ActionEvent):
         for tile in self.board.tiles:
             if tile.space_kind != SpaceKindEnum.INDOOR and tile.space_status == SpaceStatusEnum.FIRE:
                 tile.space_status = SpaceStatusEnum.SAFE
+

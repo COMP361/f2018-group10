@@ -102,3 +102,7 @@ class ChatBox:
                 count += 1
             else:
                 break
+
+    @property
+    def box(self):
+        return self.chat_textbox.rect

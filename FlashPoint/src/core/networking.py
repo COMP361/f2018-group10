@@ -6,6 +6,7 @@ import threading
 import logging
 import time
 
+from src.action_events.advance_fire_event import AdvanceFireEvent
 from src.action_events.turn_events.choose_starting_position_event import ChooseStartingPositionEvent
 from src.action_events.turn_events.end_turn_event import EndTurnEvent
 from src.action_events.chat_event import ChatEvent
@@ -207,11 +208,6 @@ class Networking:
             Disconnects the current machine. If the current machine is a host, it ends the game as well.
             :return:
             """
-            if self.client is not None:
-                logger.info("Disconnecting client")
-                self.client.disconnect()
-                self.client.__del__()
-                self.client = None
             if self.host is not None:
                 logger.info("Disconnecting host")
                 # Kill the broadcast
@@ -225,7 +221,11 @@ class Networking:
                 self.host.disconnect()
                 self.host.__del__()
                 self.host = None
-            EventQueue.post(CustomEvent(ChangeSceneEnum.STARTSCENE))
+            if self.client is not None:
+                logger.info("Disconnecting client")
+                self.client.disconnect()
+                self.client.__del__()
+                self.client = None
 
         def send_to_server(self, data, compress=True):
             """
@@ -369,7 +369,7 @@ class Networking:
             if isinstance(data, TurnEvent) or isinstance(data, ActionEvent):
                 if isinstance(data, ChatEvent) or isinstance(data, EndTurnEvent) \
                         or isinstance(data, ChooseStartingPositionEvent) or isinstance(data, ChopEvent) \
-                        or isinstance(data, ExtinguishEvent):
+                        or isinstance(data, ExtinguishEvent) or isinstance(data, AdvanceFireEvent):
                     Networking.get_instance().send_to_all_client(data)
                     return super(MastermindServerUDP, self).callback_client_handle(connection_object, data)
 
@@ -506,4 +506,5 @@ class Networking:
             """
             print("It seems that client is not connected...")
             Networking.get_instance().disconnect()
+            EventQueue.post(CustomEvent(ChangeSceneEnum.STARTSCENE))
 

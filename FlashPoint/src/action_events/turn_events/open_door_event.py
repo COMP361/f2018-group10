@@ -1,14 +1,15 @@
 from src.action_events.turn_events.turn_event import TurnEvent
 from src.models.game_board.door_model import DoorModel
+from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 
 
 class OpenDoorEvent(TurnEvent):
 
-    def __init__(self, door: DoorModel, fireman: PlayerModel):
+    def __init__(self, door: DoorModel):
         super().__init__()
-        self.door = door
-        self.fireman = fireman
+        self.door = GameStateModel.instance().game_board.get_tile_at(door.id[0], door.id[1]).get_obstacle_in_direction(door.id[2])
+        self.fireman: PlayerModel = GameStateModel.instance().players_turn
 
     def execute(self):
         door = self.door

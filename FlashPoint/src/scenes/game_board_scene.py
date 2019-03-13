@@ -3,9 +3,8 @@ from datetime import datetime
 
 import pygame
 
-from src.action_events.turn_events.move_event import MoveEvent
 from src.controllers.chop_controller import ChopController
-from src.controllers.move_controller import MoveController
+from src.controllers.door_controller import DoorController
 from src.sprites.poi_sprite import POISprite
 from src.controllers.tile_input_controller import TileInputController
 from src.constants.change_scene_enum import ChangeSceneEnum
@@ -53,6 +52,7 @@ class GameBoardScene(object):
         self._init_sprites()
         self.tile_input_controller = TileInputController(self._current_player)
         self.chop_controller = ChopController(self._current_player)
+        self.door_controller = DoorController(self._current_player)
         for poi in self._game.game_board.active_pois:
             poi_sprite = POISprite(poi.row, poi.column)
             self.game_board_sprite.add(poi_sprite)
@@ -71,7 +71,8 @@ class GameBoardScene(object):
         self.active_sprites.add(TimeBar(0, 0))
         self.ingame_states = InGameStates(250, 650, self._game.damage, self._game.victims_saved, self._game.victims_lost)
         self.active_sprites.add(self.ingame_states)
-        self.active_sprites.add(self._init_menu_button())
+        self.menu_btn = self._init_menu_button()
+        self.active_sprites.add(self.menu_btn)
 
     def _save(self):
         """Save the current game state to the hosts machine"""
@@ -88,6 +89,9 @@ class GameBoardScene(object):
 
     def _quit_btn_on_click(self):
         Networking.get_instance().disconnect()
+        TileInputController.__del__()
+        ChopController._instance = None
+        DoorController._instance = None
         EventQueue.post(CustomEvent(ChangeSceneEnum.STARTSCENE))
 
     # Example of how to use the MenuClass YOU NEED TO MAKE ALL YOUR BUTTONS EXTEND INTERACTABLE!!!!!!!!!!!!!!!!!
@@ -132,16 +136,30 @@ class GameBoardScene(object):
 
     def update(self, event_queue: EventQueue):
         """Call the update() function of everything in this class."""
-
-        # self.chat_box.update(event_queue)
-        self.game_board_sprite.update(event_queue)
         self.active_sprites.update(event_queue)
+        self.chat_box.update(event_queue)
+
+        if not self.ignore_area():
+            self.game_board_sprite.update(event_queue)
+            self.tile_input_controller.update(event_queue)
+            self.chop_controller.update(event_queue)
+            self.door_controller.update(event_queue)
 
         if self.menu and not self.menu.is_closed:
             self.menu.update(event_queue)
 
-        self.chat_box.update(event_queue)
         self.notify_turn_popup.update(event_queue)
         # self.choose_start_pos_controller.update(event_queue)
-        self.tile_input_controller.update(event_queue)
-        self.chop_controller.update(event_queue)
+
+    def ignore_area(self):
+        ignore = False
+        mouse_pos = pygame.mouse.get_pos()
+
+        ignore = ignore or (self.chat_box.box.x < mouse_pos[0] < self.chat_box.box.x + self.chat_box.box.width and
+                            self.chat_box.box.y < mouse_pos[1] < self.chat_box.box.y + self.chat_box.box.height)
+
+        for sprite in self.active_sprites:
+            ignore = ignore or (sprite.rect.x < mouse_pos[0] < sprite.rect.x + sprite.rect.width and
+                                sprite.rect.y < mouse_pos[1] < sprite.rect.y + sprite.rect.height)
+
+        return ignore

@@ -2,10 +2,11 @@ import threading
 import pygame
 import time
 from threading import Thread
+
 import src.constants.color as Color
+from action_events.end_turn_advance_fire import EndTurnAdvanceFireEvent
 from src.UIComponents.rect_label import RectLabel
 from src.UIComponents.rect_button import RectButton
-from src.action_events.turn_events.end_turn_event import EndTurnEvent
 from src.core.event_queue import EventQueue
 from src.core.networking import Networking
 from constants.state_enums import GameStateEnum
@@ -65,10 +66,9 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
             #screen.blit(self.image, self.image.get_rect().move(880, 600))
 
     def notify_player_index(self, player_index: int):
-        print("Player index" + str(player_index))
         for player in GameStateModel.instance().players:
             print(player.nickname)
-        print(self._current_player.nickname)
+
         self.enabled = (GameStateModel.instance().players[player_index] == self._current_player)
 
         if self.enabled:
@@ -80,7 +80,7 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
             self._current_sprite.turn = True
             self.running = True
 
-            self.countdown_thread = Thread(target=self.countdown, args=(120,))
+            self.countdown_thread = Thread(target=self.countdown, args=(120,), daemon=True)
             self.countdown_thread.start()
         else:
             self._current_sprite.turn = False
@@ -89,7 +89,6 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
             self._active_sprites.add(self.not_your_turn)
 
     def _init_your_turn(self):
-
         rct = RectLabel(880, 600, 250, 50, background=Color.ORANGE,
                         txt_obj=Text(pygame.font.SysFont('Agency FB', 30), "YOUR TURN", Color.GREEN2))
         rct.change_bg_image('media/GameHud/wood2.png')
@@ -123,7 +122,7 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
         self.enabled = False
         self.running = False
 
-        turn_event = EndTurnEvent(self._current_player)
+        turn_event = EndTurnAdvanceFireEvent(self._current_player)
         # send end turn, see ChatBox for example
         try:
             if Networking.get_instance().is_host:
