@@ -13,7 +13,7 @@ class VictimController(object):
     def __init__(self):
 
         if VictimController._instance:
-            raise Exception("Chop Controller is a singleton")
+            raise Exception("Victim Controller is a singleton")
 
         VictimController._instance = self
         self.fireman = GameStateModel.instance().players_turn
