@@ -54,7 +54,7 @@ class VictimController(object):
 
         player: PlayerModel = GameStateModel.instance().players_turn
 
-        if GameStateModel.instance().game_board.get_tile_at(player.row, player.column)== tile_model:
+        if GameStateModel.instance().game_board.get_tile_at(player.row, player.column) == tile_model:
 
             if self.check_drop():
                 self.can_drop = True
