@@ -5,6 +5,8 @@ from typing import Dict, List
 from src.action_events.turn_events.chop_event import ChopEvent
 from src.action_events.turn_events.extinguish_event import ExtinguishEvent
 from src.action_events.turn_events.move_event import MoveEvent
+from src.models.game_board.door_model import DoorModel
+from src.models.game_board.null_model import NullModel
 from src.models.game_board.wall_model import WallModel
 from src.observers.observer import Observer
 from src.models.game_board.tile_model import TileModel
@@ -16,7 +18,8 @@ from src.action_events.ready_event import ReadyEvent
 from src.action_events.chat_event import ChatEvent
 from src.action_events.dummy_event import DummyEvent
 from src.action_events.join_event import JoinEvent
-from src.constants.state_enums import DifficultyLevelEnum, GameKindEnum, PlayerStatusEnum, WallStatusEnum
+from src.constants.state_enums import DifficultyLevelEnum, GameKindEnum, PlayerStatusEnum, WallStatusEnum, \
+    DoorStatusEnum
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 from src.sprites.hud.player_state import PlayerState
@@ -67,16 +70,24 @@ class JSONSerializer(object):
 
 
     @staticmethod
-    def _deserialize_gameboard(payload: Dict) -> GameBoardModel:
+    def _deserialize_game_board(payload: Dict) -> GameBoardModel:
         game_board = GameBoardModel(GameStateModel.instance().rules)
-        tiles: List[List[TileModel]] = [[]]
+        tiles: List[List[TileModel]] = []
+        print(len(payload['_tiles']))
         for row in range(len(payload['_tiles'])):
-            tiles[row].append([])
+            tiles.append([])
             for column in range(len(payload['_tiles'][row])):
-                tiles[row][column].append(JSONSerializer.deserialize(payload['_tiles'][row][column]))
+                tiles[row].append(JSONSerializer.deserialize(payload['_tiles'][row][column]))
 
         game_board.tiles = tiles
-        game_board.set_adjacencies(game_board.get_tiles())
+        for i in range(game_board._dimensions[0]):
+            tiles.append([])
+            for j in range(game_board._dimensions[1]):
+                tile_kind = game_board._determine_tile_kind(i, j)
+                game_board.get_tile_at(i,j).space_kind = tile_kind
+
+        #game_board.set_adjacencies(game_board.get_tiles())
+        return game_board
 
 
     @staticmethod
@@ -139,6 +150,10 @@ class JSONSerializer(object):
     def _deserialize_tile(payload: Dict) -> TileModel:
         tile: TileModel = TileModel(payload['_row'], payload['_column'], payload['_space_kind'])
         GameStateModel.instance().game_board.set_single_tile_adjacencies(tile)
+        tile.adjacent_edge_objects['North'] = JSONSerializer.deserialize(payload['_adjacent_edge_objects']['North'])
+        tile.adjacent_edge_objects['East'] = JSONSerializer.deserialize(payload['_adjacent_edge_objects']['East'])
+        tile.adjacent_edge_objects['West'] = JSONSerializer.deserialize(payload['_adjacent_edge_objects']['West'])
+        tile.adjacent_edge_objects['South'] = JSONSerializer.deserialize(payload['_adjacent_edge_objects']['South'])
         return tile
 
     @staticmethod
@@ -147,6 +162,13 @@ class JSONSerializer(object):
         wall = WallModel(id[0], id[1], id[2])
         wall.wall_status = WallStatusEnum(payload['_wall_status']['value'])
         return wall
+
+    @staticmethod
+    def _deserialize_door(payload: Dict) -> DoorModel:
+        id = payload['_id']
+        door = DoorModel(id[0],id[1],id[2])
+        door.door_status = DoorStatusEnum(payload['_door_status']['value'])
+        return door
 
     @staticmethod
     def _deserialize_chop_event(payload: Dict) -> ChopEvent:
@@ -202,12 +224,18 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_chop_event(payload)
         elif object_type == WallModel.__name__:
             return JSONSerializer._deserialize_wall(payload)
+        elif object_type == DoorModel.__name__:
+            return JSONSerializer._deserialize_door(payload)
         elif object_type == MoveEvent.__name__:
             return JSONSerializer._deserialize_move_event(payload)
         elif object_type == DummyEvent.__name__:
             return DummyEvent()
         elif object_type == ExtinguishEvent.__name__:
             return JSONSerializer._deserialize_extinguish_event(payload)
+        elif object_type == GameBoardModel.__name__:
+            return JSONSerializer._deserialize_game_board(payload)
+        elif object_type == NullModel.__name__:
+            return NullModel()
 
         print(f"WARNING: Could not deserialize object {object_type}, not of recognized type.")
 

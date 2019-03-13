@@ -28,14 +28,14 @@ class GameStateModel(Model):
             self._rules = game_kind
             self._red_dice = 0
             self._black_dice = 0
-
+            self._game_board = GameBoardModel(self._rules)
             self._victims_saved = 0
             self._victims_lost = 0
             self._damage = 0
             self._max_damage = 24
             self._chat_history = []
             self._state = GameStateEnum.READY_TO_JOIN
-
+            s = f"{self._host.row}, {self._host.column}"
             GameStateModel._instance = self
 
         else:
@@ -71,6 +71,10 @@ class GameStateModel(Model):
     @property
     def game_board(self) -> GameBoardModel:
         return self._game_board
+
+    @game_board.setter
+    def game_board(self,model:GameBoardModel):
+        self._game_board = model
 
     @property
     def chat_history(self) -> List[Tuple[str, str]]:
