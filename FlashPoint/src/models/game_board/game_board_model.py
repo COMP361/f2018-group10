@@ -8,10 +8,11 @@ from src.models.game_board.edge_obstacle_model import EdgeObstacleModel
 from src.models.game_board.null_model import NullModel
 from src.models.game_units.poi_model import POIModel
 from src.models.game_board.tile_model import TileModel
-from src.constants.state_enums import GameKindEnum, SpaceKindEnum, SpaceStatusEnum, POIIdentityEnum, DirectionEnum, \
-    DoorStatusEnum, WallStatusEnum
+from src.constants.state_enums import GameKindEnum, SpaceKindEnum, SpaceStatusEnum, POIIdentityEnum, \
+    DoorStatusEnum, POIStatusEnum, VictimStateEnum
 from src.models.game_board.wall_model import WallModel
 from src.models.game_board.door_model import DoorModel
+from src.models.game_units.victim_model import VictimModel
 
 class GameBoardModel(object):
     """
@@ -59,8 +60,12 @@ class GameBoardModel(object):
         # victim can be seen before it is removed.
         time.sleep(0.5)
         if poi_or_victim in self._active_pois:
-            if poi_or_victim.row >= 0 and poi_or_victim.column >= 0:
-                poi_or_victim.set_position(-7, -7)
+            if isinstance(poi_or_victim, POIModel):
+                poi_or_victim.status = POIStatusEnum.LOST
+            elif isinstance(poi_or_victim, VictimModel):
+                poi_or_victim.state = VictimStateEnum.LOST
+            else:
+                pass
             self._active_pois.remove(poi_or_victim)
 
     def get_random_poi_from_bank(self) -> POIModel:

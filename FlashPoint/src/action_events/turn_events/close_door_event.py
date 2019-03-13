@@ -9,9 +9,10 @@ class CloseDoorEvent(TurnEvent):
 
     def __init__(self, door: DoorModel):
         super().__init__()
-        self.door = GameStateModel.instance().game_board.get_tile_at(door.id[0], door.id[1]).get_obstacle_in_direction(door.id[2])
-        self.fireman: PlayerModel = GameStateModel.instance().players_turn
+        game: GameStateModel = GameStateModel.instance()
+        self.door = game.game_board.get_tile_at(door.id[0], door.id[1]).get_obstacle_in_direction(door.id[2])
+        self.fireman = game.players_turn
 
     def execute(self):
         self.door.close_door()
-        self.fireman.ap -= 1
+        self.fireman.ap = self.fireman.ap - 1

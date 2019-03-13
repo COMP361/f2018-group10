@@ -18,7 +18,8 @@ class ChooseStartingPositionEvent(ActionEvent):
 
     def execute(self):
         print("Executing ChooseStartingPositionEvent")
-        self.tile.add_associated_model(self.player)
+        game: GameStateModel = GameStateModel.instance()
+        # self.tile.add_associated_model(self.player)
         player_sprite = PlayerSprite(self.player, self.tile, GameBoard.instance().grid)
         GameBoard.instance().add(player_sprite)
         self.player.set_pos(self.tile.row, self.tile.column)
