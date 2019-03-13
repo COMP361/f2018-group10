@@ -1,5 +1,6 @@
 from src.action_events.turn_events.extinguish_event import ExtinguishEvent
 from src.action_events.turn_events.move_event import MoveEvent
+from src.controllers.victim_controller import VictimController
 from src.core.event_queue import EventQueue
 from src.core.networking import Networking
 from src.models.game_board.tile_model import TileModel
@@ -35,6 +36,7 @@ class TileInputController(GameStateObserver):
         self.game_board_sprite = GameBoard.instance()
         self.move_controller = MoveController(current_player)
         self.choose_starting_controller = ChooseStartingPositionController(current_player)
+        self.victim_controller = VictimController()
         GameStateModel.instance().add_observer(self)
         self.fireman = current_player
         self.last_tile: TileSprite = None
@@ -46,7 +48,7 @@ class TileInputController(GameStateObserver):
     def instance(cls):
         return cls._instance
 
-    def move_and_extinguish(self, tile: TileSprite):
+    def move_extinguish_victim(self, tile: TileSprite):
         self.move_controller.process_input(tile)
         self.extinguish_controller.process_input(tile)
         tile_model = GameStateModel.instance().game_board.get_tile_at(tile.row, tile.column)
@@ -59,6 +61,9 @@ class TileInputController(GameStateObserver):
             if self.extinguish_controller.extinguishable:
                 self.extinguish_controller.fire_tile.extinguish_button.on_click(self.execute_extinguish_event, tile_model)
                 self.extinguish_controller.fire_tile.extinguish_button.update(EventQueue.get_instance())
+
+            if self.victim_controller.can_drop:
+
 
         if not tile.menu_shown:
             tile.menu_shown = True
@@ -94,7 +99,7 @@ class TileInputController(GameStateObserver):
         if state == GameStateEnum.PLACING:
             on_click = self.choose_starting_controller.process_input
         elif state == GameStateEnum.MAIN_GAME:
-            on_click = self.move_and_extinguish
+            on_click = self.move_extinguish_victim
 
         grid = self.game_board_sprite.grid.grid
         for column in range(len(grid)):

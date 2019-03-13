@@ -19,14 +19,7 @@ class PickupVictimEvent(TurnEvent):
 
     #### Use this check in the GUI to determine
     #### whether or not to show a pick up victim option
-    def check(self, tile: TileModel) -> bool:
-        game: GameStateModel = GameStateModel.instance()
-        victim_tile = game.game_board.get_tile_at(tile.row, tile.column)
-        for assoc_model in victim_tile.associated_models:
-            if isinstance(assoc_model, VictimModel):
-                return True
 
-        return False
 
     def execute(self):
         self.player.carrying_victim = self.victim
