@@ -118,6 +118,12 @@ class GridSprite(pygame.sprite.Group):
             if door_btn.enabled:
                 door_btn.draw(screen)
 
+        for sprite in self:
+            if isinstance(sprite, RectButton) and not sprite.enabled:
+                pass
+            else:
+                sprite.draw_menu(screen)
+
     def update(self, event_queue: EventQueue):
         for tile in self:
             tile.update(event_queue)
