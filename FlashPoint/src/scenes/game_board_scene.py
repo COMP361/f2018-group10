@@ -77,7 +77,9 @@ class GameBoardScene(GameBoardObserver):
             if isinstance(poi, POIModel):
                 self.game_board_sprite.add(POISprite(poi))
             elif isinstance(poi, VictimModel):
-                self.game_board_sprite.add(VictimSprite(poi.row, poi.column))
+                victim_sprite = VictimSprite(poi.row, poi.column)
+                poi.add_observer(victim_sprite)
+                self.game_board_sprite.add(victim_sprite)
 
     def _init_sprites(self):
         for i, player in enumerate(self._game.players):
