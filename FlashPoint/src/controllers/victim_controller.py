@@ -35,10 +35,12 @@ class VictimController(object):
 
         return False
 
-    def check_drop(self):
+    def check_drop(self, tile: TileModel):
         game: GameStateModel = GameStateModel.instance()
         player = game.players_turn
-        if isinstance(player.carrying_victim, VictimModel):
+
+        if GameStateModel.instance().game_board.get_tile_at(player.row, player.column) == tile \
+                and isinstance(player.carrying_victim, VictimModel):
             return True
 
         return False
@@ -52,34 +54,26 @@ class VictimController(object):
 
         tile_model: TileModel = GameStateModel.instance().game_board.get_tile_at(tile.row, tile.column)
 
-        player: PlayerModel = GameStateModel.instance().players_turn
+        if self.check_drop(tile_model):
+            self.can_drop = True
+            self.can_pickup = False
+            self.action_tile = tile
+            self.action_tile.drop_victim_button.enable()
+            return
 
-        if GameStateModel.instance().game_board.get_tile_at(player.row, player.column) == tile_model:
-
-            if self.check_drop():
-                self.can_drop = True
-                self.can_pickup = False
-                self.action_tile = tile
-                self.action_tile.drop_victim_button.enable()
-                return
-
-            elif self.check_pickup(tile_model):
-                self.can_pickup = True
-                self.can_drop = False
-                self.action_tile = tile
-                self.action_tile.pickup_victim_button.enable()
-
-            else:
-                self.can_drop = False
-                self.can_pickup = False
-                tile.pickup_victim_button.disable()
-                tile.drop_victim_button.disable()
+        elif self.check_pickup(tile_model):
+            self.can_pickup = True
+            self.can_drop = False
+            self.action_tile = tile
+            self.action_tile.pickup_victim_button.enable()
 
         else:
             self.can_drop = False
             self.can_pickup = False
             tile.pickup_victim_button.disable()
             tile.drop_victim_button.disable()
+
+
 
     def update(self, event_queue: EventQueue):
 
