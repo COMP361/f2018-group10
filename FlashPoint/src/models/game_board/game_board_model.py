@@ -3,6 +3,7 @@ import random
 import time
 from typing import List, Tuple, Dict
 
+from src.models.model import Model
 from src.constants.main_constants import BOARD_DIMENSIONS
 from src.models.game_board.edge_obstacle_model import EdgeObstacleModel
 from src.models.game_board.null_model import NullModel
@@ -14,13 +15,15 @@ from src.models.game_board.wall_model import WallModel
 from src.models.game_board.door_model import DoorModel
 from src.models.game_units.victim_model import VictimModel
 
-class GameBoardModel(object):
+
+class GameBoardModel(Model):
     """
     Class for aggregating all objects related to the game board itself, this means TileModels, PlayerModels
     etc. This class is created inside of GameStateModel.
     """
 
     def __init__(self, game_type: GameKindEnum):
+        super().__init__()
         self._dimensions = (8, 10)
         self._ambulance_spots = []
         self._engine_spots = []
@@ -28,6 +31,10 @@ class GameBoardModel(object):
         self._poi_bank = GameBoardModel._init_pois()
         self._active_pois = []
         self.set_initial_poi_family()
+
+    def _notify_active_poi(self):
+        for obs in self.observers:
+            obs.notify_active_poi(self._active_pois)
 
     def get_tiles(self) -> List[List[TileModel]]:
         return self._tiles
@@ -54,11 +61,11 @@ class GameBoardModel(object):
 
     def add_poi_or_victim(self, poi_or_victim):
         self._active_pois.append(poi_or_victim)
+        self._notify_active_poi()
 
     def remove_poi_or_victim(self, poi_or_victim):
         # Put to sleep briefly so that POI or
         # victim can be seen before it is removed.
-        time.sleep(0.5)
         if poi_or_victim in self._active_pois:
             if isinstance(poi_or_victim, POIModel):
                 poi_or_victim.status = POIStatusEnum.LOST
@@ -67,6 +74,7 @@ class GameBoardModel(object):
             else:
                 pass
             self._active_pois.remove(poi_or_victim)
+            self._notify_active_poi()
 
     def get_random_poi_from_bank(self) -> POIModel:
         number = random.randint(0, len(self._poi_bank)-1)

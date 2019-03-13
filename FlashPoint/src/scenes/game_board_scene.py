@@ -1,7 +1,12 @@
 import json
 from datetime import datetime
+from typing import List
 
 import pygame
+from src.models.game_units.victim_model import VictimModel
+from src.sprites.victim_sprite import VictimSprite
+from src.models.game_units.poi_model import POIModel
+from src.observers.GameBoardObserver import GameBoardObserver
 
 from src.controllers.chop_controller import ChopController
 from src.controllers.door_controller import DoorController
@@ -28,7 +33,7 @@ from src.UIComponents.text import Text
 from src.sprites.notify_player_turn import NotifyPlayerTurn
 
 
-class GameBoardScene(object):
+class GameBoardScene(GameBoardObserver):
     """
     Scene for displaying the main game view
     """
@@ -56,12 +61,23 @@ class GameBoardScene(object):
         self.tile_input_controller = TileInputController(self._current_player)
         self.chop_controller = ChopController(self._current_player)
         self.door_controller = DoorController(self._current_player)
-        for poi in self._game.game_board.active_pois:
-            poi_sprite = POISprite(poi)
-            self.game_board_sprite.add(poi_sprite)
-
+        self._game.game_board.add_observer(self)
+        self._game.game_board._notify_active_poi()
         if Networking.get_instance().is_host:
             GameStateModel.instance()._notify_player_index()
+
+    def notify_active_poi(self, active_pois: List[POIModel]):
+
+        # Removes are already handled by the sprites themselves, therefore only need to deal with adds.
+        for sprite in self.game_board_sprite:
+            if isinstance(sprite, POISprite) or isinstance(sprite, VictimSprite):
+                sprite.kill()
+
+        for poi in active_pois:
+            if isinstance(poi, POIModel):
+                self.game_board_sprite.add(POISprite(poi))
+            elif isinstance(poi, VictimModel):
+                self.game_board_sprite.add(VictimSprite(poi.row, poi.column))
 
     def _init_sprites(self):
         for i, player in enumerate(self._game.players):

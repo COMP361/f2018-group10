@@ -30,8 +30,9 @@ class POISprite(pygame.sprite.Sprite, POIObserver):
         if status == POIStatusEnum.REVEALED and victim:
             if self.poi_model.identity == POIIdentityEnum.VICTIM:
                 # Replace this sprite with a victim sprite.
-                victim_sprite = VictimSprite(self.row, self.column)
+                victim_sprite = VictimSprite(victim.row, victim.column)
                 victim.add_observer(victim_sprite)
+                print(victim_sprite.row, victim_sprite.column)
                 for group in self.groups():
                     group.add(victim_sprite)
             elif self.poi_model.identity == POIIdentityEnum.FALSE_ALARM:
@@ -43,10 +44,9 @@ class POISprite(pygame.sprite.Sprite, POIObserver):
         self.kill()
 
     def poi_position_changed(self, row: int, column: int):
-        if row > 0 and column > 0:
-            self.tile_sprite = GameBoard.instance().grid.grid[column][row]
-            self.row = row
-            self.column = column
+        self.tile_sprite = GameBoard.instance().grid.grid[column][row]
+        self.row = row
+        self.column = column
 
     def update(self, event_queue: EventQueue):
         new_x = self.tile_sprite.rect.x+70
