@@ -1,5 +1,5 @@
 import pygame
-from src.models.game_board.tile_model import TileModel
+
 from src.sprites.tile_sprite import TileSprite
 from src.core.networking import Networking
 from src.UIComponents.rect_label import RectLabel
@@ -12,7 +12,6 @@ from src.models.game_units.player_model import PlayerModel
 from src.sprites.game_board import GameBoard
 import src.constants.color as Color
 from src.UIComponents.text import Text
-from src.sprites.player_sprite import PlayerSprite
 
 
 class ChooseStartingPositionController(object):
@@ -69,18 +68,19 @@ class ChooseStartingPositionController(object):
         return True
 
     def process_input(self, tile_sprite: TileSprite):
-        tile_model = GameStateModel.instance().game_board.get_tile_at(tile_sprite.row, tile_sprite.column)
+        if not GameStateModel.instance().players_turn.has_pos:
+            tile_model = GameStateModel.instance().game_board.get_tile_at(tile_sprite.row, tile_sprite.column)
 
-        if not self._run_checks(tile_sprite, tile_model):
-            return
+            if not self._run_checks(tile_sprite, tile_model):
+                return
 
-        event = ChooseStartingPositionEvent(tile_model)
-        self.choose_prompt.kill()
+            event = ChooseStartingPositionEvent(tile_model)
+            self.choose_prompt.kill()
 
-        if Networking.get_instance().is_host:
-            Networking.get_instance().send_to_all_client(event)
-        else:
-            Networking.get_instance().client.send(event)
+            if Networking.get_instance().is_host:
+                Networking.get_instance().send_to_all_client(event)
+            else:
+                Networking.get_instance().client.send(event)
 
     def update(self, event_queue: EventQueue):
         if self.current_player == GameStateModel.instance().players_turn:

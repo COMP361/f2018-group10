@@ -15,12 +15,13 @@ from src.models.game_units.player_model import PlayerModel
 
 class EndTurnAdvanceFireEvent(TurnEvent):
 
-    def __init__(self, player: PlayerModel, red_dice: int = None, black_dice: int = None):
+    def __init__(self, player: PlayerModel, advance_fire: bool = True, red_dice: int = None, black_dice: int = None):
         super().__init__()
         self.player = player
         self.game_state: GameStateModel = GameStateModel.instance()
         self.board: GameBoardModel = self.game_state.game_board
         self.initial_tile: TileModel = None
+        self.advance_fire = advance_fire
         self.red_dice = red_dice
         self.black_dice = black_dice
 
@@ -47,17 +48,22 @@ class EndTurnAdvanceFireEvent(TurnEvent):
         GameStateModel.lock.acquire()
         if GameStateModel.instance().state == GameStateEnum.MAIN_GAME:
 
-            # ------ AdvanceFire ------ #
-            # Change state of tile depending on previous state
-            self.initial_tile = self.board.get_tile_at(self.red_dice, self.black_dice)
-            self.advance_on_tile(self.initial_tile)
-            self.flashover()
-            self.affect_damages()
+            if self.advance_fire:
+                # ------ AdvanceFire ------ #
+                # Change state of tile depending on previous state
+                self.initial_tile = self.board.get_tile_at(self.red_dice, self.black_dice)
+                self.advance_on_tile(self.initial_tile)
+                self.flashover()
+                self.affect_damages()
 
             if self.player.ap > 4:
                 self.player.ap = 4
 
             self.player.ap += 4
+
+        elif GameStateModel.instance().players_turn_index + 1 == len(GameStateModel.instance().players):
+                # If the last player has chosen a location, move the game into the next phase.
+                GameStateModel.instance().state = GameStateEnum.MAIN_GAME
 
         # call next player
         GameStateModel.instance().next_player()

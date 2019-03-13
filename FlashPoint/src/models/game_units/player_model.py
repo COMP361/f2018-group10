@@ -13,8 +13,8 @@ class PlayerModel(Model):
     def __init__(self, ip: str, nickname: str):
         super().__init__()
         self._ip = ip
-        self._row = 0
-        self._column = 0
+        self._row = -1
+        self._column = -1
         self._nickname = nickname
         self._color = Color.WHITE  # White by default (not racist I swear)
         self._status = PlayerStatusEnum.NOT_READY
@@ -76,6 +76,10 @@ class PlayerModel(Model):
     @property
     def column(self) -> int:
         return self._column
+
+    @property
+    def has_pos(self) -> bool:
+        return (self.row >= 0) and (self.column >= 0)
 
     @property
     def ip(self) -> str:

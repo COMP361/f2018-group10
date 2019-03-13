@@ -48,6 +48,7 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
         self._current_player = current_player
         self._current_sprite = current_sprite
         self._active_sprites = sprite_group
+        self._should_advance_fire = False
 
         GameStateModel.instance().add_observer(self)
 
@@ -122,7 +123,7 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
         self.enabled = False
         self.running = False
 
-        turn_event = EndTurnAdvanceFireEvent(self._current_player)
+        turn_event = EndTurnAdvanceFireEvent(self._current_player, self._should_advance_fire)
         # send end turn, see ChatBox for example
         try:
             if Networking.get_instance().is_host:
@@ -131,6 +132,9 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
                 Networking.get_instance().client.send(turn_event)
         except AttributeError as e:
             pass
+
+        if not self._should_advance_fire:
+            self._should_advance_fire = True
         
     def _end_turn(self):
         self._current_sprite.turn = False

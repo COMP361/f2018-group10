@@ -1,16 +1,13 @@
 import pygame
-from src.models.game_units.player_model import PlayerModel
+
 from src.models.game_board.tile_model import TileModel
 from src.models.game_units.player_model import PlayerModel
 from src.sprites.grid_sprite import GridSprite
 
 from src.UIComponents.file_importer import FileImporter
 from src.constants.state_enums import PlayerStatusEnum
-from src.models.game_state_model import GameStateModel
 from src.observers.player_observer import PlayerObserver
 import src.constants.color as Color
-
-
 
 
 class PlayerSprite(pygame.sprite.Sprite, PlayerObserver):
@@ -28,7 +25,6 @@ class PlayerSprite(pygame.sprite.Sprite, PlayerObserver):
         self.image = FileImporter.import_image(self.associated_png)
 
     def _associate_image(self,color:Color):
-
         return {
             Color.WHITE: "media/all_markers/whiteFighter.png",
             Color.BLUE: "media/all_markers/blueFighter.png",
@@ -37,9 +33,6 @@ class PlayerSprite(pygame.sprite.Sprite, PlayerObserver):
             Color.YELLOW: "media/all_markers/yellowFighter.png",
             Color.GREEN: "media/all_markers/greenFighter.png",
         }[color]
-
-
-
 
     def player_ap_changed(self, updated_ap: int):
         pass
