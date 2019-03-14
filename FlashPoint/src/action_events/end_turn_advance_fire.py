@@ -33,7 +33,7 @@ class EndTurnAdvanceFireEvent(TurnEvent):
             self.seed = seed
 
         # Pick random location: roll dice
-
+        random.seed(self.seed)
         self.red_dice = self.game_state.roll_red_dice()
         self.black_dice = self.game_state.roll_black_dice()
         self.directions = ["North", "South", "East", "West"]
