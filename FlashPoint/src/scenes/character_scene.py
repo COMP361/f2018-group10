@@ -102,27 +102,31 @@ class CharacterScene(Scene):
 
         if count == "cafs":
             self.role = PlayerRoleEnum.CAFS
+            self.str = count
 
         elif count == "driver":
             self.role = PlayerRoleEnum.DRIVER
+            self.str = count
 
         elif count == "captain":
             self.role = PlayerRoleEnum.CAPTAIN
-
+            self.str = count
         elif count == "generalist":
             self.role = PlayerRoleEnum.GENERALIST
-
+            self.str = count
         elif count == "hazmat":
             self.role = PlayerRoleEnum.HAZMAT
+            self.str = count
 
         elif count == "imaging":
             self.role = PlayerRoleEnum.IMAGING
-
+            self.str = count
         elif count == "paramedic":
             self.role = PlayerRoleEnum.PARAMEDIC
-
-        else:
+            self.str = count
+        elif count == "rescue":
             self.role = PlayerRoleEnum.RESCUE
+            self.str = count
 
         self.this_img.on_click(self.click_img, label, self.role)
         self.sprite_grp.add(self.this_img)
@@ -161,16 +165,15 @@ class CharacterScene(Scene):
 
     def check(self,role):
 
-        available = False
+        current = role
+        available = True
         players = GameStateModel.instance().players
 
-        for role in self.roles:
-            available = True
-            for player in players:
-                if player.character == self.roles[role]:
-                    available = False
-                    break
-                else:
-                    continue
+        for player in players:
+            if player.character == self.roles[current]:
+                available = False
+                break
+            else:
+                continue
 
         return available
