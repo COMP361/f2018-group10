@@ -26,6 +26,7 @@ class GameKindEnum(Enum):
     VETERAN = auto()
     HEROIC = auto()
 
+
 class GameStateEnum(Enum):
     READY_TO_JOIN = auto()
     PLACING = auto()
@@ -46,9 +47,11 @@ class POIStatusEnum(Enum):
     REVEALED = auto()
     LOST = auto()
 
+
 class POIIdentityEnum(Enum):
     VICTIM = auto()
     FALSE_ALARM = auto()
+
 
 class SpaceKindEnum(Enum):
     INDOOR = auto()
@@ -80,3 +83,15 @@ class WallStatusEnum(Enum):
     INTACT = auto()
     DAMAGED = auto()
     DESTROYED = auto()
+
+
+class PlayerRoleEnum(Enum):
+    CAFS = auto()
+    DRIVER = auto()
+    FAMILY = auto()
+    CAPTAIN = auto()
+    GENERALIST = auto()
+    HAZMAT = auto()
+    IMAGING = auto()
+    PARAMEDIC = auto()
+    RESCUE = auto()

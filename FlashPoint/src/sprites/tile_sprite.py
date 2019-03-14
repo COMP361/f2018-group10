@@ -3,7 +3,6 @@ from typing import Tuple, List
 import pygame
 from src.UIComponents.file_importer import FileImporter
 from src.UIComponents.rect_button import RectButton
-from src.action_events.action_event import ActionEvent
 from src.models.game_state_model import GameStateModel
 from src.constants.state_enums import SpaceStatusEnum
 from src.UIComponents.interactable import Interactable
