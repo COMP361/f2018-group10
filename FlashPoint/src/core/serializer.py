@@ -178,6 +178,8 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_chat_event(payload)
         elif object_type == ReadyEvent.__name__:
             return JSONSerializer._deserialize_ready_event(payload)
+        elif object_type == SelectCharacterEvent.__name__:
+            return JSONSerializer._deserialize_select_character_event(payload)
         elif object_type == StartGameEvent.__name__:
             return StartGameEvent()
         elif object_type == EndTurnEvent.__name__:
