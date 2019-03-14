@@ -19,6 +19,12 @@ from src.sprites.game_board import GameBoard
 
 class MoveController(PlayerObserver):
 
+    def player_carry_changed(self, carry):
+        GameStateModel.instance().game_board.reset_tiles_visit_count()
+        self.moveable_tiles = self._determine_reachable_tiles(
+            self.current_player.row, self.current_player.column, self.current_player.ap)
+        GameStateModel.instance().game_board.reset_tiles_visit_count()
+
     _instance = None
 
     def __init__(self, current_player: PlayerModel):

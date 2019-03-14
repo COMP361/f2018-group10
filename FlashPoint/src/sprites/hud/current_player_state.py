@@ -16,7 +16,10 @@ from src.observers.game_state_observer import GameStateObserver
 from src.observers.player_observer import PlayerObserver
 
 
-class CurrentPlayerState(pygame.sprite.Sprite,PlayerObserver):
+class CurrentPlayerState(pygame.sprite.Sprite, PlayerObserver):
+
+    def player_carry_changed(self, carry):
+        pass
 
     def __init__(self, x: int, y: int, name: str, color: Color,current:PlayerModel):
         super().__init__()

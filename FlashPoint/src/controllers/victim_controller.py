@@ -11,7 +11,6 @@ class VictimController(object):
     _instance = None
 
     def __init__(self):
-
         if VictimController._instance:
             raise Exception("Victim Controller is a singleton")
 
@@ -52,7 +51,6 @@ class VictimController(object):
         return False
 
     def process_input_(self, tile: TileSprite):
-
         if self.action_tile:
             self.action_tile.disable_drop()
             self.action_tile.disable_pickup()
@@ -80,7 +78,6 @@ class VictimController(object):
             tile.drop_victim_button.disable()
 
     def update(self, event_queue: EventQueue):
-
         if GameStateModel.instance().state != GameStateEnum.MAIN_GAME:
             return
 

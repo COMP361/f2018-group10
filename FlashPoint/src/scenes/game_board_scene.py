@@ -47,7 +47,7 @@ class GameBoardScene(GameBoardObserver):
         self.screen = screen
         self._game: GameStateModel = GameStateModel.instance()
         if Networking.get_instance().is_host:
-            self._current_player = self._game.host
+            self._current_player = self._game.players[0]
         else:
             self._current_player = [player for player in self._game.players if player == current_player][0]
         self._current_sprite = None

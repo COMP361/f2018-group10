@@ -60,6 +60,10 @@ class PlayerModel(Model):
         for obs in self.observers:
             obs.player_losses_changed(self.losses)
 
+    def _notify_carry(self):
+        for obs in self.observers:
+            obs.player_carry_changed(self.carrying_victim)
+
     @property
     def observers(self) -> List[PlayerObserver]:
         return self._observers
@@ -161,3 +165,4 @@ class PlayerModel(Model):
     @carrying_victim.setter
     def carrying_victim(self, victim: VictimModel):
         self._carrying_victim = victim
+        self._notify_carry()

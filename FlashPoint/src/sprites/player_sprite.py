@@ -13,6 +13,9 @@ import src.constants.color as Color
 class PlayerSprite(pygame.sprite.Sprite, PlayerObserver):
     """Visual representation of a Player and/or his fireman."""
 
+    def player_carry_changed(self, carry):
+        pass
+
     def __init__(self, current_player:PlayerModel,tile_model: TileModel, grid: GridSprite):
         super().__init__()
         self.grid = grid
