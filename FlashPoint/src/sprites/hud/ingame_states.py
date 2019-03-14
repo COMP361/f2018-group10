@@ -23,8 +23,8 @@ class InGameStates(pygame.sprite.Sprite, GameStateObserver):
         self.frame = pygame.transform.scale(self.frame, (880, 50))
 
         self.damage_str = f"Damage: {current_damage}/24"
-        self.victims_dead_str = f"Victims Saved: {victims_saved}/7"
-        self.victims_saved_str = f"Victims Lost: {victims_dead}/4"
+        self.victims_dead_str = f"Victims Lost: {victims_dead}/4"
+        self.victims_saved_str = f"Victims Saved: {victims_saved}/7"
         self.damage = self.font.render(self.damage_str, True, Color.WHITE)
         self.victims_dead = self.font.render(self.victims_dead_str, True, Color.WHITE)
         self.victims_saved = self.font.render(self.victims_saved_str, True, Color.WHITE)
