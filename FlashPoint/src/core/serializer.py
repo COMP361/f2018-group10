@@ -45,7 +45,7 @@ class JSONSerializer(object):
                 game.add_player(player_obj)
 
         if rules == GameKindEnum.RECRUIT:
-            game.difficulty_level = DifficultyLevelEnum(payload['_difficulty_level']['value'])
+            game.difficulty_level = GameKindEnum(payload['_difficulty_level']['value'])
 
         game.players_turn = payload['_players_turn_index']
         game.damage = payload['_damage']

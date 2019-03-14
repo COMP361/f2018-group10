@@ -42,7 +42,7 @@ class CreateGameMenu(Scene):
     def create_new_game(self, game_kind: GameKindEnum):
         """Instantiate a new family game and move to the lobby scene."""
         GameStateModel(self._current_player, 6, game_kind)
-        GameStateModel.difficulty_level = game_kind
+        #GameStateModel.difficulty_level = game_kind
         EventQueue.post(CustomEvent(ChangeSceneEnum.SETMAXPLAYERSCENE))
 
     # ----------------------------------------------- #
