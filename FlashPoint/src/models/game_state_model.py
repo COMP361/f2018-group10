@@ -34,6 +34,7 @@ class GameStateModel(Model):
             self._damage = 0
             self._max_damage = 24
             self._chat_history = []
+            self._saved_players = []
             self._state = GameStateEnum.READY_TO_JOIN
             s = f"{self._host.row}, {self._host.column}"
             GameStateModel._instance = self
@@ -89,6 +90,11 @@ class GameStateModel(Model):
         """Get the PlayerModel assigned to the host of the current game."""
         return self._host
 
+    @host.setter
+    def host(self,host:PlayerModel):
+        self._host = host
+
+
     @property
     def max_players(self) -> int:
         return self._max_desired_players
@@ -110,6 +116,8 @@ class GameStateModel(Model):
         if len(self._players) == self._max_desired_players:
             raise TooManyPlayersException(player)
         self._players.append(player)
+
+
 
     def get_player_by_ip(self, ip: str) -> PlayerModel:
         matching_players = [player for player in self._players if player.ip == ip]

@@ -41,7 +41,7 @@ class GameBoardModel(Model):
             for obs in tile.observers:
                 obs.tile_status_changed(tile.space_status)
 
-            for edge in tile.adjacent_edge_objects:
+            for edge in tile.adjacent_edge_objects.values():
                 if isinstance(edge, NullModel):
                     continue
 
@@ -83,6 +83,10 @@ class GameBoardModel(Model):
     @property
     def active_pois(self):
         return self._active_pois
+
+    @active_pois.setter
+    def active_pois(self,list:List[POIModel]) -> List[POIModel]:
+        self._active_pois = list
 
     def add_poi_or_victim(self, poi_or_victim):
         self._active_pois.append(poi_or_victim)

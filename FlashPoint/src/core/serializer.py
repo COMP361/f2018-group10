@@ -19,7 +19,7 @@ from src.action_events.chat_event import ChatEvent
 from src.action_events.dummy_event import DummyEvent
 from src.action_events.join_event import JoinEvent
 from src.constants.state_enums import DifficultyLevelEnum, GameKindEnum, PlayerStatusEnum, WallStatusEnum, \
-    DoorStatusEnum
+    DoorStatusEnum, SpaceKindEnum
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 from src.sprites.hud.player_state import PlayerState
@@ -34,27 +34,25 @@ class JSONSerializer(object):
 
         GameStateModel.lock.acquire()
         host: PlayerModel = JSONSerializer.deserialize(payload['_host'])
+
         num_players = payload['_max_desired_players']
         rules = GameKindEnum(payload['_rules']["value"])
-        # observers = payload["_observers"]
-
-        # for obs in observers:
-        #     obs_class = obs['class']
-        #     if obs_class == PlayerState.__class__:
-        #         # get params
-        #         game.add_observer(PlayerState())
 
         if not GameStateModel.instance():
             game = GameStateModel(host, num_players, rules)
         else:
             game = GameStateModel.instance()
 
+        game.host = host
+        host._notify_all_observers()
         game.game_board = JSONSerializer.deserialize(payload['_game_board'])
+        game.game_board.notify_all_observers()
 
-        for player in [x for x in payload['_players'] if x['_ip'] != host.ip]:
-            player_obj: PlayerModel = JSONSerializer.deserialize(player)
-            if player_obj not in game.players:
-                game.add_player(player_obj)
+        # for player in [x for x in payload['_players'] if x['_ip'] != host.ip]:
+        #     player_obj: PlayerModel = JSONSerializer.deserialize(player)
+        #     if player_obj not in game.players:
+        #         game.add_player(player_obj)
+        #         #player_obj._notify_all_observers()
 
         if rules == GameKindEnum.EXPERIENCED:
             game.difficulty_level = DifficultyLevelEnum(payload['_difficulty_level']['value'])
@@ -80,15 +78,15 @@ class JSONSerializer(object):
                 tiles[row].append(JSONSerializer.deserialize(payload['_tiles'][row][column]))
 
         game_board.tiles = tiles
-        for i in range(game_board._dimensions[0]):
-            tiles.append([])
-            for j in range(game_board._dimensions[1]):
-                tile_kind = game_board._determine_tile_kind(i, j)
-                game_board.get_tile_at(i,j).space_kind = tile_kind
+        # loaded_tiles = payload['_tiles']
+        # for i in range(game_board._dimensions[0]):
+        #     for j in range(game_board._dimensions[1]):
+        #         game_board.get_tile_at(i,j).space_status = tiles[i][j]['_space_status']
 
-        #game_board.set_adjacencies(game_board.get_tiles())
+        game_board.set_adjacencies(game_board.get_tiles())
+        #game_board.active_pois = JSONSerializer.deserialize(payload['_active_pois'])
+
         return game_board
-
 
     @staticmethod
     def _deserialize_player(payload: Dict) -> PlayerModel:
@@ -96,7 +94,8 @@ class JSONSerializer(object):
         nickname = payload['_nickname']
 
         player = PlayerModel(ip, nickname)
-        player.set_pos(payload['_row'], payload['_column'])
+        #player.set_pos(payload['_row'], payload['_column'])
+        player.set_pos(0,0)
         player.color = tuple(payload['_color'])
         player.status = PlayerStatusEnum(payload["_status"]["value"])
         player.ap = payload['_ap']
@@ -148,12 +147,13 @@ class JSONSerializer(object):
 
     @staticmethod
     def _deserialize_tile(payload: Dict) -> TileModel:
-        tile: TileModel = TileModel(payload['_row'], payload['_column'], payload['_space_kind'])
+        tile: TileModel = TileModel(payload['_row'], payload['_column'], SpaceKindEnum(payload["_space_kind"]["value"]))
         GameStateModel.instance().game_board.set_single_tile_adjacencies(tile)
         tile.adjacent_edge_objects['North'] = JSONSerializer.deserialize(payload['_adjacent_edge_objects']['North'])
         tile.adjacent_edge_objects['East'] = JSONSerializer.deserialize(payload['_adjacent_edge_objects']['East'])
         tile.adjacent_edge_objects['West'] = JSONSerializer.deserialize(payload['_adjacent_edge_objects']['West'])
         tile.adjacent_edge_objects['South'] = JSONSerializer.deserialize(payload['_adjacent_edge_objects']['South'])
+
         return tile
 
     @staticmethod

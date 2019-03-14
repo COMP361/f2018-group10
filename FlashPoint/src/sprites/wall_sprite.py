@@ -88,8 +88,6 @@ class WallSprite(pygame.sprite.Sprite, WallObserver):
         elif status == WallStatusEnum.DESTROYED:
             self.damaged = True
             self.destroyed = True
-        else:
-            raise Exception("Wall status changed back to Intact")
 
     def draw(self, screen):
         self.button.draw(screen)
