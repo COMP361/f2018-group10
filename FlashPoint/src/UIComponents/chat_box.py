@@ -64,7 +64,7 @@ class ChatBox:
             if self.current_player.ip == GameStateModel.instance().host.ip:
                 Networking.get_instance().send_to_all_client(chat_event)
             else:
-                Networking.get_instance().client.send(chat_event)
+                Networking.get_instance().send_to_server(chat_event)
 
             self.chat_textbox.message = ''
 
@@ -102,3 +102,7 @@ class ChatBox:
                 count += 1
             else:
                 break
+
+    @property
+    def box(self):
+        return self.chat_textbox.rect

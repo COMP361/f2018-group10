@@ -1,6 +1,3 @@
-from src.core.event_queue import EventQueue
-from src.sprites.game_board import GameBoard
-from src.sprites.tile_sprite import TileSprite
 from src.action_events.turn_events.turn_event import TurnEvent
 from src.constants.state_enums import SpaceStatusEnum
 from src.models.game_board.tile_model import TileModel
@@ -17,6 +14,7 @@ class ExtinguishEvent(TurnEvent):
         self.extinguish_space: TileModel = game.game_board.get_tile_at(extinguish_space.row, extinguish_space.column)
 
     def execute(self):
+        print("Executing ExtinguishEvent")
         fireman = self.fireman
         extinguish_space = self.extinguish_space
         # tile_sprite: TileSprite = GameBoard.instance().grid.grid[extinguish_space.column][extinguish_space.row]

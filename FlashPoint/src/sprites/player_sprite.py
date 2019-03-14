@@ -1,18 +1,20 @@
 import pygame
-from src.models.game_units.player_model import PlayerModel
+
 from src.models.game_board.tile_model import TileModel
 from src.models.game_units.player_model import PlayerModel
 from src.sprites.grid_sprite import GridSprite
 
 from src.UIComponents.file_importer import FileImporter
 from src.constants.state_enums import PlayerStatusEnum
-from src.models.game_state_model import GameStateModel
 from src.observers.player_observer import PlayerObserver
 import src.constants.color as Color
 
 
 class PlayerSprite(pygame.sprite.Sprite, PlayerObserver):
     """Visual representation of a Player and/or his fireman."""
+
+    def player_carry_changed(self, carry):
+        pass
 
     def __init__(self, current_player: PlayerModel, tile_model: TileModel, grid: GridSprite):
         super().__init__()

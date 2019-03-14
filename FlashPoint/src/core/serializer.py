@@ -2,23 +2,29 @@ import enum
 import json
 from typing import Dict
 
+from src.action_events.end_turn_advance_fire import EndTurnAdvanceFireEvent
+from src.action_events.set_initial_poi_family_event import SetInitialPOIFamilyEvent
 from src.action_events.select_character_event import SelectCharacterEvent
 from src.action_events.turn_events.chop_event import ChopEvent
+from src.action_events.turn_events.close_door_event import CloseDoorEvent
+from src.action_events.turn_events.drop_victim_event import DropVictimEvent
 from src.action_events.turn_events.extinguish_event import ExtinguishEvent
 from src.action_events.turn_events.move_event import MoveEvent
+from src.action_events.turn_events.pick_up_victim_event import PickupVictimEvent
+from src.action_events.turn_events.open_door_event import OpenDoorEvent
+from src.models.game_board.door_model import DoorModel
 from src.models.game_board.wall_model import WallModel
+from src.models.game_units.victim_model import VictimModel
 from src.observers.observer import Observer
 from src.models.game_board.tile_model import TileModel
 from src.action_events.turn_events.choose_starting_position_event import ChooseStartingPositionEvent
-from src.action_events.turn_events.end_turn_event import EndTurnEvent
-from src.models.game_board.game_board_model import GameBoardModel
 from src.action_events.start_game_event import StartGameEvent
 from src.action_events.ready_event import ReadyEvent
 from src.action_events.chat_event import ChatEvent
 from src.action_events.dummy_event import DummyEvent
 from src.action_events.join_event import JoinEvent
 from src.constants.state_enums import DifficultyLevelEnum, GameKindEnum, PlayerStatusEnum, WallStatusEnum, \
-    PlayerRoleEnum
+    DoorStatusEnum, SpaceKindEnum, SpaceStatusEnum
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 
@@ -40,7 +46,7 @@ class JSONSerializer(object):
         else:
             game = GameStateModel.instance()
 
-        game.game_board.set_adjacencies(game.game_board.get_tiles())
+        # game.game_board.set_adjacencies(game.game_board.get_tiles())
         for player in [x for x in payload['_players'] if x['_ip'] != host.ip]:
             player_obj: PlayerModel = JSONSerializer.deserialize(player)
             if player_obj not in game.players:
@@ -75,6 +81,14 @@ class JSONSerializer(object):
         return player
 
     @staticmethod
+    def _deserialize_victim(payload) -> VictimModel:
+        victim_state = payload['_state']
+        serialized_victim: VictimModel = VictimModel(victim_state)
+        serialized_victim.set_pos(payload['_row'], payload['_column'])
+
+        return serialized_victim
+
+    @staticmethod
     def _deserialize_chat_event(payload: Dict) -> ChatEvent:
         message = payload['_message']
         sender = payload['_sender']
@@ -101,7 +115,7 @@ class JSONSerializer(object):
     def _deserialize_choose_position_event(payload: Dict):
         tile_dict = payload['tile']
         tile: TileModel = GameStateModel.instance().game_board.get_tile_at(tile_dict['_row'], tile_dict['_column'])
-        GameStateModel.instance().game_board.set_single_tile_adjacencies(tile)
+        # GameStateModel.instance().game_board.set_single_tile_adjacencies(tile)
         event = ChooseStartingPositionEvent(tile)
         return event
 
@@ -117,15 +131,21 @@ class JSONSerializer(object):
             moveable_tiles.append(tile_model)
 
         destination_model: TileModel = game_board.get_tile_at(destination['_row'], destination['_column'])
-        game_board.set_adjacencies(game_board.get_tiles())
+        # game_board.set_adjacencies(game_board.get_tiles())
         event = MoveEvent(destination_model, moveable_tiles)
         return event
 
     @staticmethod
     def _deserialize_tile(payload: Dict) -> TileModel:
         tile: TileModel = TileModel(payload['_row'], payload['_column'], payload['_space_kind'])
-        GameStateModel.instance().game_board.set_single_tile_adjacencies(tile)
+        # GameStateModel.instance().game_board.set_single_tile_adjacencies(tile)
         return tile
+
+    @staticmethod
+    def _deserialize_door(payload: Dict) -> DoorModel:
+        id = payload['_id']
+        door = DoorModel(id[0], id[1], id[2], DoorStatusEnum(payload['_door_status']['value']))
+        return door
 
     @staticmethod
     def _deserialize_wall(payload: Dict) -> WallModel:
@@ -139,19 +159,46 @@ class JSONSerializer(object):
         wall: WallModel = JSONSerializer.deserialize(payload['wall'])
         return ChopEvent(wall)
 
-
     @staticmethod
     def _deserialize_extinguish_event(payload: Dict) -> ExtinguishEvent:
 
         tile_dict = payload['extinguish_space']
         tile: TileModel = GameStateModel.instance().game_board.get_tile_at(tile_dict['_row'], tile_dict['_column'])
-        GameStateModel.instance().game_board.set_single_tile_adjacencies(tile)
+        # GameStateModel.instance().game_board.set_single_tile_adjacencies(tile)
         return ExtinguishEvent(tile)
 
     @staticmethod
-    def _deserialize_end_turn_event(payload: Dict) -> EndTurnEvent:
-        player: PlayerModel = JSONSerializer.deserialize(payload['player'])
-        return EndTurnEvent(player)
+    def _deserialize_open_door_event(payload: Dict) -> OpenDoorEvent:
+        door: DoorModel = JSONSerializer.deserialize(payload['door'])
+        return OpenDoorEvent(door)
+
+    @staticmethod
+    def _deserialize_close_door_event(payload: Dict) -> CloseDoorEvent:
+        door: DoorModel = JSONSerializer.deserialize(payload['door'])
+        return CloseDoorEvent(door)
+
+
+    @staticmethod
+    def _deserialize_end_turn_advance_fire_event(payload: Dict) -> EndTurnAdvanceFireEvent:
+        seed: int = payload['seed']
+        event = EndTurnAdvanceFireEvent(seed)
+        return event
+
+    @staticmethod
+    def _deserialize_drop_event(payload: Dict) -> DropVictimEvent:
+        victim: VictimModel = JSONSerializer.deserialize(payload['victim_tile'])
+        return DropVictimEvent(victim)
+
+
+    @staticmethod
+    def _deserialize_pickup_event(payload: Dict) -> PickupVictimEvent:
+        victim: VictimModel = JSONSerializer.deserialize(payload['victim_tile'])
+        return PickupVictimEvent(victim)
+
+    @staticmethod
+    def _deserialize_set_initial_poi_family_event(payload: Dict) -> SetInitialPOIFamilyEvent:
+        seed = payload['seed']
+        return SetInitialPOIFamilyEvent(seed)
 
     @staticmethod
     def deserialize(payload: Dict) -> object:
@@ -163,6 +210,9 @@ class JSONSerializer(object):
         Add to this case statement to be able to deserialize your object type.
         """
         object_type = payload["class"]
+        # print(object_type)
+        # if GameStateModel.instance():
+        #     GameStateModel.instance().game_board.set_adjacencies(GameStateModel.instance().game_board.get_tiles())
 
         # --------------MODELS----------------
         if object_type == PlayerModel.__name__:
@@ -171,6 +221,12 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_tile(payload)
         elif object_type == GameStateModel.__name__:
             return JSONSerializer._deserialize_game_state(payload)
+        elif object_type == DoorModel.__name__:
+            return JSONSerializer._deserialize_door(payload)
+        elif object_type == WallModel.__name__:
+            return JSONSerializer._deserialize_wall(payload)
+        elif object_type == VictimModel.__name__:
+            return JSONSerializer._deserialize_victim(payload)
         # --------------EVENTS------------------
         elif object_type == JoinEvent.__name__:
             return JSONSerializer._deserialize_join_event(payload)
@@ -182,22 +238,44 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_select_character_event(payload)
         elif object_type == StartGameEvent.__name__:
             return StartGameEvent()
-        elif object_type == EndTurnEvent.__name__:
-            return JSONSerializer._deserialize_end_turn_event(payload)
         elif object_type == ChooseStartingPositionEvent.__name__:
             return JSONSerializer._deserialize_choose_position_event(payload)
         elif object_type == ChopEvent.__name__:
             return JSONSerializer._deserialize_chop_event(payload)
-        elif object_type == WallModel.__name__:
-            return JSONSerializer._deserialize_wall(payload)
         elif object_type == MoveEvent.__name__:
             return JSONSerializer._deserialize_move_event(payload)
         elif object_type == DummyEvent.__name__:
             return DummyEvent()
         elif object_type == ExtinguishEvent.__name__:
             return JSONSerializer._deserialize_extinguish_event(payload)
+        elif object_type == DropVictimEvent.__name__:
+            return JSONSerializer._deserialize_drop_event(payload)
+        elif object_type == PickupVictimEvent.__name__:
+            return JSONSerializer._deserialize_pickup_event(payload)
+        elif object_type == OpenDoorEvent.__name__:
+            return JSONSerializer._deserialize_open_door_event(payload)
+        elif object_type == EndTurnAdvanceFireEvent.__name__:
+            return JSONSerializer._deserialize_end_turn_advance_fire_event(payload)
+        elif object_type == CloseDoorEvent.__name__:
+            return JSONSerializer._deserialize_close_door_event(payload)
+        elif object_type == SetInitialPOIFamilyEvent.__name__:
+            return JSONSerializer._deserialize_set_initial_poi_family_event(payload)
 
         print(f"WARNING: Could not deserialize object {object_type}, not of recognized type.")
+
+    @staticmethod
+    def _safe_tile_serialize(tile: TileModel):
+        return {
+            'class': "TileModel",
+            '_row': tile.row,
+            '_column': tile.column,
+            '_space_kind': {"name": type(SpaceKindEnum).__name__, "value": tile.space_kind.value},
+            '_space_status': {"name": type(SpaceStatusEnum).__name__, "value": tile.space_status.value},
+            '_is_hotspot': tile.is_hotspot,
+            '_associated_models': [JSONSerializer.serialize(obj) for obj in tile.associated_models],
+            '_visit_count': tile.visit_count,
+            '_adjacent_edge_objects': JSONSerializer.serialize(tile.adjacent_edge_objects)
+        }
 
     @staticmethod
     def _safe_dict(obj):
@@ -206,7 +284,7 @@ class JSONSerializer(object):
             return {"class": type(obj).__name__}
 
         if isinstance(obj, TileModel):
-            obj.reset_adjacencies()
+            return JSONSerializer._safe_tile_serialize(obj)
 
         obj.__setattr__("class", type(obj).__name__)
         return obj.__dict__ if not isinstance(obj, enum.Enum) else {"name": type(obj).__name__, "value": obj.value}

@@ -3,7 +3,6 @@ from src.action_events.action_event import ActionEvent
 from src.constants.state_enums import VictimStateEnum
 from src.models.game_board.null_model import NullModel
 from src.models.game_state_model import GameStateModel
-from src.models.game_units.player_model import PlayerModel
 from src.models.game_units.victim_model import VictimModel
 
 
@@ -15,6 +14,7 @@ class KnockDownEvent(ActionEvent):
         self.player = self.game.get_player_by_ip(player_ip)
 
     def execute(self):
+        print("Exceuting KnockDownEvent")
         # if the player was carrying a victim,
         # that victim is lost. disassociate the
         # victim from the player and increment the

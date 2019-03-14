@@ -2,31 +2,37 @@ import json
 import random
 from typing import List, Tuple, Dict
 
+from src.models.model import Model
 from src.constants.main_constants import BOARD_DIMENSIONS
 from src.models.game_board.edge_obstacle_model import EdgeObstacleModel
 from src.models.game_board.null_model import NullModel
 from src.models.game_units.poi_model import POIModel
 from src.models.game_board.tile_model import TileModel
-from src.constants.state_enums import GameKindEnum, SpaceKindEnum, SpaceStatusEnum, POIIdentityEnum, DirectionEnum, \
-    DoorStatusEnum, WallStatusEnum
+from src.constants.state_enums import GameKindEnum, SpaceKindEnum, SpaceStatusEnum, POIIdentityEnum, \
+     DoorStatusEnum, POIStatusEnum, VictimStateEnum
 from src.models.game_board.wall_model import WallModel
 from src.models.game_board.door_model import DoorModel
+from src.models.game_units.victim_model import VictimModel
 
 
-class GameBoardModel(object):
+class GameBoardModel(Model):
     """
     Class for aggregating all objects related to the game board itself, this means TileModels, PlayerModels
     etc. This class is created inside of GameStateModel.
     """
 
     def __init__(self, game_type: GameKindEnum):
+        super().__init__()
         self._dimensions = (8, 10)
         self._ambulance_spots = []
         self._engine_spots = []
         self._tiles = self._init_all_tiles_family_classic()# if game_type == GameKindEnum.FAMILY else None
         self._poi_bank = GameBoardModel._init_pois()
         self._active_pois = []
-        self.set_initial_poi_family()
+
+    def _notify_active_poi(self):
+        for obs in self.observers:
+            obs.notify_active_poi(self._active_pois)
 
     def get_tiles(self) -> List[List[TileModel]]:
         return self._tiles
@@ -53,17 +59,35 @@ class GameBoardModel(object):
 
     def add_poi_or_victim(self, poi_or_victim):
         self._active_pois.append(poi_or_victim)
+        self._notify_active_poi()
 
     def remove_poi_or_victim(self, poi_or_victim):
+        # Put to sleep briefly so that POI or
+        # victim can be seen before it is removed.
         if poi_or_victim in self._active_pois:
-            if poi_or_victim.row >= 0 and poi_or_victim.column >= 0:
-                poi_or_victim.set_position(-7, -7)
+            if isinstance(poi_or_victim, POIModel):
+                poi_or_victim.status = POIStatusEnum.LOST
+            elif isinstance(poi_or_victim, VictimModel):
+                poi_or_victim.state = VictimStateEnum.LOST
+            else:
+                pass
             self._active_pois.remove(poi_or_victim)
+            self._notify_active_poi()
 
     def get_random_poi_from_bank(self) -> POIModel:
-        number = random.randint(0, len(self._poi_bank) - 1)
+        number = random.randint(0, len(self._poi_bank)-1)
         poi = self._poi_bank.pop(number)
         return poi
+
+    @property
+    def poi_bank(self) -> List[POIModel]:
+        return self._poi_bank
+
+    def remove_from_poi_bank(self, poi: POIModel):
+        self._poi_bank.remove(poi)
+
+    def get_poi_from_bank_by_index(self, index: int) -> POIModel:
+        return self._poi_bank[index]
 
     @staticmethod
     def _init_pois():
@@ -173,6 +197,8 @@ class GameBoardModel(object):
                 extended_grid[i][j].west_tile = extended_grid[i][j - 1]
                 extended_grid[i][j].south_tile = extended_grid[i + 1][j]
 
+        print("hello")
+
     def set_single_tile_adjacencies(self, tile: TileModel):
         # set north tile
         if tile.row == 0:
@@ -217,24 +243,6 @@ class GameBoardModel(object):
 
         for location in locations:
             self.get_tile_at(location[0], location[1]).space_status = SpaceStatusEnum.FIRE
-
-    def set_initial_poi_family(self):
-        """
-        Set active POI's and their positions for a family game.
-        Set all initial POIlocations for a family game.
-        Returns the locations that were randomly chosen for reuse in the PlacePOIEvent
-        """
-
-        locations = [[2, 4], [5, 1], [5, 8]]
-
-        for i in range(3):
-            poi = self.get_random_poi_from_bank()
-            # Location indices are inverted cause i wrote the list wrong lel
-            row = locations[i][0]
-            column = locations[i][1]
-            poi.set_position(row, column)
-            self._active_pois.append(poi)
-            self.get_tile_at(row, column).add_associated_model(poi)
 
     def distance_between_tiles(self, first_tile: TileModel, second_tile: TileModel) -> int:
         return abs(first_tile.row - second_tile.row) + abs(first_tile.column - second_tile.column)

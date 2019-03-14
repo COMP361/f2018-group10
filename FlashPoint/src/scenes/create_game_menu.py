@@ -1,6 +1,7 @@
 import pygame
 
 import src.constants.color as Color
+from src.sprites.game_board import GameBoard
 from src.core.custom_event import CustomEvent
 from src.core.event_queue import EventQueue
 from src.models.game_units.player_model import PlayerModel
@@ -22,6 +23,8 @@ class CreateGameMenu(Scene):
 
         if GameStateModel.instance():
             GameStateModel.__del__()
+        if GameBoard.instance():
+            GameBoard._instance = None
 
         self._init_background()
         self._init_text_box(344, 387, 200, 32, "Choose Game Mode:", Color.STANDARDBTN, Color.BLACK)
@@ -35,7 +38,11 @@ class CreateGameMenu(Scene):
         self.buttonVeteran.on_click(self.create_new_game, GameKindEnum.VETERAN)
         self.buttonHeroic.on_click(self.create_new_game, GameKindEnum.HEROIC)
         self.buttonFamily.on_click(self.create_new_game, GameKindEnum.FAMILY)
-        self.buttonBack.on_click(Networking.get_instance().disconnect)
+        self.buttonBack.on_click(self.go_back)
+
+    def go_back(self):
+        Networking.get_instance().disconnect()
+        EventQueue.post(CustomEvent(ChangeSceneEnum.STARTSCENE))
 
     # ------------- GAME CREATE/LOAD STUFF ---------- #
 

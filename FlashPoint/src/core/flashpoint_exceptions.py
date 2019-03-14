@@ -1,6 +1,5 @@
-from src.constants.state_enums import DirectionEnum, GameKindEnum
+from src.constants.state_enums import GameKindEnum
 from src.models.game_units.player_model import PlayerModel
-
 
 
 class FlashPointBaseException(Exception):
