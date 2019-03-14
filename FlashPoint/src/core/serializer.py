@@ -2,6 +2,7 @@ import enum
 import json
 from typing import Dict
 
+from src.action_events.select_character_event import SelectCharacterEvent
 from src.action_events.turn_events.chop_event import ChopEvent
 from src.action_events.turn_events.extinguish_event import ExtinguishEvent
 from src.action_events.turn_events.move_event import MoveEvent
@@ -16,7 +17,8 @@ from src.action_events.ready_event import ReadyEvent
 from src.action_events.chat_event import ChatEvent
 from src.action_events.dummy_event import DummyEvent
 from src.action_events.join_event import JoinEvent
-from src.constants.state_enums import DifficultyLevelEnum, GameKindEnum, PlayerStatusEnum, WallStatusEnum
+from src.constants.state_enums import DifficultyLevelEnum, GameKindEnum, PlayerStatusEnum, WallStatusEnum, \
+    PlayerRoleEnum
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 
@@ -45,7 +47,7 @@ class JSONSerializer(object):
                 game.add_player(player_obj)
 
         if rules == GameKindEnum.RECRUIT:
-            game.difficulty_level = DifficultyLevelEnum(payload['_difficulty_level']['value'])
+            game.difficulty_level = GameKindEnum(payload['_difficulty_level']['value'])
 
         game.players_turn = payload['_players_turn_index']
         game.damage = payload['_damage']
@@ -88,6 +90,12 @@ class JSONSerializer(object):
     def _deserialize_join_event(payload: Dict) -> JoinEvent:
         player = JSONSerializer._deserialize_player(payload['player'])
         return JoinEvent(player)
+
+    @staticmethod
+    def _deserialize_select_character_event(payload:Dict) -> SelectCharacterEvent:
+        player = JSONSerializer._deserialize_player(payload['_player'])
+        character = PlayerRoleEnum(payload['_character']['value'])
+        return  SelectCharacterEvent(player,character)
 
     @staticmethod
     def _deserialize_choose_position_event(payload: Dict):
@@ -170,6 +178,8 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_chat_event(payload)
         elif object_type == ReadyEvent.__name__:
             return JSONSerializer._deserialize_ready_event(payload)
+        elif object_type == SelectCharacterEvent.__name__:
+            return JSONSerializer._deserialize_select_character_event(payload)
         elif object_type == StartGameEvent.__name__:
             return StartGameEvent()
         elif object_type == EndTurnEvent.__name__:
