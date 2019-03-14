@@ -83,6 +83,7 @@ class CharacterScene(Scene):
                 Networking.get_instance().send_to_all_client(event)
             else:
                 Networking.get_instance().client.send(event)
+
             EventQueue.post(CustomEvent(ChangeSceneEnum.LOBBYSCENE))
 
     def _init_background(self):
