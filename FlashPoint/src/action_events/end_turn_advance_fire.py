@@ -1,3 +1,5 @@
+import random
+
 from src.action_events.knock_down_event import KnockDownEvent
 from src.action_events.replenish_poi_event import ReplenishPOIEvent
 from src.models.game_board.door_model import DoorModel
@@ -15,22 +17,22 @@ from src.models.game_state_model import GameStateModel
 
 class EndTurnAdvanceFireEvent(TurnEvent):
 
-    def __init__(self, red_dice: int = None, black_dice: int = None, poi_red_dice=[], poi_black_dice=[]):
+    def __init__(self, seed: int = 0):
         super().__init__()
         self.player = GameStateModel.instance().players_turn
         self.game_state: GameStateModel = GameStateModel.instance()
         self.board: GameBoardModel = self.game_state.game_board
         self.initial_tile: TileModel = None
-        self.red_dice = red_dice
-        self.black_dice = black_dice
-        self.poi_red_dice = poi_red_dice
-        self.poi_black_dice = poi_black_dice
+
+        if seed == 0:
+            self.seed = random.seed(random.randint(0, 6969))
+        else:
+            self.seed = seed
 
         # Pick random location: roll dice
-        if not self.red_dice:
-            self.red_dice = self.game_state.roll_red_dice()
-        if not self.black_dice:
-            self.black_dice = self.game_state.roll_black_dice()
+
+        self.red_dice = self.game_state.roll_red_dice(self.seed)
+        self.black_dice = self.game_state.roll_black_dice(self.seed)
         self.directions = ["North", "South", "East", "West"]
 
     def execute(self):
@@ -57,7 +59,7 @@ class EndTurnAdvanceFireEvent(TurnEvent):
             self.affect_damages()
 
             # ------ ReplenishPOI ------ #
-            rp_event = ReplenishPOIEvent(self.poi_red_dice, self.poi_black_dice)
+            rp_event = ReplenishPOIEvent(self.seed)
             rp_event.execute()
 
             if self.player.ap > 4:

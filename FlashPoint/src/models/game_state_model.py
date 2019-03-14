@@ -172,14 +172,18 @@ class GameStateModel(Model):
         with GameStateModel.lock:
             self._rules = rules
 
-    def roll_black_dice(self) -> int:
+    def roll_black_dice(self, seed=0) -> int:
         """Roll the black dice to get a random number between 1-8"""
         with GameStateModel.lock:
+            if seed != 0:
+                random.seed(seed)
             return random.randint(1, 8)
 
-    def roll_red_dice(self) -> int:
+    def roll_red_dice(self, seed=0) -> int:
         """Roll the red dice to get a random number between 1-6"""
         with GameStateModel.lock:
+            if seed != 0:
+                random.seed(seed)
             return random.randint(1, 6)
 
     @property

@@ -1,3 +1,4 @@
+import random
 from typing import List
 
 from src.action_events.action_event import ActionEvent
@@ -9,11 +10,12 @@ from src.models.game_units.victim_model import VictimModel
 
 class ReplenishPOIEvent(ActionEvent):
 
-    def __init__(self, red_dice: List[int] = [], black_dice: List[int]= []):
+    def __init__(self, seed: int = 0):
         super().__init__()
-        self.red_dice = red_dice
-        self.black_dice = black_dice
-
+        if seed == 0:
+            self.seed = random.seed(random.randint(0, 6969))
+        else:
+            self.seed = seed
         self.game: GameStateModel = GameStateModel.instance()
         self.board = self.game.game_board
 
@@ -36,14 +38,9 @@ class ReplenishPOIEvent(ActionEvent):
         num_pois_to_add = 3 - len(self.board.active_pois)
         x = 0
         while x < num_pois_to_add and len(self.board.poi_bank) > 0:
-            if not self.red_dice:
-                new_poi_row = self.game.roll_red_dice()
-            else:
-                new_poi_row = self.red_dice[x]
-            if not self.black_dice:
-                new_poi_column = self.game.roll_black_dice()
-            else:
-                new_poi_column = self.black_dice[x]
+
+            new_poi_row = self.game.roll_red_dice(self.seed)
+            new_poi_column = self.game.roll_black_dice(self.seed)
             tile = self.board.get_tile_at(new_poi_row, new_poi_column)
             new_poi = self.board.get_random_poi_from_bank()
             new_poi.set_pos(tile.row, tile.column)
@@ -89,7 +86,4 @@ class ReplenishPOIEvent(ActionEvent):
                     print("Victim added")
                 new_poi.reveal(new_victim)
             x += 1
-            if not self.red_dice:
-                self.red_dice.append(new_poi_row)
-            if not self.black_dice:
-                self.black_dice.append(new_poi_column)
+
