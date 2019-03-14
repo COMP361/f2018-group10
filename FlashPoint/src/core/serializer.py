@@ -25,7 +25,7 @@ from src.action_events.chat_event import ChatEvent
 from src.action_events.dummy_event import DummyEvent
 from src.action_events.join_event import JoinEvent
 from src.constants.state_enums import DifficultyLevelEnum, GameKindEnum, PlayerStatusEnum, WallStatusEnum, \
-    DoorStatusEnum
+    DoorStatusEnum, SpaceKindEnum, SpaceStatusEnum
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 
@@ -154,7 +154,6 @@ class JSONSerializer(object):
         wall: WallModel = JSONSerializer.deserialize(payload['wall'])
         return ChopEvent(wall)
 
-
     @staticmethod
     def _deserialize_extinguish_event(payload: Dict) -> ExtinguishEvent:
 
@@ -221,9 +220,9 @@ class JSONSerializer(object):
         Add to this case statement to be able to deserialize your object type.
         """
         object_type = payload["class"]
-        print(object_type)
-        if GameStateModel.instance():
-            GameStateModel.instance().game_board.set_adjacencies(GameStateModel.instance().game_board.get_tiles())
+        # print(object_type)
+        # if GameStateModel.instance():
+        #     GameStateModel.instance().game_board.set_adjacencies(GameStateModel.instance().game_board.get_tiles())
 
         # --------------MODELS----------------
         if object_type == PlayerModel.__name__:
@@ -277,13 +276,27 @@ class JSONSerializer(object):
         print(f"WARNING: Could not deserialize object {object_type}, not of recognized type.")
 
     @staticmethod
+    def _safe_tile_serialize(tile: TileModel):
+        return {
+            'class': "TileModel",
+            '_row': tile.row,
+            '_column': tile.column,
+            '_space_kind': {"name": type(SpaceKindEnum).__name__, "value": tile.space_kind.value},
+            '_space_status': {"name": type(SpaceStatusEnum).__name__, "value": tile.space_status.value},
+            '_is_hotspot': tile.is_hotspot,
+            '_associated_models': [JSONSerializer.serialize(obj) for obj in tile.associated_models],
+            '_visit_count': tile.visit_count,
+            '_adjacent_edge_objects': JSONSerializer.serialize(tile.adjacent_edge_objects)
+        }
+
+    @staticmethod
     def _safe_dict(obj):
 
         if isinstance(obj, Observer):
             return {"class": type(obj).__name__}
 
         if isinstance(obj, TileModel):
-            obj.reset_adjacencies()
+            return JSONSerializer._safe_tile_serialize(obj)
 
         obj.__setattr__("class", type(obj).__name__)
         return obj.__dict__ if not isinstance(obj, enum.Enum) else {"name": type(obj).__name__, "value": obj.value}
