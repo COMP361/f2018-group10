@@ -79,7 +79,7 @@ class GameBoardModel(Model):
         if seed != 0:
             random.seed(seed)
         number = random.randint(0, len(self._poi_bank)-1)
-        poi = self._poi_bank.pop(number)
+        poi = self._poi_bank[number]
         return poi
 
     @property
