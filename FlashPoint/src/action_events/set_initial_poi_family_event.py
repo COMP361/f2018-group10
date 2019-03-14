@@ -30,7 +30,6 @@ class SetInitialPOIFamilyEvent(ActionEvent):
                 if num != self.random_num1 and num != self.random_num2:
                     break
 
-
     def execute(self, *args, **kwargs):
         """
         Set active POI's and their positions for a family game.

@@ -14,6 +14,9 @@ class POIModel(Model):
         self._status = POIStatusEnum.HIDDEN
         self._row = -7
         self._column = -7
+        
+    def __eq__(self, other):
+        return all([self.row == other.row, self.column==other.column, self.identity == other.identity, self.status == other.status])
 
     def reveal(self, victim_model: VictimModel):
         if self._status == POIStatusEnum.HIDDEN:
