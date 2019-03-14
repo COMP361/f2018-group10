@@ -140,7 +140,7 @@ class GameStateModel(Model):
     @difficulty_level.setter
     def difficulty_level(self, level: DifficultyLevelEnum):
         """Set the difficulty level of the game. Game must be of type EXPERIENCED"""
-        if self._rules != GameKindEnum.EXPERIENCED or None:
+        if self._rules != GameKindEnum.RECRUIT or None:
             raise InvalidGameKindException("set difficulty level", self._rules)
         self._difficulty_level = level
 

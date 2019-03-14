@@ -33,7 +33,7 @@ class LobbyScene(object):
         self.players_not_ready_prompt = None
         self._init_all()
 
-        if self._game.rules == GameKindEnum.EXPERIENCED:
+        if self._game.rules == GameKindEnum.RECRUIT:
             self.buttonSelChar.on_click(EventQueue.post, CustomEvent(ChangeSceneEnum.CHARACTERSCENE))
         if Networking.get_instance().is_host:
             self._current_player.status = PlayerStatusEnum.READY
@@ -99,10 +99,10 @@ class LobbyScene(object):
                 # Ready button is grey at first
                 self._init_ready(1050, 575, "Ready", Color.GREY, Color.BLACK)
 
-            if self._game.rules == GameKindEnum.EXPERIENCED:
+            if self._game.rules == GameKindEnum.RECRUIT:
                 self._init_selec_char(1050, 475, "Select Character", Color.STANDARDBTN, Color.BLACK)
         else:
-            if self._game.rules == GameKindEnum.EXPERIENCED:
+            if self._game.rules == GameKindEnum.RECRUIT:
                 self.sprite_grp.add(self.buttonSelChar)
             if self._current_player.ip == GameStateModel.instance().host.ip:
                 self.sprite_grp.add(self.start_button)

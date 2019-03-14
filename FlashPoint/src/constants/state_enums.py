@@ -22,8 +22,9 @@ class DoorStatusEnum(Enum):
 
 class GameKindEnum(Enum):
     FAMILY = auto()
-    EXPERIENCED = auto()
-
+    RECRUIT = auto()
+    VETERAN = auto()
+    HEROIC = auto()
 
 class GameStateEnum(Enum):
     READY_TO_JOIN = auto()
