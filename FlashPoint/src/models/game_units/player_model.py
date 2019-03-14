@@ -23,7 +23,8 @@ class PlayerModel(Model):
         self._wins = 0
         self._losses = 0
         self._carrying_victim = NullModel()
-        self.character: PlayerRoleEnum = None
+        self._character: PlayerRoleEnum = None
+
 
     def __eq__(self, other):
         x = [other.ip == self.ip, other.nickname == self.nickname]
@@ -64,6 +65,15 @@ class PlayerModel(Model):
     @property
     def observers(self) -> List[PlayerObserver]:
         return self._observers
+
+
+    @property
+    def character(self) -> PlayerRoleEnum:
+        return self._character
+
+    @character.setter
+    def character(self,role:PlayerRoleEnum):
+        self._character = role
 
     @property
     def row(self) -> int:
