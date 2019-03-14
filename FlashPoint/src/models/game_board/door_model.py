@@ -25,6 +25,10 @@ class DoorModel(EdgeObstacleModel):
     def door_status(self):
         return self._door_status
 
+    @door_status.setter
+    def door_status(self,status:DoorStatusEnum):
+        self._door_status = status
+
     @property
     def id(self):
         return self._id

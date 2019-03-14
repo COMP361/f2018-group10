@@ -9,6 +9,7 @@ class WallModel(EdgeObstacleModel):
     """Logical state of a Wall object."""
     def __init__(self, row: int, column: int, direction: str):
         super().__init__()
+
         self._wall_status = WallStatusEnum.INTACT
         self._id = (row, column, direction)
 
@@ -20,6 +21,7 @@ class WallModel(EdgeObstacleModel):
         else:
             stat = "Destroyed"
         return f"{stat} wall at ({self.id[0]}, {self.id[1]}) in direction {self.id[2]}."
+
 
     @property
     def wall_status(self):

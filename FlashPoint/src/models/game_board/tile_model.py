@@ -81,6 +81,7 @@ class TileModel(Model):
         self._space_status = space_status
         self._notify_status()
 
+
     @property
     def is_hotspot(self):
         return self._is_hotspot

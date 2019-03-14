@@ -24,10 +24,10 @@ from src.sprites.hud.player_state import PlayerState
 from src.sprites.hud.current_player_state import CurrentPlayerState
 from src.sprites.hud.time_bar import TimeBar
 from src.sprites.hud.ingame_states import InGameStates
-import src.constants.color as Color
 from src.UIComponents.rect_button import RectButton
 from src.UIComponents.text import Text
 from src.sprites.notify_player_turn import NotifyPlayerTurn
+import src.constants.color as Color
 
 
 class GameBoardScene(object):
@@ -41,7 +41,8 @@ class GameBoardScene(object):
         self._save_games_file = "media/save_games.json"
         self.screen = screen
         self._game: GameStateModel = GameStateModel.instance()
-        self._current_player = current_player
+        if Networking.get_instance().is_host:
+            self._current_player = self._game.host
         self._current_sprite = None
 
         self.quit_btn = RectButton(200, 250, 100, 50, Color.STANDARDBTN, 0,
@@ -63,6 +64,8 @@ class GameBoardScene(object):
             GameStateModel.instance()._notify_player_index()
             self.state_controller = WinLoseController()
 
+        GameStateModel.instance().game_board.notify_all_observers()
+
     def _init_sprites(self):
         for i, player in enumerate(self._game.players):
             self.active_sprites.add(PlayerState(0, 30 + 64*i, player.nickname, player.color,player))
@@ -77,7 +80,7 @@ class GameBoardScene(object):
         self.active_sprites.add(self._init_menu_button())
 
     def _save(self):
-        """Save the current game state to the hosts machine"""
+
         with open(self._save_games_file, mode='r+', encoding='utf-8') as myFile:
             temp = json.load(myFile)
             game_data = JSONSerializer.serialize(self._game)

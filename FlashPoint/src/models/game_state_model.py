@@ -28,28 +28,32 @@ class GameStateModel(Model):
             self._rules = game_kind
             self._red_dice = 0
             self._black_dice = 0
-
             self._game_board = GameBoardModel(self._rules)
-
             self._victims_saved = 0
             self._victims_lost = 0
             self._damage = 0
-            self._max_damage = 24
+            self._max_damage = 1
             self._chat_history = []
+            self._saved_players = []
             self._state = GameStateEnum.READY_TO_JOIN
-
+            s = f"{self._host.row}, {self._host.column}"
             GameStateModel._instance = self
 
         else:
             print("Attempted to instantiate another singleton")
             raise Exception("GameStateModel is a Singleton")
 
+    def notify_all_observers(self):
+        self._notify_state()
+        self._game_board.notify_all_observers()
+
+
     def _notify_player_index(self):
         for obs in self._observers:
             obs.notify_player_index(self._players_turn_index)
 
     def _notify_state(self):
-        for obs in self.observers:
+        for obs in self._observers:
             obs.notify_game_state(self._state)
 
     @staticmethod
@@ -69,6 +73,10 @@ class GameStateModel(Model):
     def game_board(self) -> GameBoardModel:
         return self._game_board
 
+    @game_board.setter
+    def game_board(self,model:GameBoardModel):
+        self._game_board = model
+
     @property
     def chat_history(self) -> List[Tuple[str, str]]:
         return self._chat_history
@@ -82,6 +90,11 @@ class GameStateModel(Model):
         """Get the PlayerModel assigned to the host of the current game."""
         return self._host
 
+    @host.setter
+    def host(self,host:PlayerModel):
+        self._host = host
+
+
     @property
     def max_players(self) -> int:
         return self._max_desired_players
@@ -94,11 +107,17 @@ class GameStateModel(Model):
     def players(self)-> List[PlayerModel]:
         return self._players
 
+    @players.setter
+    def players(self,list:List[PlayerModel]):
+        self._players = list
+
     def add_player(self, player: PlayerModel):
         """Add a player to the current game."""
         if len(self._players) == self._max_desired_players:
             raise TooManyPlayersException(player)
         self._players.append(player)
+
+
 
     def get_player_by_ip(self, ip: str) -> PlayerModel:
         matching_players = [player for player in self._players if player.ip == ip]
@@ -190,6 +209,8 @@ class GameStateModel(Model):
     @property
     def damage(self) -> int:
         return self._damage
+
+
 
     @damage.setter
     def damage(self, damage: int):

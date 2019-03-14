@@ -11,21 +11,52 @@ from src.constants.state_enums import GameKindEnum, SpaceKindEnum, SpaceStatusEn
     DoorStatusEnum, WallStatusEnum
 from src.models.game_board.wall_model import WallModel
 from src.models.game_board.door_model import DoorModel
+from src.models.model import Model
 
-class GameBoardModel(object):
+class GameBoardModel(Model):
     """
     Class for aggregating all objects related to the game board itself, this means TileModels, PlayerModels
     etc. This class is created inside of GameStateModel.
     """
 
     def __init__(self, game_type: GameKindEnum):
+        Model.__init__(self)
         self._dimensions = (8, 10)
         self._ambulance_spots = []
         self._engine_spots = []
-        self._tiles = self._init_all_tiles_family_classic() if game_type == GameKindEnum.FAMILY else None
+        self._tiles: List[TileModel] = self._init_all_tiles_family_classic() if game_type == GameKindEnum.FAMILY else None
         self._poi_bank = GameBoardModel._init_pois()
         self._active_pois = []
         self.set_initial_poi_family()
+
+
+    def notify_all_observers(self):
+        self._notify_pois()
+        self._notify_walls_and_tiles()
+
+
+    def _notify_walls_and_tiles(self):
+
+        for tile in self.tiles:
+            for obs in tile.observers:
+                obs.tile_status_changed(tile.space_status)
+
+            for edge in tile.adjacent_edge_objects.values():
+                if isinstance(edge, NullModel):
+                    continue
+
+                if isinstance(edge, WallModel):
+                    for obs in edge.observers:
+                        obs.wall_status_changed(edge.wall_status)
+                elif isinstance(edge, DoorModel):
+                    for obs in edge.observers:
+                        obs.door_status_changed(edge.door_status)
+
+    def _notify_pois(self):
+        for poi in self.active_pois:
+            for obs in poi.observers:
+                obs.poi_status_changed(poi.status)
+                obs.poi_position_changed(poi.row, poi.column)
 
     def get_tiles(self) -> List[List[TileModel]]:
         return self._tiles
@@ -37,6 +68,9 @@ class GameBoardModel(object):
             for column in range(len(self._tiles[row])):
                 tile_list.append(self.get_tile_at(row, column))
         return tile_list
+    @tiles.setter
+    def tiles(self, tiles):
+        self._tiles = tiles
 
     @property
     def ambulance_spots(self) -> List[Tuple[TileModel]]:
@@ -49,6 +83,10 @@ class GameBoardModel(object):
     @property
     def active_pois(self):
         return self._active_pois
+
+    @active_pois.setter
+    def active_pois(self,list:List[POIModel]) -> List[POIModel]:
+        self._active_pois = list
 
     def add_poi_or_victim(self, poi_or_victim):
         self._active_pois.append(poi_or_victim)
