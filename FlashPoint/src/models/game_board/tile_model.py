@@ -2,6 +2,7 @@ from typing import Optional, List
 
 from src.models.game_board.door_model import DoorModel
 from src.models.game_board.wall_model import WallModel
+from src.models.game_units.hazmat_model import HazmatModel
 from src.models.model import Model
 from src.core.flashpoint_exceptions import TilePositionOutOfBoundsException
 from src.models.game_board.edge_obstacle_model import EdgeObstacleModel
@@ -41,6 +42,9 @@ class TileModel(Model):
 
     def set_hazmat(self):
         self._has_hazmat = True
+        haz = HazmatModel(self.row, self.column)
+        self._associated_models.append(haz)
+        self._notify_assoc_models()
 
     def hot_spot(self):
         self._is_hotspot = True

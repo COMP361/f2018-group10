@@ -7,10 +7,12 @@ from src.models.game_state_model import GameStateModel
 from src.constants.state_enums import SpaceStatusEnum
 from src.UIComponents.interactable import Interactable
 from src.core.event_queue import EventQueue
+from src.models.game_units.hazmat_model import HazmatModel
 from src.models.model import Model
 from src.observers.tile_observer import TileObserver
 import src.constants.color as Color
 from src.UIComponents.text import Text
+from src.sprites.hazmat_sprite import HazmatSprite
 
 
 class TileSprite(Interactable, TileObserver):
@@ -19,7 +21,7 @@ class TileSprite(Interactable, TileObserver):
     def __init__(self, image: pygame.Surface, fire_image: pygame.Surface,
                  smoke_image: pygame.Surface, x, y, x_offset, y_offset, row, column):
         self.index = 0
-        self.sprite_grp = pygame.sprite.Group()
+        self.hazmats = pygame.sprite.Group()
         self.image = image
         self._highlight_color = None
         self.row = row
@@ -88,7 +90,13 @@ class TileSprite(Interactable, TileObserver):
             return False
 
     def tile_assoc_models_changed(self, assoc_models: List[Model]):
-        pass
+        print("sprite successfully initiated")
+        print(self.row)
+        print(self.column)
+        hazmat = assoc_models[:-1]
+        if isinstance(hazmat, HazmatModel):
+            hazmatsprite = HazmatSprite(self.row, self.column)
+            self.hazmats.add(hazmatsprite)
 
     def is_clicked(self):
         if not self.hover():
@@ -147,7 +155,7 @@ class TileSprite(Interactable, TileObserver):
                 offset += 20
 
     def update(self, event_queue: EventQueue):
-        self.sprite_grp.update(event_queue)
+        self.hazmats.update(event_queue)
 
         self._scroll()
         if self.is_clicked():

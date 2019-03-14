@@ -11,12 +11,10 @@ from src.observers.player_observer import PlayerObserver
 import src.constants.color as Color
 
 
-
-
 class PlayerSprite(pygame.sprite.Sprite, PlayerObserver):
     """Visual representation of a Player and/or his fireman."""
 
-    def __init__(self, current_player:PlayerModel,tile_model: TileModel, grid: GridSprite):
+    def __init__(self, current_player: PlayerModel, tile_model: TileModel, grid: GridSprite):
         super().__init__()
         self.grid = grid
         self.tile_model = tile_model
@@ -27,8 +25,7 @@ class PlayerSprite(pygame.sprite.Sprite, PlayerObserver):
         self.associated_png = self._associate_image(self.associated_player.color)
         self.image = FileImporter.import_image(self.associated_png)
 
-    def _associate_image(self,color:Color):
-
+    def _associate_image(self, color: Color):
         return {
             Color.WHITE: "media/all_markers/whiteFighter.png",
             Color.BLUE: "media/all_markers/blueFighter.png",
@@ -37,9 +34,6 @@ class PlayerSprite(pygame.sprite.Sprite, PlayerObserver):
             Color.YELLOW: "media/all_markers/yellowFighter.png",
             Color.GREEN: "media/all_markers/greenFighter.png",
         }[color]
-
-
-
 
     def player_ap_changed(self, updated_ap: int):
         pass
@@ -62,4 +56,3 @@ class PlayerSprite(pygame.sprite.Sprite, PlayerObserver):
 
     def choose_starting_location(self):
         pass
-

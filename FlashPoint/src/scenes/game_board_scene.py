@@ -3,9 +3,7 @@ from datetime import datetime
 
 import pygame
 
-from src.action_events.turn_events.move_event import MoveEvent
 from src.controllers.chop_controller import ChopController
-from src.controllers.move_controller import MoveController
 from src.sprites.poi_sprite import POISprite
 from src.controllers.tile_input_controller import TileInputController
 from src.constants.change_scene_enum import ChangeSceneEnum
@@ -27,7 +25,7 @@ import src.constants.color as Color
 from src.UIComponents.rect_button import RectButton
 from src.UIComponents.text import Text
 from src.sprites.notify_player_turn import NotifyPlayerTurn
-
+from src.models.game_units.hazmat_model import HazmatModel
 
 class GameBoardScene(object):
     """
