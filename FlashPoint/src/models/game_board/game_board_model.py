@@ -26,7 +26,7 @@ class GameBoardModel(Model):
         self._dimensions = (8, 10)
         self._ambulance_spots = []
         self._engine_spots = []
-        self._tiles = self._init_all_tiles_family_classic()# if game_type == GameKindEnum.FAMILY else None
+        self._tiles = self._init_all_tiles_family_classic() if game_type == GameKindEnum.FAMILY else None
         self._poi_bank = GameBoardModel._init_pois()
         self._active_pois = []
 
@@ -76,7 +76,7 @@ class GameBoardModel(Model):
 
     def get_random_poi_from_bank(self) -> POIModel:
         number = random.randint(0, len(self._poi_bank)-1)
-        poi = self._poi_bank.pop(number)
+        poi = self._poi_bank[number]
         return poi
 
     @property
@@ -108,7 +108,7 @@ class GameBoardModel(Model):
 
     def _determine_tile_kind(self, row: int, column: int) -> SpaceKindEnum:
         """Return whether this tile should be indoor or outdoor based on the positions."""
-        outdoor = any([row == 0, row == self._dimensions[0] - 1, column == 0, column == self._dimensions[1] - 1])
+        outdoor = any([row == 0, row == self._dimensions[0]-1, column == 0, column == self._dimensions[1]-1])
         return SpaceKindEnum.OUTDOOR if outdoor else SpaceKindEnum.INDOOR
 
     def _init_all_tiles_family_classic(self) -> List[List[TileModel]]:
@@ -142,7 +142,7 @@ class GameBoardModel(Model):
         # setting the ambulance and engine parking spaces
         with open("media/board_layouts/engine_ambulance_locations.json", "r") as f:
             parking_spots = json.load(f)
-
+            
         for park_spot in parking_spots:
             first_x, first_y = park_spot['first_tile']
             second_x, second_y = park_spot['second_tile']
@@ -162,8 +162,7 @@ class GameBoardModel(Model):
             outside_doors = json.load(f)
 
         for out_door_adj in outside_doors:
-            door = DoorModel(out_door_adj['first_pair'][0], out_door_adj['first_pair'][1], out_door_adj['first_dirn'],
-                             DoorStatusEnum.OPEN)
+            door = DoorModel(out_door_adj['first_pair'][0], out_door_adj['first_pair'][1], out_door_adj['first_dirn'], DoorStatusEnum.OPEN)
             self.set_single_obstacle(tiles, out_door_adj, door)
 
         # setting the walls and doors present inside the house

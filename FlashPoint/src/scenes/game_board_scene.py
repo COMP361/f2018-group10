@@ -32,9 +32,9 @@ import src.constants.color as Color
 from src.UIComponents.rect_button import RectButton
 from src.UIComponents.text import Text
 from src.sprites.notify_player_turn import NotifyPlayerTurn
-from src.models.game_units.hazmat_model import HazmatModel
 
-class GameBoardScene(object):
+
+class GameBoardScene(GameBoardObserver):
     """
     Scene for displaying the main game view
     """

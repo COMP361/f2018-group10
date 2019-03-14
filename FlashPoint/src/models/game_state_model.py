@@ -24,7 +24,7 @@ class GameStateModel(Model):
             self._max_desired_players = num_players
             self._players = [self._host]
             self._players_turn_index = 0
-            self._difficulty_level = game_kind
+            self._difficulty_level = None
             self._rules = game_kind
             self._red_dice = 0
             self._black_dice = 0

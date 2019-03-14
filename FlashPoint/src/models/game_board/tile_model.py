@@ -2,7 +2,6 @@ from typing import Optional, List
 
 from src.models.game_board.door_model import DoorModel
 from src.models.game_board.wall_model import WallModel
-from src.models.game_units.hazmat_model import HazmatModel
 from src.models.model import Model
 from src.core.flashpoint_exceptions import TilePositionOutOfBoundsException
 from src.models.game_board.edge_obstacle_model import EdgeObstacleModel
@@ -22,7 +21,6 @@ class TileModel(Model):
         self._space_kind = space_kind
         self._space_status = SpaceStatusEnum.SAFE
         self._is_hotspot = False
-        self._has_hazmat = False
         self._associated_models = []
         self._visit_count = 0
 
@@ -40,15 +38,6 @@ class TileModel(Model):
             "South": NullModel(),
         }
 
-    def set_hazmat(self):
-        self._has_hazmat = True
-        haz = HazmatModel(self.row, self.column)
-        self._associated_models.append(haz)
-        self._notify_assoc_models()
-
-    def hot_spot(self):
-        self._is_hotspot = True
-
     def __str__(self):
         tile_pos = "Tile at: ({row}, {column})".format(row=self.row, column=self.column)
         tile_state = "Space status: {status}".format(status=self.space_status)
@@ -62,10 +51,6 @@ class TileModel(Model):
     def _notify_assoc_models(self):
         for obs in self.observers:
             obs.tile_assoc_models_changed(self.associated_models)
-
-    @property
-    def hazmat(self) -> bool:
-        return self._has_hazmat
 
     @property
     def observers(self) -> List[TileObserver]:
@@ -95,7 +80,6 @@ class TileModel(Model):
     def space_status(self, space_status: SpaceStatusEnum):
         self._space_status = space_status
         self._notify_status()
-
 
     @property
     def is_hotspot(self):
