@@ -33,7 +33,7 @@ class GameBoardModel(Model):
 
 
     def notify_all_observers(self):
-        self._notify_pois()
+        self._notify_active_poi()
         self._notify_walls_and_tiles()
 
 
@@ -54,11 +54,11 @@ class GameBoardModel(Model):
                     for obs in edge.observers:
                         obs.door_status_changed(edge.door_status)
 
-    def _notify_pois(self):
-        for poi in self.active_pois:
-            for obs in poi.observers:
-                obs.poi_status_changed(poi.status)
-                obs.poi_position_changed(poi.row, poi.column)
+    # def _notify_pois(self):
+    #     for poi in self.active_pois:
+    #         for obs in poi.observers:
+    #             obs.poi_status_changed(poi.status)
+    #             obs.poi_position_changed(poi.row, poi.column)
 
     def _notify_active_poi(self):
         for obs in self.observers:

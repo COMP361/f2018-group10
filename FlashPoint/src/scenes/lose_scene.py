@@ -7,6 +7,7 @@ from src.UIComponents.scene import Scene
 from src.constants.change_scene_enum import ChangeSceneEnum
 from src.core.custom_event import CustomEvent
 from src.core.event_queue import EventQueue
+from src.core.networking import Networking
 
 
 class LoseScene(Scene):
@@ -37,5 +38,9 @@ class LoseScene(Scene):
         box_size = (200,50)
         ctn_btn = RectButton(550,500,box_size[0],box_size[1],Color.GREY,0,Text(pygame.font.SysFont('Agency FB', 20), "Continue", Color.GREEN2))
         ctn_btn.add_frame('media/GameHud/frame.png')
-        ctn_btn.on_click(EventQueue.post, CustomEvent(ChangeSceneEnum.STARTSCENE))
+        ctn_btn.on_click(self._continue)
         self.sprite_grp.add(ctn_btn)
+
+    def _continue(self):
+        Networking.get_instance().disconnect()
+        EventQueue.post(CustomEvent(ChangeSceneEnum.STARTSCENE))

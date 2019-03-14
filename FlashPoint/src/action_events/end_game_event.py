@@ -5,6 +5,7 @@ from src.constants.change_scene_enum import ChangeSceneEnum
 from src.constants.state_enums import GameStateEnum, PlayerStatusEnum
 from src.core.custom_event import CustomEvent
 from src.core.event_queue import EventQueue
+
 from src.models.game_state_model import GameStateModel
 
 
@@ -38,6 +39,7 @@ class EndGameEvent(ActionEvent):
                 player.status = PlayerStatusEnum.NOT_READY
 
             EventQueue.block()
+
             EventQueue.post(CustomEvent(ChangeSceneEnum.LOSESCENE))
 
         else:

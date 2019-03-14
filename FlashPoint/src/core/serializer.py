@@ -14,6 +14,7 @@ from src.action_events.turn_events.pick_up_victim_event import PickupVictimEvent
 from src.action_events.turn_events.open_door_event import OpenDoorEvent
 from src.models.game_board.door_model import DoorModel
 from src.models.game_board.door_model import DoorModel
+from src.models.game_board.game_board_model import GameBoardModel
 from src.models.game_board.null_model import NullModel
 from src.models.game_board.wall_model import WallModel
 from src.models.game_units.victim_model import VictimModel
@@ -26,10 +27,14 @@ from src.action_events.chat_event import ChatEvent
 from src.action_events.dummy_event import DummyEvent
 from src.action_events.join_event import JoinEvent
 from src.constants.state_enums import DifficultyLevelEnum, GameKindEnum, PlayerStatusEnum, WallStatusEnum, \
-    DoorStatusEnum, SpaceKindEnum, SpaceStatusEnum
+    DoorStatusEnum, SpaceKindEnum, SpaceStatusEnum, GameStateEnum
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 from src.sprites.hud.player_state import PlayerState
+
+
+class EndTurnEvent(object):
+    pass
 
 
 class JSONSerializer(object):
@@ -92,6 +97,7 @@ class JSONSerializer(object):
 
         game_board.set_adjacencies(game_board.get_tiles())
         #game_board.active_pois = JSONSerializer.deserialize(payload['_active_pois'])
+
 
         return game_board
 
