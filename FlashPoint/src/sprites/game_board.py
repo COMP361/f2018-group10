@@ -1,41 +1,44 @@
 import pygame
 
-
-import src.constants.color as Color
 import src.constants.main_constants as MainConst
+from src.action_events.fire_placement_event import FirePlacementEvent
 from src.UIComponents.file_importer import FileImporter
+from src.models.game_units.player_model import PlayerModel
 from src.sprites.grid_sprite import GridSprite
-from src.sprites.player_sprite import PlayerSprite
 from src.core.event_queue import EventQueue
 
 
 class GameBoard(pygame.sprite.Group):
     """Wrapper class for the Grid class. Contains methods specific for user interfacing."""
 
-    def __init__(self):
+    _instance = None
+
+    def __init__(self, current_player: PlayerModel):
+        if GameBoard._instance:
+            raise Exception("GameBoard is a singleton")
         super().__init__()
+        self._fire_placement_event = FirePlacementEvent()
+        self._fire_placement_event.execute()
+
         self.image = pygame.Surface((MainConst.SCREEN_RESOLUTION[0], MainConst.SCREEN_RESOLUTION[1]))
         self.rect = self.image.get_rect()
-        self.grid = GridSprite(x_coord=self.rect.left, y_coord=self.rect.top)
-        self.add(self.grid)
+        self.grid = GridSprite(x_coord=self.rect.left, y_coord=self.rect.top, current_player=current_player)
         self.background = FileImporter.import_image("media/backgrounds/WoodBack.jpeg")
+        GameBoard._instance = self
+
+    @classmethod
+    def instance(cls):
+        return cls._instance
 
     def draw(self, screen: pygame.Surface):
 
         self.image.blit(self.background, (0, 0))
         self.grid.draw(self.image)
+        for sprite in self:
+            self.image.blit(sprite.image, sprite.rect)
         screen.blit(self.image, self.rect)
 
     def update(self, event_q: EventQueue):
-        # for event in event_q:
-        #     if event.type == pygame.MOUSEBUTTONUP:
-        #         for tile_sprite in self.grid:
-        #
-        #             if tile_sprite.hover():
-        #                 tile_sprite.tile_model.game_unit_sprites.add(CharacterSprite())
-
-                    # else:
-                        # some_sprite = tile_sprite.tile_model.find_character()
-                        # tile_sprite.tile_model.remove_sprite_character(some_sprite)
-
         self.grid.update(event_q)
+        for sprite in self:
+            sprite.update(event_q)

@@ -30,24 +30,30 @@ class GameStateEnum(Enum):
     PLACING = auto()
     MAIN_GAME = auto()
     KNOCKED_DOWN_PLACEMENT = auto()
-    COMPLETED = auto()
+    LOST = auto()
+    WON = auto()
 
 
 class PlayerStatusEnum(Enum):
-    OFFLINE = auto()
     READY = auto()
-    ONLINE = auto()
+    NOT_READY = auto()
     IN_GAME = auto()
 
 
 class POIStatusEnum(Enum):
     HIDDEN = auto()
     REVEALED = auto()
+    LOST = auto()
 
+class POIIdentityEnum(Enum):
+    VICTIM = auto()
+    FALSE_ALARM = auto()
 
 class SpaceKindEnum(Enum):
     INDOOR = auto()
     OUTDOOR = auto()
+    ENGINE_PARKING = auto()
+    AMBULANCE_PARKING = auto()
 
 
 class SpaceStatusEnum(Enum):
@@ -66,6 +72,7 @@ class VictimStateEnum(Enum):
     TREATED = auto()
     RESCUED = auto()
     LOST = auto()
+    ON_BOARD = auto()
 
 
 class WallStatusEnum(Enum):

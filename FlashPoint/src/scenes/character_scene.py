@@ -1,6 +1,8 @@
 import pygame
 
 import src.constants.color as Color
+from src.core.custom_event import CustomEvent
+from src.core.event_queue import EventQueue
 
 from src.UIComponents.rect_button import RectButton
 from src.UIComponents.rect_label import RectLabel
@@ -8,6 +10,7 @@ from src.UIComponents.rect_label import RectLabel
 from src.UIComponents.scene import Scene
 from src.UIComponents.text import Text
 from src.models.game_units.player_model import PlayerModel
+from src.constants.change_scene_enum import ChangeSceneEnum
 
 
 class CharacterScene(Scene):
@@ -47,6 +50,8 @@ class CharacterScene(Scene):
         self._init_btn_confirm(1050, 575, "Confirm", Color.STANDARDBTN, Color.BLACK)
 
         self._init_title_text()
+        self.buttonBack.on_click(EventQueue.post, CustomEvent(ChangeSceneEnum.LOBBYSCENE))
+        self.buttonConfirm.on_click(EventQueue.post, CustomEvent(ChangeSceneEnum.LOBBYSCENE))
 
     def _init_background(self):
         box_size = (self.resolution[0], self.resolution[1])
@@ -54,7 +59,6 @@ class CharacterScene(Scene):
         self.sprite_grp.add(background_box)
 
     def create_butn_img(self, x, y, width, height, path):
-
         label = self.create_label(x, y, width, height)
         self.label_grp.add(label)
         self.sprite_grp.add(label)

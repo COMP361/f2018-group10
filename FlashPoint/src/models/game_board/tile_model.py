@@ -1,74 +1,89 @@
-import pygame
+from typing import Optional, List
 
-from typing import Optional
-
+from src.models.game_board.door_model import DoorModel
+from src.models.game_board.wall_model import WallModel
+from src.models.model import Model
+from src.core.flashpoint_exceptions import TilePositionOutOfBoundsException
 from src.models.game_board.edge_obstacle_model import EdgeObstacleModel
-from src.models.game_board.null_tile_model import NullTileModel
-
-from src.sprites.fire_sprite import FireSprite
-from src.sprites.smoke_sprite import SmokeSprite
-from src.sprites.vehicle_sprite import VehicleSprite
-from src.sprites.victim_sprite import VictimSprite
-from src.sprites.game_unit_sprite import GameUnitSprite
-from src.sprites.poi_sprite import POISprite
-from src.sprites.hazmat_sprite import HazMatSprite
-
-from src.constants.state_enums import DirectionEnum
-from src.constants.state_enums import SpaceKindEnum
+from src.models.game_board.null_model import NullModel
+from src.constants.state_enums import SpaceKindEnum, DoorStatusEnum, WallStatusEnum
 from src.constants.state_enums import SpaceStatusEnum
+from src.observers.tile_observer import TileObserver
 
 
-class TileModel(object):
+class TileModel(Model):
     """Logical state of a Tile object."""
 
-    def __init__(self, x_coord: int, y_coord: int, space_kind: SpaceKindEnum):
-        self._x_coord = x_coord
-        self._y_coord = y_coord
+    def __init__(self, row: int, column: int, space_kind: SpaceKindEnum):
+        super().__init__()
+        self._row = row
+        self._column = column
         self._space_kind = space_kind
-        self._space_state = SpaceStatusEnum.SAFE
+        self._space_status = SpaceStatusEnum.SAFE
         self._is_hotspot = False
-        self._game_unit_sprites = pygame.sprite.Group()
+        self._associated_models = []
+        self._visit_count = 0
 
         self._adjacent_tiles = {
-            DirectionEnum.NORTH: NullTileModel(),
-            DirectionEnum.EAST: NullTileModel(),
-            DirectionEnum.WEST: NullTileModel(),
-            DirectionEnum.SOUTH: NullTileModel(),
+            "North": NullModel(),
+            "East": NullModel(),
+            "West": NullModel(),
+            "South": NullModel(),
         }
 
         self._adjacent_edge_objects = {
-            DirectionEnum.NORTH: NullTileModel(),
-            DirectionEnum.EAST: NullTileModel(),
-            DirectionEnum.WEST: NullTileModel(),
-            DirectionEnum.SOUTH: NullTileModel(),
+            "North": NullModel(),
+            "East": NullModel(),
+            "West": NullModel(),
+            "South": NullModel(),
         }
 
     def __str__(self):
-        return f"Tile at: ({self.x_coord}, {self.y_coord})."
+        tile_pos = "Tile at: ({row}, {column})".format(row=self.row, column=self.column)
+        tile_state = "Space status: {status}".format(status=self.space_status)
+        tile_kind = "Space kind: {kind}\n".format(kind=self.space_kind)
+        return '\n'.join([tile_pos, tile_state, tile_kind])
+
+    def _notify_status(self):
+        for obs in self.observers:
+            obs.tile_status_changed(self.space_status)
+
+    def _notify_assoc_models(self):
+        for obs in self.observers:
+            obs.tile_assoc_models_changed(self.associated_models)
 
     @property
-    def x_coord(self):
-        return self._x_coord
+    def observers(self) -> List[TileObserver]:
+        return self._observers
 
     @property
-    def y_coord(self):
-        return self._y_coord
+    def row(self):
+        return self._row
+
+    @property
+    def column(self):
+        return self._column
 
     @property
     def space_kind(self):
         return self._space_kind
 
+    @space_kind.setter
+    def space_kind(self, kind: SpaceKindEnum):
+        self._space_kind = kind
+
     @property
-    def space_state(self):
-        return self._space_state
+    def space_status(self):
+        return self._space_status
+
+    @space_status.setter
+    def space_status(self, space_status: SpaceStatusEnum):
+        self._space_status = space_status
+        self._notify_status()
 
     @property
     def is_hotspot(self):
         return self._is_hotspot
-
-    @property
-    def game_unit_sprites(self):
-        return self._game_unit_sprites
 
     @property
     def adjacent_tiles(self):
@@ -77,90 +92,134 @@ class TileModel(object):
     @property
     def adjacent_edge_objects(self):
         return self._adjacent_edge_objects
-    #
-    # @property
-    # def north_tile(self):
-    #     """
-    #     Get the TileModel to the North of this one.
-    #     :raise TilePositionOutOfBoundsException: If there is no Tile in that direction.
-    #     """
-    #     tile = self._adjacent_tiles.get(DirectionEnum.NORTH, None)
-    #     if not tile:
-    #         raise TilePositionOutOfBoundsException(self, DirectionEnum.NORTH)
-    #     return tile
-    #
-    # @north_tile.setter
-    # def north_tile(self, tile):
-    #     self._adjacent_tiles[DirectionEnum.NORTH] = tile
-    #
-    # @property
-    # def east_tile(self):
-    #     """
-    #     Get the TileModel to the North of this one.
-    #     :raise TilePositionOutOfBoundsException: If there is no Tile in that direction.
-    #     """
-    #     tile = self._adjacent_tiles.get(DirectionEnum.EAST, None)
-    #     if not tile:
-    #         raise TilePositionOutOfBoundsException(self, DirectionEnum.EAST)
-    #     return tile
-    #
-    # @east_tile.setter
-    # def east_tile(self, tile):
-    #     self._adjacent_tiles[DirectionEnum.EAST] = tile
-    #
-    # @property
-    # def west_tile(self):
-    #     """
-    #     Get the TileModel to the  of this one.
-    #     :raise TilePositionOutOfBoundsException: If there is no Tile in that direction.
-    #     """
-    #     tile = self._adjacent_tiles.get(DirectionEnum.WEST, None)
-    #     if not tile:
-    #         raise TilePositionOutOfBoundsException(self, DirectionEnum.WEST)
-    #     return tile
-    #
-    # @west_tile.setter
-    # def west_tile(self, tile):
-    #     self._adjacent_tiles[DirectionEnum.WEST] = tile
-    #
-    # @property
-    # def south_tile(self):
-    #     """
-    #     Get the TileModel to the South of this one.
-    #     :raise TilePositionOutOfBoundsException: If there is no Tile in that direction.
-    #     """
-    #     tile = self._adjacent_tiles.get(DirectionEnum.SOUTH, None)
-    #     if not tile:
-    #         raise TilePositionOutOfBoundsException(self, DirectionEnum.SOUTH)
-    #     return tile
-    #
-    # @south_tile.setter
-    # def south_tile(self, tile):
-    #     self._adjacent_tiles[DirectionEnum.SOUTH] = tile
 
-    def set_adjacent_edge_obstacle(self, direction: DirectionEnum, edge_obstacle: EdgeObstacleModel):
+    @property
+    def north_tile(self):
+        """
+        Get the TileModel to the North of this one.
+        :raise TilePositionOutOfBoundsException: If there is no Tile in that direction.
+        """
+        tile = self._adjacent_tiles.get("North", None)
+        if not tile:
+            raise TilePositionOutOfBoundsException(self, "North")
+        return tile
+
+    @north_tile.setter
+    def north_tile(self, tile):
+        self._adjacent_tiles["North"] = tile
+
+    @property
+    def east_tile(self):
+        """
+        Get the TileModel to the North of this one.
+        :raise TilePositionOutOfBoundsException: If there is no Tile in that direction.
+        """
+        tile = self._adjacent_tiles.get("East", None)
+        if not tile:
+            raise TilePositionOutOfBoundsException(self, "East")
+        return tile
+
+    @east_tile.setter
+    def east_tile(self, tile):
+        self._adjacent_tiles["East"] = tile
+
+    @property
+    def west_tile(self):
+        """
+        Get the TileModel to the  of this one.
+        :raise TilePositionOutOfBoundsException: If there is no Tile in that direction.
+        """
+        tile = self._adjacent_tiles.get("West", None)
+        if not tile:
+            raise TilePositionOutOfBoundsException(self, "West")
+        return tile
+
+    @west_tile.setter
+    def west_tile(self, tile):
+        self._adjacent_tiles["West"] = tile
+
+    @property
+    def south_tile(self):
+        """
+        Get the TileModel to the South of this one.
+        :raise TilePositionOutOfBoundsException: If there is no Tile in that direction.
+        """
+        tile = self._adjacent_tiles.get("South", None)
+        if not tile:
+            raise TilePositionOutOfBoundsException(self, "South")
+        return tile
+
+    @south_tile.setter
+    def south_tile(self, tile):
+        self._adjacent_tiles["South"] = tile
+
+    def set_adjacent_edge_obstacle(self, direction: str, edge_obstacle: EdgeObstacleModel):
         self._adjacent_edge_objects[direction] = edge_obstacle
 
-    # def get_tile_in_direction(self, direction: DirectionEnum):
-    #     """
-    #     Get the TileModel in a specified direction.
-    #     "raise TilePositionOutOfBoundsException: If there is no Tile in that direction.
-    #     """
-    #     tile = self._adjacent_tiles.get(direction, None)
-    #     if not tile:
-    #         raise TilePositionOutOfBoundsException(self, direction)
-    #     return tile
+    def set_adjacent_tile(self, direction: str, tile):
+        self._adjacent_tiles[direction] = tile
 
-    def get_obstacle_in_direction(self, direction: DirectionEnum) -> Optional['TileModel']:
+    def get_tile_in_direction(self, direction: str):
+        """
+        Get the TileModel in a specified direction.
+        "raise TilePositionOutOfBoundsException: If there is no Tile in that direction.
+        """
+        tile = self._adjacent_tiles.get(direction, None)
+        if not tile:
+            raise TilePositionOutOfBoundsException(self, direction)
+        return tile
+
+    def get_obstacle_in_direction(self, direction: str) -> Optional['EdgeObstacleModel']:
         """
         Get the EdgeObstacle model
-        :return: EdgeObstacleModel in the direction specified, or None.
+        :return: EdgeObstacleModel in the direction specified, or NullModel.
         """
-        return self._adjacent_edge_objects.get(direction, None)
+        return self._adjacent_edge_objects.get(direction, NullModel())
 
-    # def add_game_unit_sprite(self, game_unit_sprite: GameUnitSprite):
-    #     """TODO: Should check if valid sprite type."""
-    #     self._game_unit_sprites.add(game_unit_sprite)
-    def add_game_unit_sprite(self, game_unit_sprite: GameUnitSprite):
-        """TODO: Make sure to add raising exceptions if the added game sprite is illegal"""
-        type = game_unit_sprite.get_sprite()
+    def has_obstacle_in_direction(self, direction: str) -> bool:
+        """
+        Checks whether there is an obstacle in the given direction.
+        :param direction:
+        :return: False if there is -
+                1. no obstacle
+                2. destroyed wall
+                3. destroyed door
+                True otherwise
+        """
+        obstacle: EdgeObstacleModel = self.get_obstacle_in_direction(direction)
+        if isinstance(obstacle, NullModel):
+            return False
+        elif isinstance(obstacle, DoorModel) and obstacle.door_status == DoorStatusEnum.DESTROYED:
+            return False
+        elif isinstance(obstacle, WallModel) and obstacle.wall_status == WallStatusEnum.DESTROYED:
+            return False
+        else:
+            return True
+
+    @property
+    def associated_models(self):
+        return self._associated_models
+
+    def add_associated_model(self, model: Model):
+        # The model's observers will take care
+        # of redrawing the model in the new location
+        model.set_position(self.row, self.column)
+        self._associated_models.append(model)
+        self._notify_assoc_models()
+
+    def remove_associated_model(self, model: Model):
+        """CAUTION: YOUR MODEL MUST HAVE AN __EQ__ METHOD DEFINED FOR THIS TO WORK AS EXPECTED"""
+        if model in self._associated_models:
+            self._associated_models.remove(model)
+        self._notify_assoc_models()
+
+    @property
+    def visit_count(self):
+        return self._visit_count
+
+    @visit_count.setter
+    def visit_count(self, visit_count: int):
+        self._visit_count = visit_count
+
+    def reset_adjacencies(self):
+        self._adjacent_tiles = {}

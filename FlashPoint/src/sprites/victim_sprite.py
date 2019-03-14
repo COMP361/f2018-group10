@@ -1,13 +1,31 @@
 import pygame
+from src.sprites.game_board import GameBoard
+from src.constants.state_enums import VictimStateEnum
+from src.core.event_queue import EventQueue
+from src.observers.victim_observer import VictimObserver
+from src.UIComponents.file_importer import FileImporter
 
-from src.models.game_board import tile_model
-from src.models.game_units import victim_model
 
+class VictimSprite(pygame.sprite.Sprite, VictimObserver):
 
-class VictimSprite(pygame.sprite.Sprite):
+    """Visual representation of a Victim."""
 
-    def __init__(self, tile: tile_model, victim: victim_model):
+    def __init__(self, row: int, column: int):
+        super().__init__()
+        self.image = FileImporter.import_image("media/all_markers/poi.png")
+        self.rect = self.image.get_rect()
+        self.row = row
+        self.column = column
+        self.tile_sprite = GameBoard.instance().grid.grid[column][row]
 
-        super.__init__()
-        self.tile_reference = tile
-        self.victim_model = victim
+    def victim_state_changed(self, state: VictimStateEnum):
+        pass
+
+    def victim_position_changed(self, row: int, column: int):
+        pass
+
+    def update(self, event_queue: EventQueue):
+        new_x = self.tile_sprite.rect.x
+        new_y = self.tile_sprite.rect.y
+        self.rect.x = new_x
+        self.rect.y = new_y

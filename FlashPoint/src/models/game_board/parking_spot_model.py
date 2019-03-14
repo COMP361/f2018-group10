@@ -1,9 +1,9 @@
-from models.game_units.game_unit import GameUnit
+from models.model import Model
 from models.game_units.vehicle_model import VehicleModel
 from src.constants.state_enums import VehicleKindEnum
 
 
-class ParkingSpotModel(GameUnit):
+class ParkingSpotModel(Model):
 
     def __init__(self, tiles, vehicle_kind: VehicleKindEnum):
         super().__init__(tiles[0])

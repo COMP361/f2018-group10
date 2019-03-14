@@ -2,6 +2,7 @@ from typing import Tuple, Union
 
 import pygame
 
+from src.UIComponents.rect_label import RectLabel
 from src.core.event_queue import EventQueue
 from src.UIComponents.file_importer import FileImporter
 from src.UIComponents.components import Components
@@ -29,6 +30,7 @@ class ProfileList(pygame.sprite.Sprite, Components):
         self._profile_list = pygame.sprite.Group()
         self._btn_list = []
         self._remove_btn_list = []
+        self._stats_list = []
         self._init_slots()
         self._render()
 
@@ -54,6 +56,9 @@ class ProfileList(pygame.sprite.Sprite, Components):
             # Not ideal but the only way I know to re-render
             btn._render()
 
+        for s in self._stats_list:
+            s._render()
+
     def _init_slots(self):
         """
         Initialize the profile slots
@@ -69,14 +74,19 @@ class ProfileList(pygame.sprite.Sprite, Components):
             y = self.y + 20
 
             btn = RectButton(x, y, width, height, color.STANDARDBTN, 0,
-                             Text(pygame.font.SysFont('Arial', 20), "Empty", color.BLACK))
+                             Text(pygame.font.SysFont('Agency FB', 20), "Empty", color.BLACK))
             remove_btn = RectButton(btn.x, (btn.y + self.height-80)+10, btn.width, 30, color.YELLOW, 0,
-                                    Text(pygame.font.SysFont('Arial', 16), "Remove", color.BLACK))
+                                    Text(pygame.font.SysFont('Agency FB', 16), "Remove", color.BLACK))
+            s = RectLabel(btn.x,(btn.y + self.height-120),btn.width,30,color.STANDARDBTN, 0,
+                                    Text(pygame.font.SysFont('Agency FB', 16), "dadsad", color.BLACK))
+
+            s.set_transparent_background(True)
+            self._stats_list.append(s)
             self._remove_btn_list.append(remove_btn)
             self._btn_list.append(btn)
             self._profile_list.add(btn)
 
-    def set_profile(self, index: int, name: str, click_action: callable, *args, **kwargs):
+    def set_profile(self, index: int, name: str,wins:int,losses:int, click_action: callable, *args, **kwargs):
         """
         Set the name for the profile slot and assign callbacks to it
         :param index: Index of the profile slot (0-2)
@@ -91,10 +101,14 @@ class ProfileList(pygame.sprite.Sprite, Components):
             btn = self._btn_list[index]
             rect = pygame.rect.Rect(btn.x, btn.y, btn.width, height)
             btn.change_rect(rect)
-            btn.txt_obj = Text(pygame.font.SysFont('Arial', 20), name, color.BLACK)
+            str = "Wins:" + f'{wins}' + "    Losses:" + f'{losses}'
+            btn.txt_obj = Text(pygame.font.SysFont('Agency FB', 30), name, color.BLACK)
             btn.on_click(click_action, *args, **kwargs)
             btn.enable()
+
             self._profile_list.add(self._remove_btn_list[index])
+            self._stats_list[index].change_text(Text(pygame.font.SysFont('Agency FB', 20), str, color.BLACK))
+            self._profile_list.add(self._stats_list[index])
             self._render()
         else:
             raise IndexError("Index out of range")
@@ -110,9 +124,10 @@ class ProfileList(pygame.sprite.Sprite, Components):
             btn = self._btn_list[index]
             rect = pygame.rect.Rect(btn.x, btn.y, btn.width, height)
             btn.change_rect(rect)
-            btn.txt_obj = Text(pygame.font.SysFont('Arial', 20), "Empty", color.BLACK)
+            btn.txt_obj = Text(pygame.font.SysFont('Agency FB', 20), "Empty", color.BLACK)
             btn.disable()
             self._profile_list.remove(self._remove_btn_list[index])
+            self._profile_list.remove(self._stats_list[index])
             self._render()
         else:
             raise IndexError("Index out of range")

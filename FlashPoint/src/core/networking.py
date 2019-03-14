@@ -1,28 +1,30 @@
+from typing import Union
+
 import ipaddress
 import socket
 import threading
 import logging
 import time
 
+from src.action_events.turn_events.choose_starting_position_event import ChooseStartingPositionEvent
+from src.action_events.turn_events.end_turn_event import EndTurnEvent
 from src.action_events.chat_event import ChatEvent
-from src.action_events.dummy_event import DummyEvent
-from src.models.game_state_model import GameStateModel
+from src.action_events.turn_events.chop_event import ChopEvent
+from src.action_events.turn_events.extinguish_event import ExtinguishEvent
+from src.core.custom_event import CustomEvent
 from src.core.serializer import JSONSerializer
+from src.core.event_queue import EventQueue
+from src.constants.change_scene_enum import ChangeSceneEnum
+from src.models.game_state_model import GameStateModel
 from src.action_events.action_event import ActionEvent
+from src.action_events.turn_events.turn_event import TurnEvent
 from src.action_events.join_event import JoinEvent
+from src.action_events.dummy_event import DummyEvent
+from src.action_events.disconnect_event import DisconnectEvent
 from src.external.Mastermind import *
 
 logger = logging.getLogger("networking")
 logger.setLevel(logging.INFO)
-
-
-class TestObject(object):
-
-    class_thing = 69
-
-    def __init__(self):
-        self.something = "Francis is gay"
-        self.something_else = "Holy"
 
 
 class Networking:
@@ -63,24 +65,19 @@ class Networking:
     def __getattr__(self, name):
         return getattr(self.__instance, name)
 
-    @staticmethod
-    def set_game(game):
-        Networking.__instance.game = game
-
     class NetworkingInner:
-        host = None
-        client = None
-        TIMEOUT_CONNECT = 200
-        TIMEOUT_RECEIVE = 200
+        TIMEOUT_CONNECT = 5
+        TIMEOUT_RECEIVE = 5
 
         stop_broadcast = threading.Event()
         stop_listen = threading.Event()
 
-        server_reply = None
-
         def __init__(self):
+            self.host = None
+            self.client = None
             self.game = None
             self.stop_broadcast.set()
+            self.server_reply = None
 
         def create_host(self, port=20298):
             """
@@ -91,7 +88,7 @@ class Networking:
             :return:
             """
             # We use UDP to broadcast the host
-            self.host = Networking.Host()
+            self.host = Networking.Host(1, 2, 5)
 
             """
             # find unused ip address
@@ -147,9 +144,11 @@ class Networking:
                 self.client.send(JoinEvent(player))
                 return True
             except MastermindErrorClient as e:
+                self.client.disconnect()
                 logger.error(f"Error connecting to server at: {ip}:{port}")
                 raise MastermindErrorClient(e)
             except OSError as e:
+                self.client.disconnect()
                 raise OSError(e)
 
         @staticmethod
@@ -160,7 +159,7 @@ class Networking:
             b_caster.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
             msg = f"{socket.gethostname()} {mastermind_get_local_ip()}"
             bip = Networking.get_instance().get_broadcast_ip()
-            print(f"Broadcasting at {bip}:54545")
+            print(f"Broadcasting at {bip}:54545\n")
 
             while not stop_event.is_set():
                 b_caster.sendto(str.encode(msg), (str(bip), 54545))
@@ -212,7 +211,7 @@ class Networking:
                 logger.info("Disconnecting client")
                 self.client.disconnect()
                 self.client.__del__()
-                # self.client = None
+                self.client = None
             if self.host is not None:
                 logger.info("Disconnecting host")
                 # Kill the broadcast
@@ -221,23 +220,12 @@ class Networking:
                 # Stops accepting connection
                 self.host.accepting_disallow()
                 # Disconnects all clients
+                self.send_to_all_client(DisconnectEvent())
                 self.host.disconnect_clients()
                 self.host.disconnect()
                 self.host.__del__()
                 self.host = None
-
-        # If game is started, stops new client from connecting
-        def start_game(self):
-            """
-            Starts the game
-            :return:
-            """
-            # Kill the broadcast
-            self.stop_broadcast.set()
-            print("Broadcast killed")
-
-            if self.host is not None:
-                self.host.accepting_disallow()
+            EventQueue.post(CustomEvent(ChangeSceneEnum.STARTSCENE))
 
         def send_to_server(self, data, compress=True):
             """
@@ -282,7 +270,6 @@ class Networking:
             """
             if self.host:
                 for client in self.host.client_list.values():
-                    print(f"Sending {data.__class__} to client at {client.address}\n")
                     try:
                         self.host.callback_client_send(client, data, compress)
                     except MastermindErrorSocket as e:
@@ -292,7 +279,9 @@ class Networking:
 
     # Overridden classes
     class Host(MastermindServerUDP):
-        client_list = {}
+        def __init__(self, time_server_refresh=1.0, time_connection_refresh=2.0, time_connection_timeout=5.0):
+            MastermindServerUDP.__init__(self, time_server_refresh, time_connection_refresh, time_connection_timeout)
+            self.client_list = {}
 
         def lookup_client(self, ip_addr: str):
             """
@@ -300,16 +289,25 @@ class Networking:
             :param ip_addr: client's ip address
             :return:
             """
-            conn_obj = self.client_list[ip_addr]
-            if conn_obj is not None:
-                return conn_obj
-            else:
+            try:
+                conn_obj = self.client_list[ip_addr]
+                if conn_obj is not None:
+                    return conn_obj
+                else:
+                    raise Networking.Host.ClientNotFoundException
+            except KeyError:
                 raise Networking.Host.ClientNotFoundException
 
+        def client_exists(self, ip_addr: str):
+            try:
+                if self.lookup_client(ip_addr):
+                    return True
+                return False
+            except Networking.Host.ClientNotFoundException:
+                return False
+
         def kick_client(self, ip_addr: str):
-            key = self.lookup_client(ip_addr)
-            if key:
-                self.client_list.pop(key)
+            self.client_list.pop(ip_addr)
 
         def callback_connect_client(self, connection_object):
             """
@@ -319,18 +317,14 @@ class Networking:
             :param connection_object: Represents the appropriate connection
             :return:
             """
-            print(f"Client at {connection_object.address} is connected")
             # Assign a new connection object to the address (as a key value pair)
-            self.client_list[connection_object.address[0]] = connection_object
-
-            # inform the event queue that a client is connected, with the respective client id
-            # event = pygame.event.Event(CustomEvents.CLIENT_CONNECTED, {'client_id': client_id})
-            # pygame.event.post(event)
-
-            # Check if connected client exceeds limit
-            if len(self.client_list) >= 6:
-                print("Limit reached, stop accepting connections")
-                self.accepting_disallow()
+            if not self.client_exists(connection_object.address[0]):
+                if len(self.client_list) <= 6:
+                    self.client_list[connection_object.address[0]] = connection_object
+                    print(f"Client at {connection_object.address} is connected")
+                else:
+                    self.accepting_disallow()
+                    print("Limit reached, stop accepting connections")
             return super(MastermindServerUDP, self).callback_connect_client(connection_object)
 
         def callback_disconnect_client(self, connection_object):
@@ -342,12 +336,13 @@ class Networking:
             :return:
             """
             # Pops the client's connection object
-            game = Networking.get_instance().game
+            game = GameStateModel.instance()
             if game:
                 players = [x for x in game.players if x.ip == connection_object.address[0]]
                 if players:
-                    game.remove_player(players[0])
-                    self.client_list.pop(connection_object.address[0])
+                    # game.remove_player(players[0])
+                    print(f"Removing player at {connection_object.address}")
+                    self.kick_client(connection_object.address[0])
             return super(MastermindServerUDP, self).callback_disconnect()
 
         def callback_client_handle(self, connection_object, data):
@@ -360,22 +355,34 @@ class Networking:
             :param data: Data received from the connection
             :return:
             """
+            # print("Received")
             if connection_object.address[0] == "127.0.0.1":
                 return
 
             data = JSONSerializer.deserialize(data)
             # If it's a dummy event, don't do anything
             if isinstance(data, DummyEvent):
-                return
+                # print("Received dummy event")
+                return super(MastermindServerUDP, self).callback_client_handle(connection_object, data)
 
             print(f"Client at {connection_object.address} sent a message: {data.__class__}")
-            if isinstance(data, ActionEvent):
-                if isinstance(data, JoinEvent):
-                    Networking.get_instance().game.add_player(data.player)
-                    Networking.get_instance().send_to_all_client(Networking.get_instance().game)
-                if isinstance(data, ChatEvent):
-                    data.execute(Networking.get_instance().game)
+            if isinstance(data, TurnEvent) or isinstance(data, ActionEvent):
+                if isinstance(data, ChatEvent) or isinstance(data, EndTurnEvent) \
+                        or isinstance(data, ChooseStartingPositionEvent) or isinstance(data, ChopEvent) \
+                        or isinstance(data, ExtinguishEvent):
                     Networking.get_instance().send_to_all_client(data)
+                    return super(MastermindServerUDP, self).callback_client_handle(connection_object, data)
+
+                data.execute()
+
+                if isinstance(data, DisconnectEvent):
+                    # Kick the player that send the DC event and notify all other players.
+                    # Need to have similar polling mechanics like in lobby
+                    self.kick_client(connection_object.address[0])
+
+                if isinstance(data, JoinEvent):
+                    Networking.get_instance().send_to_all_client(GameStateModel.instance())
+
             return super(MastermindServerUDP, self).callback_client_handle(connection_object, data)
 
         def callback_client_send(self, connection_object, data, compression=None):
@@ -391,7 +398,9 @@ class Networking:
             :return:
             """
             # define override here
+            print(f"Serializing: {data}")
             data = JSONSerializer.serialize(data)
+            print(f"Sending message to client at {connection_object.address} : {data['class']}")
             return super(MastermindServerUDP, self).callback_client_send(connection_object, data, compression)
 
         class ClientNotFoundException(Exception):
@@ -412,7 +421,7 @@ class Networking:
             signaler.start()
             receiver.start()
 
-        def send(self, data: ActionEvent, compression=None):
+        def send(self, data: Union[ActionEvent, TurnEvent], compression=None):
             """
             Send data to the server
             :param data: data to be sent, MUST be an instance of ActionEvent
@@ -422,6 +431,8 @@ class Networking:
             self._pause_receive.set()
             try:
                 super(MastermindClientUDP, self).send(JSONSerializer.serialize(data), compression)
+            except MastermindErrorClient:
+                self.callback_disconnect()
             except MastermindErrorSocket:
                 self.callback_disconnect()
             self._pause_receive.clear()
@@ -437,10 +448,11 @@ class Networking:
                         _server_reply = self.receive(False)
                         if _server_reply:
                             self._reply_queue.append(_server_reply)
-                            if not Networking.get_instance().is_host:
-                                self.callback_client_receive(_server_reply)
-                    except OSError as e:
-                        print(f"Error receiving data: {e}")
+                            self.callback_client_receive(_server_reply)
+                    except MastermindErrorClient:
+                        self.callback_disconnect()
+                    except OSError:
+                        self.callback_disconnect()
 
         def disconnect(self):
             self._pause_blk_signal.set()
@@ -449,16 +461,18 @@ class Networking:
             time.sleep(0.5)
             return super(MastermindClientUDP, self).disconnect()
 
-        def callback_client_receive(self, data):
+        @staticmethod
+        def callback_client_receive(data):
             """Handle receiving data from host."""
             data: GameStateModel = JSONSerializer.deserialize(data)
             print(f"Received {data.__class__} object from host.")
             if isinstance(data, GameStateModel):
-                print(f"Updating game object, there are now: {len(data.players)} players.")
-                Networking.set_game(data)
-            if isinstance(data, ActionEvent):
-                if isinstance(data, ChatEvent):
-                    data.execute(Networking.get_instance().game)
+                GameStateModel.set_game(data)
+                return
+            if isinstance(data, TurnEvent) or isinstance(data, ActionEvent):
+                data.execute()
+                if isinstance(data, DisconnectEvent):
+                    Networking.get_instance().disconnect()
 
         def get_server_reply(self):
             """
@@ -484,9 +498,12 @@ class Networking:
             else:
                 self._pause_blk_signal.clear()
 
-        def callback_disconnect(self):
+        @staticmethod
+        def callback_disconnect():
             """
             Define callback here when client's connection to host is interrupted.
             :return:
             """
-            pass
+            print("It seems that client is not connected...")
+            Networking.get_instance().disconnect()
+

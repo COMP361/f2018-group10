@@ -1,7 +1,7 @@
-from src.models.game_units.game_unit import GameUnit
+from models.model import Model
 
 
-class SmokeModel(GameUnit):
+class SmokeModel(Model):
 
     def __init__(self, tile):
         super().__init__(tile)
