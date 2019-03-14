@@ -10,7 +10,7 @@ from src.UIComponents.rect_button import RectButton
 from src.UIComponents.rect_label import RectLabel
 from src.UIComponents.text import Text
 from src.UIComponents.scene import Scene
-from src.constants.state_enums import GameKindEnum
+from src.constants.state_enums import GameKindEnum, DifficultyLevelEnum
 from src.constants.change_scene_enum import ChangeSceneEnum
 from src.core.networking import Networking
 
@@ -69,18 +69,22 @@ class CreateGameMenu(Scene):
         self.buttonRecruit = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
                                     Text(pygame.font.SysFont('Arial', 20), text, color_text))
         self.sprite_grp.add(self.buttonRecruit)
+        GameStateModel.instance().difficulty_level(DifficultyLevelEnum.RECRUIT)
+
 
     def _init_btn_veteran(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
         box_size = (130, 48)
         self.buttonVeteran = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
                                     Text(pygame.font.SysFont('Arial', 20), text, color_text))
         self.sprite_grp.add(self.buttonVeteran)
+        GameStateModel.instance().difficulty_level(DifficultyLevelEnum.VETERAN)
 
     def _init_btn_heroic(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
         box_size = (130, 48)
         self.buttonHeroic = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
                                     Text(pygame.font.SysFont('Arial', 20), text, color_text))
         self.sprite_grp.add(self.buttonHeroic)
+        GameStateModel.instance().difficulty_level(DifficultyLevelEnum.HEROIC)
 
     def _init_btn_back(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
         box_size = (130, 48)
