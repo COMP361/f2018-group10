@@ -6,11 +6,6 @@ import threading
 import logging
 import time
 
-from src.action_events.turn_events.choose_starting_position_event import ChooseStartingPositionEvent
-from src.action_events.turn_events.end_turn_event import EndTurnEvent
-from src.action_events.chat_event import ChatEvent
-from src.action_events.turn_events.chop_event import ChopEvent
-from src.action_events.turn_events.extinguish_event import ExtinguishEvent
 from src.core.custom_event import CustomEvent
 from src.core.serializer import JSONSerializer
 from src.core.event_queue import EventQueue
@@ -207,11 +202,6 @@ class Networking:
             Disconnects the current machine. If the current machine is a host, it ends the game as well.
             :return:
             """
-            if self.client is not None:
-                logger.info("Disconnecting client")
-                self.client.disconnect()
-                self.client.__del__()
-                self.client = None
             if self.host is not None:
                 logger.info("Disconnecting host")
                 # Kill the broadcast
@@ -225,22 +215,34 @@ class Networking:
                 self.host.disconnect()
                 self.host.__del__()
                 self.host = None
-            EventQueue.post(CustomEvent(ChangeSceneEnum.STARTSCENE))
+            if self.client is not None:
+                logger.info("Disconnecting client")
+                self.client.disconnect()
+                self.client.__del__()
+                self.client = None
 
-        def send_to_server(self, data, compress=True):
+        def send_to_server(self, data, compress=True, count: int = 0):
             """
             Send data to server
             :param data: data to be sent
             :param compress: compression, enabled by default
+            :param count: used for error handling
             :return:
             """
+            if count > 3:
+                # if retry more than 3 times, disconnect the client
+                self.client.callback_disconnect()
             if self.client is not None:
+                self.client.toggle_block_signal(True)
                 try:
-                    self.client.toggle_block_signal(True)
+                    print(f"Sending {data} to server")
                     self.client.send(data, compress)
-                    self.client.toggle_block_signal(False)
                 except MastermindErrorSocket as e:
                     raise MastermindErrorSocket(e)
+                except MastermindErrorClient:
+                    # retry
+                    self.send_to_server(data, compress, count+1)
+                self.client.toggle_block_signal(False)
             else:
                 raise MastermindErrorClient("Client is not available")
 
@@ -367,21 +369,19 @@ class Networking:
 
             print(f"Client at {connection_object.address} sent a message: {data.__class__}")
             if isinstance(data, TurnEvent) or isinstance(data, ActionEvent):
-                if isinstance(data, ChatEvent) or isinstance(data, EndTurnEvent) \
-                        or isinstance(data, ChooseStartingPositionEvent) or isinstance(data, ChopEvent) \
-                        or isinstance(data, ExtinguishEvent):
-                    Networking.get_instance().send_to_all_client(data)
-                    return super(MastermindServerUDP, self).callback_client_handle(connection_object, data)
-
-                data.execute()
-
                 if isinstance(data, DisconnectEvent):
                     # Kick the player that send the DC event and notify all other players.
                     # Need to have similar polling mechanics like in lobby
                     self.kick_client(connection_object.address[0])
+                    return super(MastermindServerUDP, self).callback_client_handle(connection_object, data)
 
                 if isinstance(data, JoinEvent):
+                    data.execute()
                     Networking.get_instance().send_to_all_client(GameStateModel.instance())
+                    return super(MastermindServerUDP, self).callback_client_handle(connection_object, data)
+
+                # send everything back to the clients to process
+                Networking.get_instance().send_to_all_client(data)
 
             return super(MastermindServerUDP, self).callback_client_handle(connection_object, data)
 
@@ -429,13 +429,9 @@ class Networking:
             :return:
             """
             self._pause_receive.set()
-            try:
-                super(MastermindClientUDP, self).send(JSONSerializer.serialize(data), compression)
-            except MastermindErrorClient:
-                self.callback_disconnect()
-            except MastermindErrorSocket:
-                self.callback_disconnect()
+            super(MastermindClientUDP, self).send(JSONSerializer.serialize(data), compression)
             self._pause_receive.clear()
+            return
 
         def receive_data_from_server(self):
             """
@@ -506,4 +502,5 @@ class Networking:
             """
             print("It seems that client is not connected...")
             Networking.get_instance().disconnect()
+            EventQueue.post(CustomEvent(ChangeSceneEnum.STARTSCENE))
 

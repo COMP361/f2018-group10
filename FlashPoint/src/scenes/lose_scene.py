@@ -28,8 +28,6 @@ class LoseScene(Scene):
         log_box = RectLabel(x_pos, y_pos, box_size[0], box_size[1], Color.GREEN)
         self.sprite_grp.add(log_box)
 
-
-
     def _init_title_text(self):
             box_size = (400, 40)
             self.text_title = RectButton(440, 350, box_size[0], box_size[1], "media/Win_Loose/LOST.png")

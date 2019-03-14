@@ -10,7 +10,7 @@ class VictimDead(pygame.sprite.Sprite):
         self.image = pygame.Surface([227, 88])
         self.font_name = pygame.font.SysFont('Arial', 23)
         self.font_other = pygame.font.SysFont('Arial', 25)
-        self.name = "Victims Dead: "
+        self.name = "Victims Lost: "
         self.current = str(2)
         self.max = str(4)
         self.slash = "/"

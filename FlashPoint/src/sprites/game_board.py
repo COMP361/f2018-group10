@@ -1,6 +1,7 @@
 import pygame
 
 import src.constants.main_constants as MainConst
+from src.UIComponents.rect_button import RectButton
 from src.action_events.fire_placement_event import FirePlacementEvent
 from src.UIComponents.file_importer import FileImporter
 from src.models.game_units.player_model import PlayerModel
@@ -31,11 +32,15 @@ class GameBoard(pygame.sprite.Group):
         return cls._instance
 
     def draw(self, screen: pygame.Surface):
-
         self.image.blit(self.background, (0, 0))
         self.grid.draw(self.image)
         for sprite in self:
             self.image.blit(sprite.image, sprite.rect)
+        for sprite in self.grid:
+            if isinstance(sprite, RectButton) and not sprite.enabled:
+                pass
+            else:
+                sprite.draw_menu(self.image)
         screen.blit(self.image, self.rect)
 
     def update(self, event_q: EventQueue):

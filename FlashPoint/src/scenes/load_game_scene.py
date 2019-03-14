@@ -3,7 +3,6 @@ from typing import List
 import pygame
 
 import src.constants.color as color
-import json
 
 from src.constants.state_enums import GameKindEnum
 from src.core.custom_event import CustomEvent

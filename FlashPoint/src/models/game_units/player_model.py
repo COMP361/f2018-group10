@@ -1,4 +1,4 @@
-from typing import Tuple, List
+from typing import Tuple, List, Union
 
 import src.constants.color as Color
 from src.models.game_board.null_model import NullModel
@@ -13,12 +13,12 @@ class PlayerModel(Model):
     def __init__(self, ip: str, nickname: str):
         super().__init__()
         self._ip = ip
-        self._row = 0
-        self._column = 0
+        self._row = -1
+        self._column = -1
         self._nickname = nickname
         self._color = Color.WHITE  # White by default (not racist I swear)
         self._status = PlayerStatusEnum.NOT_READY
-        self._ap = 4
+        self._ap = 0
         self._special_ap = 0
         self._wins = 0
         self._losses = 0
@@ -67,6 +67,10 @@ class PlayerModel(Model):
         for obs in self.observers:
             obs.player_losses_changed(self.losses)
 
+    def _notify_carry(self):
+        for obs in self.observers:
+            obs.player_carry_changed(self.carrying_victim)
+
     @property
     def observers(self) -> List[PlayerObserver]:
         return self._observers
@@ -81,12 +85,16 @@ class PlayerModel(Model):
         self._row = row
         self._column = column
         if isinstance(self.carrying_victim, VictimModel):
-            self.carrying_victim.set_position(row, column)
+            self.carrying_victim.set_pos(row, column)
         self._notify_position()
 
     @property
     def column(self) -> int:
         return self._column
+
+    @property
+    def has_pos(self) -> bool:
+        return (self.row >= 0) and (self.column >= 0)
 
     @property
     def ip(self) -> str:
@@ -158,10 +166,10 @@ class PlayerModel(Model):
         self._notify_status()
 
     @property
-    def carrying_victim(self) -> VictimModel:
+    def carrying_victim(self) -> Union[VictimModel, NullModel]:
         return self._carrying_victim
 
     @carrying_victim.setter
     def carrying_victim(self, victim: VictimModel):
         self._carrying_victim = victim
-        
+        self._notify_carry()

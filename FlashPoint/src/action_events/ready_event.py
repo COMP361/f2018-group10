@@ -13,8 +13,8 @@ class ReadyEvent(ActionEvent):
         self._ready = ready
 
     def execute(self):
-        with GameStateModel.lock:
-            if self._ready:
-                GameStateModel.instance().get_player_by_ip(self._player.ip).status = PlayerStatusEnum.READY
-            else:
-                GameStateModel.instance().get_player_by_ip(self._player.ip).status = PlayerStatusEnum.NOT_READY
+        print("Executing ReadyEvent")
+        if self._ready:
+            GameStateModel.instance().get_player_by_ip(self._player.ip).status = PlayerStatusEnum.READY
+        else:
+            GameStateModel.instance().get_player_by_ip(self._player.ip).status = PlayerStatusEnum.NOT_READY

@@ -19,6 +19,12 @@ from src.sprites.game_board import GameBoard
 
 class MoveController(PlayerObserver):
 
+    def player_carry_changed(self, carry):
+        GameStateModel.instance().game_board.reset_tiles_visit_count()
+        self.moveable_tiles = self._determine_reachable_tiles(
+            self.current_player.row, self.current_player.column, self.current_player.ap)
+        GameStateModel.instance().game_board.reset_tiles_visit_count()
+
     _instance = None
 
     def __init__(self, current_player: PlayerModel):
@@ -161,6 +167,7 @@ class MoveController(PlayerObserver):
     def _run_checks(self, tile_model: TileModel) -> bool:
         if self.current_player != GameStateModel.instance().players_turn:
             return False
+        # self._determine_reachable_tiles(self.current_player.row, self.current_player.column, self.current_player.ap)
         return tile_model in self.moveable_tiles
 
     def process_input(self, tile_sprite: TileSprite):
@@ -207,7 +214,6 @@ class MoveController(PlayerObserver):
         pass
 
     def player_position_changed(self, x_pos: int, y_pos: int):
-
         GameStateModel.instance().game_board.reset_tiles_visit_count()
         self.moveable_tiles = self._determine_reachable_tiles(
             self.current_player.row, self.current_player.column, self.current_player.ap)

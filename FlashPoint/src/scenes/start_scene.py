@@ -4,7 +4,13 @@ import pygame
 import os.path
 
 import src.constants.color as color
+from src.controllers.chop_controller import ChopController
+from src.controllers.door_controller import DoorController
+from src.controllers.tile_input_controller import TileInputController
 from src.models.game_state_model import GameStateModel
+from src.sprites.game_board import GameBoard
+
+from src.models.game_board.null_model import NullModel
 from src.core.custom_event import CustomEvent
 from src.core.networking import Networking
 from src.core.serializer import JSONSerializer
@@ -21,8 +27,6 @@ from src.constants.change_scene_enum import ChangeSceneEnum
 
 class StartScene(object):
     def __init__(self, screen):
-        if GameStateModel.instance():
-            GameStateModel.__del__()
         self.profiles = "media/profiles.json"
         self.resolution = (1280, 700)
         self.sprite_grp = pygame.sprite.Group()
@@ -34,8 +38,15 @@ class StartScene(object):
 
         self._init_btn_register(((self.resolution[0]/2)-(500/2))+400, 592, "Create Profile",
                                 color.STANDARDBTN, color.BLACK)
-
         self.update_profiles()
+
+        if GameStateModel.instance():
+            GameStateModel.__del__()
+        if GameBoard.instance():
+            GameBoard._instance = None
+            TileInputController.__del__()
+            ChopController._instance = None
+            DoorController._instance = None
 
     def _init_background(self):
         box_size = (self.resolution[0], self.resolution[1])
@@ -107,6 +118,10 @@ class StartScene(object):
             temp = json.load(myFile)
             for i, user in enumerate(temp):
                 player: PlayerModel = JSONSerializer.deserialize(user)
+                player.set_pos(-1, -1)
+                player.ap = 0
+                player.special_ap = 0
+                player.carrying_victim = NullModel()
                 self.profile.set_profile(
                     i, player.nickname, player.wins, player.losses, EventQueue.post,
                     CustomEvent(ChangeSceneEnum.HOSTJOINSCENE, player=player)

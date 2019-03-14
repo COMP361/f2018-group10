@@ -6,10 +6,7 @@ from src.core.event_queue import EventQueue
 from src.models.game_units.player_model import PlayerModel
 from src.UIComponents.rect_button import RectButton
 from src.UIComponents.rect_label import RectLabel
-from src.UIComponents.text import Text
 from src.UIComponents.scene import Scene
-from src.constants.change_scene_enum import ChangeSceneEnum
-from src.core.networking import Networking
 
 
 class WinScene(Scene):
