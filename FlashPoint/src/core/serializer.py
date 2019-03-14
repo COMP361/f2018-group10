@@ -191,7 +191,11 @@ class JSONSerializer(object):
     def _deserialize_end_turn_advance_fire_event(payload: Dict) -> EndTurnAdvanceFireEvent:
         red_dice: int = payload['red_dice']
         black_dice: int = payload['black_dice']
-        event = EndTurnAdvanceFireEvent(red_dice, black_dice)
+
+        poi_red_dice = payload['poi_red_dice']
+        poi_black_dice = payload['poi_black_dice']
+
+        event = EndTurnAdvanceFireEvent(red_dice, black_dice, poi_red_dice, poi_black_dice)
         board = GameStateModel.instance().game_board
         # board.set_adjacencies(board.get_tiles())
         return event

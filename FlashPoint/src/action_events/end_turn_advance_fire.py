@@ -15,7 +15,7 @@ from src.models.game_state_model import GameStateModel
 
 class EndTurnAdvanceFireEvent(TurnEvent):
 
-    def __init__(self, red_dice: int = None, black_dice: int = None):
+    def __init__(self, red_dice: int = None, black_dice: int = None, poi_red_dice=[], poi_black_dice=[]):
         super().__init__()
         self.player = GameStateModel.instance().players_turn
         self.game_state: GameStateModel = GameStateModel.instance()
@@ -23,6 +23,8 @@ class EndTurnAdvanceFireEvent(TurnEvent):
         self.initial_tile: TileModel = None
         self.red_dice = red_dice
         self.black_dice = black_dice
+        self.poi_red_dice = poi_red_dice
+        self.poi_black_dice = poi_black_dice
 
         # Pick random location: roll dice
         if not self.red_dice:
@@ -55,7 +57,7 @@ class EndTurnAdvanceFireEvent(TurnEvent):
             self.affect_damages()
 
             # ------ ReplenishPOI ------ #
-            rp_event = ReplenishPOIEvent()
+            rp_event = ReplenishPOIEvent(self.poi_red_dice, self.poi_black_dice)
             rp_event.execute()
 
             if self.player.ap > 4:
