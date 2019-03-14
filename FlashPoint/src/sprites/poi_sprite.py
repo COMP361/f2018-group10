@@ -35,12 +35,12 @@ class POISprite(pygame.sprite.Sprite, POIObserver):
                 print(victim_sprite.row, victim_sprite.column)
                 for group in self.groups():
                     group.add(victim_sprite)
-            elif self.poi_model.identity == POIIdentityEnum.FALSE_ALARM:
-                # Show the false alarm for a few seconds, then remove it.
-                false_alarm_sprite = FalseAlarmSprite(self.poi_model)
-                print(false_alarm_sprite.row, false_alarm_sprite.column)
-                for group in self.groups():
-                    group.add(false_alarm_sprite)
+            # elif self.poi_model.identity == POIIdentityEnum.FALSE_ALARM:
+            #     # Show the false alarm for a few seconds, then remove it.
+            #     false_alarm_sprite = FalseAlarmSprite(self.poi_model)
+            #     print(false_alarm_sprite.row, false_alarm_sprite.column)
+            #     for group in self.groups():
+            #         group.add(false_alarm_sprite)
         self.kill()
 
     def poi_position_changed(self, row: int, column: int):
