@@ -74,9 +74,7 @@ class GameBoardModel(Model):
             self._active_pois.remove(poi_or_victim)
             self._notify_active_poi()
 
-    def get_random_poi_from_bank(self, seed=0) -> POIModel:
-        if seed != 0:
-            random.seed(seed)
+    def get_random_poi_from_bank(self) -> POIModel:
         number = random.randint(0, len(self._poi_bank)-1)
         poi = self._poi_bank[number]
         return poi
@@ -244,24 +242,6 @@ class GameBoardModel(Model):
 
         for location in locations:
             self.get_tile_at(location[0], location[1]).space_status = SpaceStatusEnum.FIRE
-
-    def set_initial_poi_family(self):
-        """
-        Set active POI's and their positions for a family game.
-        Set all initial POIlocations for a family game.
-        Returns the locations that were randomly chosen for reuse in the PlacePOIEvent
-        """
-
-        # locations = [[2, 4], [5, 1], [5, 8]]
-        #
-        # for i in range(3):
-        #     poi = self.get_random_poi_from_bank()
-        #     # Location indices are inverted cause i wrote the list wrong lel
-        #     row = locations[i][0]
-        #     column = locations[i][1]
-        #     poi.set_pos(row, column)
-        #     self._active_pois.append(poi)
-        #     self.get_tile_at(row, column).add_associated_model(poi)
 
     def distance_between_tiles(self, first_tile: TileModel, second_tile: TileModel) -> int:
         return abs(first_tile.row - second_tile.row) + abs(first_tile.column - second_tile.column)

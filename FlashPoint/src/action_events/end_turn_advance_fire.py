@@ -1,5 +1,7 @@
 import random
+import time
 
+import src.constants.color as Color
 from src.action_events.knock_down_event import KnockDownEvent
 from src.action_events.replenish_poi_event import ReplenishPOIEvent
 from src.models.game_board.door_model import DoorModel
@@ -13,6 +15,7 @@ from src.constants.state_enums import GameStateEnum, SpaceStatusEnum, WallStatus
     SpaceKindEnum, POIIdentityEnum
 from src.action_events.turn_events.turn_event import TurnEvent
 from src.models.game_state_model import GameStateModel
+from src.sprites.game_board import GameBoard
 
 
 class EndTurnAdvanceFireEvent(TurnEvent):
@@ -31,8 +34,8 @@ class EndTurnAdvanceFireEvent(TurnEvent):
 
         # Pick random location: roll dice
 
-        self.red_dice = self.game_state.roll_red_dice(self.seed)
-        self.black_dice = self.game_state.roll_black_dice(self.seed)
+        self.red_dice = self.game_state.roll_red_dice()
+        self.black_dice = self.game_state.roll_black_dice()
         self.directions = ["North", "South", "East", "West"]
 
     def execute(self):
