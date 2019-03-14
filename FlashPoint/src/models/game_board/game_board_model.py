@@ -29,7 +29,6 @@ class GameBoardModel(Model):
         self._tiles = self._init_all_tiles_family_classic() if game_type == GameKindEnum.FAMILY else None
         self._poi_bank = GameBoardModel._init_pois()
         self._active_pois = []
-        # self.set_initial_poi_family()
 
     def _notify_active_poi(self):
         for obs in self.observers:
@@ -75,7 +74,9 @@ class GameBoardModel(Model):
             self._active_pois.remove(poi_or_victim)
             self._notify_active_poi()
 
-    def get_random_poi_from_bank(self) -> POIModel:
+    def get_random_poi_from_bank(self, seed=0) -> POIModel:
+        if seed != 0:
+            random.seed(seed)
         number = random.randint(0, len(self._poi_bank)-1)
         poi = self._poi_bank[number]
         return poi
@@ -88,7 +89,6 @@ class GameBoardModel(Model):
         self._poi_bank.remove(poi)
 
     def get_poi_from_bank_by_index(self, index: int) -> POIModel:
-        print(f"Getting poi at index: {index}")
         return self._poi_bank[index]
 
     @staticmethod

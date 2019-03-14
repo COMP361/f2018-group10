@@ -59,7 +59,6 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
             self.image.blit(self.bg, self.image.get_rect())
             self.image.blit(self.frame, self.image.get_rect())
             self.image.blit(self.text, self.image.get_rect().move(77, 7))
-            # screen.blit(self.image, self.image.get_rect().move(880, 600))
 
     def notify_player_index(self, player_index: int):
         for player in GameStateModel.instance().players:

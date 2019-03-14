@@ -1,5 +1,3 @@
-from random import seed
-
 from src.action_events.action_event import ActionEvent
 from src.constants.state_enums import SpaceStatusEnum, POIIdentityEnum, VictimStateEnum
 from src.models.game_state_model import GameStateModel
@@ -39,7 +37,7 @@ class ReplenishPOIEvent(ActionEvent):
             new_poi_row = self.game.roll_red_dice(self.seed)
             new_poi_column = self.game.roll_black_dice(self.seed)
             tile = self.board.get_tile_at(new_poi_row, new_poi_column)
-            new_poi = self.board.get_random_poi_from_bank()
+            new_poi = self.board.get_random_poi_from_bank(self.seed)
             print(f"Placing new poi on location: {new_poi_row}, {new_poi_column}")
             new_poi.set_pos(tile.row, tile.column)
 
