@@ -83,5 +83,5 @@ class ReplenishPOIEvent(ActionEvent):
                     print("POI was placed on a player and was a victim. It has been revealed.")
                 new_poi.reveal(new_victim)
             x += 1
-            self.game.game_board.active_pois.remove(new_poi)
+            self.game.game_board.poi_bank.remove(new_poi)
 
