@@ -17,7 +17,7 @@ class CharacterScene(Scene):
     def __init__(self, screen, current_player: PlayerModel):
         self.label_grp = pygame.sprite.Group()
         self._current_player = current_player
-        
+
         Scene.__init__(self, screen)
         self._init_background()
         self.create_label(0, 0, 100, 150)
@@ -51,7 +51,11 @@ class CharacterScene(Scene):
 
         self._init_title_text()
         self.buttonBack.on_click(EventQueue.post, CustomEvent(ChangeSceneEnum.LOBBYSCENE))
-        self.buttonConfirm.on_click(EventQueue.post, CustomEvent(ChangeSceneEnum.LOBBYSCENE))
+        self.buttonConfirm.on_click(self.confirm)
+
+    def confirm(self):
+        if not self._current_player.character == None:
+            EventQueue.post(CustomEvent(ChangeSceneEnum.LOBBYSCENE))
 
     def _init_background(self):
         box_size = (self.resolution[0], self.resolution[1])
@@ -66,7 +70,7 @@ class CharacterScene(Scene):
         box_size = (width, height)
         self.this_img = RectButton(x, y, box_size[0], box_size[1], path)
 
-        self.this_img.on_click(self.click_img, label)
+        self.this_img.on_click(self.click_img, label, path)
 
         self.sprite_grp.add(self.this_img)
 
@@ -92,10 +96,12 @@ class CharacterScene(Scene):
     def create_label(self, x_pos: int, y_pos: int, width: int, height: int):
         return RectLabel(x_pos - 15, y_pos - 15, width + 30, height + 30, Color.BLACK)
 
-    def click_img(self, btn):
+    def click_img(self, btn, path: str):
         for sprite in self.label_grp:
             if isinstance(sprite, RectLabel):
                 sprite.change_color(Color.BLACK)
 
         if isinstance(btn, RectLabel):
             btn.change_color(Color.WHITE)
+
+        self._current_player.character = path

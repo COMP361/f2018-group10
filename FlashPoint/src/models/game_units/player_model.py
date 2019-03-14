@@ -23,6 +23,7 @@ class PlayerModel(Model):
         self._wins = 0
         self._losses = 0
         self._carrying_victim = NullModel()
+        self.character: str = None
 
     def __eq__(self, other):
         x = [other.ip == self.ip, other.nickname == self.nickname]

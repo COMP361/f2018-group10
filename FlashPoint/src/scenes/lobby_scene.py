@@ -130,7 +130,11 @@ class LobbyScene(object):
         self.sprite_grp.add(self.this_img)
 
     def _init_background_player(self, rect):
-        user_box = RectLabel(rect[0], rect[1], rect[2], rect[3], "media/specialist_cards/family.png")
+
+        if self._current_player.character:
+            user_box = RectLabel(rect[0], rect[1], rect[2], rect[3], self._current_player.character)
+        else:
+            user_box = RectLabel(rect[0], rect[1], rect[2], rect[3], "media/specialist_cards/family.png")
         return user_box
 
     def _init_text_box(self, position, text, color):
