@@ -2,7 +2,6 @@ from src.constants.state_enums import GameStateEnum
 from src.core.event_queue import EventQueue
 from src.models.game_board.tile_model import TileModel
 from src.models.game_state_model import GameStateModel
-from src.models.game_units.player_model import PlayerModel
 from src.models.game_units.victim_model import VictimModel
 from src.sprites.tile_sprite import TileSprite
 

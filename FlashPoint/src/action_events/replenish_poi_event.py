@@ -39,7 +39,7 @@ class ReplenishPOIEvent(ActionEvent):
             new_poi_row = self.game.roll_red_dice(self.seed)
             new_poi_column = self.game.roll_black_dice(self.seed)
             tile = self.board.get_tile_at(new_poi_row, new_poi_column)
-            new_poi = self.board.get_random_poi_from_bank(self.seed)
+            new_poi = self.board.get_random_poi_from_bank()
             print(f"Placing new poi on location: {new_poi_row}, {new_poi_column}")
             new_poi.set_pos(tile.row, tile.column)
 

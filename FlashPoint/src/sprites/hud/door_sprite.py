@@ -4,10 +4,7 @@ import pygame
 import src.constants.color as Color
 from src.UIComponents.rect_button import RectButton
 from src.UIComponents.rect_label import RectLabel
-from src.action_events.turn_events.chop_event import ChopEvent
-from src.action_events.turn_events.close_door_event import CloseDoorEvent
-from src.action_events.turn_events.open_door_event import OpenDoorEvent
-from src.constants.state_enums import WallStatusEnum, DoorStatusEnum
+from src.constants.state_enums import DoorStatusEnum
 from src.models.game_board.door_model import DoorModel
 from src.models.game_board.tile_model import TileModel
 from src.models.game_state_model import GameStateModel
@@ -15,7 +12,6 @@ from src.models.game_units.player_model import PlayerModel
 from src.observers.door_observer import DoorObserver
 from src.sprites.tile_sprite import TileSprite
 from src.UIComponents.text import Text
-from src.action_events.turn_events.turn_event import TurnEvent
 
 
 class DoorSprite(pygame.sprite.Sprite, DoorObserver):
@@ -47,11 +43,11 @@ class DoorSprite(pygame.sprite.Sprite, DoorObserver):
                                        Color.BLACK, 0, Text(pygame.font.SysFont('Arial', 20), "Interact", Color.ORANGE))
         self.button_input.disable()
         self.menu_shown = False
-        # self.button_input.on_click(self.wall_chop)
 
     @property
     def direction(self) -> str:
         return self.id[2]
+
     @property
     def player(self) -> PlayerModel:
         return self._current_player
@@ -63,36 +59,6 @@ class DoorSprite(pygame.sprite.Sprite, DoorObserver):
     @button.setter
     def button(self, button):
         self._button = button
-
-    # def wall_chop(self):
-    #     self.button_input.disable()
-    #     print("Francisdadasdad")
-
-    def process_input(self):
-        # if self.check():
-        self.button_input.enable()
-
-    def check(self) -> bool:
-        valid_to_open_close = TurnEvent.has_required_AP(self.player.ap, 1)
-        if not valid_to_open_close:
-            return False
-
-        player_tile = self._game.game_board.get_tile_at(self.player.row, self.player.column)
-
-        if self.door_model not in player_tile.adjacent_edge_objects.values():
-            return False
-
-        door_status = self.door_model.door_status
-        if door_status == DoorStatusEnum.DESTROYED:
-            return False
-
-        return True
-
-    def instantiate_event(self):
-        if self.door_model.door_status == DoorStatusEnum.OPEN:
-            CloseDoorEvent(self.door_model, self.player).execute()
-        elif self.door_model.door_status == DoorStatusEnum.CLOSED:
-            OpenDoorEvent(self.door_model, self.player).execute()
 
     def update(self, event_queue):
         diff_x = self.tile_sprite.rect.x - self._prev_x

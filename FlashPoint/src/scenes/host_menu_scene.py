@@ -1,7 +1,7 @@
 import pygame
 
 import src.constants.color as Color
-from core.custom_event import CustomEvent
+from src.core.custom_event import CustomEvent
 from src.core.event_queue import EventQueue
 from src.models.game_units.player_model import PlayerModel
 from src.UIComponents.rect_button import RectButton

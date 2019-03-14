@@ -3,7 +3,6 @@ from typing import Tuple, List
 import pygame
 from src.UIComponents.file_importer import FileImporter
 from src.UIComponents.rect_button import RectButton
-from src.action_events.action_event import ActionEvent
 from src.models.game_state_model import GameStateModel
 from src.constants.state_enums import SpaceStatusEnum
 from src.UIComponents.interactable import Interactable
@@ -73,14 +72,6 @@ class TileSprite(Interactable, TileObserver):
     @highlight_color.setter
     def highlight_color(self, color: Tuple[int, int, int]):
         self._highlight_color = color
-        # hover = pygame.Surface(
-        #     (self._non_highlight_image.get_width(), self._non_highlight_image.get_height())).convert_alpha()
-        # if self._highlight_color:
-        #     hover.fill(self._highlight_color)
-        #     hover.set_alpha(10)
-        #     self.image.blit(hover, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
-        # else:
-        #     self.image.blit(self._non_highlight_image, (0, 0))
 
     def hover(self):
         if self._is_enabled:

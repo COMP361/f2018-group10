@@ -75,9 +75,7 @@ class GameBoardModel(Model):
             self._active_pois.remove(poi_or_victim)
             self._notify_active_poi()
 
-    def get_random_poi_from_bank(self, seed=0) -> POIModel:
-        if seed != 0:
-            random.seed(seed)
+    def get_random_poi_from_bank(self) -> POIModel:
         number = random.randint(0, len(self._poi_bank)-1)
         poi = self._poi_bank[number]
         return poi

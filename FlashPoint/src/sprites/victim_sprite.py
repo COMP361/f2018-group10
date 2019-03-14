@@ -27,9 +27,7 @@ class VictimSprite(pygame.sprite.Sprite, VictimObserver):
             self.kill()
 
     def victim_position_changed(self, row: int, column: int):
-        print(f"Victim pos changed {row} {column}")
         self.tile_sprite = GameBoard.instance().grid.grid[column][row]
-        print(f"{self.tile_sprite.row}, {self.tile_sprite.column}")
         self.row = row
         self.column = column
 

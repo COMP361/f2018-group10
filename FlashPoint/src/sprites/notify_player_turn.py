@@ -4,12 +4,12 @@ import time
 from threading import Thread
 
 import src.constants.color as Color
-from action_events.end_turn_advance_fire import EndTurnAdvanceFireEvent
+from src.action_events.end_turn_advance_fire import EndTurnAdvanceFireEvent
 from src.UIComponents.rect_label import RectLabel
 from src.UIComponents.rect_button import RectButton
 from src.core.event_queue import EventQueue
 from src.core.networking import Networking
-from constants.state_enums import GameStateEnum
+from src.constants.state_enums import GameStateEnum
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 from src.observers.game_state_observer import GameStateObserver
@@ -53,13 +53,6 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
         self.your_turn = None
 
         GameStateModel.instance().add_observer(self)
-
-    # def draw(self, screen: pygame.display):
-    #     if self.enabled and self._current_sprite.turn:
-    #         self.image.blit(self.bg, self.image.get_rect())
-    #         self.image.blit(self.frame, self.image.get_rect())
-    #         self.image.blit(self.text, self.image.get_rect().move(77, 7))
-    #         screen.blit(self.image, self.image.get_rect().move(880, 600))
 
     def update(self, event_queue:EventQueue):
         if self.enabled and self._current_sprite.turn:
