@@ -9,7 +9,7 @@ from src.models.game_board.null_model import NullModel
 from src.models.game_units.poi_model import POIModel
 from src.models.game_board.tile_model import TileModel
 from src.constants.state_enums import GameKindEnum, SpaceKindEnum, SpaceStatusEnum, POIIdentityEnum, \
-    DoorStatusEnum, POIStatusEnum, VictimStateEnum
+     DoorStatusEnum, POIStatusEnum, VictimStateEnum
 from src.models.game_board.wall_model import WallModel
 from src.models.game_board.door_model import DoorModel
 from src.models.game_units.victim_model import VictimModel
@@ -75,7 +75,9 @@ class GameBoardModel(Model):
             self._active_pois.remove(poi_or_victim)
             self._notify_active_poi()
 
-    def get_random_poi_from_bank(self) -> POIModel:
+    def get_random_poi_from_bank(self, seed=0) -> POIModel:
+        if seed != 0:
+            random.seed(seed)
         number = random.randint(0, len(self._poi_bank)-1)
         poi = self._poi_bank.pop(number)
         return poi
@@ -88,6 +90,7 @@ class GameBoardModel(Model):
         self._poi_bank.remove(poi)
 
     def get_poi_from_bank_by_index(self, index: int) -> POIModel:
+        print(f"Getting poi at index: {index}")
         return self._poi_bank[index]
 
     @staticmethod

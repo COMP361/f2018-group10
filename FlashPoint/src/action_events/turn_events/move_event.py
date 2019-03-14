@@ -124,6 +124,7 @@ class MoveEvent(TurnEvent):
                 self.destination = d_tile
 
     def execute(self):
+        print("Executing MoveEvent")
         # initialize the Dijkstra tiles
         self._init_dijkstra_tiles(self.destination)
         # Insert the Dijkstra tiles

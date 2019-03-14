@@ -3,8 +3,6 @@ from typing import List
 import pygame
 
 from src.action_events.turn_events.close_door_event import CloseDoorEvent
-from src.action_events.turn_events.extinguish_event import ExtinguishEvent
-from src.action_events.turn_events.move_event import MoveEvent
 from src.action_events.turn_events.open_door_event import OpenDoorEvent
 from src.action_events.turn_events.turn_event import TurnEvent
 from src.core.event_queue import EventQueue
@@ -85,7 +83,6 @@ class DoorController(object):
                 Networking.get_instance().send_to_all_client(event)
             else:
                 Networking.get_instance().send_to_server(event)
-
 
     def update(self, queue: EventQueue):
         if GameStateModel.instance().state != GameStateEnum.MAIN_GAME:

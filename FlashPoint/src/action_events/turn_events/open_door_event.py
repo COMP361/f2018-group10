@@ -1,7 +1,6 @@
 from src.action_events.turn_events.turn_event import TurnEvent
 from src.models.game_board.door_model import DoorModel
 from src.models.game_state_model import GameStateModel
-from src.models.game_units.player_model import PlayerModel
 
 
 class OpenDoorEvent(TurnEvent):
@@ -13,6 +12,7 @@ class OpenDoorEvent(TurnEvent):
         self.fireman = game.players_turn
 
     def execute(self):
+        print("Executing OpenDoorEvent")
         door = self.door
         fireman = self.fireman
         door.open_door()

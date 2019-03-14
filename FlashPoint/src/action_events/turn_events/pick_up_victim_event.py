@@ -1,5 +1,4 @@
 from src.action_events.turn_events.turn_event import TurnEvent
-from src.models.game_board.tile_model import TileModel
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 from src.models.game_units.victim_model import VictimModel
@@ -23,6 +22,6 @@ class PickupVictimEvent(TurnEvent):
     #### whether or not to show a pick up victim option
 
     def execute(self):
-        
+        print("Excecuting PickupVictimEvent")
         self.player.carrying_victim = self.victim
         self.victim_tile.remove_associated_model(self.victim_tile)

@@ -15,6 +15,7 @@ class DropVictimEvent(TurnEvent):
     #### whether or not to show a drop victim option
 
     def execute(self):
+        print("Executing Drop Victim Event")
         self.victim_tile.add_associated_model(self.player.carrying_victim)
 
         self.player.carrying_victim = NullModel()

@@ -64,6 +64,7 @@ class GameBoardScene(GameBoardObserver):
         self.chop_controller = ChopController(self._current_player)
         self.door_controller = DoorController(self._current_player)
         self._game.game_board.add_observer(self)
+
         self._game.game_board._notify_active_poi()
         if Networking.get_instance().is_host:
             GameStateModel.instance()._notify_player_index()
