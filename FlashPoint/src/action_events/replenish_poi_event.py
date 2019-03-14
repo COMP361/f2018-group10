@@ -10,12 +10,9 @@ from src.models.game_units.victim_model import VictimModel
 
 class ReplenishPOIEvent(ActionEvent):
 
-    def __init__(self, seed: int = 0):
+    def __init__(self, seed: int):
         super().__init__()
-        if seed == 0:
-            self.seed = random.seed(random.randint(0, 6969))
-        else:
-            self.seed = seed
+        self.seed = seed
         self.game: GameStateModel = GameStateModel.instance()
         self.board = self.game.game_board
 
