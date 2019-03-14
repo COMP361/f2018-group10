@@ -13,6 +13,7 @@ class SetInitialPOIFamilyEvent(ActionEvent):
         else:
             self.seed = seed
 
+        random.seed(self.seed)
         self.rand_nums = random.sample(range(0, len(self.game_state.game_board.poi_bank)-1), 3)
 
     def execute(self, *args, **kwargs):
