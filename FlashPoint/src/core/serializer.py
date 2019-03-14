@@ -205,10 +205,8 @@ class JSONSerializer(object):
 
     @staticmethod
     def _deserialize_set_initial_poi_family_event(payload: Dict) -> SetInitialPOIFamilyEvent:
-        random_num1 = payload['random_num1']
-        random_num2 = payload['random_num2']
-        random_num3 = payload['random_num3']
-        return SetInitialPOIFamilyEvent(random_num1, random_num2, random_num3)
+        seed = payload['seed']
+        return SetInitialPOIFamilyEvent(seed)
 
     @staticmethod
     def deserialize(payload: Dict) -> object:
