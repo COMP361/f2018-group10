@@ -34,6 +34,7 @@ class ExtinguishController(object):
         valid_to_extinguish = tile_model == player_tile or tile_model == player_tile.north_tile \
                               or tile_model == player_tile.east_tile or tile_model == player_tile.west_tile \
                               or tile_model == player_tile.south_tile
+
         if not valid_to_extinguish:
             return False
 

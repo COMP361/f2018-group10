@@ -110,7 +110,7 @@ class JSONSerializer(object):
     def _deserialize_choose_position_event(payload: Dict):
         tile_dict = payload['tile']
         tile: TileModel = GameStateModel.instance().game_board.get_tile_at(tile_dict['_row'], tile_dict['_column'])
-        GameStateModel.instance().game_board.set_single_tile_adjacencies(tile)
+        # GameStateModel.instance().game_board.set_single_tile_adjacencies(tile)
         event = ChooseStartingPositionEvent(tile)
         return event
 
