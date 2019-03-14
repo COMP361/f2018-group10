@@ -16,6 +16,7 @@ class ReplenishPOIEvent(ActionEvent):
     # the POIs should be replenished or not
     def check(self):
         num_active_pois = len(self.board.active_pois)
+        print(f"I have {num_active_pois} pois")
         if num_active_pois >= 3:
             return False
 
@@ -28,7 +29,9 @@ class ReplenishPOIEvent(ActionEvent):
 
         print("Going to replenish")
         num_pois_to_add = 3 - len(self.board.active_pois)
-        for x in range(num_pois_to_add):
+        x = 0
+        while x < num_pois_to_add and len(self.board.poi_bank) > 0:
+
             new_poi_row = self.game.roll_red_dice()
             new_poi_column = self.game.roll_black_dice()
             tile = self.board.get_tile_at(new_poi_row, new_poi_column)
@@ -41,7 +44,6 @@ class ReplenishPOIEvent(ActionEvent):
             do_reroll = False
             for assoc_model in tile.associated_models:
                 if isinstance(assoc_model, POIModel) or isinstance(assoc_model, VictimModel):
-                    x -= 1
                     do_reroll = True
                     break
 
@@ -76,3 +78,4 @@ class ReplenishPOIEvent(ActionEvent):
                     self.game.game_board.add_poi_or_victim(new_victim)
                     print("Victim added")
                 new_poi.reveal(new_victim)
+            x += 1

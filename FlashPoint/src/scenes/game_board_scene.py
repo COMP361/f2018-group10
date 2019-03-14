@@ -70,7 +70,6 @@ class GameBoardScene(GameBoardObserver):
             GameStateModel.instance()._notify_player_index()
 
     def notify_active_poi(self, active_pois: List[POIModel]):
-        print("Active poi notified")
         # Removes are already handled by the sprites themselves, therefore only need to deal with adds.
         for sprite in self.game_board_sprite:
             if isinstance(sprite, POISprite) or isinstance(sprite, VictimSprite):

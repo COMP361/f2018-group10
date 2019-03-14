@@ -47,7 +47,7 @@ class JSONSerializer(object):
         else:
             game = GameStateModel.instance()
 
-        game.game_board.set_adjacencies(game.game_board.get_tiles())
+        # game.game_board.set_adjacencies(game.game_board.get_tiles())
         for player in [x for x in payload['_players'] if x['_ip'] != host.ip]:
             player_obj: PlayerModel = JSONSerializer.deserialize(player)
             if player_obj not in game.players:
@@ -126,14 +126,14 @@ class JSONSerializer(object):
             moveable_tiles.append(tile_model)
 
         destination_model: TileModel = game_board.get_tile_at(destination['_row'], destination['_column'])
-        game_board.set_adjacencies(game_board.get_tiles())
+        # game_board.set_adjacencies(game_board.get_tiles())
         event = MoveEvent(destination_model, moveable_tiles)
         return event
 
     @staticmethod
     def _deserialize_tile(payload: Dict) -> TileModel:
         tile: TileModel = TileModel(payload['_row'], payload['_column'], payload['_space_kind'])
-        GameStateModel.instance().game_board.set_single_tile_adjacencies(tile)
+        # GameStateModel.instance().game_board.set_single_tile_adjacencies(tile)
         return tile
 
     @staticmethod
@@ -160,7 +160,7 @@ class JSONSerializer(object):
 
         tile_dict = payload['extinguish_space']
         tile: TileModel = GameStateModel.instance().game_board.get_tile_at(tile_dict['_row'], tile_dict['_column'])
-        GameStateModel.instance().game_board.set_single_tile_adjacencies(tile)
+        # GameStateModel.instance().game_board.set_single_tile_adjacencies(tile)
         return ExtinguishEvent(tile)
 
     @staticmethod
@@ -183,8 +183,8 @@ class JSONSerializer(object):
         red_dice: int = payload['red_dice']
         black_dice: int = payload['black_dice']
         event = AdvanceFireEvent(red_dice, black_dice)
-        board = GameStateModel.instance().game_board
-        board.set_adjacencies(board.get_tiles())
+        # board = GameStateModel.instance().game_board
+        # board.set_adjacencies(board.get_tiles())
         return event
 
     @staticmethod
@@ -193,7 +193,7 @@ class JSONSerializer(object):
         black_dice: int = payload['black_dice']
         event = EndTurnAdvanceFireEvent(red_dice, black_dice)
         board = GameStateModel.instance().game_board
-        board.set_adjacencies(board.get_tiles())
+        # board.set_adjacencies(board.get_tiles())
         return event
 
     @staticmethod

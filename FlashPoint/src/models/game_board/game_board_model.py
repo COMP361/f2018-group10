@@ -81,6 +81,13 @@ class GameBoardModel(Model):
         poi = self._poi_bank.pop(number)
         return poi
 
+    @property
+    def poi_bank(self) -> List[POIModel]:
+        return self._poi_bank
+
+    def remove_from_poi_bank(self, poi: POIModel):
+        self._poi_bank.remove(poi)
+
     def get_poi_from_bank_by_index(self, index: int) -> POIModel:
         return self._poi_bank[index]
 
@@ -190,6 +197,8 @@ class GameBoardModel(Model):
                 extended_grid[i][j].east_tile = extended_grid[i][j + 1]
                 extended_grid[i][j].west_tile = extended_grid[i][j - 1]
                 extended_grid[i][j].south_tile = extended_grid[i + 1][j]
+
+        print("hello")
 
     def set_single_tile_adjacencies(self, tile: TileModel):
         # set north tile
