@@ -79,10 +79,10 @@ class CharacterScene(Scene):
         else:
             event = SelectCharacterEvent(self._current_player,self.role)
             if self._current_player.ip == GameStateModel.instance().host.ip:
-                event.execute()
                 Networking.get_instance().send_to_all_client(event)
             else:
-                Networking.get_instance().client.send(event)
+                Networking.get_instance().send_to_server(event)
+
 
             EventQueue.post(CustomEvent(ChangeSceneEnum.LOBBYSCENE))
 
