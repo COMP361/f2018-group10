@@ -236,12 +236,6 @@ class GameStateModel(Model):
     def state(self, game_state: GameStateEnum):
         self._state = game_state
         self._notify_state()
-        if self._state == GameStateEnum.LOST:
-            # TODO: More stuff here for what is supposed to happen when the game is lost.
-            pass
-        elif self._state == GameStateEnum.WON:
-            # TODO: More stuff here for what is supposed to happen when the game is won.
-            pass
 
     def game_lost(self):
         self._state = GameStateEnum.LOST

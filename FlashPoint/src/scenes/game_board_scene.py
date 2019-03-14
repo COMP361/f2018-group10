@@ -6,6 +6,7 @@ import pygame
 from src.action_events.turn_events.move_event import MoveEvent
 from src.controllers.chop_controller import ChopController
 from src.controllers.move_controller import MoveController
+from src.controllers.win_lose_controller import WinLoseController
 from src.sprites.poi_sprite import POISprite
 from src.controllers.tile_input_controller import TileInputController
 from src.constants.change_scene_enum import ChangeSceneEnum
@@ -52,6 +53,7 @@ class GameBoardScene(object):
         self.chat_box = ChatBox(self._current_player)
         self.menu = None
         self._init_sprites()
+
         self.tile_input_controller = TileInputController(self._current_player)
         self.chop_controller = ChopController(self._current_player)
         for poi in self._game.game_board.active_pois:
@@ -60,6 +62,7 @@ class GameBoardScene(object):
 
         if Networking.get_instance().is_host:
             GameStateModel.instance()._notify_player_index()
+            self.state_controller = WinLoseController()
 
         GameStateModel.instance().game_board.notify_all_observers()
 

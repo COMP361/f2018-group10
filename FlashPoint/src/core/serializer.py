@@ -2,6 +2,7 @@ import enum
 import json
 from typing import Dict, List
 
+from src.action_events.end_game_event import EndGameEvent
 from src.action_events.turn_events.chop_event import ChopEvent
 from src.action_events.turn_events.extinguish_event import ExtinguishEvent
 from src.action_events.turn_events.move_event import MoveEvent
@@ -20,6 +21,7 @@ from src.action_events.dummy_event import DummyEvent
 from src.action_events.join_event import JoinEvent
 from src.constants.state_enums import DifficultyLevelEnum, GameKindEnum, PlayerStatusEnum, WallStatusEnum, \
     DoorStatusEnum, SpaceKindEnum
+from src.constants.state_enums import DifficultyLevelEnum, GameKindEnum, PlayerStatusEnum, WallStatusEnum, GameStateEnum
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 from src.sprites.hud.player_state import PlayerState
@@ -109,6 +111,10 @@ class JSONSerializer(object):
         message = payload['_message']
         sender = payload['_sender']
         return ChatEvent(message, sender)
+
+    def _deserialize_end_game_event(payload:Dict) -> EndGameEvent:
+        state = GameStateEnum(payload['_state']['value'])
+        return EndGameEvent(state)
 
     @staticmethod
     def _deserialize_ready_event(payload: Dict) -> ReadyEvent:
@@ -216,6 +222,8 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_ready_event(payload)
         elif object_type == StartGameEvent.__name__:
             return StartGameEvent()
+        elif object_type == EndGameEvent.__name__:
+            return JSONSerializer._deserialize_end_game_event(payload)
         elif object_type == EndTurnEvent.__name__:
             return JSONSerializer._deserialize_end_turn_event(payload)
         elif object_type == ChooseStartingPositionEvent.__name__:

@@ -1,6 +1,6 @@
 import pygame
 import src.constants.color as Color
-from constants.state_enums import GameStateEnum
+from src.constants.state_enums import GameStateEnum
 from src.core.event_queue import EventQueue
 from src.models.game_state_model import GameStateModel
 from src.observers.game_state_observer import GameStateObserver
