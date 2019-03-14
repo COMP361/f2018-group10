@@ -16,6 +16,8 @@ class POIModel(Model):
         self._column = -7
         
     def __eq__(self, other):
+        if not isinstance(other, POIModel):
+            return False
         return all([self.row == other.row, self.column==other.column, self.identity == other.identity, self.status == other.status])
 
     def reveal(self, victim_model: VictimModel):

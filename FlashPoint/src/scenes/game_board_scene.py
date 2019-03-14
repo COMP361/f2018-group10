@@ -187,8 +187,6 @@ class GameBoardScene(GameBoardObserver):
         return ignore
 
     def set_initial_poi_family(self):
-        event = SetInitialPOIFamilyEvent()
         if Networking.get_instance().is_host:
+            event = SetInitialPOIFamilyEvent()
             Networking.get_instance().send_to_all_client(event)
-        else:
-            Networking.get_instance().send_to_server(event)
