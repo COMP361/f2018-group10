@@ -1,3 +1,5 @@
+import json
+
 from src.action_events.action_event import ActionEvent
 from src.constants.change_scene_enum import ChangeSceneEnum
 from src.constants.state_enums import GameStateEnum, PlayerStatusEnum
@@ -19,10 +21,20 @@ class EndGameEvent(ActionEvent):
 
         state_model = GameStateModel.instance()
         players = state_model.players
+        profiles = "media/profiles.json"
 
         if self._state == GameStateEnum.LOST:
             for player in players:
-                player.losses += 1
+
+                with open(profiles, mode='r+', encoding='utf-8') as file:
+                    temp = json.load(file)
+                    file.seek(0)
+                    file.truncate()
+                    for user in temp:
+                        if user['_nickname'] == player.nickname:
+                            losses = user['_losses']
+                            user['_losses'] = losses + 1
+                    json.dump(temp,file)
                 player.status = PlayerStatusEnum.NOT_READY
 
             EventQueue.block()
@@ -30,7 +42,16 @@ class EndGameEvent(ActionEvent):
 
         else:
             for player in players:
-                player.wins += 1
+
+                with open(profiles, mode='r+', encoding='utf-8') as file:
+                    temp = json.load(file)
+                    file.seek(0)
+                    file.truncate()
+                    for user in temp:
+                        if user['_nickname'] == player.nickname:
+                            wins = user['_wins']
+                            user['_wins'] = wins + 1
+                    json.dump(temp,file)
                 player.status = PlayerStatusEnum.NOT_READY
 
             EventQueue.block()

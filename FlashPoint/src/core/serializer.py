@@ -20,8 +20,7 @@ from src.action_events.chat_event import ChatEvent
 from src.action_events.dummy_event import DummyEvent
 from src.action_events.join_event import JoinEvent
 from src.constants.state_enums import DifficultyLevelEnum, GameKindEnum, PlayerStatusEnum, WallStatusEnum, \
-    DoorStatusEnum, SpaceKindEnum
-from src.constants.state_enums import DifficultyLevelEnum, GameKindEnum, PlayerStatusEnum, WallStatusEnum, GameStateEnum
+    DoorStatusEnum, SpaceKindEnum,GameStateEnum
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 from src.sprites.hud.player_state import PlayerState
