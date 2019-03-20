@@ -51,7 +51,7 @@ class JSONSerializer(object):
             if player_obj not in game.players:
                 game.add_player(player_obj)
 
-        if rules == GameKindEnum.RECRUIT:
+        if rules == GameKindEnum.EXPERIENCED:
             game.difficulty_level = DifficultyLevelEnum(payload['_difficulty_level']['value'])
 
         game.players_turn = payload['_players_turn_index']
