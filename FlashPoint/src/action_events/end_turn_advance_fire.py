@@ -28,12 +28,13 @@ class EndTurnAdvanceFireEvent(TurnEvent):
         self.initial_tile: TileModel = None
 
         if seed == 0:
-            self.seed = random.randint(0, 6969)
+            self.seed = random.randint(1, 6969)
         else:
             self.seed = seed
 
         # Pick random location: roll dice
         random.seed(self.seed)
+
         self.red_dice = self.game_state.roll_red_dice()
         self.black_dice = self.game_state.roll_black_dice()
         self.directions = ["North", "South", "East", "West"]
