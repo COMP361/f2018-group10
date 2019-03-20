@@ -1,4 +1,5 @@
 import pygame
+import time
 
 import src.constants.color as Color
 from src.constants.state_enums import PlayerRoleEnum
@@ -21,6 +22,7 @@ class CharacterScene(Scene):
 
         Scene.__init__(self, screen)
         self._init_background()
+
         self.create_label(0, 0, 100, 150)
         self.create_butn_img(250, 150, 99, 150,
                              "media/specialist_cards/cafs_firefighter.png", 1)
@@ -51,19 +53,31 @@ class CharacterScene(Scene):
         self._init_btn_confirm(1050, 575, "Confirm", Color.STANDARDBTN, Color.BLACK)
 
         self._init_title_text()
+        self.character_enum: str = None
         self.buttonBack.on_click(EventQueue.post, CustomEvent(ChangeSceneEnum.LOBBYSCENE))
         self.buttonConfirm.on_click(self.confirm)
 
     def confirm(self):
-        if not self._current_player.character == None:
+
+        if not self.character_enum == None:
+
+            self._current_player.character = self.character_enum
             EventQueue.post(CustomEvent(ChangeSceneEnum.LOBBYSCENE))
+            
+        # else:
+        #     error_label: RectLabel = RectLabel(300, 150, 500, 150, Color.BLACK, 0,
+        #                             Text(pygame.font.SysFont('Arial', 45), "Please select a character", Color.RED))
+        #     self.sprite_grp.add(error_label)
+        #     time.sleep(2)
+        #     self.sprite_grp.remove_internal(error_label)
+
 
     def _init_background(self):
         box_size = (self.resolution[0], self.resolution[1])
         background_box = RectLabel(0, 0, box_size[0], box_size[1], "media/backgrounds/flashpoint_background.png")
         self.sprite_grp.add(background_box)
 
-    def create_butn_img(self, x, y, width, height, path: str,  count: int):
+    def create_butn_img(self, x, y, width, height, path: str, count: int):
         label = self.create_label(x, y, width, height)
         self.label_grp.add(label)
         self.sprite_grp.add(label)
@@ -123,6 +137,7 @@ class CharacterScene(Scene):
         return RectLabel(x_pos - 15, y_pos - 15, width + 30, height + 30, Color.BLACK)
 
     def click_img(self, btn, enum: PlayerRoleEnum):
+
         for sprite in self.label_grp:
             if isinstance(sprite, RectLabel):
                 sprite.change_color(Color.BLACK)
@@ -130,4 +145,4 @@ class CharacterScene(Scene):
         if isinstance(btn, RectLabel):
             btn.change_color(Color.WHITE)
 
-        self._current_player.character = enum
+        self.character_enum = enum
