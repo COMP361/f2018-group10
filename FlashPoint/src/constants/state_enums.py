@@ -81,3 +81,15 @@ class WallStatusEnum(Enum):
     INTACT = auto()
     DAMAGED = auto()
     DESTROYED = auto()
+
+
+class PlayerRoleEnum(Enum):
+    CAFS = auto()
+    DRIVER = auto()
+    FAMILY = auto()
+    CAPTAIN = auto()
+    GENERALIST = auto()
+    HAZMAT = auto()
+    IMAGING = auto()
+    PARAMEDIC = auto()
+    RESCUE = auto()

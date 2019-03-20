@@ -2,12 +2,13 @@ import pygame
 import time
 
 import src.constants.color as Color
+from src.constants.state_enums import PlayerRoleEnum
 from src.core.custom_event import CustomEvent
 from src.core.event_queue import EventQueue
 
 from src.UIComponents.rect_button import RectButton
 from src.UIComponents.rect_label import RectLabel
-
+from src.models.game_state_model import GameStateModel
 from src.UIComponents.scene import Scene
 from src.UIComponents.text import Text
 from src.models.game_units.player_model import PlayerModel
@@ -18,34 +19,34 @@ class CharacterScene(Scene):
     def __init__(self, screen, current_player: PlayerModel):
         self.label_grp = pygame.sprite.Group()
         self._current_player = current_player
-        
+
         Scene.__init__(self, screen)
         self._init_background()
 
         self.create_label(0, 0, 100, 150)
         self.create_butn_img(250, 150, 99, 150,
-                             "media/specialist_cards/cafs_firefighter.png")
+                             "media/specialist_cards/cafs_firefighter.png", 1)
 
         self.create_butn_img(450, 150, 100, 150,
-                             "media/specialist_cards/driver_operator.png")
+                             "media/specialist_cards/driver_operator.png", 2)
 
         self.create_butn_img(650, 150, 100, 150,
-                             "media/specialist_cards/fire_captain.png")
+                             "media/specialist_cards/fire_captain.png", 3)
 
         self.create_butn_img(850, 150, 99, 150,
-                             "media/specialist_cards/generalist.png")
+                             "media/specialist_cards/generalist.png", 4)
 
         self.create_butn_img(250, 450, 100, 150,
-                             "media/specialist_cards/hazmat_technician.png")
+                             "media/specialist_cards/hazmat_technician.png", 5)
 
         self.create_butn_img(450, 450, 99, 150,
-                             "media/specialist_cards/imaging_technician.png")
+                             "media/specialist_cards/imaging_technician.png", 6)
 
         self.create_butn_img(650, 450, 99, 150,
-                             "media/specialist_cards/paramedic.png")
+                             "media/specialist_cards/paramedic.png", 7)
 
         self.create_butn_img(850, 450, 98, 150,
-                             "media/specialist_cards/rescue_specialist.png")
+                             "media/specialist_cards/rescue_specialist.png", 8)
 
         self._init_btn_back(20, 20, "Back", Color.STANDARDBTN, Color.BLACK)
 
@@ -54,22 +55,20 @@ class CharacterScene(Scene):
         self._init_title_text()
         self.character_enum: str = None
         self.buttonBack.on_click(EventQueue.post, CustomEvent(ChangeSceneEnum.LOBBYSCENE))
-        self.buttonConfirm.on_click(EventQueue.post, CustomEvent(ChangeSceneEnum.LOBBYSCENE))
+        self.buttonConfirm.on_click(self.confirm)
 
     def confirm(self):
 
         if not self.character_enum == None:
-
             self._current_player.character = self.character_enum
             EventQueue.post(CustomEvent(ChangeSceneEnum.LOBBYSCENE))
-            
+
         # else:
         #     error_label: RectLabel = RectLabel(300, 150, 500, 150, Color.BLACK, 0,
         #                             Text(pygame.font.SysFont('Arial', 45), "Please select a character", Color.RED))
         #     self.sprite_grp.add(error_label)
         #     time.sleep(2)
         #     self.sprite_grp.remove_internal(error_label)
-
 
     def _init_background(self):
         box_size = (self.resolution[0], self.resolution[1])
@@ -84,7 +83,32 @@ class CharacterScene(Scene):
         box_size = (width, height)
         self.this_img = RectButton(x, y, box_size[0], box_size[1], path)
 
-        self.this_img.on_click(self.click_img, label)
+        role: PlayerRoleEnum = None
+        if count == 1:
+            role = PlayerRoleEnum.CAFS
+
+        elif count == 2:
+            role = PlayerRoleEnum.DRIVER
+
+        elif count == 3:
+            role = PlayerRoleEnum.CAPTAIN
+
+        elif count == 4:
+            role = PlayerRoleEnum.GENERALIST
+
+        elif count == 5:
+            role = PlayerRoleEnum.HAZMAT
+
+        elif count == 6:
+            role = PlayerRoleEnum.IMAGING
+
+        elif count == 7:
+            role = PlayerRoleEnum.PARAMEDIC
+
+        else:
+            role = PlayerRoleEnum.RESCUE
+
+        self.this_img.on_click(self.click_img, label, role)
 
         self.sprite_grp.add(self.this_img)
 
