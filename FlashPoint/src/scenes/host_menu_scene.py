@@ -1,7 +1,7 @@
 import pygame
 
 import src.constants.color as Color
-from core.custom_event import CustomEvent
+from src.core.custom_event import CustomEvent
 from src.core.event_queue import EventQueue
 from src.models.game_units.player_model import PlayerModel
 from src.UIComponents.rect_button import RectButton
@@ -24,7 +24,11 @@ class HostMenuScene(Scene):
 
         self.buttonNewGame.on_click(EventQueue.post, CustomEvent(ChangeSceneEnum.CREATEGAMEMENU))
         self.buttonLogin.on_click(EventQueue.post, CustomEvent(ChangeSceneEnum.LOADGAME))
-        self.buttonBack.on_click(Networking.get_instance().disconnect)
+        self.buttonBack.on_click(self.go_back)
+
+    def go_back(self):
+        Networking.get_instance().disconnect()
+        EventQueue.post(CustomEvent(ChangeSceneEnum.STARTSCENE))
 
     def _init_background(self):
         box_size = (self.resolution[0], self.resolution[1])

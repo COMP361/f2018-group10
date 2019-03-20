@@ -30,6 +30,8 @@ class ChopController(object):
         return cls._instance
 
     def check(self, wall: WallModel) -> bool:
+        if not self.current_player == self.game.players_turn:
+            return False
 
         valid_to_chop = TurnEvent.has_required_AP(self.current_player.ap, 2)
         if not valid_to_chop:
@@ -57,7 +59,6 @@ class ChopController(object):
         if not self.check(wall_model):
             wall_sprite.disable_chop()
             self.chop_able = False
-            print("Check failed")
             return
 
         self.chop_able = True
@@ -76,7 +77,7 @@ class ChopController(object):
         if Networking.get_instance().is_host:
             Networking.get_instance().send_to_all_client(event)
         else:
-            Networking.get_instance().client.send(event)
+            Networking.get_instance().send_to_server(event)
 
     def update(self, event_queue: EventQueue):
         if GameStateModel.instance().state != GameStateEnum.MAIN_GAME:

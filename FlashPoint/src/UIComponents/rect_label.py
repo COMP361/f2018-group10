@@ -63,7 +63,6 @@ class RectLabel(pygame.sprite.Sprite, Components):
             image_file = pygame.transform.scale(image_file, (self.width, self.height))
             self.image.blit(image_file, (0, 0))
 
-
         self.rect.x = self.x
         self.rect.y = self.y
 

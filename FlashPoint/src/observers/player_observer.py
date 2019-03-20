@@ -33,3 +33,7 @@ class PlayerObserver(Observer, ABC):
     @abstractmethod
     def player_losses_changed(self, losses: int):
         pass
+
+    @abstractmethod
+    def player_carry_changed(self, carry):
+        pass

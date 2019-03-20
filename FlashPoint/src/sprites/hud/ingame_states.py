@@ -1,12 +1,12 @@
 import pygame
 import src.constants.color as Color
-from constants.state_enums import GameStateEnum
+from src.constants.state_enums import GameStateEnum
 from src.core.event_queue import EventQueue
 from src.models.game_state_model import GameStateModel
 from src.observers.game_state_observer import GameStateObserver
 
 
-class InGameStates(pygame.sprite.Sprite,GameStateObserver):
+class InGameStates(pygame.sprite.Sprite, GameStateObserver):
 
     def notify_game_state(self, game_state: GameStateEnum):
         pass
@@ -23,8 +23,8 @@ class InGameStates(pygame.sprite.Sprite,GameStateObserver):
         self.frame = pygame.transform.scale(self.frame, (880, 50))
 
         self.damage_str = f"Damage: {current_damage}/24"
-        self.victims_dead_str = f"Victims Dead: {victims_dead}/7"
-        self.victims_saved_str = f"Victims Saved: {victims_saved}/4"
+        self.victims_dead_str = f"Victims Lost: {victims_dead}/4"
+        self.victims_saved_str = f"Victims Saved: {victims_saved}/7"
         self.damage = self.font.render(self.damage_str, True, Color.WHITE)
         self.victims_dead = self.font.render(self.victims_dead_str, True, Color.WHITE)
         self.victims_saved = self.font.render(self.victims_saved_str, True, Color.WHITE)
@@ -49,17 +49,13 @@ class InGameStates(pygame.sprite.Sprite,GameStateObserver):
         self.damage_str = f"Damage: {new_damage}/24"
         self.damage = self.font.render(self.damage_str, True, Color.WHITE)
 
-
     def saved_victims(self, victims_saved: int):
-        self.victims_saved_str = f"Victims Saved: {victims_saved}/4"
+        self.victims_saved_str = f"Victims Saved: {victims_saved}/7"
         self.victims_saved = self.font.render(self.victims_saved_str, True, Color.WHITE)
 
-
     def dead_victims(self, victims_dead: int):
-        self.victims_dead_str = f"Victims Dead: {victims_dead}/7"
+        self.victims_dead_str = f"Victims Lost: {victims_dead}/4"
         self.victims_dead = self.font.render(self.victims_dead_str, True, Color.WHITE)
 
     def notify_player_index(self, player_index: int):
         pass
-
-

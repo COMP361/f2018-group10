@@ -8,7 +8,7 @@ class POIObserver(Observer):
     """Base class for getting changes regarding a POI model."""
 
     @abstractmethod
-    def poi_status_changed(self, status: POIStatusEnum):
+    def poi_status_changed(self, status: POIStatusEnum, victim):
         pass
 
     @abstractmethod
