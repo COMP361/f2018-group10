@@ -15,7 +15,7 @@ from src.models.game_board.door_model import DoorModel
 from src.models.game_units.victim_model import VictimModel
 
 
-class GameBoardModel(object):
+class GameBoardModel(Model):
     """
     Class for aggregating all objects related to the game board itself, this means TileModels, PlayerModels
     etc. This class is created inside of GameStateModel.
