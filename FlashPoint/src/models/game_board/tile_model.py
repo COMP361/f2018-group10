@@ -21,7 +21,6 @@ class TileModel(Model):
         self._space_kind = space_kind
         self._space_status = SpaceStatusEnum.SAFE
         self._is_hotspot = False
-        self._has_hazmat = False
         self._associated_models = []
         self._visit_count = 0
 
@@ -39,12 +38,6 @@ class TileModel(Model):
             "South": NullModel(),
         }
 
-    def set_hazmat(self):
-        self._has_hazmat = True
-
-    def hot_spot(self):
-        self._is_hotspot = True
-
     def __str__(self):
         tile_pos = "Tile at: ({row}, {column})".format(row=self.row, column=self.column)
         tile_state = "Space status: {status}".format(status=self.space_status)
@@ -58,10 +51,6 @@ class TileModel(Model):
     def _notify_assoc_models(self):
         for obs in self.observers:
             obs.tile_assoc_models_changed(self.associated_models)
-
-    @property
-    def hazmat(self) -> bool:
-        return self._has_hazmat
 
     @property
     def observers(self) -> List[TileObserver]:
@@ -91,7 +80,6 @@ class TileModel(Model):
     def space_status(self, space_status: SpaceStatusEnum):
         self._space_status = space_status
         self._notify_status()
-
 
     @property
     def is_hotspot(self):
