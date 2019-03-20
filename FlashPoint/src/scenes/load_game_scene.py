@@ -1,7 +1,6 @@
 import pygame
 
 import src.constants.color as color
-import json
 
 from src.core.custom_event import CustomEvent
 from src.core.event_queue import EventQueue

@@ -43,7 +43,11 @@ class LobbyScene(object):
         else:
             self._current_player.status = PlayerStatusEnum.NOT_READY
             self.buttonReady.on_click(self.set_ready)
-        self.buttonBack.on_click(Networking.get_instance().disconnect)
+        self.buttonBack.on_click(self.go_back)
+
+    def go_back(self):
+        Networking.get_instance().disconnect()
+        EventQueue.post(CustomEvent(ChangeSceneEnum.STARTSCENE))
 
     def start_game(self):
         """Callback for when the host tries to start the game."""
@@ -73,7 +77,7 @@ class LobbyScene(object):
                 event.execute()
                 Networking.get_instance().send_to_all_client(event)
             else:
-                Networking.get_instance().client.send(event)
+                Networking.get_instance().send_to_server(event)
         else:
             self.isReady = False
             self.buttonReady.change_color(Color.GREY)
@@ -83,7 +87,7 @@ class LobbyScene(object):
                 event.execute()
                 Networking.get_instance().send_to_all_client(event)
             else:
-                Networking.get_instance().client.send(event)
+                Networking.get_instance().send_to_server(event)
 
     def _init_all(self, reuse=False):
         self._init_background()

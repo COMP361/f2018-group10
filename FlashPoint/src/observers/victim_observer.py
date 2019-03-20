@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from src.constants.state_enums import PlayerStatusEnum, VictimStateEnum
+from src.constants.state_enums import VictimStateEnum
 from src.observers.observer import Observer
 
 

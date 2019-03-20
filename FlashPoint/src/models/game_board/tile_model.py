@@ -164,9 +164,9 @@ class TileModel(Model):
         Get the TileModel in a specified direction.
         "raise TilePositionOutOfBoundsException: If there is no Tile in that direction.
         """
-        tile = self._adjacent_tiles.get(direction, None)
-        if not tile:
-            raise TilePositionOutOfBoundsException(self, direction)
+        tile = self._adjacent_tiles.get(direction, NullModel)
+        if isinstance(tile, NullModel):
+            raise TilePositionOutOfBoundsException(tile, direction)
         return tile
 
     def get_obstacle_in_direction(self, direction: str) -> Optional['EdgeObstacleModel']:
@@ -203,7 +203,7 @@ class TileModel(Model):
     def add_associated_model(self, model: Model):
         # The model's observers will take care
         # of redrawing the model in the new location
-        model.set_position(self.row, self.column)
+
         self._associated_models.append(model)
         self._notify_assoc_models()
 

@@ -1,41 +1,82 @@
-from src.action_events.action_event import ActionEvent
+import random
+import time
+
+import src.constants.color as Color
 from src.action_events.knock_down_event import KnockDownEvent
-from src.constants.state_enums import WallStatusEnum, SpaceStatusEnum, SpaceKindEnum, VictimStateEnum, DoorStatusEnum, \
-    POIStatusEnum
+from src.action_events.replenish_poi_event import ReplenishPOIEvent
 from src.models.game_board.door_model import DoorModel
-from src.models.game_board.game_board_model import GameBoardModel
 from src.models.game_board.null_model import NullModel
-from src.models.game_board.tile_model import TileModel
 from src.models.game_board.wall_model import WallModel
-from src.models.game_state_model import GameStateModel
 from src.models.game_units.poi_model import POIModel
 from src.models.game_units.victim_model import VictimModel
+from src.models.game_board.tile_model import TileModel
+from src.models.game_board.game_board_model import GameBoardModel
+from src.constants.state_enums import GameStateEnum, SpaceStatusEnum, WallStatusEnum, DoorStatusEnum, VictimStateEnum, \
+    SpaceKindEnum, POIIdentityEnum
+from src.action_events.turn_events.turn_event import TurnEvent
+from src.models.game_state_model import GameStateModel
+from src.sprites.game_board import GameBoard
 
 
-class AdvanceFireEvent(ActionEvent):
+class EndTurnAdvanceFireEvent(TurnEvent):
 
-    def __init__(self, red_dice: int = None, black_dice: int = None):
+    def __init__(self, seed: int = 0):
         super().__init__()
+        self.player = GameStateModel.instance().players_turn
         self.game_state: GameStateModel = GameStateModel.instance()
         self.board: GameBoardModel = self.game_state.game_board
         self.initial_tile: TileModel = None
-        self.red_dice = red_dice
-        self.black_dice = black_dice
+
+        if seed == 0:
+            self.seed = random.randint(0, 6969)
+        else:
+            self.seed = seed
 
         # Pick random location: roll dice
-        if not self.red_dice:
-            self.red_dice = self.game_state.roll_red_dice()
-        if not self.black_dice:
-            self.black_dice = self.game_state.roll_black_dice()
+        random.seed(self.seed)
+        self.red_dice = self.game_state.roll_red_dice()
+        self.black_dice = self.game_state.roll_black_dice()
         self.directions = ["North", "South", "East", "West"]
 
-    def execute(self, *args, **kwargs):
-        # Change state of tile depending on previous state
-        self.initial_tile = self.board.get_tile_at(self.red_dice, self.black_dice)
-        self.advance_on_tile(self.initial_tile)
-        self.flashover()
-        self.affect_damages()
+    def execute(self):
+        """
+        Steps:
+        1)start the AdvanceFire
+        2)knockdown event
+        3)replenish POI
+        4)retain and replenish player's AP
+        5)call player_next
+        :return:
+        """
+        # retain up to a maximum of 4 AP
+        # as the turn is ending and
+        # replenish player's AP by 4
+        GameStateModel.lock.acquire()
+        if GameStateModel.instance().state == GameStateEnum.MAIN_GAME:
 
+            # ------ AdvanceFire ------ #
+            # Change state of tile depending on previous state
+            self.initial_tile = self.board.get_tile_at(self.red_dice, self.black_dice)
+            self.advance_on_tile(self.initial_tile)
+            self.flashover()
+            self.affect_damages()
+
+            # ------ ReplenishPOI ------ #
+            rp_event = ReplenishPOIEvent(self.seed)
+            rp_event.execute()
+
+            if self.player.ap > 4:
+                self.player.ap = 4
+
+            self.player.ap += 4
+
+        elif GameStateModel.instance().players_turn_index + 1 == len(GameStateModel.instance().players):
+                # If the last player has chosen a location, move the game into the next phase.
+                GameStateModel.instance().state = GameStateEnum.MAIN_GAME
+
+        # call next player
+        GameStateModel.instance().next_player()
+        GameStateModel.lock.release()
 
     def advance_on_tile(self, target_tile: TileModel):
         tile_status = target_tile.space_status
@@ -50,7 +91,6 @@ class AdvanceFireEvent(ActionEvent):
         # Fire -> Explosion
         else:
             self.explosion(target_tile)
-
 
     def explosion(self, origin_tile: TileModel):
         for direction, obstacle in origin_tile.adjacent_edge_objects.items():
@@ -70,13 +110,11 @@ class AdvanceFireEvent(ActionEvent):
             # else it is just set on fire.
             else:
                 nb_tile = origin_tile.get_tile_in_direction(direction)
-                if nb_tile:
+                if not isinstance(nb_tile, NullModel):
                     if nb_tile.space_status == SpaceStatusEnum.FIRE:
                         self.shockwave(nb_tile, direction)
                     else:
                         nb_tile.space_status = SpaceStatusEnum.FIRE
-
-
 
     def shockwave(self, tile: TileModel, direction: str):
         """
@@ -124,7 +162,6 @@ class AdvanceFireEvent(ActionEvent):
                 else:
                     pass
 
-
     def flashover(self):
         """
         Convert all smokes adjacent to fires
@@ -163,7 +200,6 @@ class AdvanceFireEvent(ActionEvent):
             if num_converted == 0:
                 all_smokes_converted = True
 
-
     def affect_damages(self):
         """
         Affect any valid damages to firemen,
@@ -184,10 +220,24 @@ class AdvanceFireEvent(ActionEvent):
                     self.board.remove_poi_or_victim(model)
 
                 elif isinstance(model, POIModel):
-                    model.reveal()
-                    model.status = POIStatusEnum.LOST
+                    # Reveal the POI and remove it regardless
+                    # of False Alarm or Victim identity.
+                    # If it is a Victim, put a Victim model
+                    # there, sleep (inside remove_poi_or_victim)
+                    # so that the victim can be seen briefly, then
+                    # remove it and increment the game state damage.
+                    new_victim = None
+                    model.reveal(new_victim)
                     tile.remove_associated_model(model)
                     self.board.remove_poi_or_victim(model)
+                    if model.identity == POIIdentityEnum.VICTIM:
+                        new_victim = VictimModel(VictimStateEnum.ON_BOARD)
+                        tile.add_associated_model(new_victim)
+                        self.board.add_poi_or_victim(new_victim)
+                        tile.remove_associated_model(new_victim)
+                        self.board.remove_poi_or_victim(new_victim)
+                        self.game_state.victims_lost = self.game_state.victims_lost + 1
+
 
                 else:
                     pass
@@ -201,3 +251,4 @@ class AdvanceFireEvent(ActionEvent):
         for tile in self.board.tiles:
             if tile.space_kind != SpaceKindEnum.INDOOR and tile.space_status == SpaceStatusEnum.FIRE:
                 tile.space_status = SpaceStatusEnum.SAFE
+

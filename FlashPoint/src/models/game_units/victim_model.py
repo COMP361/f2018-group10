@@ -35,7 +35,7 @@ class VictimModel(Model):
     def column(self):
         return self._column
 
-    def set_position(self, row: int, column: int):
+    def set_pos(self, row: int, column: int):
         self._row = row
         self._column = column
         for obs in self.observers:
