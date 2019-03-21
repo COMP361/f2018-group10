@@ -4,7 +4,7 @@ import src.constants.color as Color
 from src.core.custom_event import CustomEvent
 from src.core.event_queue import EventQueue
 from src.action_events.ready_event import ReadyEvent
-from src.constants.state_enums import GameKindEnum, PlayerStatusEnum
+from src.constants.state_enums import GameKindEnum, PlayerStatusEnum, PlayerRoleEnum
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 from src.UIComponents.rect_button import RectButton
@@ -103,10 +103,10 @@ class LobbyScene(object):
                 # Ready button is grey at first
                 self._init_ready(1050, 575, "Ready", Color.GREY, Color.BLACK)
 
-            if self._game.rules == GameKindEnum.EXPERIENCED:
+            if not self._game.rules == GameKindEnum.FAMILY :
                 self._init_selec_char(1050, 475, "Select Character", Color.STANDARDBTN, Color.BLACK)
         else:
-            if self._game.rules == GameKindEnum.EXPERIENCED:
+            if not self._game.rules == GameKindEnum.FAMILY:
                 self.sprite_grp.add(self.buttonSelChar)
             if self._current_player.ip == GameStateModel.instance().host.ip:
                 self.sprite_grp.add(self.start_button)
@@ -134,8 +134,32 @@ class LobbyScene(object):
         self.sprite_grp.add(self.this_img)
 
     def _init_background_player(self, rect):
-        user_box = RectLabel(rect[0], rect[1], rect[2], rect[3], "media/specialist_cards/family.png")
+
+        if not self._game.rules == GameKindEnum.FAMILY and self._current_player.character:
+            role_path = self.get_path_from_character_enum(self._current_player.character)
+            user_box = RectLabel(rect[0], rect[1], rect[2], rect[3], role_path)
+        else:
+            user_box = RectLabel(rect[0], rect[1], rect[2], rect[3], "media/specialist_cards/family.png")
         return user_box
+
+    def get_path_from_character_enum(self, enum: PlayerRoleEnum):
+        if enum == PlayerRoleEnum.CAFS:
+            return "media/specialist_cards/cafs_firefighter.png"
+        elif enum == PlayerRoleEnum.CAPTAIN:
+            return "media/specialist_cards/fire_captain.png"
+
+        elif enum == PlayerRoleEnum.GENERALIST:
+            return "media/specialist_cards/generalist.png"
+        elif enum == PlayerRoleEnum.DRIVER:
+            return "media/specialist_cards/driver_operator.png"
+        elif enum == PlayerRoleEnum.HAZMAT:
+            return "media/specialist_cards/hazmat_technician.png"
+        elif enum == PlayerRoleEnum.IMAGING:
+            return "media/specialist_cards/imaging_technician.png"
+        elif enum == PlayerRoleEnum.PARAMEDIC:
+            return "media/specialist_cards/paramedic.png"
+        elif enum == PlayerRoleEnum.RESCUE:
+            return "media/specialist_cards/rescue_specialist.png"
 
     def _init_text_box(self, position, text, color):
         box_size = (position[2], position[3])

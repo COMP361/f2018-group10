@@ -9,7 +9,7 @@ from src.models.game_board.null_model import NullModel
 from src.models.game_units.poi_model import POIModel
 from src.models.game_board.tile_model import TileModel
 from src.constants.state_enums import GameKindEnum, SpaceKindEnum, SpaceStatusEnum, POIIdentityEnum, \
-     DoorStatusEnum, POIStatusEnum, VictimStateEnum
+    DoorStatusEnum, POIStatusEnum, VictimStateEnum
 from src.models.game_board.wall_model import WallModel
 from src.models.game_board.door_model import DoorModel
 from src.models.game_units.victim_model import VictimModel
@@ -29,6 +29,7 @@ class GameBoardModel(Model):
         self._tiles = self._init_all_tiles_family_classic() if game_type == GameKindEnum.FAMILY else None
         self._poi_bank = GameBoardModel._init_pois()
         self._active_pois = []
+
 
     def _notify_active_poi(self):
         for obs in self.observers:

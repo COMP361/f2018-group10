@@ -15,7 +15,7 @@ class GameStateModel(Model):
     _instance = None
     lock = RLock()
 
-    def __init__(self, host: PlayerModel, num_players: int, game_kind: GameKindEnum):
+    def __init__(self, host: PlayerModel, num_players: int, game_kind: GameKindEnum, difficulty: DifficultyLevelEnum = None):
         print("Initializing game state...")
 
         if not GameStateModel._instance:
@@ -24,7 +24,7 @@ class GameStateModel(Model):
             self._max_desired_players = num_players
             self._players = [self._host]
             self._players_turn_index = 0
-            self._difficulty_level = None
+            self._difficulty_level = difficulty
             self._rules = game_kind
             self._red_dice = 0
             self._black_dice = 0
