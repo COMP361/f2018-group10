@@ -58,6 +58,7 @@ class TileInputController(GameStateObserver):
         MoveController._instance = None
         ChooseStartingPositionController._instance = None
         TileInputController._instance = None
+        VictimController._instance = None
 
     def move_extinguish_victim(self, tile: TileSprite):
         self.move_controller.process_input(tile)
