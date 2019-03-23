@@ -1,0 +1,10 @@
+[
+  ["None", "None", "None", "None", "None", "None", "None", "None", "None", "None"],
+  ["None", "South-East", "South", "South", "South", "South", "South", "South", "South-West", "None"],
+  ["None", "East", "South-East", "West", "South", "South", "East", "South-West", "West", "None"],
+  ["None", "East", "North", "South", "West", "West", "West", "North", "West", "None"],
+  ["None", "East", "South", "East", "East", "East", "North", "South", "West", "None"],
+  ["None", "East", "North-East", "West", "North", "North", "East", "North-West", "West", "None"],
+  ["None", "North-East", "North", "North", "North", "North", "North", "North", "North-West", "None"],
+  ["None", "None", "None", "None", "None", "None", "None", "None", "None", "None"]
+]

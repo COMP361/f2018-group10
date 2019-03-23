@@ -9,7 +9,7 @@ from src.models.game_board.null_model import NullModel
 from src.models.game_units.poi_model import POIModel
 from src.models.game_board.tile_model import TileModel
 from src.constants.state_enums import GameKindEnum, SpaceKindEnum, SpaceStatusEnum, POIIdentityEnum, \
-     DoorStatusEnum, POIStatusEnum, VictimStateEnum
+    DoorStatusEnum, POIStatusEnum, VictimStateEnum, ArrowDirectionEnum
 from src.models.game_board.wall_model import WallModel
 from src.models.game_board.door_model import DoorModel
 from src.models.game_units.victim_model import VictimModel
@@ -298,6 +298,7 @@ class GameBoardModel(Model):
         self.set_inside_walls_doors("media/board_layouts/experienced_inside_walls_doors.json", tiles)
 
         # setting the arrow directions given for the inside tiles
+        self.set_all_tiles_arrows("media/board_layouts/experienced_tile_arrow_directions.json", tiles)
 
         return tiles
 
@@ -374,3 +375,37 @@ class GameBoardModel(Model):
     def reset_tiles_visit_count(self):
         for tile in self.tiles:
             tile.visit_count = 0
+
+    def set_all_tiles_arrows(self, tile_arrows_file: str, tiles: List[List[TileModel]]):
+        """
+        Set the arrow direction for all the tiles of the board.
+
+        :param tile_arrows_file: Name of JSON file containing details about arrows of the tiles.
+        :param tiles: tiles of the board
+        :return:
+        """
+        with open(tile_arrows_file, "r") as f:
+            all_tiles_arrows = [tuple(x) for x in json.load(f)]
+
+        for row_num, row in enumerate(all_tiles_arrows):
+            for col_num, tile_dirn in enumerate(row):
+                if tile_dirn == "North":
+                    tile_dirn = ArrowDirectionEnum.NORTH
+                elif tile_dirn == "North-East":
+                    tile_dirn = ArrowDirectionEnum.NORTH_EAST
+                elif tile_dirn == "East":
+                    tile_dirn = ArrowDirectionEnum.EAST
+                elif tile_dirn == "South-East":
+                    tile_dirn = ArrowDirectionEnum.SOUTH_EAST
+                elif tile_dirn == "South":
+                    tile_dirn = ArrowDirectionEnum.SOUTH
+                elif tile_dirn == "South-West":
+                    tile_dirn = ArrowDirectionEnum.SOUTH_WEST
+                elif tile_dirn == "West":
+                    tile_dirn = ArrowDirectionEnum.WEST
+                elif tile_dirn == "North-West":
+                    tile_dirn = ArrowDirectionEnum.NORTH_WEST
+                else:
+                    tile_dirn = None
+
+                tiles[row_num][col_num].arrow_dirn = tile_dirn
