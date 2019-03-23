@@ -26,7 +26,10 @@ class GameBoardModel(Model):
         self._dimensions = (8, 10)
         self._ambulance_spots = []
         self._engine_spots = []
-        self._tiles = self._init_all_tiles_family_classic() if game_type == GameKindEnum.FAMILY else None
+        if game_type == GameKindEnum.FAMILY:
+            self._tiles = self._init_all_tiles_family_classic()
+        else:
+            self._tiles = self._init_all_tiles_experienced_classic()
         self._poi_bank = GameBoardModel._init_pois()
         self._active_pois = []
 
