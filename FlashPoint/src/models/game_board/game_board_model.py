@@ -196,7 +196,6 @@ class GameBoardModel(Model):
                 extended_grid[i][j].west_tile = extended_grid[i][j - 1]
                 extended_grid[i][j].south_tile = extended_grid[i + 1][j]
 
-        print("hello")
 
     def set_single_tile_adjacencies(self, tile: TileModel):
         # set north tile
