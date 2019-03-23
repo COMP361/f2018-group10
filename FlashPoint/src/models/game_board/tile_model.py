@@ -8,7 +8,7 @@ from src.models.model import Model
 from src.core.flashpoint_exceptions import TilePositionOutOfBoundsException
 from src.models.game_board.edge_obstacle_model import EdgeObstacleModel
 from src.models.game_board.null_model import NullModel
-from src.constants.state_enums import SpaceKindEnum, DoorStatusEnum, WallStatusEnum
+from src.constants.state_enums import SpaceKindEnum, DoorStatusEnum, WallStatusEnum, ArrowDirectionEnum
 from src.constants.state_enums import SpaceStatusEnum
 from src.observers.tile_observer import TileObserver
 
@@ -39,6 +39,8 @@ class TileModel(Model):
             "West": NullModel(),
             "South": NullModel(),
         }
+
+        self._arrow_dirn: ArrowDirectionEnum = None
 
     def __str__(self):
         tile_pos = "Tile at: ({row}, {column})".format(row=self.row, column=self.column)
@@ -97,6 +99,14 @@ class TileModel(Model):
     @property
     def adjacent_edge_objects(self):
         return self._adjacent_edge_objects
+
+    @property
+    def arrow_dirn(self):
+        return self._arrow_dirn
+
+    @arrow_dirn.setter
+    def arrow_dirn(self, arrow_dirn: ArrowDirectionEnum):
+        self._arrow_dirn = arrow_dirn
 
     @property
     def north_tile(self):
