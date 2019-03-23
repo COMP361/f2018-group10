@@ -1,3 +1,4 @@
+from src.controllers.choose_vehicle_positions_controller import ChooseVehiclePositionController
 from src.action_events.turn_events.drop_victim_event import DropVictimEvent
 from src.action_events.turn_events.extinguish_event import ExtinguishEvent
 from src.action_events.turn_events.move_event import MoveEvent
@@ -41,6 +42,7 @@ class TileInputController(GameStateObserver):
         self.move_controller = MoveController(current_player)
         self.choose_starting_controller = ChooseStartingPositionController(current_player)
         self.victim_controller = VictimController()
+        self.vehicle_controller = ChooseVehiclePositionController(current_player)
         GameStateModel.instance().add_observer(self)
         self.fireman = current_player
         self.last_tile: TileSprite = None
@@ -59,6 +61,7 @@ class TileInputController(GameStateObserver):
         ChooseStartingPositionController._instance = None
         TileInputController._instance = None
         VictimController._instance = None
+        ChooseVehiclePositionController._instance = None
 
     def move_extinguish_victim(self, tile: TileSprite):
         self.move_controller.process_input(tile)
@@ -97,6 +100,9 @@ class TileInputController(GameStateObserver):
             if self.last_tile:
                 self.last_tile.menu_shown = False
             self.last_tile = tile
+
+    def place_vehicles(self, tile_sprite: TileSprite):
+        self.vehicle_controller.process_input(tile_sprite)
 
     def execute_drop_event(self, victim: VictimModel):
         print(f"Drop event created")
@@ -157,3 +163,4 @@ class TileInputController(GameStateObserver):
         self.choose_starting_controller.update(event_queue)
         self.extinguish_controller.update(event_queue)
         self.victim_controller.update(event_queue)
+        self.vehicle_controller.update(event_queue)

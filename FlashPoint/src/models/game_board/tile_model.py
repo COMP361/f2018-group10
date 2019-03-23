@@ -49,7 +49,9 @@ class TileModel(Model):
         return '\n'.join([tile_pos, tile_state, tile_kind])
 
     def __eq__(self, other):
-        return self.row == other.row and self.column == other.column
+        if isinstance(other, TileModel):
+            return self.row == other.row and self.column == other.column
+        return False
 
     def _notify_status(self):
         for obs in self.observers:

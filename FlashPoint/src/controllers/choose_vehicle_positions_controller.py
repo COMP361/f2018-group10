@@ -1,6 +1,7 @@
 import pygame
 
 import src.constants.color as Color
+from src.core.event_queue import EventQueue
 from src.core.networking import Networking
 from src.action_events.vehicle_placed_event import VehiclePlacedEvent
 from src.sprites.tile_sprite import TileSprite
@@ -112,7 +113,7 @@ class ChooseVehiclePositionController(object):
         else:
             Networking.get_instance().send_to_server(event)
 
-    def update(self):
+    def update(self, event_queue: EventQueue):
         game_state: GameStateModel = GameStateModel.instance()
         engine_placed = game_state.game_board.engine.orientation != VehicleOrientationEnum.UNSET
         ambulance_placed = game_state.game_board.ambulance.orientation != VehicleOrientationEnum.UNSET
