@@ -1,5 +1,7 @@
 from typing import Optional, List
 
+from src.models.game_units.poi_model import POIModel
+from src.models.game_units.victim_model import VictimModel
 from src.models.game_board.door_model import DoorModel
 from src.models.game_board.wall_model import WallModel
 from src.models.model import Model
@@ -223,3 +225,9 @@ class TileModel(Model):
 
     def reset_adjacencies(self):
         self._adjacent_tiles = {}
+
+    def has_poi_or_victim(self) -> bool:
+        for model in self.associated_models:
+            if isinstance(model, POIModel) or isinstance(model, VictimModel):
+                return True
+        return False
