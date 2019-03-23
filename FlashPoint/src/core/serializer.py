@@ -23,7 +23,7 @@ from src.action_events.chat_event import ChatEvent
 from src.action_events.dummy_event import DummyEvent
 from src.action_events.join_event import JoinEvent
 from src.constants.state_enums import DifficultyLevelEnum, GameKindEnum, PlayerStatusEnum, WallStatusEnum, \
-    DoorStatusEnum, SpaceKindEnum, SpaceStatusEnum
+    DoorStatusEnum, SpaceKindEnum, SpaceStatusEnum, ArrowDirectionEnum
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 
@@ -265,7 +265,8 @@ class JSONSerializer(object):
             '_is_hotspot': tile.is_hotspot,
             '_associated_models': [JSONSerializer.serialize(obj) for obj in tile.associated_models],
             '_visit_count': tile.visit_count,
-            '_adjacent_edge_objects': JSONSerializer.serialize(tile.adjacent_edge_objects)
+            '_adjacent_edge_objects': JSONSerializer.serialize(tile.adjacent_edge_objects),
+            '_arrow_dirn': {"name": type(ArrowDirectionEnum).__name__, "value": tile.arrow_dirn.value}
         }
 
     @staticmethod
