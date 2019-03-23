@@ -52,7 +52,7 @@ class ChooseStartingPositionController(object):
                     tile_sprite.hover_color = None
 
     def _run_checks(self, tile_sprite: TileSprite, tile_model: TileModel) -> bool:
-        if GameStateModel.instance().state != GameStateEnum.PLACING:
+        if GameStateModel.instance().state != GameStateEnum.PLACING_PLAYERS:
             return False
 
         if self.current_player != GameStateModel.instance().players_turn:
@@ -85,5 +85,5 @@ class ChooseStartingPositionController(object):
     def update(self, event_queue: EventQueue):
         if self.current_player == GameStateModel.instance().players_turn:
             self.wait_prompt.kill()
-        if GameStateModel.instance().state == GameStateEnum.PLACING:
+        if GameStateModel.instance().state == GameStateEnum.PLACING_PLAYERS:
             self._apply_hover()

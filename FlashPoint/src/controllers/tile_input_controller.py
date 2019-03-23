@@ -45,7 +45,7 @@ class TileInputController(GameStateObserver):
         self.fireman = current_player
         self.last_tile: TileSprite = None
         current_player.ap = 4
-        GameStateModel.instance().state = GameStateEnum.PLACING
+        GameStateModel.instance().state = GameStateEnum.PLACING_PLAYERS
         TileInputController._instance = self
 
     @classmethod
@@ -141,7 +141,7 @@ class TileInputController(GameStateObserver):
 
     def notify_game_state(self, state: GameStateEnum):
         on_click = None
-        if state == GameStateEnum.PLACING:
+        if state == GameStateEnum.PLACING_PLAYERS:
             on_click = self.choose_starting_controller.process_input
         elif state == GameStateEnum.MAIN_GAME:
             on_click = self.move_extinguish_victim

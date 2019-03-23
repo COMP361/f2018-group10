@@ -27,7 +27,8 @@ class GameKindEnum(Enum):
 
 class GameStateEnum(Enum):
     READY_TO_JOIN = auto()
-    PLACING = auto()
+    PLACING_PLAYERS = auto()
+    PLACING_VEHICLES = auto()
     MAIN_GAME = auto()
     KNOCKED_DOWN_PLACEMENT = auto()
     LOST = auto()
@@ -81,3 +82,9 @@ class WallStatusEnum(Enum):
     INTACT = auto()
     DAMAGED = auto()
     DESTROYED = auto()
+
+
+class VehicleOrientationEnum(Enum):
+    VERTICAL = auto()
+    HORIZONTAL = auto()
+    UNSET = auto()

@@ -5,7 +5,7 @@ from typing import List, Optional, Tuple
 
 from src.models.model import Model
 from src.models.game_board.game_board_model import GameBoardModel
-from src.constants.state_enums import GameKindEnum, DifficultyLevelEnum, GameStateEnum
+from src.constants.state_enums import GameKindEnum, DifficultyLevelEnum, GameStateEnum, VehicleOrientationEnum
 from src.core.flashpoint_exceptions import TooManyPlayersException, InvalidGameKindException, PlayerNotFoundException
 from src.models.game_units.player_model import PlayerModel
 
@@ -273,3 +273,12 @@ class GameStateModel(Model):
                     players_on_tile.append(player)
 
             return players_on_tile
+
+    def all_players_have_chosen_location(self) -> bool:
+        """If all player locations are positive, then we know that they have chosen their position."""
+        return all([player.column >= 0 and player.row >= 0 for player in self.players])
+
+    def vehicles_have_been_placed(self) -> bool:
+        ambulance_placed = self.game_board.ambulance.orientation != VehicleOrientationEnum.UNSET
+        engine_placed = self.game_board.engine.orientation != VehicleOrientationEnum.UNSET
+        return ambulance_placed and engine_placed

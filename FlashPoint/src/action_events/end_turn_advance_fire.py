@@ -1,7 +1,5 @@
 import random
-import time
 
-import src.constants.color as Color
 from src.action_events.knock_down_event import KnockDownEvent
 from src.action_events.replenish_poi_event import ReplenishPOIEvent
 from src.models.game_board.door_model import DoorModel
@@ -12,10 +10,9 @@ from src.models.game_units.victim_model import VictimModel
 from src.models.game_board.tile_model import TileModel
 from src.models.game_board.game_board_model import GameBoardModel
 from src.constants.state_enums import GameStateEnum, SpaceStatusEnum, WallStatusEnum, DoorStatusEnum, VictimStateEnum, \
-    SpaceKindEnum, POIIdentityEnum
+    SpaceKindEnum, POIIdentityEnum, GameKindEnum
 from src.action_events.turn_events.turn_event import TurnEvent
 from src.models.game_state_model import GameStateModel
-from src.sprites.game_board import GameBoard
 
 
 class EndTurnAdvanceFireEvent(TurnEvent):
@@ -52,8 +49,7 @@ class EndTurnAdvanceFireEvent(TurnEvent):
         # retain up to a maximum of 4 AP
         # as the turn is ending and
         # replenish player's AP by 4
-        GameStateModel.lock.acquire()
-        if GameStateModel.instance().state == GameStateEnum.MAIN_GAME:
+        if self.game_state.state == GameStateEnum.MAIN_GAME:
 
             # ------ AdvanceFire ------ #
             # Change state of tile depending on previous state
@@ -71,13 +67,23 @@ class EndTurnAdvanceFireEvent(TurnEvent):
 
             self.player.ap += 4
 
-        elif GameStateModel.instance().players_turn_index + 1 == len(GameStateModel.instance().players):
+        elif (self.game_state.state == GameStateEnum.PLACING_PLAYERS
+              and self.game_state.all_players_have_chosen_location()):
+
                 # If the last player has chosen a location, move the game into the next phase.
-                GameStateModel.instance().state = GameStateEnum.MAIN_GAME
+                if self.game_state.rules == GameKindEnum.EXPERIENCED:
+                    self.game_state.state = GameStateEnum.PLACING_VEHICLES
+                else:
+                    self.game_state.state = GameStateEnum.MAIN_GAME
+
+        elif self.game_state.state == GameStateEnum.PLACING_VEHICLES:
+            # Don't call the next player. Wait until the host chooses the positions.
+            if self.game_state.vehicles_have_been_placed():
+                self.game_state.state = GameStateEnum.MAIN_GAME
+            return
 
         # call next player
-        GameStateModel.instance().next_player()
-        GameStateModel.lock.release()
+        self.game_state.next_player()
 
     def advance_on_tile(self, target_tile: TileModel):
         tile_status = target_tile.space_status
