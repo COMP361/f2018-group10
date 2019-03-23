@@ -60,7 +60,7 @@ class ChooseStartingPositionController(object):
             return False
 
         # Check if any Players are in this tile
-        if any([isinstance(model, PlayerModel) for model in tile_model.associated_models]):
+        if GameStateModel.instance().get_players_on_tile(tile_model.row, tile_model.column):
             return False
 
         if tile_model.space_kind == SpaceKindEnum.INDOOR:

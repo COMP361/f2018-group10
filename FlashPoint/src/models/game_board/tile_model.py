@@ -46,6 +46,9 @@ class TileModel(Model):
         tile_kind = "Space kind: {kind}\n".format(kind=self.space_kind)
         return '\n'.join([tile_pos, tile_state, tile_kind])
 
+    def __eq__(self, other):
+        return self.row == other.row and self.column == other.column
+
     def _notify_status(self):
         for obs in self.observers:
             obs.tile_status_changed(self.space_status)

@@ -15,7 +15,7 @@ class VehiclePlacedEvent(ActionEvent):
     """Determining the parking spot will be up to the GUI. This will create required associations, set positions
        and set up observers."""
 
-    def __init__(self, vehicle: VehicleModel, parking_spot: Tuple[TileModel, TileModel]):
+    def __init__(self, vehicle: VehicleModel, parking_spot: Tuple[TileModel]):
         super().__init__()
         self._vehicle_type = "AMBULANCE" if isinstance(vehicle, AmbulanceModel) else "ENGINE"
         self._row = min(tile.row for tile in parking_spot)
