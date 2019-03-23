@@ -94,7 +94,7 @@ class GameBoardModel(Model):
         pois = []
         # POIs initialized with negative coordinates
         # since they are not on the board
-        for i in range(5):
+        for i in range(10):
             pois.append(POIModel(POIIdentityEnum.VICTIM))
         for i in range(5):
             pois.append(POIModel(POIIdentityEnum.FALSE_ALARM))
