@@ -6,6 +6,7 @@ from src.action_events.end_turn_advance_fire import EndTurnAdvanceFireEvent
 from src.action_events.set_initial_poi_family_event import SetInitialPOIFamilyEvent
 from src.action_events.turn_events.chop_event import ChopEvent
 from src.action_events.turn_events.close_door_event import CloseDoorEvent
+from src.action_events.turn_events.drive_ambulance_event import DriveAmbulanceEvent
 from src.action_events.turn_events.drop_victim_event import DropVictimEvent
 from src.action_events.turn_events.extinguish_event import ExtinguishEvent
 from src.action_events.turn_events.move_event import MoveEvent
@@ -132,7 +133,6 @@ class JSONSerializer(object):
     @staticmethod
     def _deserialize_tile(payload: Dict) -> TileModel:
         tile: TileModel = TileModel(payload['_row'], payload['_column'], payload['_space_kind'])
-        # GameStateModel.instance().game_board.set_single_tile_adjacencies(tile)
         return tile
 
     @staticmethod
@@ -202,6 +202,13 @@ class JSONSerializer(object):
         return event
 
     @staticmethod
+    def _deserialize_drive_ambulance_event(payload: Dict) -> DriveAmbulanceEvent:
+        event: DriveAmbulanceEvent()
+        event._row = payload['_row']
+        event._column = payload['_column']
+        return event
+
+    @staticmethod
     def deserialize(payload: Dict) -> object:
         """
         Grab an object and deserialize it.
@@ -261,6 +268,8 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_set_initial_poi_family_event(payload)
         elif object_type == VehiclePlacedEvent.__name__:
             return JSONSerializer._deserialize_vehicle_placed_event(payload)
+        elif object_type == DriveAmbulanceEvent.__name__:
+            return JSONSerializer._deserialize_drive_ambulance_event(payload)
 
         print(f"WARNING: Could not deserialize object {object_type}, not of recognized type.")
 
@@ -276,7 +285,7 @@ class JSONSerializer(object):
             '_associated_models': [JSONSerializer.serialize(obj) for obj in tile.associated_models],
             '_visit_count': tile.visit_count,
             '_adjacent_edge_objects': JSONSerializer.serialize(tile.adjacent_edge_objects),
-            '_arrow_dirn': {"name": type(ArrowDirectionEnum).__name__, "value": tile.arrow_dirn.value}
+          #   '_arrow_dirn': {"name": type(ArrowDirectionEnum).__name__, "value": tile.arrow_dirn.value}
         }
 
     @staticmethod

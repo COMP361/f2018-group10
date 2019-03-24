@@ -1,4 +1,4 @@
-from src.controllers.choose_vehicle_positions_controller import ChooseVehiclePositionController
+from src.controllers.vehicle_controller import VehicleController
 from src.action_events.turn_events.drop_victim_event import DropVictimEvent
 from src.action_events.turn_events.extinguish_event import ExtinguishEvent
 from src.action_events.turn_events.move_event import MoveEvent
@@ -43,7 +43,7 @@ class TileInputController(GameStateObserver):
         self.choose_starting_controller = ChooseStartingPositionController(current_player)
         self.victim_controller = VictimController()
         if GameStateModel.instance().rules == GameKindEnum.EXPERIENCED:
-            self.vehicle_controller = ChooseVehiclePositionController(current_player)
+            self.vehicle_controller = VehicleController(current_player)
         GameStateModel.instance().add_observer(self)
         self.fireman = current_player
         self.last_tile: TileSprite = None
@@ -62,7 +62,7 @@ class TileInputController(GameStateObserver):
         ChooseStartingPositionController._instance = None
         TileInputController._instance = None
         VictimController._instance = None
-        ChooseVehiclePositionController._instance = None
+        VehicleController._instance = None
 
     def move_extinguish_victim(self, tile: TileSprite):
         self.move_controller.process_input(tile)
@@ -103,7 +103,7 @@ class TileInputController(GameStateObserver):
             self.last_tile = tile
 
     def place_vehicles(self, tile_sprite: TileSprite):
-        self.vehicle_controller.process_input(tile_sprite)
+        self.vehicle_controller.process_input_placement(tile_sprite)
 
     def execute_drop_event(self, victim: VictimModel):
         event = DropVictimEvent(victim)
@@ -150,7 +150,7 @@ class TileInputController(GameStateObserver):
             on_click = self.choose_starting_controller.process_input
         elif state == GameStateEnum.PLACING_VEHICLES:
             self.vehicle_controller.enable_prompts()
-            on_click = self.vehicle_controller.process_input
+            on_click = self.vehicle_controller.process_input_placement
         elif state == GameStateEnum.MAIN_GAME:
             on_click = self.move_extinguish_victim
 

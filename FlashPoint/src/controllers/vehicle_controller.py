@@ -1,3 +1,5 @@
+from typing import Tuple
+
 import pygame
 
 import src.constants.color as Color
@@ -14,12 +16,12 @@ from src.sprites.game_board import GameBoard
 from src.models.game_units.player_model import PlayerModel
 
 
-class ChooseVehiclePositionController(object):
+class VehicleController(object):
 
     _instance = None
 
     def __init__(self, current_player: PlayerModel):
-        if ChooseVehiclePositionController._instance:
+        if VehicleController._instance:
             raise Exception("ChooseVehiclePositionController is a singleton!")
         if GameStateModel.instance().rules != GameKindEnum.EXPERIENCED:
             raise Exception("ChooseVehiclePositionController should not exist in Family Mode!")
@@ -35,13 +37,13 @@ class ChooseVehiclePositionController(object):
                                               Text(pygame.font.SysFont('Agency FB', 30), "Host Is Placing Vehicles...",
                                                    Color.ORANGE))
 
-        ChooseVehiclePositionController._instance = self
+        VehicleController._instance = self
 
     @classmethod
     def instance(cls):
         return cls._instance
 
-    def _run_checks(self, tile_model: TileModel):
+    def _run_placement_checks(self, tile_model: TileModel):
         game_state: GameStateModel = GameStateModel.instance()
         engine_placed = game_state.game_board.engine.orientation != VehicleOrientationEnum.UNSET
         ambulance_placed = game_state.game_board.ambulance.orientation != VehicleOrientationEnum.UNSET
@@ -73,26 +75,44 @@ class ChooseVehiclePositionController(object):
                 tile_model = game_state.game_board.get_tile_at(j, i)
                 tile_sprite = self.game_board_sprite.grid.grid[i][j]
 
-                success = self._run_checks(tile_model)
+                success = self._run_placement_checks(tile_model)
 
                 if success and not tile_sprite.highlight_color:
                     tile_sprite.highlight_color = Color.GREEN
                 elif not success:
                     tile_sprite.highlight_color = None
 
+    def _determine_second_tile(self, parking_type: SpaceKindEnum, first_tile: TileModel) -> TileModel:
+        game_state: GameStateModel = GameStateModel.instance()
+        orientation = None
+        if parking_type == SpaceKindEnum.AMBULANCE_PARKING:
+            orientation = game_state.game_board.ambulance.orientation
+        elif parking_type == SpaceKindEnum.ENGINE_PARKING:
+            orientation = game_state.game_board.engine.orientation
+
+        if orientation == VehicleOrientationEnum.HORIZONTAL:
+            return game_state.game_board.get_tile_at(first_tile.row, first_tile.column+1)
+        elif orientation == VehicleOrientationEnum.VERTICAL:
+            return game_state.game_board.get_tile_at(first_tile.row+1, first_tile.column)
+
+    def _player_is_in_parking_space(self, parking_spot: Tuple[TileModel, TileModel]):
+        player = self.current_player
+        row_match = player.row == parking_spot[0].row or player.row == parking_spot[1].row
+        column_match = player.column == parking_spot[0].column or player.row == parking_spot[1].column
+        return row_match and column_match
+
     def enable_prompts(self):
         self.game_board_sprite.add(self.choose_ambulance_prompt)
         self.game_board_sprite.add(self.wait_prompt)
 
-    def process_input(self, tile_sprite: TileSprite):
+    def process_input_placement(self, tile_sprite: TileSprite):
         game_state: GameStateModel = GameStateModel.instance()
         engine_placed = game_state.game_board.engine.orientation != VehicleOrientationEnum.UNSET
         ambulance_placed = game_state.game_board.ambulance.orientation != VehicleOrientationEnum.UNSET
 
         tile_model = game_state.game_board.get_tile_at(tile_sprite.row, tile_sprite.column)
 
-        checks_passed = self._run_checks(tile_model)
-        if not checks_passed:
+        if not self._run_placement_checks(tile_model):
             return
 
         event = None
@@ -115,6 +135,24 @@ class ChooseVehiclePositionController(object):
             Networking.get_instance().send_to_all_client(event)
         else:
             Networking.get_instance().send_to_server(event)
+
+    def process_input_main_game(self, tile_sprite: TileSprite):
+        game_state: GameStateModel = GameStateModel.instance()
+        first_tile = game_state.game_board.get_tile_at(tile_sprite.row, tile_sprite.column)
+        parking_type = first_tile.space_kind
+        second_tile = self._determine_second_tile(parking_type, first_tile)
+
+        if parking_type == SpaceKindEnum.AMBULANCE_PARKING:
+            if self._player_is_in_parking_space((first_tile, second_tile)):
+                # Display some kind of prompt for riding the ambulance
+                pass
+            else:
+                # Display some kind of prompt for moving the ambulance to here
+                pass
+
+        elif parking_type == SpaceKindEnum.ENGINE_PARKING:
+            # Display some kind of prompt for driving/riding the engine
+            pass
 
     def update(self, event_queue: EventQueue):
         game_state: GameStateModel = GameStateModel.instance()
