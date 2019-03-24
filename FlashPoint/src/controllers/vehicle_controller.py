@@ -43,7 +43,7 @@ class VehicleController(object):
     def instance(cls):
         return cls._instance
 
-    def _run_placement_checks(self, tile_model: TileModel):
+    def _run_placement_checks(self, tile_model: TileModel) -> bool:
         game_state: GameStateModel = GameStateModel.instance()
         engine_placed = game_state.game_board.engine.orientation != VehicleOrientationEnum.UNSET
         ambulance_placed = game_state.game_board.ambulance.orientation != VehicleOrientationEnum.UNSET
@@ -110,10 +110,12 @@ class VehicleController(object):
             if potential_tile.space_kind == parking_type:
                 return potential_tile
 
-    def _player_is_in_parking_space(self, parking_spot: Tuple[TileModel, TileModel]):
+    def _player_is_in_ambulance_space(self):
         player = self.current_player
-        row_match = player.row == parking_spot[0].row or player.row == parking_spot[1].row
-        column_match = player.column == parking_spot[0].column or player.row == parking_spot[1].column
+        ambulance_row = GameStateModel.instance().game_board.ambulance.row
+        ambulance_column = GameStateModel.instance().game_board.ambulance.column
+        row_match = player.row == ambulance_row or player.row == ambulance_row + 1
+        column_match = player.column == ambulance_column or player.row == ambulance_column + 1
         return row_match and column_match
 
     def enable_prompts(self):
@@ -155,10 +157,8 @@ class VehicleController(object):
         game_state: GameStateModel = GameStateModel.instance()
         first_tile = game_state.game_board.get_tile_at(tile_sprite.row, tile_sprite.column)
         parking_type = first_tile.space_kind
-        second_tile = self.determine_second_tile(first_tile.space_kind, first_tile)
-
         if parking_type == SpaceKindEnum.AMBULANCE_PARKING:
-            if self._player_is_in_parking_space((first_tile, second_tile)):
+            if self._player_is_in_ambulance_space():
                 # Display some kind of prompt for riding the ambulance
                 pass
             else:
