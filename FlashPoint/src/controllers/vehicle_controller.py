@@ -6,6 +6,7 @@ import src.constants.color as Color
 from src.core.event_queue import EventQueue
 from src.core.networking import Networking
 from src.action_events.vehicle_placed_event import VehiclePlacedEvent
+from src.models.game_board.game_board_model import GameBoardModel
 from src.sprites.tile_sprite import TileSprite
 from src.models.game_board.tile_model import TileModel
 from src.constants.state_enums import GameKindEnum, GameStateEnum, SpaceKindEnum, VehicleOrientationEnum
@@ -42,6 +43,22 @@ class VehicleController(object):
     @classmethod
     def instance(cls):
         return cls._instance
+
+    def _player_has_enough_ap(self, tile_model: TileModel) -> bool:
+        game_board: GameBoardModel = GameStateModel.instance().game_board
+        destination_second_tile = game_board.get_other_parking_tile(tile_model)
+
+        ap_multiplier = game_board.get_distance_to_parking_spot((tile_model, destination_second_tile))
+        return self.current_player.ap >= 2 * ap_multiplier
+
+    def _run_drive_checks(self, tile_model: TileModel) -> bool:
+        game_board: GameBoardModel = GameStateModel.instance().game_board
+
+        if tile_model.space_kind not in [SpaceKindEnum.AMBULANCE_PARKING, SpaceKindEnum.ENGINE_PARKING]:
+            return False
+        if not self._player_has_enough_ap(tile_model):
+            return False
+        return True
 
     def _run_placement_checks(self, tile_model: TileModel) -> bool:
         game_state: GameStateModel = GameStateModel.instance()
@@ -81,34 +98,6 @@ class VehicleController(object):
                     tile_sprite.highlight_color = Color.GREEN
                 elif not success:
                     tile_sprite.highlight_color = None
-
-    def determine_second_tile(self, parking_type: SpaceKindEnum, first_tile: TileModel) -> TileModel:
-        game_state: GameStateModel = GameStateModel.instance()
-
-        if first_tile.row == 0 or first_tile.row == game_state.game_board.dimensions[0]-1:
-            offset = 1 if first_tile.column < game_state.game_board.dimensions[1]-1 else -1
-            potential_tile = game_state.game_board.get_tile_at(first_tile.row, first_tile.column+offset)
-
-            if potential_tile.space_kind == parking_type:
-                return potential_tile
-
-            offset = -1 if first_tile.column > 0 else 1
-            potential_tile = game_state.game_board.get_tile_at(first_tile.row, first_tile.column + offset)
-
-            if potential_tile.space_kind == parking_type:
-                return potential_tile
-        elif first_tile.column == 0 or first_tile.column == game_state.game_board.dimensions[1]-1:
-            offset = 1 if first_tile.row < game_state.game_board.dimensions[0] - 1 else -1
-            potential_tile = game_state.game_board.get_tile_at(first_tile.row + offset, first_tile.column)
-
-            if potential_tile.space_kind == parking_type:
-                return potential_tile
-
-            offset = -1 if first_tile.row > 0 else 1
-            potential_tile = game_state.game_board.get_tile_at(first_tile.row + offset, first_tile.column)
-
-            if potential_tile.space_kind == parking_type:
-                return potential_tile
 
     def _player_is_in_ambulance_space(self):
         player = self.current_player
@@ -157,6 +146,10 @@ class VehicleController(object):
         game_state: GameStateModel = GameStateModel.instance()
         first_tile = game_state.game_board.get_tile_at(tile_sprite.row, tile_sprite.column)
         parking_type = first_tile.space_kind
+
+        if not self._run_drive_checks(first_tile):
+            return
+
         if parking_type == SpaceKindEnum.AMBULANCE_PARKING:
             if self._player_is_in_ambulance_space():
                 # Display some kind of prompt for riding the ambulance

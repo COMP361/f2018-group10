@@ -11,7 +11,7 @@ from src.models.game_board.null_model import NullModel
 from src.models.game_units.poi_model import POIModel
 from src.models.game_board.tile_model import TileModel
 from src.constants.state_enums import GameKindEnum, SpaceKindEnum, SpaceStatusEnum, POIIdentityEnum, \
-    DoorStatusEnum, POIStatusEnum, VictimStateEnum, ArrowDirectionEnum
+    DoorStatusEnum, POIStatusEnum, VictimStateEnum, ArrowDirectionEnum, VehicleOrientationEnum
 from src.models.game_board.wall_model import WallModel
 from src.models.game_board.door_model import DoorModel
 from src.models.game_units.victim_model import VictimModel
@@ -428,3 +428,60 @@ class GameBoardModel(Model):
                     tile_dirn = None
 
                 tiles[row_num][col_num].arrow_dirn = tile_dirn
+
+    def get_other_parking_tile(self, first_tile: TileModel) -> TileModel:
+        """Get the other parking spot tile if this one is a parking tile"""
+        parking_type = first_tile.space_kind
+        if parking_type not in [SpaceKindEnum.AMBULANCE_PARKING, SpaceKindEnum.ENGINE_PARKING]:
+            raise Exception("Tile is not a parking space!")
+
+        if first_tile.row == 0 or first_tile.row == self.dimensions[0] - 1:
+            offset = 1 if first_tile.column < self.dimensions[1] - 1 else -1
+            potential_tile = self.get_tile_at(first_tile.row, first_tile.column + offset)
+
+            if potential_tile.space_kind == parking_type:
+                return potential_tile
+
+            offset = -1 if first_tile.column > 0 else 1
+            potential_tile = self.get_tile_at(first_tile.row, first_tile.column + offset)
+
+            if potential_tile.space_kind == parking_type:
+                return potential_tile
+        elif first_tile.column == 0 or first_tile.column == self.dimensions[1] - 1:
+            offset = 1 if first_tile.row < self.dimensions[0] - 1 else -1
+            potential_tile = self.get_tile_at(first_tile.row + offset, first_tile.column)
+
+            if potential_tile.space_kind == parking_type:
+                return potential_tile
+
+            offset = -1 if first_tile.row > 0 else 1
+            potential_tile = self.get_tile_at(first_tile.row + offset, first_tile.column)
+
+            if potential_tile.space_kind == parking_type:
+                return potential_tile
+
+    def get_parking_space_orientation(self, spot: Tuple[TileModel, TileModel]) -> VehicleOrientationEnum:
+        if any(tile.space_kind not in [SpaceKindEnum.ENGINE_PARKING, SpaceKindEnum.AMBULANCE_PARKING] for tile in spot):
+            raise Exception("Tried to get orientation on tiles that are not Parking Spaces!")
+
+        if spot[0].row == spot[1].row + 1 or spot[0].row == spot[1].row - 1:
+            return VehicleOrientationEnum.VERTICAL
+        else:
+            return VehicleOrientationEnum.HORIZONTAL
+
+    def get_distance_to_parking_spot(self, destination: Tuple[TileModel, TileModel]):
+        origin_first_tile = self.get_tile_at(self.ambulance.row, self.ambulance.column)
+        origin_second_tile = self.get_other_parking_tile(origin_first_tile)
+        origin_spot = (origin_first_tile, origin_second_tile)
+
+        first_orientation = self.get_parking_space_orientation(origin_spot)
+        second_orientation = self.get_parking_space_orientation(destination)
+
+        # Grab the rows/columns of each tile. If after removing duplicates theres only 1 entry, then the same.
+        rows = set([tile.row for tile in origin_spot + destination])
+        columns = set([tile.column for tile in origin_spot + destination])
+
+        if len(rows) == 1 or len(columns) == 1:
+            return 0
+
+        return 1 if first_orientation != second_orientation else 2

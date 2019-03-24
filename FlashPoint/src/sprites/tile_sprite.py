@@ -100,7 +100,7 @@ class TileSprite(Interactable, TileObserver):
             return False
 
         for event in EventQueue.get_instance():
-            if event.type == pygame.MOUSEBUTTONUP:
+            if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 return True
         return False
 

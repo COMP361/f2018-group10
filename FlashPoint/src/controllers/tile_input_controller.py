@@ -108,7 +108,10 @@ class TileInputController(GameStateObserver):
         self.vehicle_controller.process_input_placement(tile_sprite)
 
     def execute_drive_ambulance_event(self, tile_model: TileModel):
-        second_tile = self.vehicle_controller.determine_second_tile(tile_model.space_kind, tile_model)
+        if not self.vehicle_controller._run_drive_checks(tile_model):
+            return
+        
+        second_tile = GameStateModel.instance().game_board.get_other_parking_tile(tile_model)
         event = DriveAmbulanceEvent((tile_model, second_tile))
         if Networking.get_instance().is_host:
             Networking.get_instance().send_to_all_client(event)
