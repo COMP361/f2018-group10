@@ -51,10 +51,14 @@ class TileSprite(Interactable, TileObserver):
                                                Text(pygame.font.SysFont('Arial', 15), "Pickup Victim", Color.ORANGE))
         self.drop_victim_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
                                              Text(pygame.font.SysFont('Arial', 15), "Drop Victim", Color.ORANGE))
+
+        self.drive_ambulance_here_button = RectButton(self.rect.x, self.rect.y, 120, 25, Color.BLACK, 0,
+                                             Text(pygame.font.SysFont('Arial', 15), "Drive Ambulance Here", Color.ORANGE))
         self.move_button.disable()
         self.extinguish_button.disable()
         self.pickup_victim_button.disable()
         self.drop_victim_button.disable()
+        self.drive_ambulance_here_button.disable()
 
     def __str__(self):
         return f"TileSprite at: {self.row},{self.column}"
@@ -96,7 +100,7 @@ class TileSprite(Interactable, TileObserver):
             return False
 
         for event in EventQueue.get_instance():
-            if event.type == pygame.MOUSEBUTTONUP:
+            if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 return True
         return False
 
@@ -158,6 +162,11 @@ class TileSprite(Interactable, TileObserver):
                 self.drop_victim_button.rect.x = self.rect.x
                 self.drop_victim_button.rect.y = self.rect.y + offset
                 offset += 20
+            if self.drive_ambulance_here_button.enabled:
+                screen.blit(self.drive_ambulance_here_button.image, self.drive_ambulance_here_button.rect)
+                self.drive_ambulance_here_button.rect.x = self.rect.x
+                self.drive_ambulance_here_button.rect.y = self.rect.y + offset
+                offset += 20
 
     def update(self, event_queue: EventQueue):
         self.sprite_grp.update(event_queue)
@@ -165,6 +174,12 @@ class TileSprite(Interactable, TileObserver):
         self._scroll()
         if self.is_clicked():
             self.click()
+
+        self.drive_ambulance_here_button.update(event_queue)
+        self.drop_victim_button.update(event_queue)
+        self.extinguish_button.update(event_queue)
+        self.pickup_victim_button.update(event_queue)
+        self.move_button.update(event_queue)
 
     def tile_status_changed(self, status: SpaceStatusEnum):
         new_surf = pygame.Surface([self._non_highlight_image.get_width(), self._non_highlight_image.get_height()])
