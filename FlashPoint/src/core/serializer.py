@@ -203,7 +203,7 @@ class JSONSerializer(object):
 
     @staticmethod
     def _deserialize_drive_ambulance_event(payload: Dict) -> DriveAmbulanceEvent:
-        event: DriveAmbulanceEvent()
+        event = DriveAmbulanceEvent()
         event._row = payload['_row']
         event._column = payload['_column']
         return event

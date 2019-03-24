@@ -49,7 +49,7 @@ class VictimController(object):
 
         return False
 
-    def process_input_(self, tile: TileSprite):
+    def process_input(self, tile: TileSprite):
         if self.action_tile:
             self.action_tile.disable_drop()
             self.action_tile.disable_pickup()

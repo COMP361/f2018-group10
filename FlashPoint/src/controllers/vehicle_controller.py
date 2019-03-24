@@ -82,18 +82,33 @@ class VehicleController(object):
                 elif not success:
                     tile_sprite.highlight_color = None
 
-    def _determine_second_tile(self, parking_type: SpaceKindEnum, first_tile: TileModel) -> TileModel:
+    def determine_second_tile(self, parking_type: SpaceKindEnum, first_tile: TileModel) -> TileModel:
         game_state: GameStateModel = GameStateModel.instance()
-        orientation = None
-        if parking_type == SpaceKindEnum.AMBULANCE_PARKING:
-            orientation = game_state.game_board.ambulance.orientation
-        elif parking_type == SpaceKindEnum.ENGINE_PARKING:
-            orientation = game_state.game_board.engine.orientation
 
-        if orientation == VehicleOrientationEnum.HORIZONTAL:
-            return game_state.game_board.get_tile_at(first_tile.row, first_tile.column+1)
-        elif orientation == VehicleOrientationEnum.VERTICAL:
-            return game_state.game_board.get_tile_at(first_tile.row+1, first_tile.column)
+        if first_tile.row == 0 or first_tile.row == game_state.game_board.dimensions[0]-1:
+            offset = 1 if first_tile.column < game_state.game_board.dimensions[1]-1 else -1
+            potential_tile = game_state.game_board.get_tile_at(first_tile.row, first_tile.column+offset)
+
+            if potential_tile.space_kind == parking_type:
+                return potential_tile
+
+            offset = -1 if first_tile.column > 0 else 1
+            potential_tile = game_state.game_board.get_tile_at(first_tile.row, first_tile.column + offset)
+
+            if potential_tile.space_kind == parking_type:
+                return potential_tile
+        elif first_tile.column == 0 or first_tile.column == game_state.game_board.dimensions[1]-1:
+            offset = 1 if first_tile.row < game_state.game_board.dimensions[0] - 1 else -1
+            potential_tile = game_state.game_board.get_tile_at(first_tile.row + offset, first_tile.column)
+
+            if potential_tile.space_kind == parking_type:
+                return potential_tile
+
+            offset = -1 if first_tile.row > 0 else 1
+            potential_tile = game_state.game_board.get_tile_at(first_tile.row + offset, first_tile.column)
+
+            if potential_tile.space_kind == parking_type:
+                return potential_tile
 
     def _player_is_in_parking_space(self, parking_spot: Tuple[TileModel, TileModel]):
         player = self.current_player
@@ -140,7 +155,7 @@ class VehicleController(object):
         game_state: GameStateModel = GameStateModel.instance()
         first_tile = game_state.game_board.get_tile_at(tile_sprite.row, tile_sprite.column)
         parking_type = first_tile.space_kind
-        second_tile = self._determine_second_tile(parking_type, first_tile)
+        second_tile = self.determine_second_tile(first_tile.space_kind, first_tile)
 
         if parking_type == SpaceKindEnum.AMBULANCE_PARKING:
             if self._player_is_in_parking_space((first_tile, second_tile)):
@@ -148,11 +163,14 @@ class VehicleController(object):
                 pass
             else:
                 # Display some kind of prompt for moving the ambulance to here
-                pass
+                tile_sprite.drive_ambulance_here_button.enable()
 
         elif parking_type == SpaceKindEnum.ENGINE_PARKING:
             # Display some kind of prompt for driving/riding the engine
+            tile_sprite.drive_ambulance_here_button.disable()
             pass
+        else:
+            tile_sprite.drive_ambulance_here_button.disable()
 
     def update(self, event_queue: EventQueue):
         game_state: GameStateModel = GameStateModel.instance()

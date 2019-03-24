@@ -10,7 +10,7 @@ from src.models.game_units.player_model import PlayerModel
 class DriveAmbulanceEvent(TurnEvent):
     """Move the Ambulance and all its passengers to the designated spot. Assumes passengers have already climbed on."""
 
-    def __init__(self, parking_spot: Tuple[TileModel] = None):
+    def __init__(self, parking_spot: Tuple[TileModel, TileModel] = None):
         super().__init__()
         self._player: PlayerModel = GameStateModel.instance().players_turn
         self._row = min(tile.row for tile in parking_spot) if parking_spot else -1
@@ -30,4 +30,5 @@ class DriveAmbulanceEvent(TurnEvent):
 
         ap_multiplier = self._determine_distance(original_orientation)
         self._player.ap = self._player.ap - 2*ap_multiplier
+
 

@@ -45,6 +45,10 @@ class GameBoardModel(Model):
         return self._tiles
 
     @property
+    def dimensions(self) -> Tuple[int, int]:
+        return self._dimensions
+
+    @property
     def ambulance(self) -> AmbulanceModel:
         return self._ambulance
 
