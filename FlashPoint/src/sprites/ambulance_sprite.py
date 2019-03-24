@@ -1,5 +1,6 @@
 import pygame
 from src.constants.state_enums import VehicleOrientationEnum
+from src.core.event_queue import EventQueue
 from src.sprites.game_board import GameBoard
 from src.sprites.tile_sprite import TileSprite
 from src.UIComponents.file_importer import FileImporter
@@ -32,7 +33,7 @@ class AmbulanceSprite(pygame.sprite.Sprite, VehicleObserver):
         elif self.orientation == VehicleOrientationEnum.HORIZONTAL and orientation == VehicleOrientationEnum.VERTICAL:
             self.image = pygame.transform.rotate(self.image, 90)
 
-    def update(self):
+    def update(self, event_queue: EventQueue):
         new_x = self.tile_sprite.rect.x
         new_y = self.tile_sprite.rect.y
         self.rect.x = new_x

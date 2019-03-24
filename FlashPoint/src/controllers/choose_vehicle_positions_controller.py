@@ -35,7 +35,6 @@ class ChooseVehiclePositionController(object):
                                               Text(pygame.font.SysFont('Agency FB', 30), "Host Is Placing Vehicles...",
                                                    Color.ORANGE))
 
-
         ChooseVehiclePositionController._instance = self
 
     @classmethod
@@ -96,17 +95,19 @@ class ChooseVehiclePositionController(object):
         if not checks_passed:
             return
 
+        event = None
         parking_spot = None
         if not ambulance_placed:
             parking_spot = [spot for spot in game_state.game_board.ambulance_spots if tile_model in spot][0]
+            event = VehiclePlacedEvent(game_state.game_board.ambulance, parking_spot)
             self.game_board_sprite.add(self.choose_engine_prompt)
         elif not engine_placed:
             parking_spot = [spot for spot in game_state.game_board.engine_spots if tile_model in spot][0]
-
+            event = VehiclePlacedEvent(game_state.game_board.engine, parking_spot)
+            
         if not parking_spot:
             return
 
-        event = VehiclePlacedEvent(game_state.game_board.ambulance, parking_spot)
         if not event:
             return
 
@@ -130,6 +131,3 @@ class ChooseVehiclePositionController(object):
 
         if game_state.state == GameStateEnum.PLACING_VEHICLES:
             self._apply_highlight()
-
-
-

@@ -50,13 +50,16 @@ class VehicleModel(Model):
         self._column = parking_spot[1]
 
         # Maintain the driver being in the front and the passengers in the back
-        if self.orientation == VehicleOrientationEnum.VERTICAL:
-            self.driver.set_pos(self.row + 1, self.column)
-        elif self.orientation == VehicleOrientationEnum.HORIZONTAL:
-            self.driver.set_pos(self.row, self.column+1)
 
-        for passenger in self._passengers:
-            passenger.set_pos(self.row, self.column)
+        if self.driver:
+            if self.orientation == VehicleOrientationEnum.VERTICAL:
+                self.driver.set_pos(self.row + 1, self.column)
+            elif self.orientation == VehicleOrientationEnum.HORIZONTAL:
+                self.driver.set_pos(self.row, self.column+1)
+
+        if self.passengers:
+            for passenger in self._passengers:
+                passenger.set_pos(self.row, self.column)
 
         self._notify_pos()
 

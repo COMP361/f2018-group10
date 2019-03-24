@@ -106,7 +106,6 @@ class TileInputController(GameStateObserver):
         self.vehicle_controller.process_input(tile_sprite)
 
     def execute_drop_event(self, victim: VictimModel):
-        print(f"Drop event created")
         event = DropVictimEvent(victim)
         self.victim_controller.process_input_(GameBoard.instance().grid.grid[victim.column][victim.row])
         if Networking.get_instance().is_host:
@@ -115,7 +114,6 @@ class TileInputController(GameStateObserver):
             Networking.get_instance().client.send(event)
 
     def execute_pickup_event(self, victim: VictimModel):
-        print(f"Pickup event created")
         event = PickupVictimEvent(victim)
         self.victim_controller.process_input_(GameBoard.instance().grid.grid[victim.column][victim.row])
         if Networking.get_instance().is_host:
@@ -124,9 +122,10 @@ class TileInputController(GameStateObserver):
             Networking.get_instance().client.send(event)
 
     def execute_extinguish_event(self, tile: TileModel):
-        print(f"Extinguish event created")
-        print("tile was: ")
         print(tile.space_status)
+        if not self.extinguish_controller._run_checks(tile):
+            return
+
         event = ExtinguishEvent(tile)
 
         if Networking.get_instance().is_host:
@@ -135,7 +134,6 @@ class TileInputController(GameStateObserver):
             Networking.get_instance().send_to_server(event)
 
     def execute_move_event(self, tile: TileModel):
-        print("move_event created")
         self.move_controller.move_to.disable_move()
         event = MoveEvent(tile, self.move_controller.moveable_tiles)
         if Networking.get_instance().is_host:
