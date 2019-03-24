@@ -1,3 +1,4 @@
+from src.controllers.choose_vehicle_positions_controller import ChooseVehiclePositionController
 from src.action_events.turn_events.drop_victim_event import DropVictimEvent
 from src.action_events.turn_events.extinguish_event import ExtinguishEvent
 from src.action_events.turn_events.move_event import MoveEvent
@@ -11,7 +12,7 @@ from src.models.game_units.victim_model import VictimModel
 from src.sprites.tile_sprite import TileSprite
 from src.sprites.game_board import GameBoard
 from src.models.game_units.player_model import PlayerModel
-from src.constants.state_enums import GameStateEnum
+from src.constants.state_enums import GameStateEnum, GameKindEnum
 from src.controllers.choose_starting_position_controller import ChooseStartingPositionController
 from src.controllers.extinguish_controller import ExtinguishController
 from src.controllers.move_controller import MoveController
@@ -41,11 +42,13 @@ class TileInputController(GameStateObserver):
         self.move_controller = MoveController(current_player)
         self.choose_starting_controller = ChooseStartingPositionController(current_player)
         self.victim_controller = VictimController()
+        if GameStateModel.instance().rules == GameKindEnum.EXPERIENCED:
+            self.vehicle_controller = ChooseVehiclePositionController(current_player)
         GameStateModel.instance().add_observer(self)
         self.fireman = current_player
         self.last_tile: TileSprite = None
         current_player.ap = 4
-        GameStateModel.instance().state = GameStateEnum.PLACING
+        GameStateModel.instance().state = GameStateEnum.PLACING_PLAYERS
         TileInputController._instance = self
 
     @classmethod
@@ -59,6 +62,7 @@ class TileInputController(GameStateObserver):
         ChooseStartingPositionController._instance = None
         TileInputController._instance = None
         VictimController._instance = None
+        ChooseVehiclePositionController._instance = None
 
     def move_extinguish_victim(self, tile: TileSprite):
         self.move_controller.process_input(tile)
@@ -98,8 +102,10 @@ class TileInputController(GameStateObserver):
                 self.last_tile.menu_shown = False
             self.last_tile = tile
 
+    def place_vehicles(self, tile_sprite: TileSprite):
+        self.vehicle_controller.process_input(tile_sprite)
+
     def execute_drop_event(self, victim: VictimModel):
-        print(f"Drop event created")
         event = DropVictimEvent(victim)
         self.victim_controller.process_input_(GameBoard.instance().grid.grid[victim.column][victim.row])
         if Networking.get_instance().is_host:
@@ -108,7 +114,6 @@ class TileInputController(GameStateObserver):
             Networking.get_instance().client.send(event)
 
     def execute_pickup_event(self, victim: VictimModel):
-        print(f"Pickup event created")
         event = PickupVictimEvent(victim)
         self.victim_controller.process_input_(GameBoard.instance().grid.grid[victim.column][victim.row])
         if Networking.get_instance().is_host:
@@ -117,9 +122,10 @@ class TileInputController(GameStateObserver):
             Networking.get_instance().client.send(event)
 
     def execute_extinguish_event(self, tile: TileModel):
-        print(f"Extinguish event created")
-        print("tile was: ")
         print(tile.space_status)
+        if not self.extinguish_controller._run_checks(tile):
+            return
+
         event = ExtinguishEvent(tile)
 
         if Networking.get_instance().is_host:
@@ -128,7 +134,6 @@ class TileInputController(GameStateObserver):
             Networking.get_instance().send_to_server(event)
 
     def execute_move_event(self, tile: TileModel):
-        print("move_event created")
         self.move_controller.move_to.disable_move()
         event = MoveEvent(tile, self.move_controller.moveable_tiles)
         if Networking.get_instance().is_host:
@@ -141,8 +146,11 @@ class TileInputController(GameStateObserver):
 
     def notify_game_state(self, state: GameStateEnum):
         on_click = None
-        if state == GameStateEnum.PLACING:
+        if state == GameStateEnum.PLACING_PLAYERS:
             on_click = self.choose_starting_controller.process_input
+        elif state == GameStateEnum.PLACING_VEHICLES:
+            self.vehicle_controller.enable_prompts()
+            on_click = self.vehicle_controller.process_input
         elif state == GameStateEnum.MAIN_GAME:
             on_click = self.move_extinguish_victim
 
@@ -157,3 +165,5 @@ class TileInputController(GameStateObserver):
         self.choose_starting_controller.update(event_queue)
         self.extinguish_controller.update(event_queue)
         self.victim_controller.update(event_queue)
+        if GameStateModel.instance().rules == GameKindEnum.EXPERIENCED:
+            self.vehicle_controller.update(event_queue)

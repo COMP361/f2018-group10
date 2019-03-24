@@ -2,6 +2,8 @@ import json
 import random
 from typing import List, Tuple, Dict
 
+from src.models.game_units.engine_model import EngineModel
+from src.models.game_units.ambulance_model import AmbulanceModel
 from src.models.model import Model
 from src.constants.main_constants import BOARD_DIMENSIONS
 from src.models.game_board.edge_obstacle_model import EdgeObstacleModel
@@ -32,6 +34,8 @@ class GameBoardModel(Model):
             self._tiles = self._init_all_tiles_experienced_classic()
         self._poi_bank = GameBoardModel._init_pois()
         self._active_pois = []
+        self._ambulance = AmbulanceModel((8, 10))
+        self._engine = EngineModel((8, 10))
 
     def _notify_active_poi(self):
         for obs in self.observers:
@@ -39,6 +43,14 @@ class GameBoardModel(Model):
 
     def get_tiles(self) -> List[List[TileModel]]:
         return self._tiles
+
+    @property
+    def ambulance(self) -> AmbulanceModel:
+        return self._ambulance
+
+    @property
+    def engine(self) -> EngineModel:
+        return self._engine
 
     @property
     def tiles(self) -> List[TileModel]:

@@ -11,7 +11,7 @@ class StartGameEvent(ActionEvent):
     """Event to signal every client to start game."""
 
     def execute(self):
-        GameStateModel.instance().state = GameStateEnum.PLACING
+        GameStateModel.instance().state = GameStateEnum.PLACING_PLAYERS
         time.sleep(0.1)
         EventQueue.block()
         EventQueue.post(CustomEvent(ChangeSceneEnum.GAMEBOARDSCENE))

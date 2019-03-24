@@ -11,6 +11,7 @@ from src.action_events.turn_events.extinguish_event import ExtinguishEvent
 from src.action_events.turn_events.move_event import MoveEvent
 from src.action_events.turn_events.pick_up_victim_event import PickupVictimEvent
 from src.action_events.turn_events.open_door_event import OpenDoorEvent
+from src.action_events.vehicle_placed_event import VehiclePlacedEvent
 from src.models.game_board.door_model import DoorModel
 from src.models.game_board.wall_model import WallModel
 from src.models.game_units.victim_model import VictimModel
@@ -182,7 +183,6 @@ class JSONSerializer(object):
         victim: VictimModel = JSONSerializer.deserialize(payload['victim_tile'])
         return DropVictimEvent(victim)
 
-
     @staticmethod
     def _deserialize_pickup_event(payload: Dict) -> PickupVictimEvent:
         victim: VictimModel = JSONSerializer.deserialize(payload['victim_tile'])
@@ -192,6 +192,14 @@ class JSONSerializer(object):
     def _deserialize_set_initial_poi_family_event(payload: Dict) -> SetInitialPOIFamilyEvent:
         seed = payload['seed']
         return SetInitialPOIFamilyEvent(seed)
+
+    @staticmethod
+    def _deserialize_vehicle_placed_event(payload: Dict) -> VehiclePlacedEvent:
+        event: VehiclePlacedEvent = VehiclePlacedEvent()
+        event._vehicle_type = payload['_vehicle_type']
+        event._row = payload['_row']
+        event._column = payload['_column']
+        return event
 
     @staticmethod
     def deserialize(payload: Dict) -> object:
@@ -251,6 +259,8 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_close_door_event(payload)
         elif object_type == SetInitialPOIFamilyEvent.__name__:
             return JSONSerializer._deserialize_set_initial_poi_family_event(payload)
+        elif object_type == VehiclePlacedEvent.__name__:
+            return JSONSerializer._deserialize_vehicle_placed_event(payload)
 
         print(f"WARNING: Could not deserialize object {object_type}, not of recognized type.")
 
