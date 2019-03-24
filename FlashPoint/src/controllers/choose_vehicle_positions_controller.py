@@ -22,7 +22,7 @@ class ChooseVehiclePositionController(object):
         if ChooseVehiclePositionController._instance:
             raise Exception("ChooseVehiclePositionController is a singleton!")
         if GameStateModel.instance().rules != GameKindEnum.EXPERIENCED:
-            raise Exception("ChooseVehiclePositionController should not exist in Experienced Mode!")
+            raise Exception("ChooseVehiclePositionController should not exist in Family Mode!")
         self.current_player = current_player
         self.game_board_sprite = GameBoard.instance()
         self.choose_engine_prompt = RectLabel(500, 0, 350, 75, Color.GREY, 0,
@@ -34,8 +34,7 @@ class ChooseVehiclePositionController(object):
         self.wait_prompt = RectLabel(500, 400, 350, 75, Color.GREY, 0,
                                               Text(pygame.font.SysFont('Agency FB', 30), "Host Is Placing Vehicles...",
                                                    Color.ORANGE))
-        self.game_board_sprite.add(self.choose_ambulance_prompt)
-        self.game_board_sprite.add(self.wait_prompt)
+
 
         ChooseVehiclePositionController._instance = self
 
@@ -62,26 +61,29 @@ class ChooseVehiclePositionController(object):
             return False
 
         # If we reach here then the ambulance has already been placed.
-        if not engine_placed and tile_model.space_kind != SpaceKindEnum.ENGINE_PARKING:
+        if not engine_placed and ambulance_placed and tile_model.space_kind != SpaceKindEnum.ENGINE_PARKING:
             return False
 
         return True
 
     def _apply_highlight(self):
-        grid = self.game_board_sprite.grid
         game_state = GameStateModel.instance()
 
-        for i in range(len(grid)):
-            for j in range(len(grid[i])):
+        for i in range(len(self.game_board_sprite.grid.grid)):
+            for j in range(len(self.game_board_sprite.grid.grid[i])):
                 tile_model = game_state.game_board.get_tile_at(j, i)
-                tile_sprite = grid[i][j]
+                tile_sprite = self.game_board_sprite.grid.grid[i][j]
 
                 success = self._run_checks(tile_model)
 
                 if success and not tile_sprite.highlight_color:
                     tile_sprite.highlight_color = Color.GREEN
                 elif not success:
-                    tile_sprite.hover_color = None
+                    tile_sprite.highlight_color = None
+
+    def enable_prompts(self):
+        self.game_board_sprite.add(self.choose_ambulance_prompt)
+        self.game_board_sprite.add(self.wait_prompt)
 
     def process_input(self, tile_sprite: TileSprite):
         game_state: GameStateModel = GameStateModel.instance()
@@ -126,7 +128,8 @@ class ChooseVehiclePositionController(object):
         if self.current_player == GameStateModel.instance().players_turn:
             self.wait_prompt.kill()
 
-        self._apply_highlight()
+        if game_state.state == GameStateEnum.PLACING_VEHICLES:
+            self._apply_highlight()
 
 
 

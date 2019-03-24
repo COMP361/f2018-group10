@@ -80,7 +80,6 @@ class EndTurnAdvanceFireEvent(TurnEvent):
             # Don't call the next player. Wait until the host chooses the positions.
             if self.game_state.vehicles_have_been_placed():
                 self.game_state.state = GameStateEnum.MAIN_GAME
-            return
 
         # call next player
         self.game_state.next_player()

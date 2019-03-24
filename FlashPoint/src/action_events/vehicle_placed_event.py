@@ -22,6 +22,8 @@ class VehiclePlacedEvent(ActionEvent):
         self._column = min(tile.column for tile in parking_spot)
 
     def execute(self, *args, **kwargs):
+        print("Executing VehiclePlacedEvent")
+
         board_model: GameBoardModel = GameStateModel.instance().game.game_board
         board_sprite: GameBoard = GameBoard.instance()
         tile_sprite = board_sprite.grid.grid[self._column][self._row]

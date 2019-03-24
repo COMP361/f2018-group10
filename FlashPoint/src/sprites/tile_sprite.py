@@ -56,6 +56,9 @@ class TileSprite(Interactable, TileObserver):
         self.pickup_victim_button.disable()
         self.drop_victim_button.disable()
 
+    def __str__(self):
+        return f"TileSprite at: {self.row},{self.column}"
+
     def _draw_hightlight(self):
         self.image.blit(self._non_highlight_image, (0, 0))
         hover = pygame.Surface(

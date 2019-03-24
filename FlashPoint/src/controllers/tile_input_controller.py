@@ -12,7 +12,7 @@ from src.models.game_units.victim_model import VictimModel
 from src.sprites.tile_sprite import TileSprite
 from src.sprites.game_board import GameBoard
 from src.models.game_units.player_model import PlayerModel
-from src.constants.state_enums import GameStateEnum
+from src.constants.state_enums import GameStateEnum, GameKindEnum
 from src.controllers.choose_starting_position_controller import ChooseStartingPositionController
 from src.controllers.extinguish_controller import ExtinguishController
 from src.controllers.move_controller import MoveController
@@ -42,7 +42,8 @@ class TileInputController(GameStateObserver):
         self.move_controller = MoveController(current_player)
         self.choose_starting_controller = ChooseStartingPositionController(current_player)
         self.victim_controller = VictimController()
-        self.vehicle_controller = ChooseVehiclePositionController(current_player)
+        if GameStateModel.instance().rules == GameKindEnum.EXPERIENCED:
+            self.vehicle_controller = ChooseVehiclePositionController(current_player)
         GameStateModel.instance().add_observer(self)
         self.fireman = current_player
         self.last_tile: TileSprite = None
@@ -149,6 +150,9 @@ class TileInputController(GameStateObserver):
         on_click = None
         if state == GameStateEnum.PLACING_PLAYERS:
             on_click = self.choose_starting_controller.process_input
+        elif state == GameStateEnum.PLACING_VEHICLES:
+            self.vehicle_controller.enable_prompts()
+            on_click = self.vehicle_controller.process_input
         elif state == GameStateEnum.MAIN_GAME:
             on_click = self.move_extinguish_victim
 
@@ -163,4 +167,5 @@ class TileInputController(GameStateObserver):
         self.choose_starting_controller.update(event_queue)
         self.extinguish_controller.update(event_queue)
         self.victim_controller.update(event_queue)
-        self.vehicle_controller.update(event_queue)
+        if GameStateModel.instance().rules == GameKindEnum.EXPERIENCED:
+            self.vehicle_controller.update(event_queue)

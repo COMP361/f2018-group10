@@ -46,10 +46,10 @@ class ChooseStartingPositionController(object):
 
                 success = self._run_checks(tile_sprite, tile_model)
 
-                if success and not tile_sprite.highlight_color :
+                if success and not tile_sprite.highlight_color:
                     tile_sprite.highlight_color = Color.GREEN
                 elif not success:
-                    tile_sprite.hover_color = None
+                    tile_sprite.highlight_color = None
 
     def _run_checks(self, tile_sprite: TileSprite, tile_model: TileModel) -> bool:
         if GameStateModel.instance().state != GameStateEnum.PLACING_PLAYERS:
