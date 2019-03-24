@@ -1,8 +1,13 @@
+from src.action_events.turn_events.drop_victim_event import DropVictimEvent
 from src.action_events.turn_events.extinguish_event import ExtinguishEvent
 from src.action_events.turn_events.move_event import MoveEvent
+from src.action_events.turn_events.pick_up_victim_event import PickupVictimEvent
+from src.controllers.victim_controller import VictimController
 from src.core.event_queue import EventQueue
 from src.core.networking import Networking
+from src.models.game_board.null_model import NullModel
 from src.models.game_board.tile_model import TileModel
+from src.models.game_units.victim_model import VictimModel
 from src.sprites.tile_sprite import TileSprite
 from src.sprites.game_board import GameBoard
 from src.models.game_units.player_model import PlayerModel
@@ -35,6 +40,7 @@ class TileInputController(GameStateObserver):
         self.game_board_sprite = GameBoard.instance()
         self.move_controller = MoveController(current_player)
         self.choose_starting_controller = ChooseStartingPositionController(current_player)
+        self.victim_controller = VictimController()
         GameStateModel.instance().add_observer(self)
         self.fireman = current_player
         self.last_tile: TileSprite = None
@@ -46,9 +52,18 @@ class TileInputController(GameStateObserver):
     def instance(cls):
         return cls._instance
 
-    def move_and_extinguish(self, tile: TileSprite):
+    @staticmethod
+    def __del__():
+        ExtinguishController._instance = None
+        MoveController._instance = None
+        ChooseStartingPositionController._instance = None
+        TileInputController._instance = None
+        VictimController._instance = None
+
+    def move_extinguish_victim(self, tile: TileSprite):
         self.move_controller.process_input(tile)
         self.extinguish_controller.process_input(tile)
+        self.victim_controller.process_input_(tile)
         tile_model = GameStateModel.instance().game_board.get_tile_at(tile.row, tile.column)
 
         if tile.menu_shown:
@@ -60,11 +75,46 @@ class TileInputController(GameStateObserver):
                 self.extinguish_controller.fire_tile.extinguish_button.on_click(self.execute_extinguish_event, tile_model)
                 self.extinguish_controller.fire_tile.extinguish_button.update(EventQueue.get_instance())
 
+            if self.victim_controller.can_drop:
+                victim: VictimModel = self.fireman.carrying_victim
+                if not isinstance(victim, NullModel):
+                    self.victim_controller.action_tile.drop_victim_button.on_click(self.execute_drop_event, victim)
+                    self.victim_controller.action_tile.drop_victim_button.update(EventQueue.get_instance())
+
+            elif self.victim_controller.can_pickup:
+                victim: VictimModel = None
+                board = GameStateModel.instance().game_board
+                for assoc_model in board.get_tile_at(tile.row, tile.column).associated_models:
+                    if isinstance(assoc_model, VictimModel):
+                            victim = assoc_model
+
+                if victim:
+                    self.victim_controller.action_tile.pickup_victim_button.on_click(self.execute_pickup_event, victim)
+                    self.victim_controller.action_tile.pickup_victim_button.update(EventQueue.get_instance())
+
         if not tile.menu_shown:
             tile.menu_shown = True
             if self.last_tile:
                 self.last_tile.menu_shown = False
             self.last_tile = tile
+
+    def execute_drop_event(self, victim: VictimModel):
+        print(f"Drop event created")
+        event = DropVictimEvent(victim)
+        self.victim_controller.process_input_(GameBoard.instance().grid.grid[victim.column][victim.row])
+        if Networking.get_instance().is_host:
+            Networking.get_instance().send_to_all_client(event)
+        else:
+            Networking.get_instance().client.send(event)
+
+    def execute_pickup_event(self, victim: VictimModel):
+        print(f"Pickup event created")
+        event = PickupVictimEvent(victim)
+        self.victim_controller.process_input_(GameBoard.instance().grid.grid[victim.column][victim.row])
+        if Networking.get_instance().is_host:
+            Networking.get_instance().send_to_all_client(event)
+        else:
+            Networking.get_instance().client.send(event)
 
     def execute_extinguish_event(self, tile: TileModel):
         print(f"Extinguish event created")
@@ -75,7 +125,7 @@ class TileInputController(GameStateObserver):
         if Networking.get_instance().is_host:
             Networking.get_instance().send_to_all_client(event)
         else:
-            Networking.get_instance().client.send(event)
+            Networking.get_instance().send_to_server(event)
 
     def execute_move_event(self, tile: TileModel):
         print("move_event created")
@@ -84,7 +134,7 @@ class TileInputController(GameStateObserver):
         if Networking.get_instance().is_host:
             Networking.get_instance().send_to_all_client(event)
         else:
-            Networking.get_instance().client.send(event)
+            Networking.get_instance().send_to_server(event)
 
     def notify_player_index(self, player_index: int):
         pass
@@ -94,7 +144,7 @@ class TileInputController(GameStateObserver):
         if state == GameStateEnum.PLACING:
             on_click = self.choose_starting_controller.process_input
         elif state == GameStateEnum.MAIN_GAME:
-            on_click = self.move_and_extinguish
+            on_click = self.move_extinguish_victim
 
         grid = self.game_board_sprite.grid.grid
         for column in range(len(grid)):
@@ -106,3 +156,4 @@ class TileInputController(GameStateObserver):
         self.move_controller.update(event_queue)
         self.choose_starting_controller.update(event_queue)
         self.extinguish_controller.update(event_queue)
+        self.victim_controller.update(event_queue)

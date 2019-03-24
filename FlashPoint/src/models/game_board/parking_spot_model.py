@@ -1,5 +1,5 @@
-from models.model import Model
-from models.game_units.vehicle_model import VehicleModel
+from src.models.model import Model
+from src.models.game_units.vehicle_model import VehicleModel
 from src.constants.state_enums import VehicleKindEnum
 
 

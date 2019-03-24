@@ -11,6 +11,7 @@ class ChopEvent(TurnEvent):
         self.wall = GameStateModel.instance().game_board.get_tile_at(wall.id[0], wall.id[1]).get_obstacle_in_direction(wall.id[2])
 
     def execute(self):
+        print("Executing Chop Event")
         GameStateModel.lock.acquire()
         game: GameStateModel = GameStateModel.instance()
         self.wall.inflict_damage()

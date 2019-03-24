@@ -1,12 +1,14 @@
 from typing import Optional, List
 
+from src.models.game_units.poi_model import POIModel
+from src.models.game_units.victim_model import VictimModel
 from src.models.game_board.door_model import DoorModel
 from src.models.game_board.wall_model import WallModel
 from src.models.model import Model
 from src.core.flashpoint_exceptions import TilePositionOutOfBoundsException
 from src.models.game_board.edge_obstacle_model import EdgeObstacleModel
 from src.models.game_board.null_model import NullModel
-from src.constants.state_enums import SpaceKindEnum, DoorStatusEnum, WallStatusEnum
+from src.constants.state_enums import SpaceKindEnum, DoorStatusEnum, WallStatusEnum, ArrowDirectionEnum
 from src.constants.state_enums import SpaceStatusEnum
 from src.observers.tile_observer import TileObserver
 
@@ -37,6 +39,8 @@ class TileModel(Model):
             "West": NullModel(),
             "South": NullModel(),
         }
+
+        self._arrow_dirn: ArrowDirectionEnum = None
 
     def __str__(self):
         tile_pos = "Tile at: ({row}, {column})".format(row=self.row, column=self.column)
@@ -92,6 +96,14 @@ class TileModel(Model):
     @property
     def adjacent_edge_objects(self):
         return self._adjacent_edge_objects
+
+    @property
+    def arrow_dirn(self):
+        return self._arrow_dirn
+
+    @arrow_dirn.setter
+    def arrow_dirn(self, arrow_dirn: ArrowDirectionEnum):
+        self._arrow_dirn = arrow_dirn
 
     @property
     def north_tile(self):
@@ -164,9 +176,9 @@ class TileModel(Model):
         Get the TileModel in a specified direction.
         "raise TilePositionOutOfBoundsException: If there is no Tile in that direction.
         """
-        tile = self._adjacent_tiles.get(direction, None)
-        if not tile:
-            raise TilePositionOutOfBoundsException(self, direction)
+        tile = self._adjacent_tiles.get(direction, NullModel)
+        if isinstance(tile, NullModel):
+            raise TilePositionOutOfBoundsException(tile, direction)
         return tile
 
     def get_obstacle_in_direction(self, direction: str) -> Optional['EdgeObstacleModel']:
@@ -203,7 +215,7 @@ class TileModel(Model):
     def add_associated_model(self, model: Model):
         # The model's observers will take care
         # of redrawing the model in the new location
-        model.set_position(self.row, self.column)
+
         self._associated_models.append(model)
         self._notify_assoc_models()
 
@@ -223,3 +235,9 @@ class TileModel(Model):
 
     def reset_adjacencies(self):
         self._adjacent_tiles = {}
+
+    def has_poi_or_victim(self) -> bool:
+        for model in self.associated_models:
+            if isinstance(model, POIModel) or isinstance(model, VictimModel):
+                return True
+        return False

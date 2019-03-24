@@ -26,23 +26,14 @@ class DamageState(pygame.sprite.Sprite):
         self.current_rect = self.text_name.get_rect()
         self.current_rect.move_ip(80, 40)
         self.slash_rect = self.text_slash.get_rect()
-        self.slash_rect.move_ip(90,40)
+        self.slash_rect.move_ip(90, 40)
         self.max_rect = self.text_max.get_rect()
         self.max_rect.move_ip(100, 40)
 
-
-
-
-
-
-    def update(self,event_queue: EventQueue):
-
+    def update(self, event_queue: EventQueue):
         self.image.fill(Color.GREEN)
         self.image.blit(self.text_name, self.name_rect)
         self.image.blit(self.text_current, self.current_rect)
         self.image.blit(self.text_slash, self.slash_rect)
         self.image.blit(self.text_max, self.max_rect)
         pygame.draw.rect(self.image, Color.RED, self.image.get_rect(), 2)
-
-
-

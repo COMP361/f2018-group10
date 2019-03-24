@@ -1,5 +1,4 @@
 import src.constants.color as Color
-from src.constants.state_enums import PlayerStatusEnum
 from src.models.game_state_model import GameStateModel
 from src.action_events.action_event import ActionEvent
 from src.models.game_units.player_model import PlayerModel
@@ -11,6 +10,7 @@ class JoinEvent(ActionEvent):
         self.player = player
 
     def execute(self):
+        print("Executing JoinEvent")
         self.player.color = None
 
         colors = {

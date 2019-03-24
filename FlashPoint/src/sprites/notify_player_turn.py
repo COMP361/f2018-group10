@@ -2,13 +2,14 @@ import threading
 import pygame
 import time
 from threading import Thread
+
 import src.constants.color as Color
+from src.action_events.end_turn_advance_fire import EndTurnAdvanceFireEvent
 from src.UIComponents.rect_label import RectLabel
 from src.UIComponents.rect_button import RectButton
-from src.action_events.turn_events.end_turn_event import EndTurnEvent
 from src.core.event_queue import EventQueue
 from src.core.networking import Networking
-from constants.state_enums import GameStateEnum
+from src.constants.state_enums import GameStateEnum
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 from src.observers.game_state_observer import GameStateObserver
@@ -47,28 +48,22 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
         self._current_player = current_player
         self._current_sprite = current_sprite
         self._active_sprites = sprite_group
+        self._should_advance_fire = False
+        self.btn = None
+        self.your_turn = None
 
         GameStateModel.instance().add_observer(self)
-
-    # def draw(self, screen: pygame.display):
-    #     if self.enabled and self._current_sprite.turn:
-    #         self.image.blit(self.bg, self.image.get_rect())
-    #         self.image.blit(self.frame, self.image.get_rect())
-    #         self.image.blit(self.text, self.image.get_rect().move(77, 7))
-    #         screen.blit(self.image, self.image.get_rect().move(880, 600))
 
     def update(self, event_queue:EventQueue):
         if self.enabled and self._current_sprite.turn:
             self.image.blit(self.bg, self.image.get_rect())
             self.image.blit(self.frame, self.image.get_rect())
             self.image.blit(self.text, self.image.get_rect().move(77, 7))
-            #screen.blit(self.image, self.image.get_rect().move(880, 600))
 
     def notify_player_index(self, player_index: int):
-        print("Player index" + str(player_index))
         for player in GameStateModel.instance().players:
             print(player.nickname)
-        print(self._current_player.nickname)
+
         self.enabled = (GameStateModel.instance().players[player_index] == self._current_player)
 
         if self.enabled:
@@ -80,16 +75,17 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
             self._current_sprite.turn = True
             self.running = True
 
-            self.countdown_thread = Thread(target=self.countdown, args=(120,))
+            self.countdown_thread = Thread(target=self.countdown, args=(120,), daemon=True)
             self.countdown_thread.start()
         else:
             self._current_sprite.turn = False
-            self._active_sprites.remove(self.btn)
-            self._active_sprites.remove(self.your_turn)
+            if self.btn:
+                self._active_sprites.remove(self.btn)
+            if self.your_turn:
+                self._active_sprites.remove(self.your_turn)
             self._active_sprites.add(self.not_your_turn)
 
     def _init_your_turn(self):
-
         rct = RectLabel(880, 600, 250, 50, background=Color.ORANGE,
                         txt_obj=Text(pygame.font.SysFont('Agency FB', 30), "YOUR TURN", Color.GREEN2))
         rct.change_bg_image('media/GameHud/wood2.png')
@@ -123,15 +119,18 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
         self.enabled = False
         self.running = False
 
-        turn_event = EndTurnEvent(self._current_player)
+        turn_event = EndTurnAdvanceFireEvent()
         # send end turn, see ChatBox for example
         try:
             if Networking.get_instance().is_host:
                 Networking.get_instance().send_to_all_client(turn_event)
             else:
-                Networking.get_instance().client.send(turn_event)
+                Networking.get_instance().send_to_server(turn_event)
         except AttributeError as e:
             pass
+
+        if not self._should_advance_fire:
+            self._should_advance_fire = True
         
     def _end_turn(self):
         self._current_sprite.turn = False

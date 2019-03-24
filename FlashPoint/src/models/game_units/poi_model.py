@@ -1,6 +1,6 @@
 from typing import List
 
-from src.core.flashpoint_exceptions import POINotRevealedYetException
+from src.models.game_units.victim_model import VictimModel
 from src.observers.poi_observer import POIObserver
 from src.constants.state_enums import POIStatusEnum, POIIdentityEnum
 from src.models.model import Model
@@ -15,14 +15,22 @@ class POIModel(Model):
         self._row = -7
         self._column = -7
 
-    def reveal(self):
-        if self._status is POIStatusEnum.HIDDEN:
-            self._status = POIStatusEnum.REVEALED
-            self._notify_status()
+    def __str__(self):
+        return f"PoiModel: {self._identity} at: ({self._row}, {self._column})"
 
-    def _notify_status(self):
+    def __eq__(self, other):
+        if not isinstance(other, POIModel):
+            return False
+        return all([self.row == other.row, self.column==other.column, self.identity == other.identity, self.status == other.status])
+
+    def reveal(self, victim_model: VictimModel):
+        if self._status == POIStatusEnum.HIDDEN:
+            self._status = POIStatusEnum.REVEALED
+            self._notify_status(victim_model)
+
+    def _notify_status(self, victim_model: VictimModel):
         for obs in self.observers:
-            obs.poi_status_changed(self.status)
+            obs.poi_status_changed(self.status, victim_model)
 
     def _notify_position(self):
         for obs in self.observers:
@@ -40,7 +48,7 @@ class POIModel(Model):
     def column(self) -> int:
         return self._column
 
-    def set_position(self, row: int, column: int):
+    def set_pos(self, row: int, column: int):
         self._row = row
         self._column = column
         self._notify_position()
@@ -52,13 +60,8 @@ class POIModel(Model):
     @status.setter
     def status(self, status: POIStatusEnum):
         self._status = status
-        self._notify_status()
 
     @property
     def identity(self) -> POIIdentityEnum:  # GOTTA CHECK IF IT IS REVEALED YET
         """Is this POI a Victim or a FalseAlarm?"""
-        if self._status is not POIStatusEnum.REVEALED:
-            raise POINotRevealedYetException()
-
-        else:
-            return self._identity
+        return self._identity

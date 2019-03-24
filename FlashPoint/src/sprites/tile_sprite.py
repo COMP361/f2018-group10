@@ -3,7 +3,6 @@ from typing import Tuple, List
 import pygame
 from src.UIComponents.file_importer import FileImporter
 from src.UIComponents.rect_button import RectButton
-from src.action_events.action_event import ActionEvent
 from src.models.game_state_model import GameStateModel
 from src.constants.state_enums import SpaceStatusEnum
 from src.UIComponents.interactable import Interactable
@@ -45,11 +44,17 @@ class TileSprite(Interactable, TileObserver):
         # ------- POP-UP MENU -------- #
         self.menu_shown = False
         self.move_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
-                                      Text(pygame.font.SysFont('Arial', 15), "MoVe HeRe", Color.ORANGE))
+                                      Text(pygame.font.SysFont('Arial', 15), "Move Here", Color.ORANGE))
         self.extinguish_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
-                                            Text(pygame.font.SysFont('Arial', 15), "ExTiNgUiSh FiRe", Color.ORANGE))
+                                            Text(pygame.font.SysFont('Arial', 15), "Extinguish Fire", Color.ORANGE))
+        self.pickup_victim_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
+                                               Text(pygame.font.SysFont('Arial', 15), "Pickup Victim", Color.ORANGE))
+        self.drop_victim_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
+                                             Text(pygame.font.SysFont('Arial', 15), "Drop Victim", Color.ORANGE))
         self.move_button.disable()
         self.extinguish_button.disable()
+        self.pickup_victim_button.disable()
+        self.drop_victim_button.disable()
 
     def _draw_hightlight(self):
         self.image.blit(self._non_highlight_image, (0, 0))
@@ -67,14 +72,6 @@ class TileSprite(Interactable, TileObserver):
     @highlight_color.setter
     def highlight_color(self, color: Tuple[int, int, int]):
         self._highlight_color = color
-        # hover = pygame.Surface(
-        #     (self._non_highlight_image.get_width(), self._non_highlight_image.get_height())).convert_alpha()
-        # if self._highlight_color:
-        #     hover.fill(self._highlight_color)
-        #     hover.set_alpha(10)
-        #     self.image.blit(hover, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
-        # else:
-        #     self.image.blit(self._non_highlight_image, (0, 0))
 
     def hover(self):
         if self._is_enabled:
@@ -131,6 +128,7 @@ class TileSprite(Interactable, TileObserver):
         self._draw_hightlight()
         screen.blit(self.image, self.rect)
 
+    def draw_menu(self, screen: pygame.Surface):
         if self.menu_shown:
             offset = 0
             if self.move_button.enabled:
@@ -145,6 +143,17 @@ class TileSprite(Interactable, TileObserver):
                 self.extinguish_button.rect.x = self.rect.x
                 self.extinguish_button.rect.y = self.rect.y + offset
                 # self.extinguish_button.change_pos(self.rect.x, self.rect.y + offset)
+                offset += 20
+            if self.pickup_victim_button.enabled:
+                screen.blit(self.pickup_victim_button.image, self.pickup_victim_button.rect)
+                self.pickup_victim_button.rect.x = self.rect.x
+                self.pickup_victim_button.rect.y = self.rect.y + offset
+                offset += 20
+
+            elif self.drop_victim_button.enabled:
+                screen.blit(self.drop_victim_button.image, self.drop_victim_button.rect)
+                self.drop_victim_button.rect.x = self.rect.x
+                self.drop_victim_button.rect.y = self.rect.y + offset
                 offset += 20
 
     def update(self, event_queue: EventQueue):
@@ -181,3 +190,15 @@ class TileSprite(Interactable, TileObserver):
 
     def disable_extinguish(self):
         self.extinguish_button.disable()
+
+    def enable_pickup(self):
+        self.pickup_victim_button.enable()
+
+    def disable_pickup(self):
+        self.pickup_victim_button.disable()
+
+    def enable_drop(self):
+        self.drop_victim_button.enable()
+
+    def disable_drop(self):
+        self.drop_victim_button.disable()
