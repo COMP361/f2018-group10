@@ -54,11 +54,18 @@ class TileSprite(Interactable, TileObserver):
 
         self.drive_ambulance_here_button = RectButton(self.rect.x, self.rect.y, 120, 25, Color.BLACK, 0,
                                              Text(pygame.font.SysFont('Arial', 15), "Drive Ambulance Here", Color.ORANGE))
+        self.drive_engine_here_button = RectButton(self.rect.x, self.rect.y, 120, 25, Color.BLACK, 0,
+                                                      Text(pygame.font.SysFont('Arial', 15), "Drive Engine Here",
+                                                           Color.ORANGE))
+        self.ride_vehicle_button = RectButton(self.rect.x, self.rect.y, 120, 25, Color.BLACK, 0,
+                                              Text(pygame.font.SysFont('Arial', 15), "Ride Vehicle", Color.ORANGE))
         self.move_button.disable()
         self.extinguish_button.disable()
         self.pickup_victim_button.disable()
         self.drop_victim_button.disable()
         self.drive_ambulance_here_button.disable()
+        self.drive_engine_here_button.disable()
+        self.ride_vehicle_button.disable()
 
     def __str__(self):
         return f"TileSprite at: {self.row},{self.column}"
@@ -164,6 +171,18 @@ class TileSprite(Interactable, TileObserver):
                 offset += 20
             if self.drive_ambulance_here_button.enabled:
                 screen.blit(self.drive_ambulance_here_button.image, self.drive_ambulance_here_button.rect)
+                self.drive_ambulance_here_button.rect.x = self.rect.x
+                self.drive_ambulance_here_button.rect.y = self.rect.y + offset
+                offset += 20
+
+            if self.drive_engine_here_button.enabled:
+                screen.blit(self.drive_engine_here_button.image, self.drive_engine_here_button.rect)
+                self.drive_engine_here_button.rect.x = self.rect.x
+                self.drive_engine_here_button.rect.y = self.rect.y + offset
+                offset += 20
+
+            if self.ride_vehicle_button.enabled:
+                screen.blit(self.ride_vehicle_button.image, self.drive_ambulance_here_button.rect)
                 self.drive_ambulance_here_button.rect.x = self.rect.x
                 self.drive_ambulance_here_button.rect.y = self.rect.y + offset
                 offset += 20

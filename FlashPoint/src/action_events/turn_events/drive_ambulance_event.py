@@ -15,7 +15,7 @@ class DriveAmbulanceEvent(TurnEvent):
         self._player: PlayerModel = GameStateModel.instance().players_turn
         self._row = min(tile.row for tile in parking_spot) if parking_spot else -1
         self._column = min(tile.column for tile in parking_spot) if parking_spot else -1
-        self._board_model : GameBoardModel = GameStateModel.instance().game_board
+        self._board_model: GameBoardModel = GameStateModel.instance().game_board
 
     def execute(self, *args, **kwargs):
         destination_first_tile = self._board_model.get_tile_at(self._row, self._column)
