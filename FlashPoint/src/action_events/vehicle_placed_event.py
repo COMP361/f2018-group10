@@ -44,6 +44,6 @@ class VehiclePlacedEvent(ActionEvent):
 
             # Create EngineSprite
             engine_sprite = EngineSprite(board_model.engine.orientation, tile_sprite)
-            board_model.ambulance.add_observer(engine_sprite)
+            board_model.engine.add_observer(engine_sprite)
             # Add to gameboard sprite group
             board_sprite.add(engine_sprite)

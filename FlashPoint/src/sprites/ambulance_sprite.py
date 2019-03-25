@@ -30,8 +30,11 @@ class AmbulanceSprite(pygame.sprite.Sprite, VehicleObserver):
         # Fix the orientation if needed
         if self.orientation == VehicleOrientationEnum.VERTICAL and orientation == VehicleOrientationEnum.HORIZONTAL:
             self.image = pygame.transform.rotate(self.image, -90)
+
         elif self.orientation == VehicleOrientationEnum.HORIZONTAL and orientation == VehicleOrientationEnum.VERTICAL:
             self.image = pygame.transform.rotate(self.image, 90)
+
+        self.orientation = orientation
 
     def update(self, event_queue: EventQueue):
         new_x = self.tile_sprite.rect.x
