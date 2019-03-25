@@ -1,12 +1,14 @@
 from typing import Optional, List
 
+from src.models.game_units.poi_model import POIModel
+from src.models.game_units.victim_model import VictimModel
 from src.models.game_board.door_model import DoorModel
 from src.models.game_board.wall_model import WallModel
 from src.models.model import Model
 from src.core.flashpoint_exceptions import TilePositionOutOfBoundsException
 from src.models.game_board.edge_obstacle_model import EdgeObstacleModel
 from src.models.game_board.null_model import NullModel
-from src.constants.state_enums import SpaceKindEnum, DoorStatusEnum, WallStatusEnum
+from src.constants.state_enums import SpaceKindEnum, DoorStatusEnum, WallStatusEnum, ArrowDirectionEnum
 from src.constants.state_enums import SpaceStatusEnum
 from src.observers.tile_observer import TileObserver
 
@@ -38,11 +40,18 @@ class TileModel(Model):
             "South": NullModel(),
         }
 
+        self._arrow_dirn: ArrowDirectionEnum = None
+
     def __str__(self):
         tile_pos = "Tile at: ({row}, {column})".format(row=self.row, column=self.column)
         tile_state = "Space status: {status}".format(status=self.space_status)
         tile_kind = "Space kind: {kind}\n".format(kind=self.space_kind)
         return '\n'.join([tile_pos, tile_state, tile_kind])
+
+    def __eq__(self, other):
+        if isinstance(other, TileModel):
+            return self.row == other.row and self.column == other.column
+        return False
 
     def _notify_status(self):
         for obs in self.observers:
@@ -92,6 +101,14 @@ class TileModel(Model):
     @property
     def adjacent_edge_objects(self):
         return self._adjacent_edge_objects
+
+    @property
+    def arrow_dirn(self):
+        return self._arrow_dirn
+
+    @arrow_dirn.setter
+    def arrow_dirn(self, arrow_dirn: ArrowDirectionEnum):
+        self._arrow_dirn = arrow_dirn
 
     @property
     def north_tile(self):
@@ -223,3 +240,9 @@ class TileModel(Model):
 
     def reset_adjacencies(self):
         self._adjacent_tiles = {}
+
+    def has_poi_or_victim(self) -> bool:
+        for model in self.associated_models:
+            if isinstance(model, POIModel) or isinstance(model, VictimModel):
+                return True
+        return False

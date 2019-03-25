@@ -14,7 +14,10 @@ class POIModel(Model):
         self._status = POIStatusEnum.HIDDEN
         self._row = -7
         self._column = -7
-        
+
+    def __str__(self):
+        return f"PoiModel: {self._identity} at: ({self._row}, {self._column})"
+
     def __eq__(self, other):
         if not isinstance(other, POIModel):
             return False
@@ -23,8 +26,6 @@ class POIModel(Model):
     def reveal(self, victim_model: VictimModel):
         if self._status == POIStatusEnum.HIDDEN:
             self._status = POIStatusEnum.REVEALED
-            print("Revealed in model")
-            print("POI position: {row}, {column} Identity: {iden}".format(row=self.row, column=self.column, iden=self.identity))
             self._notify_status(victim_model)
 
     def _notify_status(self, victim_model: VictimModel):
