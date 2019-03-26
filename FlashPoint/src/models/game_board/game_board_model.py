@@ -11,7 +11,7 @@ from src.models.game_board.null_model import NullModel
 from src.models.game_units.poi_model import POIModel
 from src.models.game_board.tile_model import TileModel
 from src.constants.state_enums import GameKindEnum, SpaceKindEnum, SpaceStatusEnum, POIIdentityEnum, \
-    DoorStatusEnum, POIStatusEnum, VictimStateEnum, ArrowDirectionEnum, VehicleOrientationEnum
+    DoorStatusEnum, POIStatusEnum, VictimStateEnum, ArrowDirectionEnum, VehicleOrientationEnum, GameBoardTypeEnum
 from src.models.game_board.wall_model import WallModel
 from src.models.game_board.door_model import DoorModel
 from src.models.game_units.victim_model import VictimModel
@@ -30,12 +30,15 @@ class GameBoardModel(Model):
         self._engine_spots = []
         if game_type == GameKindEnum.FAMILY:
             self._tiles = self._init_all_tiles_family_classic()
+
         else:
             self._tiles = self._init_all_tiles_experienced_classic()
+            self.board_type = GameBoardTypeEnum.ORIGINAL
         self._poi_bank = GameBoardModel._init_pois()
         self._active_pois = []
         self._ambulance = AmbulanceModel((8, 10))
         self._engine = EngineModel((8, 10))
+
 
     def _notify_active_poi(self):
         for obs in self.observers:
@@ -43,6 +46,10 @@ class GameBoardModel(Model):
 
     def get_tiles(self) -> List[List[TileModel]]:
         return self._tiles
+
+    # @property
+    # def board_type(self):
+    #     return self.board_type
 
     @property
     def dimensions(self) -> Tuple[int, int]:
