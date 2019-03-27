@@ -5,6 +5,7 @@ from src.constants.change_scene_enum import ChangeSceneEnum
 from src.constants.state_enums import GameBoardTypeEnum
 from src.core.custom_event import CustomEvent
 from src.core.event_queue import EventQueue
+from src.models.game_board.game_board_model import GameBoardModel
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 from src.UIComponents.rect_button import RectButton
@@ -72,7 +73,8 @@ class ChooseBoard(object):
 
     @staticmethod
     def set_and_continue(type : GameBoardTypeEnum):
-        GameStateModel.instance().game_board.board_type = type
+
+        GameStateModel.instance().game_board = GameBoardModel(GameStateModel.instance(), type)
         EventQueue.post(CustomEvent(ChangeSceneEnum.SETMAXPLAYERSCENE))
 
     def draw(self, screen):

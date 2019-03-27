@@ -23,12 +23,12 @@ class GameBoardModel(Model):
     etc. This class is created inside of GameStateModel.
     """
 
-    def __init__(self, game_type: GameKindEnum):
+    def __init__(self, game_type: GameKindEnum, type: GameBoardTypeEnum):
         super().__init__()
         self._dimensions = (8, 10)
         self._ambulance_spots = []
         self._engine_spots = []
-        self.board_type = None
+        self.board_type = type
         if game_type == GameKindEnum.FAMILY:
             if(self.board_type == GameBoardTypeEnum.ORIGINAL):
                 self._tiles = self._init_all_tiles_family_classic()

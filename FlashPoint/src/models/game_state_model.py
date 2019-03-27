@@ -29,7 +29,7 @@ class GameStateModel(Model):
             self._red_dice = 0
             self._black_dice = 0
 
-            self._game_board = GameBoardModel(self._rules)
+            self._game_board = None
 
             self._victims_saved = 0
             self._victims_lost = 0
@@ -70,6 +70,11 @@ class GameStateModel(Model):
         with GameStateModel.lock:
             return self._game_board
 
+    @game_board.setter
+    def game_board(self,board: GameBoardModel):
+        with GameStateModel.lock:
+            self.game_board = board
+
     @property
     def chat_history(self) -> List[Tuple[str, str]]:
         with GameStateModel.lock:
@@ -95,6 +100,10 @@ class GameStateModel(Model):
     def max_players(self, max_players: int):
         with GameStateModel.lock:
             self._max_desired_players = max_players
+
+
+
+
 
     @property
     def players(self)-> List[PlayerModel]:
