@@ -5,6 +5,7 @@ from src.action_events.replenish_poi_event import ReplenishPOIEvent
 from src.models.game_board.door_model import DoorModel
 from src.models.game_board.null_model import NullModel
 from src.models.game_board.wall_model import WallModel
+from src.models.game_units.hazmat_model import HazmatModel
 from src.models.game_units.poi_model import POIModel
 from src.models.game_units.victim_model import VictimModel
 from src.models.game_board.tile_model import TileModel
@@ -86,6 +87,13 @@ class EndTurnAdvanceFireEvent(TurnEvent):
 
     def advance_on_tile(self, target_tile: TileModel):
         tile_status = target_tile.space_status
+        assoc_models = target_tile.associated_models
+
+        for model in assoc_models:
+            if isinstance(model, HazmatModel):
+                target_tile.remove_associated_model(model)
+                target_tile.space_status = SpaceStatusEnum.FIRE
+
         # Safe -> Smoke
         if tile_status == SpaceStatusEnum.SAFE:
             target_tile.space_status = SpaceStatusEnum.SMOKE
