@@ -39,7 +39,6 @@ class GameStateModel(Model):
             self._state = GameStateEnum.READY_TO_JOIN
 
             GameStateModel._instance = self
-
         else:
             print("Attempted to instantiate another singleton")
             raise Exception("GameStateModel is a Singleton")
@@ -101,10 +100,6 @@ class GameStateModel(Model):
         with GameStateModel.lock:
             self._max_desired_players = max_players
 
-
-
-
-
     @property
     def players(self)-> List[PlayerModel]:
         with GameStateModel.lock:
@@ -156,7 +151,7 @@ class GameStateModel(Model):
     def difficulty_level(self) -> Optional[DifficultyLevelEnum]:
         """Difficulty level of an experienced game. A Family game should not have a difficulty level."""
         with GameStateModel.lock:
-            if self._rules != GameKindEnum.FAMILY or None:
+            if self._rules == GameKindEnum.FAMILY or None:
                 print("WARNING: GameKind is FAMILY, you should not be accessing Difficulty Level.")
                 return
             return self._difficulty_level
