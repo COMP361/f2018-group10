@@ -1,5 +1,7 @@
 import random
 
+from src.sprites.game_board import GameBoard
+from src.sprites.hazmat_sprite import HazmatSprite
 from src.models.game_units.victim_model import VictimModel
 from src.models.game_units.poi_model import POIModel
 from src.models.game_units.hazmat_model import HazmatModel
@@ -62,4 +64,5 @@ class PlaceHazmatEvent(ActionEvent):
 
             print(f"Placed hazmat on location: {new_haz_row}, {new_haz_column}")
             tile.add_associated_model(HazmatModel())
+            GameBoard.instance().add(HazmatSprite(tile))
             hazmat_to_place -= 1
