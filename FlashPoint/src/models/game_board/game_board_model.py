@@ -23,23 +23,29 @@ class GameBoardModel(Model):
     etc. This class is created inside of GameStateModel.
     """
 
-    def __init__(self, game_type: GameKindEnum):
+    def __init__(self, game_type: GameKindEnum, type: GameBoardTypeEnum):
         super().__init__()
         self._dimensions = (8, 10)
         self._ambulance_spots = []
         self._engine_spots = []
+        self._board_type = type
+
         if game_type == GameKindEnum.FAMILY:
-            self._tiles = self._init_all_tiles_family_classic()
+            if self._board_type == GameBoardTypeEnum.ORIGINAL:
+                self._tiles = self._init_all_tiles_family_classic()
+            else:
+                self._tiles = self._init_all_tiles_experienced_classic()
 
         else:
-            self._tiles = self._init_all_tiles_experienced_classic()
-            self.board_type = GameBoardTypeEnum.ORIGINAL
+            if self._board_type == GameBoardTypeEnum.ORIGINAL:
+                self._tiles = self._init_all_tiles_family_classic()
+            else:
+                self._tiles = self._init_all_tiles_experienced_classic()
+
         self._poi_bank = GameBoardModel._init_pois()
         self._active_pois = []
         self._ambulance = AmbulanceModel((8, 10))
         self._engine = EngineModel((8, 10))
-
-
 
     def _notify_active_poi(self):
         for obs in self.observers:
@@ -48,9 +54,9 @@ class GameBoardModel(Model):
     def get_tiles(self) -> List[List[TileModel]]:
         return self._tiles
 
-    # @property
-    # def board_type(self):
-    #     return self.board_type
+    @property
+    def board_type(self):
+        return self._board_type
 
     @property
     def dimensions(self) -> Tuple[int, int]:

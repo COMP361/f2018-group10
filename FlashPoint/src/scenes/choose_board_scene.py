@@ -5,6 +5,7 @@ from src.constants.change_scene_enum import ChangeSceneEnum
 from src.constants.state_enums import GameBoardTypeEnum
 from src.core.custom_event import CustomEvent
 from src.core.event_queue import EventQueue
+from src.models.game_board.game_board_model import GameBoardModel
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 from src.UIComponents.rect_button import RectButton
@@ -23,13 +24,8 @@ class ChooseBoard(object):
         self._init_title_text()
         self._init_back_box((int)(1280 / 2 - 250), 130, "", Color.GREY, Color.GREEN)
 
-        # COMMENT THIS OUT LATER
         self._init_board1(410, 400, "Original", Color.STANDARDBTN, Color.BLACK)
         self._init_board2(740, 400, "Alternative", Color.STANDARDBTN, Color.BLACK)
-        # self._init_button3(410, 200, "3", Color.STANDARDBTN, Color.BLACK)
-        # self._init_button4(740, 200, "4", Color.STANDARDBTN, Color.BLACK)
-        # self._init_button5(410, 300, "5", Color.STANDARDBTN, Color.BLACK)
-        # self._init_button6(740, 300, "6", Color.STANDARDBTN, Color.BLACK)
         self._init_btn_back(20, 20, "Back", Color.STANDARDBTN, Color.BLACK)
 
     def _init_back_box(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
@@ -71,8 +67,8 @@ class ChooseBoard(object):
         self.sprite_grp.add(self.buttonBack)
 
     @staticmethod
-    def set_and_continue(type : GameBoardTypeEnum):
-        GameStateModel.instance().game_board.board_type = type
+    def set_and_continue(board_type : GameBoardTypeEnum):
+        GameStateModel.instance().game_board = GameBoardModel(GameStateModel.instance().rules, board_type)
         EventQueue.post(CustomEvent(ChangeSceneEnum.SETMAXPLAYERSCENE))
 
     def draw(self, screen):
