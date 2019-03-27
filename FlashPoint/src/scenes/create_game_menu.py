@@ -42,9 +42,9 @@ class CreateGameMenu(Scene):
     def create_new_game(self, game_kind: GameKindEnum, diff: DifficultyLevelEnum = None):
         """Instantiate a new family game and move to the lobby scene."""
         GameStateModel(self._current_player, 6, game_kind)
-        if(game_kind == GameKindEnum.FAMILY):
+        if game_kind == GameKindEnum.FAMILY:
             EventQueue.post(CustomEvent(ChangeSceneEnum.SETMAXPLAYERSCENE))
-        elif(game_kind == GameKindEnum.EXPERIENCED):
+        elif game_kind == GameKindEnum.EXPERIENCED:
             EventQueue.post(CustomEvent(ChangeSceneEnum.CHOOSEBOARDSCENE))
 
     # ----------------------------------------------- #
