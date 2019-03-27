@@ -39,13 +39,13 @@ class PlaceHazmatEvent(ActionEvent):
         level = self.game.difficulty_level
 
         if level is DifficultyLevelEnum.RECRUIT:
-            self.place_hazmat(self.RECRUIT)
+            self.place_hazmat(PlaceHazmatEvent.RECRUIT)
 
         elif level is DifficultyLevelEnum.VETERAN:
-            self.place_hazmat(self.VETERAN)
+            self.place_hazmat(PlaceHazmatEvent.VETERAN)
 
         elif level is DifficultyLevelEnum.HEROIC:
-            self.place_hazmat(self.HEROIC)
+            self.place_hazmat(PlaceHazmatEvent.HEROIC)
 
     def place_hazmat(self, hazmat_to_place: int):
         while hazmat_to_place > 0:
