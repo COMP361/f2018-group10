@@ -100,6 +100,18 @@ class WallStatusEnum(Enum):
     DESTROYED = auto()
 
 
+class PlayerRoleEnum(Enum):
+    CAFS = auto()
+    DRIVER = auto()
+    FAMILY = auto()
+    CAPTAIN = auto()
+    GENERALIST = auto()
+    HAZMAT = auto()
+    IMAGING = auto()
+    PARAMEDIC = auto()
+    RESCUE = auto()
+
+
 class VehicleOrientationEnum(Enum):
     VERTICAL = auto()
     HORIZONTAL = auto()

@@ -4,6 +4,7 @@ from src.models.game_units.poi_model import POIModel
 from src.models.game_units.victim_model import VictimModel
 from src.models.game_board.door_model import DoorModel
 from src.models.game_board.wall_model import WallModel
+from src.models.game_units.hazmat_model import HazmatModel
 from src.models.model import Model
 from src.core.flashpoint_exceptions import TilePositionOutOfBoundsException
 from src.models.game_board.edge_obstacle_model import EdgeObstacleModel
