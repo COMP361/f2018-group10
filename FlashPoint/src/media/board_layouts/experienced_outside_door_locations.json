@@ -1,0 +1,14 @@
+[
+  {
+    "first_pair": [3, 0],
+    "first_dirn": "East",
+    "second_pair": [3, 1],
+    "second_dirn": "West"
+  },
+  {
+    "first_pair": [6, 3],
+    "first_dirn": "South",
+    "second_pair": [7, 3],
+    "second_dirn": "North"
+  }
+]

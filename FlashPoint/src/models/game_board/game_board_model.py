@@ -2,6 +2,8 @@ import json
 import random
 from typing import List, Tuple, Dict
 
+from src.models.game_units.engine_model import EngineModel
+from src.models.game_units.ambulance_model import AmbulanceModel
 from src.models.model import Model
 from src.constants.main_constants import BOARD_DIMENSIONS
 from src.models.game_board.edge_obstacle_model import EdgeObstacleModel
@@ -9,7 +11,7 @@ from src.models.game_board.null_model import NullModel
 from src.models.game_units.poi_model import POIModel
 from src.models.game_board.tile_model import TileModel
 from src.constants.state_enums import GameKindEnum, SpaceKindEnum, SpaceStatusEnum, POIIdentityEnum, \
-    DoorStatusEnum, POIStatusEnum, VictimStateEnum
+    DoorStatusEnum, POIStatusEnum, VictimStateEnum, ArrowDirectionEnum, VehicleOrientationEnum, GameBoardTypeEnum
 from src.models.game_board.wall_model import WallModel
 from src.models.game_board.door_model import DoorModel
 from src.models.game_units.victim_model import VictimModel
@@ -26,9 +28,17 @@ class GameBoardModel(Model):
         self._dimensions = (8, 10)
         self._ambulance_spots = []
         self._engine_spots = []
-        self._tiles = self._init_all_tiles_family_classic() if game_type == GameKindEnum.FAMILY else None
+        if game_type == GameKindEnum.FAMILY:
+            self._tiles = self._init_all_tiles_family_classic()
+
+        else:
+            self._tiles = self._init_all_tiles_experienced_classic()
+            self.board_type = GameBoardTypeEnum.ORIGINAL
         self._poi_bank = GameBoardModel._init_pois()
         self._active_pois = []
+        self._ambulance = AmbulanceModel((8, 10))
+        self._engine = EngineModel((8, 10))
+
 
 
     def _notify_active_poi(self):
@@ -37,6 +47,22 @@ class GameBoardModel(Model):
 
     def get_tiles(self) -> List[List[TileModel]]:
         return self._tiles
+
+    # @property
+    # def board_type(self):
+    #     return self.board_type
+
+    @property
+    def dimensions(self) -> Tuple[int, int]:
+        return self._dimensions
+
+    @property
+    def ambulance(self) -> AmbulanceModel:
+        return self._ambulance
+
+    @property
+    def engine(self) -> EngineModel:
+        return self._engine
 
     @property
     def tiles(self) -> List[TileModel]:
@@ -95,7 +121,7 @@ class GameBoardModel(Model):
         pois = []
         # POIs initialized with negative coordinates
         # since they are not on the board
-        for i in range(5):
+        for i in range(10):
             pois.append(POIModel(POIIdentityEnum.VICTIM))
         for i in range(5):
             pois.append(POIModel(POIIdentityEnum.FALSE_ALARM))
@@ -141,42 +167,13 @@ class GameBoardModel(Model):
                 tiles[i][right].set_adjacent_edge_obstacle("West", wall)
 
         # setting the ambulance and engine parking spaces
-        with open("media/board_layouts/engine_ambulance_locations.json", "r") as f:
-            parking_spots = json.load(f)
-            
-        for park_spot in parking_spots:
-            first_x, first_y = park_spot['first_tile']
-            second_x, second_y = park_spot['second_tile']
-            first_tile = tiles[first_x][first_y]
-            second_tile = tiles[second_x][second_y]
-            if park_spot['parking_type'] == "Ambulance":
-                first_tile.space_kind = SpaceKindEnum.AMBULANCE_PARKING
-                second_tile.space_kind = SpaceKindEnum.AMBULANCE_PARKING
-                self.ambulance_spots.append((first_tile, second_tile))
-            else:
-                first_tile.space_kind = SpaceKindEnum.ENGINE_PARKING
-                second_tile.space_kind = SpaceKindEnum.ENGINE_PARKING
-                self.engine_spots.append((first_tile, second_tile))
+        self.set_parking_spaces("media/board_layouts/family_engine_ambulance_locations.json", tiles)
 
         # setting the doors present on the outside of the house EXPLICITLY
-        with open("media/board_layouts/outside_door_locations.json", "r") as f:
-            outside_doors = json.load(f)
-
-        for out_door_adj in outside_doors:
-            door = DoorModel(out_door_adj['first_pair'][0], out_door_adj['first_pair'][1], out_door_adj['first_dirn'], DoorStatusEnum.OPEN)
-            self.set_single_obstacle(tiles, out_door_adj, door)
+        self.set_outside_doors("media/board_layouts/family_outside_door_locations.json", tiles)
 
         # setting the walls and doors present inside the house
-        with open("media/board_layouts/tiles_adjacencies.json", "r") as f:
-            inner_adjacencies = json.load(f)
-
-        for adjacency in inner_adjacencies:
-            if adjacency['obstacle_type'] == 'wall':
-                obstacle = WallModel(adjacency['first_pair'][0], adjacency['first_pair'][1], adjacency['first_dirn'])
-            else:
-                obstacle = DoorModel(adjacency['first_pair'][0], adjacency['first_pair'][1], adjacency['first_dirn'])
-
-            self.set_single_obstacle(tiles, adjacency, obstacle)
+        self.set_inside_walls_doors("media/board_layouts/family_inside_walls_doors.json", tiles)
 
         return tiles
 
@@ -197,7 +194,66 @@ class GameBoardModel(Model):
                 extended_grid[i][j].west_tile = extended_grid[i][j - 1]
                 extended_grid[i][j].south_tile = extended_grid[i + 1][j]
 
-        print("hello")
+    def set_parking_spaces(self, parking_spaces_file: str, tiles: List[List[TileModel]]):
+        """
+        Sets the Ambulance and Engine parking spaces of the board
+        and adds those spaces to the ambulance spots list and
+        engine spots list.
+
+        :param parking_spaces_file: Name of JSON file containing the details of the parking spaces.
+        :param tiles: tiles of the board
+        :return:
+        """
+        with open(parking_spaces_file, "r") as f:
+            parking_spots = json.load(f)
+
+        for park_spot in parking_spots:
+            first_x, first_y = park_spot['first_tile']
+            second_x, second_y = park_spot['second_tile']
+            first_tile = tiles[first_x][first_y]
+            second_tile = tiles[second_x][second_y]
+            if park_spot['parking_type'] == "Ambulance":
+                first_tile.space_kind = SpaceKindEnum.AMBULANCE_PARKING
+                second_tile.space_kind = SpaceKindEnum.AMBULANCE_PARKING
+                self.ambulance_spots.append((first_tile, second_tile))
+            else:
+                first_tile.space_kind = SpaceKindEnum.ENGINE_PARKING
+                second_tile.space_kind = SpaceKindEnum.ENGINE_PARKING
+                self.engine_spots.append((first_tile, second_tile))
+
+    def set_outside_doors(self, outside_doors_file: str, tiles: List[List[TileModel]]):
+        """
+        Set the doors present on the outside of the house.
+
+        :param outside_doors_file: Name of JSON file containing the details of the outside doors.
+        :param tiles: tiles of the board
+        :return:
+        """
+        with open(outside_doors_file, "r") as f:
+            outside_doors = json.load(f)
+
+        for out_door_adj in outside_doors:
+            door = DoorModel(out_door_adj['first_pair'][0], out_door_adj['first_pair'][1], out_door_adj['first_dirn'], DoorStatusEnum.OPEN)
+            self.set_single_obstacle(tiles, out_door_adj, door)
+
+    def set_inside_walls_doors(self, inside_walls_doors_file: str, tiles: List[List[TileModel]]):
+        """
+        Set the walls and doors present inside the house.
+
+        :param inside_walls_doors_file: Name of the JSON file containing the details of the inside walls/doors.
+        :param tiles: tiles of the board
+        :return:
+        """
+        with open(inside_walls_doors_file, "r") as f:
+            inner_adjacencies = json.load(f)
+
+        for adjacency in inner_adjacencies:
+            if adjacency['obstacle_type'] == 'wall':
+                obstacle = WallModel(adjacency['first_pair'][0], adjacency['first_pair'][1], adjacency['first_dirn'])
+            else:
+                obstacle = DoorModel(adjacency['first_pair'][0], adjacency['first_pair'][1], adjacency['first_dirn'])
+
+            self.set_single_obstacle(tiles, adjacency, obstacle)
 
     def set_single_tile_adjacencies(self, tile: TileModel):
         # set north tile
@@ -230,8 +286,48 @@ class GameBoardModel(Model):
         for coord, direction in [(first_pair, first_dirn), (second_pair, second_dirn)]:
             tiles[coord[0]][coord[1]].set_adjacent_edge_obstacle(direction, obstacle)
 
-    def _init_all_tiles_experienced_classic(self):
-        pass
+    def _init_all_tiles_experienced_classic(self) -> List[List[TileModel]]:
+        """Create all tiles for the experienced board
+            and set their adjacencies."""
+        tiles = []
+
+        for i in range(self._dimensions[0]):
+            tiles.append([])
+            for j in range(self._dimensions[1]):
+                tile_kind = self._determine_tile_kind(i, j)
+                tile = TileModel(i, j, tile_kind)
+                tiles[i].append(tile)
+
+        # setting tile adjacencies
+        self.set_adjacencies(tiles)
+
+        # setting the top and bottom walls on the outside of the house
+        for top, bottom in [(0, 1), (6, 7)]:
+            for i in range(1, 9):
+                wall = WallModel(top, i, "South")
+                tiles[top][i].set_adjacent_edge_obstacle("South", wall)
+                tiles[bottom][i].set_adjacent_edge_obstacle("North", wall)
+
+        # setting the left and right walls on the outside of the house
+        for left, right in [(0, 1), (8, 9)]:
+            for i in range(1, 7):
+                wall = WallModel(i, left, "East")
+                tiles[i][left].set_adjacent_edge_obstacle("East", wall)
+                tiles[i][right].set_adjacent_edge_obstacle("West", wall)
+
+        # setting the ambulance and engine parking spaces
+        self.set_parking_spaces("media/board_layouts/experienced_engine_ambulance_locations.json", tiles)
+
+        # setting the doors present on the outside of the house EXPLICITLY
+        self.set_outside_doors("media/board_layouts/experienced_outside_door_locations.json", tiles)
+
+        # setting the walls and doors present inside the house
+        self.set_inside_walls_doors("media/board_layouts/experienced_inside_walls_doors.json", tiles)
+
+        # setting the arrow directions given for the inside tiles
+        self.set_all_tiles_arrows("media/board_layouts/experienced_tile_arrow_directions.json", tiles)
+
+        return tiles
 
     def get_tile_at(self, row: int, column: int) -> TileModel:
         """Grab the TileModel at a given position"""
@@ -306,3 +402,94 @@ class GameBoardModel(Model):
     def reset_tiles_visit_count(self):
         for tile in self.tiles:
             tile.visit_count = 0
+
+    def set_all_tiles_arrows(self, tile_arrows_file: str, tiles: List[List[TileModel]]):
+        """
+        Set the arrow direction for all the tiles of the board.
+
+        :param tile_arrows_file: Name of JSON file containing details about arrows of the tiles.
+        :param tiles: tiles of the board
+        :return:
+        """
+        with open(tile_arrows_file, "r") as f:
+            all_tiles_arrows = [tuple(x) for x in json.load(f)]
+
+        for row_num, row in enumerate(all_tiles_arrows):
+            for col_num, tile_dirn in enumerate(row):
+                if tile_dirn == "North":
+                    tile_dirn = ArrowDirectionEnum.NORTH
+                elif tile_dirn == "North-East":
+                    tile_dirn = ArrowDirectionEnum.NORTH_EAST
+                elif tile_dirn == "East":
+                    tile_dirn = ArrowDirectionEnum.EAST
+                elif tile_dirn == "South-East":
+                    tile_dirn = ArrowDirectionEnum.SOUTH_EAST
+                elif tile_dirn == "South":
+                    tile_dirn = ArrowDirectionEnum.SOUTH
+                elif tile_dirn == "South-West":
+                    tile_dirn = ArrowDirectionEnum.SOUTH_WEST
+                elif tile_dirn == "West":
+                    tile_dirn = ArrowDirectionEnum.WEST
+                elif tile_dirn == "North-West":
+                    tile_dirn = ArrowDirectionEnum.NORTH_WEST
+                else:
+                    tile_dirn = None
+
+                tiles[row_num][col_num].arrow_dirn = tile_dirn
+
+    def get_other_parking_tile(self, first_tile: TileModel) -> TileModel:
+        """Get the other parking spot tile if this one is a parking tile"""
+        parking_type = first_tile.space_kind
+        if parking_type not in [SpaceKindEnum.AMBULANCE_PARKING, SpaceKindEnum.ENGINE_PARKING]:
+            raise Exception("Tile is not a parking space!")
+
+        if first_tile.row == 0 or first_tile.row == self.dimensions[0] - 1:
+            offset = 1 if first_tile.column < self.dimensions[1] - 1 else -1
+            potential_tile = self.get_tile_at(first_tile.row, first_tile.column + offset)
+
+            if potential_tile.space_kind == parking_type:
+                return potential_tile
+
+            offset = -1 if first_tile.column > 0 else 1
+            potential_tile = self.get_tile_at(first_tile.row, first_tile.column + offset)
+
+            if potential_tile.space_kind == parking_type:
+                return potential_tile
+        elif first_tile.column == 0 or first_tile.column == self.dimensions[1] - 1:
+            offset = 1 if first_tile.row < self.dimensions[0] - 1 else -1
+            potential_tile = self.get_tile_at(first_tile.row + offset, first_tile.column)
+
+            if potential_tile.space_kind == parking_type:
+                return potential_tile
+
+            offset = -1 if first_tile.row > 0 else 1
+            potential_tile = self.get_tile_at(first_tile.row + offset, first_tile.column)
+
+            if potential_tile.space_kind == parking_type:
+                return potential_tile
+
+    def get_parking_space_orientation(self, spot: Tuple[TileModel, TileModel]) -> VehicleOrientationEnum:
+        if any(tile.space_kind not in [SpaceKindEnum.ENGINE_PARKING, SpaceKindEnum.AMBULANCE_PARKING] for tile in spot):
+            raise Exception("Tried to get orientation on tiles that are not Parking Spaces!")
+
+        if spot[0].row == spot[1].row + 1 or spot[0].row == spot[1].row - 1:
+            return VehicleOrientationEnum.VERTICAL
+        else:
+            return VehicleOrientationEnum.HORIZONTAL
+
+    def get_distance_to_parking_spot(self, destination: Tuple[TileModel, TileModel]):
+        origin_first_tile = self.get_tile_at(self.ambulance.row, self.ambulance.column)
+        origin_second_tile = self.get_other_parking_tile(origin_first_tile)
+        origin_spot = (origin_first_tile, origin_second_tile)
+
+        first_orientation = self.get_parking_space_orientation(origin_spot)
+        second_orientation = self.get_parking_space_orientation(destination)
+
+        # Grab the rows/columns of each tile. If after removing duplicates theres only 1 entry, then the same.
+        rows = set([tile.row for tile in origin_spot + destination])
+        columns = set([tile.column for tile in origin_spot + destination])
+
+        if len(rows) == 1 or len(columns) == 1:
+            return 0
+
+        return 1 if first_orientation != second_orientation else 2

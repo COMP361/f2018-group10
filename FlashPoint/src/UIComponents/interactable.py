@@ -53,7 +53,7 @@ class Interactable(pygame.sprite.Sprite):
 
             for event in event_queue:
                 if not isinstance(event, ChangeSceneEnum):
-                    if event.type == pygame.MOUSEBUTTONUP and not self._clicked:
+                    if event.type == pygame.MOUSEBUTTONUP and event.button == 1 and not self._clicked:
                         self._clicked = True
                         self.click()
 

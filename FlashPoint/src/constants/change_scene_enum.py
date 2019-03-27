@@ -17,4 +17,4 @@ class ChangeSceneEnum(Enum):
     SETMAXPLAYERSCENE = auto()
     LOSESCENE = auto()
     WINSCENE = auto()
-
+    CHOOSEBOARDSCENE = auto()

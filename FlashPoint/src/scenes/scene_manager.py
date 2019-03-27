@@ -3,6 +3,7 @@ import logging
 
 from src.models.game_units.player_model import PlayerModel
 from src.UIComponents.file_importer import FileImporter
+from src.scenes.choose_board_scene import ChooseBoard
 from src.scenes.game_board_scene import GameBoardScene
 from src.scenes.host_join_scene import HostJoinScene
 from src.scenes.host_menu_scene import HostMenuScene
@@ -90,6 +91,8 @@ class SceneManager(object):
                     self.next(StartScene)
                 elif event.type == ChangeSceneEnum.SETMAXPLAYERSCENE:
                     self.next(SetMaxPlayers, self._current_player)
+                elif event.type == ChangeSceneEnum.CHOOSEBOARDSCENE:
+                    self.next(ChooseBoard, self._current_player)
                 elif event.type == ChangeSceneEnum.CHARACTERSCENE:
                     self.next(CharacterScene, self._current_player)
                 elif event.type == ChangeSceneEnum.CREATEGAMEMENU:
