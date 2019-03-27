@@ -28,16 +28,16 @@ class GameBoardModel(Model):
         self._dimensions = (8, 10)
         self._ambulance_spots = []
         self._engine_spots = []
-        self.board_type = type
+        self._board_type = type
+
         if game_type == GameKindEnum.FAMILY:
-            if(self.board_type == GameBoardTypeEnum.ORIGINAL):
+            if self._board_type == GameBoardTypeEnum.ORIGINAL:
                 self._tiles = self._init_all_tiles_family_classic()
             else:
                 self._tiles = self._init_all_tiles_experienced_classic()
 
-
         else:
-            if (self.board_type == GameBoardTypeEnum.ORIGINAL):
+            if self._board_type == GameBoardTypeEnum.ORIGINAL:
                 self._tiles = self._init_all_tiles_family_classic()
             else:
                 self._tiles = self._init_all_tiles_experienced_classic()
@@ -47,7 +47,6 @@ class GameBoardModel(Model):
         self._ambulance = AmbulanceModel((8, 10))
         self._engine = EngineModel((8, 10))
 
-
     def _notify_active_poi(self):
         for obs in self.observers:
             obs.notify_active_poi(self._active_pois)
@@ -55,9 +54,9 @@ class GameBoardModel(Model):
     def get_tiles(self) -> List[List[TileModel]]:
         return self._tiles
 
-    # @property
-    # def board_type(self):
-    #     return self.board_type
+    @property
+    def board_type(self):
+        return self._board_type
 
     @property
     def dimensions(self) -> Tuple[int, int]:

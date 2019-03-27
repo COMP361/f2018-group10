@@ -71,9 +71,9 @@ class GameStateModel(Model):
             return self._game_board
 
     @game_board.setter
-    def game_board(self,board: GameBoardModel):
+    def game_board(self, board: GameBoardModel):
         with GameStateModel.lock:
-            self.game_board = board
+            self._game_board = board
 
     @property
     def chat_history(self) -> List[Tuple[str, str]]:
