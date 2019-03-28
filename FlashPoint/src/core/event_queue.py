@@ -23,12 +23,10 @@ class EventQueue(object):
     @staticmethod
     def block():
         """Block the event queue from being flushed"""
-        print("Blocking EventQueue")
         EventQueue.get_instance().blocked = True
 
     @staticmethod
     def unblock():
-        print("Unblocking EventQueue")
         EventQueue.get_instance().blocked = False
 
     @staticmethod

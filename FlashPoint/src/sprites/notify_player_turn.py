@@ -61,9 +61,6 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
             self.image.blit(self.text, self.image.get_rect().move(77, 7))
 
     def notify_player_index(self, player_index: int):
-        for player in GameStateModel.instance().players:
-            print(player.nickname)
-
         self.enabled = (GameStateModel.instance().players[player_index] == self._current_player)
 
         if self.enabled:

@@ -1,7 +1,11 @@
+import logging
+
 from src.action_events.turn_events.turn_event import TurnEvent
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 from src.models.game_units.victim_model import VictimModel
+
+logger = logging.getLogger("FlashPoint")
 
 
 class PickupVictimEvent(TurnEvent):
@@ -18,10 +22,7 @@ class PickupVictimEvent(TurnEvent):
 
         self.player: PlayerModel = game.players_turn
 
-    #### Use this check in the GUI to determine
-    #### whether or not to show a pick up victim option
-
     def execute(self):
-        print("Excecuting PickupVictimEvent")
+        logger.info("Excecuting PickupVictimEvent")
         self.player.carrying_victim = self.victim
         self.victim_tile.remove_associated_model(self.victim_tile)

@@ -1,4 +1,5 @@
 import random
+import logging
 from threading import RLock
 
 from typing import List, Optional, Tuple
@@ -9,6 +10,8 @@ from src.constants.state_enums import GameKindEnum, DifficultyLevelEnum, GameSta
 from src.core.flashpoint_exceptions import TooManyPlayersException, InvalidGameKindException, PlayerNotFoundException
 from src.models.game_units.player_model import PlayerModel
 
+logger = logging.getLogger("FlashPoint")
+
 
 class GameStateModel(Model):
     """Singleton Class for maintaining the current Game state."""
@@ -16,7 +19,7 @@ class GameStateModel(Model):
     lock = RLock()
 
     def __init__(self, host: PlayerModel, num_players: int, game_kind: GameKindEnum, difficulty: DifficultyLevelEnum = None):
-        print("Initializing game state...")
+        logger.info("Initializing game state...")
 
         if not GameStateModel._instance:
             super().__init__()
@@ -40,7 +43,6 @@ class GameStateModel(Model):
 
             GameStateModel._instance = self
         else:
-            print("Attempted to instantiate another singleton")
             raise Exception("GameStateModel is a Singleton")
 
     def _notify_player_index(self):
@@ -152,7 +154,7 @@ class GameStateModel(Model):
         """Difficulty level of an experienced game. A Family game should not have a difficulty level."""
         with GameStateModel.lock:
             if self._rules == GameKindEnum.FAMILY or None:
-                print("WARNING: GameKind is FAMILY, you should not be accessing Difficulty Level.")
+                logger.warning("GameKind is FAMILY, you should not be accessing Difficulty Level.")
                 return
             return self._difficulty_level
 

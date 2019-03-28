@@ -2,7 +2,7 @@ from typing import List
 
 import pygame
 
-from src.action_events.advance_fire_event import AdvanceFireEvent
+from src.action_events.end_turn_advance_fire import EndTurnAdvanceFireEvent
 from src.constants.state_enums import SpaceStatusEnum
 from src.models.model import Model
 from src.models.game_units.hazmat_model import HazmatModel
@@ -33,7 +33,7 @@ class HazmatSprite(pygame.sprite.Sprite, TileObserver):
 
     def tile_status_changed(self, status: SpaceStatusEnum):
         if status is SpaceStatusEnum.FIRE:
-            advance_fire = AdvanceFireEvent()
+            advance_fire = EndTurnAdvanceFireEvent()
             advance_fire.explosion(self.tile_model)
 
             for model in self.tile_model.associated_models:

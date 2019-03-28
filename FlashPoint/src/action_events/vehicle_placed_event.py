@@ -1,4 +1,5 @@
 from typing import Tuple
+import logging
 
 from src.sprites.engine_sprite import EngineSprite
 from src.sprites.game_board import GameBoard
@@ -9,6 +10,9 @@ from src.models.game_state_model import GameStateModel
 from src.models.game_units.vehicle_model import VehicleModel
 from src.models.game_board.tile_model import TileModel
 from src.action_events.action_event import ActionEvent
+
+
+logger = logging.getLogger("FlashPoint")
 
 
 class VehiclePlacedEvent(ActionEvent):
@@ -23,7 +27,7 @@ class VehiclePlacedEvent(ActionEvent):
         self._column = min(tile.column for tile in parking_spot) if parking_spot else -1
 
     def execute(self, *args, **kwargs):
-        print("Executing VehiclePlacedEvent")
+        logger.info(f"Executing VehiclePlacedEvent: {self._vehicle_type} placed.")
 
         board_model: GameBoardModel = GameStateModel.instance().game_board
         board_sprite: GameBoard = GameBoard.instance()
