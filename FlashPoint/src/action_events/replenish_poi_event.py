@@ -1,7 +1,10 @@
 import logging
 
+from src.models.game_board.tile_model import TileModel
+from src.core.flashpoint_exceptions import NoAvailableTileException
 from src.action_events.action_event import ActionEvent
-from src.constants.state_enums import SpaceStatusEnum, POIIdentityEnum, VictimStateEnum
+from src.constants.state_enums import SpaceStatusEnum, POIIdentityEnum, VictimStateEnum, GameKindEnum, \
+    ArrowDirectionEnum
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.victim_model import VictimModel
 
@@ -47,12 +50,26 @@ class ReplenishPOIEvent(ActionEvent):
 
             logger.info(f"Attempting to place new poi on location: {new_poi_row}, {new_poi_column}")
             if tile.has_poi_or_victim():
-                should_roll = True
-                continue
+                if self.game.rules is GameKindEnum.FAMILY:
+                    logger.info("Tile has poi or victim, will reroll")
+                    should_roll = True
+                    continue
+                else:
+                    logger.info("Tile has poi or victim, checking the arrow path")
+                    try:
+                        (new_poi_row, new_poi_column) = self.check_arrow_path(new_poi_row, new_poi_column)
+                    except NoAvailableTileException:
+                        should_roll = True
+                        continue
 
             if tile.space_status != SpaceStatusEnum.SAFE:
-                logger.info("Tile was not SAFE for adding POI. It is now safe.")
-                tile.space_status = SpaceStatusEnum.SAFE
+                if self.game.rules is GameKindEnum.FAMILY:
+                    logger.info("Tile was not SAFE for adding POI. It is now safe.")
+                    tile.space_status = SpaceStatusEnum.SAFE
+                else:
+                    logger.info("Tile is not SAFE, checking the arrow path")
+                    should_roll = True
+                    continue
 
             if self.game.get_players_on_tile(tile.row, tile.column):
                 if new_poi.identity == POIIdentityEnum.FALSE_ALARM:
@@ -70,3 +87,59 @@ class ReplenishPOIEvent(ActionEvent):
             self.board.poi_bank.remove(new_poi)
             num_pois_to_add = 3 - len(self.board.active_pois)
             should_roll = num_pois_to_add > 0 and len(self.board.poi_bank) > 0
+
+    def check_arrow_path(self, row: int, column: int) -> (int, int):
+        """
+        Gets the next tile following the arrow path, raises a NoAvailableTileException if no available tile can be found
+        (ie. the loop goes back to the original point)
+        :param row:
+        :param column:
+        :return:
+        """
+        (row_ptr, column_ptr) = self.get_next_tile(row, column)
+
+        while (row_ptr, column_ptr) != (row, column):
+            if self.place_check_experienced(row_ptr, column_ptr):
+                return row_ptr, column_ptr
+            else:
+                (row_ptr, column_ptr) = self.get_next_tile(row_ptr, column_ptr)
+
+        raise NoAvailableTileException
+
+    def place_check_experienced(self, row: int, column: int) -> bool:
+        return True
+
+    def get_next_tile(self, row: int, column: int) -> (int, int):
+        tile: TileModel = self.board.get_tile_at(row, column)
+
+        if tile.arrow_dirn is ArrowDirectionEnum.NORTH:
+            dest: TileModel = tile.north_tile
+            return dest.row, dest.column
+
+        elif tile.arrow_dirn is ArrowDirectionEnum.EAST:
+            dest: TileModel = tile.east_tile
+            return dest.row, dest.column
+
+        elif tile.arrow_dirn is ArrowDirectionEnum.WEST:
+            dest: TileModel = tile.west_tile
+            return dest.row, dest.column
+
+        elif tile.arrow_dirn is ArrowDirectionEnum.SOUTH:
+            dest: TileModel = tile.south_tile
+            return dest.row, dest.column
+
+        elif tile.arrow_dirn is ArrowDirectionEnum.NORTH_EAST:
+            dest: TileModel = tile.east_tile.north_tile
+            return dest.row, dest.column
+
+        elif tile.arrow_dirn is ArrowDirectionEnum.NORTH_WEST:
+            dest: TileModel = tile.west_tile.north_tile
+            return dest.row, dest.column
+
+        elif tile.arrow_dirn is ArrowDirectionEnum.SOUTH_EAST:
+            dest: TileModel = tile.east_tile.south_tile
+            return dest.row, dest.column
+
+        elif tile.arrow_dirn is ArrowDirectionEnum.SOUTH_WEST:
+            dest: TileModel = tile.west_tile.south_tile
+            return dest.row, dest.column
