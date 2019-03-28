@@ -1,4 +1,5 @@
 import random
+import logging
 
 from src.sprites.game_board import GameBoard
 from src.sprites.hazmat_sprite import HazmatSprite
@@ -8,6 +9,8 @@ from src.models.game_units.hazmat_model import HazmatModel
 from src.constants.state_enums import DifficultyLevelEnum, SpaceStatusEnum
 from src.models.game_state_model import GameStateModel
 from src.action_events.action_event import ActionEvent
+
+logger = logging.getLogger("FlashPoint")
 
 
 class PlaceHazmatEvent(ActionEvent):
@@ -38,6 +41,7 @@ class PlaceHazmatEvent(ActionEvent):
         :param kwargs:
         :return:
         """
+        logger.info("Executing HazMat Placement")
         level = self.game.difficulty_level
 
         if level is DifficultyLevelEnum.RECRUIT:
@@ -62,7 +66,7 @@ class PlaceHazmatEvent(ActionEvent):
                 if isinstance(model, HazmatModel) or isinstance(model, POIModel) or isinstance(model, VictimModel):
                     continue
 
-            print(f"Placed hazmat on location: {new_haz_row}, {new_haz_column}")
+            logger.info(f"Placed hazmat on location: {new_haz_row}, {new_haz_column}")
             tile.add_associated_model(HazmatModel())
             GameBoard.instance().add(HazmatSprite(tile))
             hazmat_to_place -= 1

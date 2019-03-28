@@ -1,6 +1,7 @@
 import enum
 import json
 from typing import Dict
+import logging
 
 from src.action_events.place_hazmat_event import PlaceHazmatEvent
 from src.action_events.end_turn_advance_fire import EndTurnAdvanceFireEvent
@@ -29,6 +30,9 @@ from src.constants.state_enums import DifficultyLevelEnum, GameKindEnum, PlayerS
     DoorStatusEnum, SpaceKindEnum, SpaceStatusEnum, ArrowDirectionEnum
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
+
+
+logger = logging.getLogger("FlashPoint")
 
 
 class JSONSerializer(object):
@@ -223,10 +227,6 @@ class JSONSerializer(object):
         Add to this case statement to be able to deserialize your object type.
         """
         object_type = payload["class"]
-        # print(object_type)
-        # if GameStateModel.instance():
-        #     GameStateModel.instance().game_board.set_adjacencies(GameStateModel.instance().game_board.get_tiles())
-
         # --------------MODELS----------------
         if object_type == PlayerModel.__name__:
             return JSONSerializer._deserialize_player(payload)
@@ -278,7 +278,7 @@ class JSONSerializer(object):
         elif object_type == DriveAmbulanceEvent.__name__:
             return JSONSerializer._deserialize_drive_ambulance_event(payload)
 
-        print(f"WARNING: Could not deserialize object {object_type}, not of recognized type.")
+        logger.warning(f"Could not deserialize object {object_type}, not of recognized type.")
 
     @staticmethod
     def _safe_tile_serialize(tile: TileModel):

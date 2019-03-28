@@ -1,6 +1,10 @@
+import logging
+
 from src.action_events.action_event import ActionEvent
 from src.models.game_state_model import GameStateModel
 import random
+
+logger = logging.getLogger("FlashPoint")
 
 
 class SetInitialPOIFamilyEvent(ActionEvent):
@@ -22,8 +26,7 @@ class SetInitialPOIFamilyEvent(ActionEvent):
         Set all initial POIlocations for a family game.
         Returns the locations that were randomly chosen for reuse in the PlacePOIEvent
         """
-        print("Executing SetInitialPOIFamilyEvent")
-        print(f"Random indexes are: {self.rand_nums}, seed is {self.seed} range is: 0-{len(self.game_state.game_board.poi_bank)-1}")
+        logging.info("Executing SetInitialPOIFamilyEvent")
         locations = [[2, 4], [5, 1], [5, 8]]
         pois_to_remove = []
         for i, index in enumerate(self.rand_nums):

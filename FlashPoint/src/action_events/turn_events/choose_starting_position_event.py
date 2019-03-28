@@ -1,9 +1,14 @@
+import logging
+
 from src.sprites.game_board import GameBoard
 from src.sprites.player_sprite import PlayerSprite
 from src.models.game_units.player_model import PlayerModel
 from src.models.game_state_model import GameStateModel
 from src.action_events.action_event import ActionEvent
 from src.models.game_board.tile_model import TileModel
+
+
+logger = logging.getLogger("FlashPoint")
 
 
 class ChooseStartingPositionEvent(ActionEvent):
@@ -16,7 +21,7 @@ class ChooseStartingPositionEvent(ActionEvent):
         self.player: PlayerModel = game.players_turn
 
     def execute(self):
-        print("Executing ChooseStartingPositionEvent")
+        logger.info("Executing ChooseStartingPositionEvent")
         player_sprite = PlayerSprite(self.player, self.tile, GameBoard.instance().grid)
         GameBoard.instance().add(player_sprite)
         self.player.set_pos(self.tile.row, self.tile.column)

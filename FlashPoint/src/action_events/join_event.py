@@ -1,7 +1,11 @@
+import logging
+
 import src.constants.color as Color
 from src.models.game_state_model import GameStateModel
 from src.action_events.action_event import ActionEvent
 from src.models.game_units.player_model import PlayerModel
+
+logger = logging.getLogger("FlashPoint")
 
 
 class JoinEvent(ActionEvent):
@@ -10,7 +14,7 @@ class JoinEvent(ActionEvent):
         self.player = player
 
     def execute(self):
-        print("Executing JoinEvent")
+        logger.info(f"Executing JoinEvent: {self.player.nickname} has joined the game.")
         self.player.color = None
 
         colors = {
@@ -19,7 +23,6 @@ class JoinEvent(ActionEvent):
             "orange": Color.ORANGE,
             "yellow": Color.YELLOW,
             "green": Color.GREEN,
-
             "red": Color.RED,
         }
 
