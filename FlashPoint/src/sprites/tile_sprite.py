@@ -179,7 +179,7 @@ class TileSprite(Interactable, TileObserver):
             if self.identify_button.enabled:
                 screen.blit(self.identify_button.image, self.identify_button.rect)
                 self.identify_button.rect.x = self.rect.x
-                self.identify_button.rect.y = self.rect.y
+                self.identify_button.rect.y = self.rect.y + offset
                 offset += 20
 
     def update(self, event_queue: EventQueue):
