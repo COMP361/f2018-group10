@@ -1,4 +1,5 @@
 from src.action_events.turn_events.drive_ambulance_event import DriveAmbulanceEvent
+from src.controllers.identify_controller import IdentifyController
 from src.controllers.vehicle_controller import VehicleController
 from src.action_events.turn_events.drop_victim_event import DropVictimEvent
 from src.action_events.turn_events.extinguish_event import ExtinguishEvent
@@ -43,8 +44,10 @@ class TileInputController(GameStateObserver):
         self.move_controller = MoveController(current_player)
         self.choose_starting_controller = ChooseStartingPositionController(current_player)
         self.victim_controller = VictimController()
+
         if GameStateModel.instance().rules == GameKindEnum.EXPERIENCED:
             self.vehicle_controller = VehicleController(current_player)
+            self.identify_controller = IdentifyController(current_player)
         GameStateModel.instance().add_observer(self)
         self.fireman = current_player
         self.last_tile: TileSprite = None
@@ -64,6 +67,8 @@ class TileInputController(GameStateObserver):
         TileInputController._instance = None
         VictimController._instance = None
         VehicleController._instance = None
+        IdentifyController._instance = None
+
 
     def main_game_input(self, tile: TileSprite):
         self.move_controller.process_input(tile)
