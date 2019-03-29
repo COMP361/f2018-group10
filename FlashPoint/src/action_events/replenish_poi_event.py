@@ -45,29 +45,27 @@ class ReplenishPOIEvent(ActionEvent):
             new_poi_row = self.game.roll_red_dice()
             new_poi_column = self.game.roll_black_dice()
             new_poi = self.board.get_random_poi_from_bank()
-            new_poi.set_pos(new_poi_row, new_poi_column)
-            tile = self.board.get_tile_at(new_poi_row, new_poi_column)
 
-            logger.info(f"Attempting to place new poi on location: {new_poi_row}, {new_poi_column}")
-            if tile.has_poi_or_victim():
-                if self.game.rules is GameKindEnum.FAMILY:
+            if self.game.rules is GameKindEnum.FAMILY:
+                new_poi.set_pos(new_poi_row, new_poi_column)
+                tile = self.board.get_tile_at(new_poi_row, new_poi_column)
+
+                logger.info(f"Attempting to place new poi on location: {new_poi_row}, {new_poi_column}")
+                if tile.has_poi_or_victim():
                     logger.info("Tile has poi or victim, will reroll")
                     should_roll = True
                     continue
-                else:
-                    logger.info("Tile has poi or victim, checking the arrow path")
-                    try:
-                        (new_poi_row, new_poi_column) = self.check_arrow_path(new_poi_row, new_poi_column)
-                    except NoAvailableTileException:
-                        should_roll = True
-                        continue
 
-            if tile.space_status != SpaceStatusEnum.SAFE:
-                if self.game.rules is GameKindEnum.FAMILY:
+                if tile.space_status != SpaceStatusEnum.SAFE:
                     logger.info("Tile was not SAFE for adding POI. It is now safe.")
                     tile.space_status = SpaceStatusEnum.SAFE
-                else:
-                    logger.info("Tile is not SAFE, checking the arrow path")
+
+            else:
+                try:
+                    (new_poi_row, new_poi_column) = self.check_arrow_path(new_poi_row, new_poi_column)
+                    new_poi.set_pos(new_poi_row, new_poi_column)
+                    tile = self.board.get_tile_at(new_poi_row, new_poi_column)
+                except NoAvailableTileException:
                     should_roll = True
                     continue
 
@@ -96,9 +94,14 @@ class ReplenishPOIEvent(ActionEvent):
         :param column:
         :return:
         """
+        logger.info(f"Attempting to place new poi on location: {row}, {column}")
+        if self.place_check_experienced(row, column):
+            return row, column
+
         (row_ptr, column_ptr) = self.get_next_tile(row, column)
 
         while (row_ptr, column_ptr) != (row, column):
+            logger.info(f"Attempting to place new poi on location: {row_ptr}, {column_ptr}")
             if self.place_check_experienced(row_ptr, column_ptr):
                 return row_ptr, column_ptr
             else:
@@ -107,10 +110,26 @@ class ReplenishPOIEvent(ActionEvent):
         raise NoAvailableTileException
 
     def place_check_experienced(self, row: int, column: int) -> bool:
+        tile: TileModel = self.board.get_tile_at(row, column)
+
+        if tile.space_status is not SpaceStatusEnum.SAFE:
+            logger.info("Tile is not SAFE, will check the next arrow path")
+            return False
+
+        if tile.has_poi_or_victim():
+            logger.info("Tile has poi or victim, will check the next arrow path")
+            return False
+
+        for player in self.game.players:
+            if (player.row is row) and (player.column is column):
+                logger.info("Found a player at the same tile, will check the next arrow path")
+                return False
+
         return True
 
     def get_next_tile(self, row: int, column: int) -> (int, int):
         tile: TileModel = self.board.get_tile_at(row, column)
+        logger.info(f"Next tile at direction: {tile.arrow_dirn}")
 
         if tile.arrow_dirn is ArrowDirectionEnum.NORTH:
             dest: TileModel = tile.north_tile
