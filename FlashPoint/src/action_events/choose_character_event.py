@@ -11,15 +11,15 @@ logger = logging.getLogger("FlashPoint")
 
 class ChooseCharacterEvent(ActionEvent):
 
-    def __init__(self, role: PlayerRoleEnum):
+    def __init__(self, role: PlayerRoleEnum,player:PlayerModel):
         super().__init__()
         self._game: GameStateModel = GameStateModel.instance()
         if self._game.rules == GameKindEnum.FAMILY:
             raise WrongEventInstantiation(self)
 
-        self.curr_player: PlayerModel = self._game.players_turn
-        self.role: PlayerRoleEnum = role
+        self._player = player
+        self._role: PlayerRoleEnum = role
 
     def execute(self):
         logger.info("Executing ChooseCharacterEvent")
-        self.curr_player.character = self.role
+        self._player.character = self._role

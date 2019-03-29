@@ -2,7 +2,7 @@ import pygame
 
 import src.constants.color as Color
 from src.UIComponents.interactable import Interactable
-from src.constants.state_enums import PlayerStatusEnum
+from src.constants.state_enums import PlayerStatusEnum, GameKindEnum
 from src.core.event_queue import EventQueue
 from src.models.game_units.player_model import PlayerModel
 from src.observers.player_observer import PlayerObserver
@@ -13,7 +13,7 @@ class PlayerState(Interactable, PlayerObserver):
     def player_carry_changed(self, carry):
         pass
 
-    def __init__(self, x: int, y: int, name: str, color: Color, current: PlayerModel):
+    def __init__(self, x: int, y: int, name: str, color: Color, current: PlayerModel,rules:GameKindEnum):
         current.add_observer(self)
         self.image = pygame.Surface([64, 64])
         self.bg = pygame.image.load('media/GameHud/wood2-150x64.png')
@@ -29,6 +29,7 @@ class PlayerState(Interactable, PlayerObserver):
         self.color = color
         self.ap = current.ap
         self.sap = current.special_ap
+        self.rules = rules
         self.AP = f'Action Points: {self.ap}'
         self.SAP = f'Special Action Points: {self.sap}'
 
@@ -87,7 +88,10 @@ class PlayerState(Interactable, PlayerObserver):
         self.image.blit(self.player_icon, player_icon_rect)
         self.image.blit(self.text, self.NAME_rect)
         self.image.blit(self.text_AP, self.AP_rect)
-        # self.image.blit(self.text_SAP, self.SAP_rect)
+
+        if self.rules is GameKindEnum.EXPERIENCED:
+            self.image.blit(self.text_SAP, self.SAP_rect)
+
         self.image.blit(self.frame, self.image.get_rect())
 
     def player_status_changed(self, status: PlayerStatusEnum):
@@ -98,8 +102,10 @@ class PlayerState(Interactable, PlayerObserver):
         self.AP = f'AP: {self.ap}'
         self.text_AP = self.font_other.render(self.AP, True, Color.GREEN2)
 
-    def player_special_ap_changed(self, updated_ap: int):
-        pass
+    def player_special_ap_changed(self, updated_sap: int):
+        self.sap = updated_sap
+        self.AP = f'SAP: {self.sap}'
+        self.text_AP = self.font_other.render(self.SAP, True, Color.GREEN2)
 
     def player_position_changed(self, x_pos: int, y_pos: int):
         pass

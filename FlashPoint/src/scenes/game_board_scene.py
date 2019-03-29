@@ -92,8 +92,8 @@ class GameBoardScene(GameBoardObserver):
 
     def _init_sprites(self):
         for i, player in enumerate(self._game.players):
-            self.active_sprites.add(PlayerState(0, 30 + 64*i, player.nickname, player.color,player))
-        self._current_sprite = CurrentPlayerState(1130, 550, self._current_player.nickname,self._current_player.color,self._current_player)
+            self.active_sprites.add(PlayerState(0, 30 + 64*i, player.nickname, player.color,player,self._game.rules))
+        self._current_sprite = CurrentPlayerState(1130, 550, self._current_player.nickname,self._current_player.color,self._current_player,self._game.rules)
         self.active_sprites.add(self._current_sprite)
         self.notify_turn_popup = NotifyPlayerTurn(self._current_player, self._current_sprite, self.active_sprites)
         self.active_sprites.add(self.notify_turn_popup)

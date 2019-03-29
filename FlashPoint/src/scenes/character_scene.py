@@ -2,12 +2,14 @@ import pygame
 import time
 
 import src.constants.color as Color
+from src.action_events.choose_character_event import ChooseCharacterEvent
 from src.constants.state_enums import PlayerRoleEnum
 from src.core.custom_event import CustomEvent
 from src.core.event_queue import EventQueue
 
 from src.UIComponents.rect_button import RectButton
 from src.UIComponents.rect_label import RectLabel
+from src.core.networking import Networking
 from src.models.game_state_model import GameStateModel
 from src.UIComponents.scene import Scene
 from src.UIComponents.text import Text
@@ -60,7 +62,16 @@ class CharacterScene(Scene):
     def confirm(self):
 
         if not self.character_enum == None:
-            self._current_player.character = self.character_enum
+            #self._current_player.character = self.character_enum
+            event = ChooseCharacterEvent(self.character_enum,self._current_player)
+
+            if self._current_player.ip == GameStateModel.instance().host.ip:
+                event.execute()
+                Networking.get_instance().send_to_all_client(event)
+            else:
+                Networking.get_instance().send_to_server(event)
+
+
             EventQueue.post(CustomEvent(ChangeSceneEnum.LOBBYSCENE))
 
         # else:

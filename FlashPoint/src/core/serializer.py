@@ -3,6 +3,7 @@ import json
 from typing import Dict
 import logging
 
+from src.action_events.choose_character_event import ChooseCharacterEvent
 from src.action_events.place_hazmat_event import PlaceHazmatEvent
 from src.action_events.end_turn_advance_fire import EndTurnAdvanceFireEvent
 from src.action_events.set_initial_poi_family_event import SetInitialPOIFamilyEvent
@@ -27,7 +28,7 @@ from src.action_events.chat_event import ChatEvent
 from src.action_events.dummy_event import DummyEvent
 from src.action_events.join_event import JoinEvent
 from src.constants.state_enums import DifficultyLevelEnum, GameKindEnum, PlayerStatusEnum, WallStatusEnum, \
-    DoorStatusEnum, SpaceKindEnum, SpaceStatusEnum, ArrowDirectionEnum
+    DoorStatusEnum, SpaceKindEnum, SpaceStatusEnum, ArrowDirectionEnum, PlayerRoleEnum
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 
@@ -105,6 +106,12 @@ class JSONSerializer(object):
         player: PlayerModel = JSONSerializer.deserialize(payload['_player'])
         ready: bool = payload['_ready']
         return ReadyEvent(player, ready)
+
+    @staticmethod
+    def _deserialize_choose_character_event(payload:Dict) -> ChooseCharacterEvent:
+        player:PlayerModel = JSONSerializer.deserialize(payload['_player'])
+        role = PlayerRoleEnum(payload['_role']['value'])
+        return ChooseCharacterEvent(role, player)
 
     @staticmethod
     def _deserialize_join_event(payload: Dict) -> JoinEvent:
@@ -261,6 +268,8 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_extinguish_event(payload)
         elif object_type == DropVictimEvent.__name__:
             return JSONSerializer._deserialize_drop_event(payload)
+        elif object_type == ChooseCharacterEvent.__name__:
+            return JSONSerializer._deserialize_choose_character_event(payload)
         elif object_type == PickupVictimEvent.__name__:
             return JSONSerializer._deserialize_pickup_event(payload)
         elif object_type == OpenDoorEvent.__name__:

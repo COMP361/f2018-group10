@@ -3,7 +3,7 @@ from datetime import datetime
 import pygame
 
 import src.constants.color as Color
-from src.constants.state_enums import PlayerStatusEnum
+from src.constants.state_enums import PlayerStatusEnum, GameKindEnum
 from src.core.event_queue import EventQueue
 from src.models.game_units.player_model import PlayerModel
 from src.observers.player_observer import PlayerObserver
@@ -14,7 +14,7 @@ class CurrentPlayerState(pygame.sprite.Sprite, PlayerObserver):
     def player_carry_changed(self, carry):
         pass
 
-    def __init__(self, x: int, y: int, name: str, color: Color, current: PlayerModel):
+    def __init__(self, x: int, y: int, name: str, color: Color, current: PlayerModel,rules:GameKindEnum):
         super().__init__()
         current.add_observer(self)
         bg = pygame.image.load('media/GameHud/wood2.png')
@@ -31,9 +31,10 @@ class CurrentPlayerState(pygame.sprite.Sprite, PlayerObserver):
         self.font_other = pygame.font.SysFont('Agency FB', 23)
         self.font_time = pygame.font.SysFont('Agency FB', 25)
         self.name = name
+        self.rules = rules
         self.ap = current.ap
         self.AP = f'AP: {self.ap}'
-        self.sap = 0
+        self.sap = current.special_ap
         self.SAP = f'Special AP:{self.sap}'
 
         self.text = self.font_name.render(self.name, True, Color.GREEN2)
@@ -83,9 +84,10 @@ class CurrentPlayerState(pygame.sprite.Sprite, PlayerObserver):
         self.AP = f'AP: {self.ap}'
         self.text_AP = self.font_other.render(self.AP, True, Color.GREEN2)
 
-    def player_special_ap_changed(self, updated_ap: int):
-        pass
-
+    def player_special_ap_changed(self, updated_sap: int):
+        self.sap = updated_sap
+        self.SAP = f'AP: {self.sap}'
+        self.text_SAP = self.font_other.render(self.SAP, True, Color.GREEN2)
     def player_position_changed(self, x_pos: int, y_pos: int):
         pass
 
