@@ -499,3 +499,19 @@ class GameBoardModel(Model):
             return 0
 
         return 1 if first_orientation != second_orientation else 2
+
+    def flip_poi(self, poi: POIModel):
+        """Reveal a POI adding Victims if necessary"""
+        new_victim = None
+        tile_model = self.get_tile_at(poi.row, poi.column)
+        # If the POI is a Victim, instantiate a VictimModel
+        # and add it to the tile, board.
+        if poi.identity == POIIdentityEnum.VICTIM:
+            new_victim = VictimModel(VictimStateEnum.ON_BOARD)
+            new_victim.set_pos(poi.row, poi.column)
+            tile_model.add_associated_model(new_victim)
+            self.add_poi_or_victim(new_victim)
+        poi.reveal(new_victim)
+
+        tile_model.remove_associated_model(poi)
+        self.remove_poi_or_victim(poi)

@@ -3,6 +3,7 @@ import json
 from typing import Dict
 import logging
 
+from src.action_events.identify_event import IdentifyEvent
 from src.action_events.place_hazmat_event import PlaceHazmatEvent
 from src.action_events.end_turn_advance_fire import EndTurnAdvanceFireEvent
 from src.action_events.set_initial_poi_family_event import SetInitialPOIFamilyEvent
@@ -218,6 +219,12 @@ class JSONSerializer(object):
         return event
 
     @staticmethod
+    def _deserialize_identify_event(payload: Dict) -> IdentifyEvent:
+        event = IdentifyEvent(payload['row'],payload['column'])
+        return event
+
+
+    @staticmethod
     def deserialize(payload: Dict) -> object:
         """
         Grab an object and deserialize it.
@@ -277,6 +284,8 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_vehicle_placed_event(payload)
         elif object_type == DriveAmbulanceEvent.__name__:
             return JSONSerializer._deserialize_drive_ambulance_event(payload)
+        elif object_type == IdentifyEvent.__name__:
+            return JSONSerializer._deserialize_identify_event(payload)
 
         logger.warning(f"Could not deserialize object {object_type}, not of recognized type.")
 
