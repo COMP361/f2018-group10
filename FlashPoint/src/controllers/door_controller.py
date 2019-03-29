@@ -8,7 +8,7 @@ from src.action_events.turn_events.turn_event import TurnEvent
 from src.core.event_queue import EventQueue
 from src.core.networking import Networking
 from src.models.game_board.door_model import DoorModel
-from src.sprites.hud.door_sprite import DoorSprite
+from src.sprites.door_sprite import DoorSprite
 from src.sprites.game_board import GameBoard
 from src.models.game_units.player_model import PlayerModel
 from src.constants.state_enums import GameStateEnum, DoorStatusEnum
@@ -58,14 +58,12 @@ class DoorController(object):
         if not self.check(door_model):
             door_sprite.button_input.disable()
             self.can_open = False
-            print("Check failed")
             return
 
         self.can_open = True
         door_sprite.menu_shown = True
         self.door = door_sprite
         self.door.button_input.enable()
-        # print(door_model.door_status)
         self.door.button_input.on_click(self.instantiate_event, door_model)
 
     def instantiate_event(self, door_model: DoorModel):
@@ -98,7 +96,6 @@ class DoorController(object):
                             0] <= door.button.rect.x + 20 and door.button.rect.y + 40 <= \
                                 pygame.mouse.get_pos()[1] <= door.button.rect.y + 100:
                             # means the user is pressing on the door
-                            print("door detected")
                             self.process_input(door)
 
                     if door.direction == 'North' or door.direction == 'South':
@@ -106,6 +103,5 @@ class DoorController(object):
                             0] <= door.button.rect.x + 100 and door.button.rect.y <= \
                                 pygame.mouse.get_pos()[1] <= door.button.rect.y + 20:
                             # means the user is pressing on the door
-                            print("door detected")
                             self.process_input(door)
 

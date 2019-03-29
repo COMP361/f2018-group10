@@ -13,6 +13,7 @@ class DirectionEnum(Enum):
     WEST = auto()
     SOUTH = auto()
 
+
 class ArrowDirectionEnum(Enum):
     NORTH = auto()
     NORTH_EAST = auto()
@@ -23,10 +24,16 @@ class ArrowDirectionEnum(Enum):
     WEST = auto()
     NORTH_WEST = auto()
 
+
 class DoorStatusEnum(Enum):
     OPEN = auto()
     CLOSED = auto()
     DESTROYED = auto()
+
+
+class GameBoardTypeEnum(Enum):
+    ORIGINAL = auto()
+    ALTERNATIVE = auto()
 
 
 class GameKindEnum(Enum):
@@ -91,6 +98,18 @@ class WallStatusEnum(Enum):
     INTACT = auto()
     DAMAGED = auto()
     DESTROYED = auto()
+
+
+class PlayerRoleEnum(Enum):
+    CAFS = auto()
+    DRIVER = auto()
+    FAMILY = auto()
+    CAPTAIN = auto()
+    GENERALIST = auto()
+    HAZMAT = auto()
+    IMAGING = auto()
+    PARAMEDIC = auto()
+    RESCUE = auto()
 
 
 class VehicleOrientationEnum(Enum):

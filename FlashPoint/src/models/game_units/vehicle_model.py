@@ -1,6 +1,5 @@
 from typing import List, Tuple
 
-from src.models.game_board.tile_model import TileModel
 from src.constants.state_enums import VehicleOrientationEnum
 from src.models.game_units.player_model import PlayerModel
 from src.models.model import Model

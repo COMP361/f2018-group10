@@ -4,7 +4,7 @@ import src.constants.color as Color
 from src.models.game_board.null_model import NullModel
 from src.models.game_units.victim_model import VictimModel
 from src.observers.player_observer import PlayerObserver
-from src.constants.state_enums import PlayerStatusEnum
+from src.constants.state_enums import PlayerStatusEnum, PlayerRoleEnum
 from src.models.model import Model
 
 
@@ -23,6 +23,7 @@ class PlayerModel(Model):
         self._wins = 0
         self._losses = 0
         self._carrying_victim = NullModel()
+        self.character: PlayerRoleEnum = None
 
     def __eq__(self, other):
         x = [other.ip == self.ip, other.nickname == self.nickname]

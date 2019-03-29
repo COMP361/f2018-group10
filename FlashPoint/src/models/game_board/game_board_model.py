@@ -11,7 +11,7 @@ from src.models.game_board.null_model import NullModel
 from src.models.game_units.poi_model import POIModel
 from src.models.game_board.tile_model import TileModel
 from src.constants.state_enums import GameKindEnum, SpaceKindEnum, SpaceStatusEnum, POIIdentityEnum, \
-    DoorStatusEnum, POIStatusEnum, VictimStateEnum, ArrowDirectionEnum, VehicleOrientationEnum
+    DoorStatusEnum, POIStatusEnum, VictimStateEnum, ArrowDirectionEnum, VehicleOrientationEnum, GameBoardTypeEnum
 from src.models.game_board.wall_model import WallModel
 from src.models.game_board.door_model import DoorModel
 from src.models.game_units.victim_model import VictimModel
@@ -23,15 +23,25 @@ class GameBoardModel(Model):
     etc. This class is created inside of GameStateModel.
     """
 
-    def __init__(self, game_type: GameKindEnum):
+    def __init__(self, game_type: GameKindEnum, type: GameBoardTypeEnum):
         super().__init__()
         self._dimensions = (8, 10)
         self._ambulance_spots = []
         self._engine_spots = []
+        self._board_type = type
+
         if game_type == GameKindEnum.FAMILY:
-            self._tiles = self._init_all_tiles_family_classic()
+            if self._board_type == GameBoardTypeEnum.ORIGINAL:
+                self._tiles = self._init_all_tiles_family_classic()
+            else:
+                self._tiles = self._init_all_tiles_experienced_classic()
+
         else:
-            self._tiles = self._init_all_tiles_experienced_classic()
+            if self._board_type == GameBoardTypeEnum.ORIGINAL:
+                self._tiles = self._init_all_tiles_family_classic()
+            else:
+                self._tiles = self._init_all_tiles_experienced_classic()
+
         self._poi_bank = GameBoardModel._init_pois()
         self._active_pois = []
         self._ambulance = AmbulanceModel((8, 10))
@@ -43,6 +53,10 @@ class GameBoardModel(Model):
 
     def get_tiles(self) -> List[List[TileModel]]:
         return self._tiles
+
+    @property
+    def board_type(self):
+        return self._board_type
 
     @property
     def dimensions(self) -> Tuple[int, int]:
@@ -485,3 +499,19 @@ class GameBoardModel(Model):
             return 0
 
         return 1 if first_orientation != second_orientation else 2
+
+    def flip_poi(self, poi: POIModel):
+        """Reveal a POI adding Victims if necessary"""
+        new_victim = None
+        tile_model = self.get_tile_at(poi.row, poi.column)
+        # If the POI is a Victim, instantiate a VictimModel
+        # and add it to the tile, board.
+        if poi.identity == POIIdentityEnum.VICTIM:
+            new_victim = VictimModel(VictimStateEnum.ON_BOARD)
+            new_victim.set_pos(poi.row, poi.column)
+            tile_model.add_associated_model(new_victim)
+            self.add_poi_or_victim(new_victim)
+        poi.reveal(new_victim)
+
+        tile_model.remove_associated_model(poi)
+        self.remove_poi_or_victim(poi)

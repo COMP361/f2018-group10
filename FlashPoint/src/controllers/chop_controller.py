@@ -93,7 +93,6 @@ class ChopController(object):
                             0] <= wall.button.rect.x + 100 and wall.button.rect.y <= \
                                 pygame.mouse.get_pos()[1] <= wall.button.rect.y + 25:
                             # means the user is pressing on the wall
-                            print("wall detected")
                             self.process_input(wall)
 
                     else:  # means the wall is vertical
@@ -101,5 +100,4 @@ class ChopController(object):
                             0] <= wall.button.rect.x + 25 and wall.button.rect.y <= \
                                 pygame.mouse.get_pos()[1] <= wall.button.rect.y + 100:
                             # means the user is pressing on the wall
-                            print("wall detected")
                             self.process_input(wall)

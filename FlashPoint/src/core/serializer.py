@@ -1,7 +1,10 @@
 import enum
 import json
 from typing import Dict
+import logging
 
+from src.action_events.identify_event import IdentifyEvent
+from src.action_events.place_hazmat_event import PlaceHazmatEvent
 from src.action_events.end_turn_advance_fire import EndTurnAdvanceFireEvent
 from src.action_events.set_initial_poi_family_event import SetInitialPOIFamilyEvent
 from src.action_events.turn_events.chop_event import ChopEvent
@@ -28,6 +31,9 @@ from src.constants.state_enums import DifficultyLevelEnum, GameKindEnum, PlayerS
     DoorStatusEnum, SpaceKindEnum, SpaceStatusEnum, ArrowDirectionEnum
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
+
+
+logger = logging.getLogger("FlashPoint")
 
 
 class JSONSerializer(object):
@@ -171,7 +177,6 @@ class JSONSerializer(object):
         door: DoorModel = JSONSerializer.deserialize(payload['door'])
         return CloseDoorEvent(door)
 
-
     @staticmethod
     def _deserialize_end_turn_advance_fire_event(payload: Dict) -> EndTurnAdvanceFireEvent:
         seed: int = payload['seed']
@@ -194,6 +199,11 @@ class JSONSerializer(object):
         return SetInitialPOIFamilyEvent(seed)
 
     @staticmethod
+    def _deserialize_place_hazmat_event(payload: Dict) -> PlaceHazmatEvent:
+        seed = payload['seed']
+        return PlaceHazmatEvent(seed)
+
+    @staticmethod
     def _deserialize_vehicle_placed_event(payload: Dict) -> VehiclePlacedEvent:
         event: VehiclePlacedEvent = VehiclePlacedEvent()
         event._vehicle_type = payload['_vehicle_type']
@@ -209,6 +219,12 @@ class JSONSerializer(object):
         return event
 
     @staticmethod
+    def _deserialize_identify_event(payload: Dict) -> IdentifyEvent:
+        event = IdentifyEvent(payload['row'],payload['column'])
+        return event
+
+
+    @staticmethod
     def deserialize(payload: Dict) -> object:
         """
         Grab an object and deserialize it.
@@ -218,10 +234,6 @@ class JSONSerializer(object):
         Add to this case statement to be able to deserialize your object type.
         """
         object_type = payload["class"]
-        # print(object_type)
-        # if GameStateModel.instance():
-        #     GameStateModel.instance().game_board.set_adjacencies(GameStateModel.instance().game_board.get_tiles())
-
         # --------------MODELS----------------
         if object_type == PlayerModel.__name__:
             return JSONSerializer._deserialize_player(payload)
@@ -266,12 +278,16 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_close_door_event(payload)
         elif object_type == SetInitialPOIFamilyEvent.__name__:
             return JSONSerializer._deserialize_set_initial_poi_family_event(payload)
+        elif object_type == PlaceHazmatEvent.__name__:
+            return JSONSerializer._deserialize_place_hazmat_event(payload)
         elif object_type == VehiclePlacedEvent.__name__:
             return JSONSerializer._deserialize_vehicle_placed_event(payload)
         elif object_type == DriveAmbulanceEvent.__name__:
             return JSONSerializer._deserialize_drive_ambulance_event(payload)
+        elif object_type == IdentifyEvent.__name__:
+            return JSONSerializer._deserialize_identify_event(payload)
 
-        print(f"WARNING: Could not deserialize object {object_type}, not of recognized type.")
+        logger.warning(f"Could not deserialize object {object_type}, not of recognized type.")
 
     @staticmethod
     def _safe_tile_serialize(tile: TileModel):
