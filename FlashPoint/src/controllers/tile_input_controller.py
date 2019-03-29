@@ -1,4 +1,6 @@
+from src.action_events.identify_event import IdentifyEvent
 from src.action_events.turn_events.drive_ambulance_event import DriveAmbulanceEvent
+from src.controllers.identify_controller import IdentifyController
 from src.controllers.vehicle_controller import VehicleController
 from src.action_events.turn_events.drop_victim_event import DropVictimEvent
 from src.action_events.turn_events.extinguish_event import ExtinguishEvent
@@ -43,8 +45,10 @@ class TileInputController(GameStateObserver):
         self.move_controller = MoveController(current_player)
         self.choose_starting_controller = ChooseStartingPositionController(current_player)
         self.victim_controller = VictimController()
+
         if GameStateModel.instance().rules == GameKindEnum.EXPERIENCED:
             self.vehicle_controller = VehicleController(current_player)
+            self.identify_controller = IdentifyController(current_player)
         GameStateModel.instance().add_observer(self)
         self.fireman = current_player
         self.last_tile: TileSprite = None
@@ -64,16 +68,22 @@ class TileInputController(GameStateObserver):
         TileInputController._instance = None
         VictimController._instance = None
         VehicleController._instance = None
+        IdentifyController._instance = None
+
 
     def main_game_input(self, tile: TileSprite):
         self.move_controller.process_input(tile)
         self.extinguish_controller.process_input(tile)
         self.victim_controller.process_input(tile)
+
         if GameStateModel.instance().rules == GameKindEnum.EXPERIENCED:
             self.vehicle_controller.process_input_main_game(tile)
+            self.identify_controller.process_input(tile)
 
         tile_model = GameStateModel.instance().game_board.get_tile_at(tile.row, tile.column)
         if tile.menu_shown:
+
+
             if self.move_controller.is_moveable:
                 self.move_controller.move_to.move_button.on_click(self.execute_move_event, tile_model)
 
@@ -97,6 +107,7 @@ class TileInputController(GameStateObserver):
 
             if GameStateModel.instance().rules == GameKindEnum.EXPERIENCED:
                 tile.drive_ambulance_here_button.on_click(self.execute_drive_ambulance_event, tile_model)
+                tile.identify_button.on_click(self.execute_identify_event, tile_model)
 
         if not tile.menu_shown:
             tile.menu_shown = True
@@ -106,6 +117,15 @@ class TileInputController(GameStateObserver):
 
     def place_vehicles(self, tile_sprite: TileSprite):
         self.vehicle_controller.process_input_placement(tile_sprite)
+
+    def execute_identify_event(self,tile_model: TileModel):
+        if not self.identify_controller.check(tile_model):
+            return
+        event = IdentifyEvent(tile_model.row, tile_model.column)
+        if Networking.get_instance().is_host:
+            Networking.get_instance().send_to_all_client(event)
+        else:
+            Networking.get_instance().client.send(event)
 
     def execute_drive_ambulance_event(self, tile_model: TileModel):
         if not self.vehicle_controller._run_drive_checks(tile_model):

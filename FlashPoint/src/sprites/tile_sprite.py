@@ -41,8 +41,13 @@ class TileSprite(Interactable, TileObserver):
         self._mouse_pos = (0, 0)  # For keeping track of previous location.
         self.is_scrolling = False
 
+
+
         # ------- POP-UP MENU -------- #
         self.menu_shown = False
+        self.identify_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
+                                       Text(pygame.font.SysFont('Arial', 20), "Identify", Color.ORANGE))
+
         self.move_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
                                       Text(pygame.font.SysFont('Arial', 15), "Move Here", Color.ORANGE))
         self.extinguish_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
@@ -59,6 +64,7 @@ class TileSprite(Interactable, TileObserver):
                                                            Color.ORANGE))
         self.ride_vehicle_button = RectButton(self.rect.x, self.rect.y, 120, 25, Color.BLACK, 0,
                                               Text(pygame.font.SysFont('Arial', 15), "Ride Vehicle", Color.ORANGE))
+        self.identify_button.disable()
         self.move_button.disable()
         self.extinguish_button.disable()
         self.pickup_victim_button.disable()
@@ -145,6 +151,8 @@ class TileSprite(Interactable, TileObserver):
     def draw_menu(self, screen: pygame.Surface):
         if self.menu_shown:
             offset = 0
+
+
             if self.move_button.enabled:
                 screen.blit(self.move_button.image, self.move_button.rect)
                 self.move_button.rect.x = self.rect.x
@@ -175,10 +183,10 @@ class TileSprite(Interactable, TileObserver):
                 self.drive_ambulance_here_button.rect.y = self.rect.y + offset
                 offset += 20
 
-            if self.drive_engine_here_button.enabled:
-                screen.blit(self.drive_engine_here_button.image, self.drive_engine_here_button.rect)
-                self.drive_engine_here_button.rect.x = self.rect.x
-                self.drive_engine_here_button.rect.y = self.rect.y + offset
+            if self.identify_button.enabled:
+                screen.blit(self.identify_button.image, self.identify_button.rect)
+                self.identify_button.rect.x = self.rect.x
+                self.identify_button.rect.y = self.rect.y + offset
                 offset += 20
 
             if self.ride_vehicle_button.enabled:
@@ -199,6 +207,7 @@ class TileSprite(Interactable, TileObserver):
         self.extinguish_button.update(event_queue)
         self.pickup_victim_button.update(event_queue)
         self.move_button.update(event_queue)
+        self.identify_button.update(event_queue)
 
     def tile_status_changed(self, status: SpaceStatusEnum):
         new_surf = pygame.Surface([self._non_highlight_image.get_width(), self._non_highlight_image.get_height()])
@@ -239,3 +248,6 @@ class TileSprite(Interactable, TileObserver):
 
     def disable_drop(self):
         self.drop_victim_button.disable()
+
+    def disable_identify(self):
+        self.identify_button.disable()
