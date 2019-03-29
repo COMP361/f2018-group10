@@ -1,5 +1,9 @@
+import logging
+
 from src.models.game_state_model import GameStateModel
 from src.action_events.action_event import ActionEvent
+
+logger = logging.getLogger("FlashPoint")
 
 
 class ChatEvent(ActionEvent):
@@ -11,5 +15,5 @@ class ChatEvent(ActionEvent):
         self._message = message
 
     def execute(self):
-        print("Executing ChatEvent")
+        logger.info("Executing ChatEvent")
         GameStateModel.instance().add_chat_message(self._message, self._sender)

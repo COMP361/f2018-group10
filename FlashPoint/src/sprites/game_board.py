@@ -1,6 +1,7 @@
 import pygame
 
 import src.constants.main_constants as MainConst
+from src.sprites.player_sprite import PlayerSprite
 from src.UIComponents.rect_button import RectButton
 from src.action_events.fire_placement_event import FirePlacementEvent
 from src.UIComponents.file_importer import FileImporter
@@ -35,7 +36,15 @@ class GameBoard(pygame.sprite.Group):
         self.image.blit(self.background, (0, 0))
         self.grid.draw(self.image)
         for sprite in self:
+            if isinstance(sprite, PlayerSprite):
+                pass
             self.image.blit(sprite.image, sprite.rect)
+
+        # Blit the player sprite last, so that it's on top
+        for sprite in self:
+            if isinstance(sprite, PlayerSprite):
+                self.image.blit(sprite.image, sprite.rect)
+
         for sprite in self.grid:
             if isinstance(sprite, RectButton) and not sprite.enabled:
                 pass

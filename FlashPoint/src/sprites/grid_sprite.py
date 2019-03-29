@@ -4,6 +4,7 @@ import pygame
 
 import src.constants.color as Color
 from src.UIComponents.rect_button import RectButton
+from src.constants.state_enums import GameBoardTypeEnum
 from src.core.event_queue import EventQueue
 from src.models.game_board.door_model import DoorModel
 from src.models.game_board.wall_model import WallModel
@@ -42,7 +43,9 @@ class GridSprite(pygame.sprite.Group):
         """Initialize a grid of Tiles, add to self Sprite Group."""
         grid = []
         x_offset = 0
-        tile_images = Spritesheet("media/boards/board1.png", 10, 8).cell_images
+        boardType = GameStateModel.instance().game_board.board_type
+        filePath = self.choose_board(boardType)
+        tile_images = Spritesheet(filePath, 10, 8).cell_images
 
         for i in range(0, self.width):
             grid.append([])
@@ -120,6 +123,16 @@ class GridSprite(pygame.sprite.Group):
 
         for door in self.doors:
             door.update(event_queue)
+
+
+    def choose_board(self,type :GameBoardTypeEnum):
+        if(type == GameBoardTypeEnum.ORIGINAL):
+            str = "media/boards/board1.png"
+            return str
+        else:
+            str = "media/boards/board2.png"
+            return str
+
 
     @property
     def get_walls(self) -> List[WallSprite]:

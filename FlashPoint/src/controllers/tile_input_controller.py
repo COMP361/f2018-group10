@@ -135,7 +135,6 @@ class TileInputController(GameStateObserver):
             Networking.get_instance().client.send(event)
 
     def execute_extinguish_event(self, tile: TileModel):
-        print(tile.space_status)
         if not self.extinguish_controller._run_checks(tile):
             return
 

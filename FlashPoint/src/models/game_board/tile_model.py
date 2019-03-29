@@ -4,6 +4,7 @@ from src.models.game_units.poi_model import POIModel
 from src.models.game_units.victim_model import VictimModel
 from src.models.game_board.door_model import DoorModel
 from src.models.game_board.wall_model import WallModel
+from src.models.game_units.hazmat_model import HazmatModel
 from src.models.model import Model
 from src.core.flashpoint_exceptions import TilePositionOutOfBoundsException
 from src.models.game_board.edge_obstacle_model import EdgeObstacleModel
@@ -43,10 +44,7 @@ class TileModel(Model):
         self._arrow_dirn: ArrowDirectionEnum = None
 
     def __str__(self):
-        tile_pos = "Tile at: ({row}, {column})".format(row=self.row, column=self.column)
-        tile_state = "Space status: {status}".format(status=self.space_status)
-        tile_kind = "Space kind: {kind}\n".format(kind=self.space_kind)
-        return '\n'.join([tile_pos, tile_state, tile_kind])
+        return f"Tile at: ({self.row}, {self.column})"
 
     def __eq__(self, other):
         if isinstance(other, TileModel):

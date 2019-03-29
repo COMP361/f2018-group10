@@ -7,6 +7,12 @@ from src.core.event_queue import EventQueue
 
 class Scene(pygame.sprite.Group):
     """
+    $$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+    DEPRECIATED. DO NOT USE
+
+    $$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
     Scene object
 
     To add new components (Sprite) into the scene, use: Scene.sprite_grp.add( Sprite )
