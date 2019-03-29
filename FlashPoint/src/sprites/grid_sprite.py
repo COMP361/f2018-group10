@@ -12,7 +12,7 @@ from src.models.game_state_model import GameStateModel
 
 from src.UIComponents.spritesheet import Spritesheet
 from src.models.game_units.player_model import PlayerModel
-from src.sprites.hud.door_sprite import DoorSprite
+from src.sprites.door_sprite import DoorSprite
 from src.sprites.tile_sprite import TileSprite
 from src.sprites.wall_sprite import WallSprite
 

@@ -13,7 +13,6 @@ class PickupVictimEvent(TurnEvent):
     def __init__(self, victim: VictimModel):
         super().__init__()
         game: GameStateModel = GameStateModel.instance()
-        print(f"{victim.row}, {victim.column}")
         self.victim_tile = game.game_board.get_tile_at(victim.row, victim.column)
         for assoc_model in self.victim_tile.associated_models:
             if isinstance(assoc_model, VictimModel):
