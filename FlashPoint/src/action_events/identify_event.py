@@ -7,7 +7,7 @@ from src.models.game_units.poi_model import POIModel
 
 class IdentifyEvent(ActionEvent):
 
-    def __init__(self, row:int,column:int):
+    def __init__(self, row: int, column: int):
         super().__init__()
         self.row = row
         self.column = column
@@ -21,19 +21,6 @@ class IdentifyEvent(ActionEvent):
 
         tile_model: TileModel = self.game_board.get_tile_at(self.row, self.column)
 
-
         for model in tile_model.associated_models:
             if isinstance(model, POIModel):
-               # GameStateModel.instance().game_board.flip(model)
-
-        #models = tile_model.associated_models
-
-        #self.game_board.flip(models)
-
-
-
-
-
-
-
-
+                GameStateModel.instance().game_board.flip_poi(model)

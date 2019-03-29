@@ -299,19 +299,7 @@ class MoveEvent(TurnEvent):
                     # from the board and the tile. If it is a Victim,
                     # remove the POI from the board, tile and
                     # add a Victim in its place.
-                    new_victim = None
-
-                    # If the POI is a Victim, instantiate a VictimModel
-                    # and add it to the tile, board.
-                    if assoc_model.identity == POIIdentityEnum.VICTIM:
-                        new_victim = VictimModel(VictimStateEnum.ON_BOARD)
-                        new_victim.set_pos(d_tile.tile_model.row, d_tile.tile_model.column)
-                        d_tile.tile_model.add_associated_model(new_victim)
-                        self.game.game_board.add_poi_or_victim(new_victim)
-                    assoc_model.reveal(new_victim)
-
-                    d_tile.tile_model.remove_associated_model(assoc_model)
-                    self.game.game_board.remove_poi_or_victim(assoc_model)
+                    self.game.game_board.flip_poi(assoc_model)
 
             # Put to sleep so that we can see the
             # player move through the individual tiles
