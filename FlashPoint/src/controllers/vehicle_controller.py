@@ -135,6 +135,7 @@ class VehicleController(object):
             parking_spot = [spot for spot in game_state.game_board.ambulance_spots if tile_model in spot][0]
             event = VehiclePlacedEvent(game_state.game_board.ambulance, parking_spot)
             self.game_board_sprite.add(self.choose_engine_prompt)
+
         elif not engine_placed:
             parking_spot = [spot for spot in game_state.game_board.engine_spots if tile_model in spot][0]
             event = VehiclePlacedEvent(game_state.game_board.engine, parking_spot)
@@ -161,10 +162,17 @@ class VehicleController(object):
         if parking_type == SpaceKindEnum.AMBULANCE_PARKING:
             if self._player_is_in_ambulance_space(first_tile):
                 # Display some kind of prompt for riding the ambulance
-                tile_sprite.ride_vehicle_button.enable()
+                if self.current_player in game_state.game_board.ambulance.passengers:
+                    tile_sprite.dismount_vehicle_button.enable()
+                    tile_sprite.ride_vehicle_button.disable()
+                else:
+                    tile_sprite.ride_vehicle_button.enable()
+                    tile_sprite.dismount_vehicle_button.disable()
+
             else:
                 # Display some kind of prompt for moving the ambulance to here
                 tile_sprite.ride_vehicle_button.disable()
+                tile_sprite.dismount_vehicle_button.disable()
                 tile_sprite.drive_ambulance_here_button.enable()
 
         elif parking_type == SpaceKindEnum.ENGINE_PARKING:

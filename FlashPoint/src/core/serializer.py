@@ -9,6 +9,7 @@ from src.action_events.end_turn_advance_fire import EndTurnAdvanceFireEvent
 from src.action_events.set_initial_poi_family_event import SetInitialPOIFamilyEvent
 from src.action_events.turn_events.chop_event import ChopEvent
 from src.action_events.turn_events.close_door_event import CloseDoorEvent
+from src.action_events.turn_events.dismount_vehicle_event import DismountVehicleEvent
 from src.action_events.turn_events.drive_ambulance_event import DriveAmbulanceEvent
 from src.action_events.turn_events.drop_victim_event import DropVictimEvent
 from src.action_events.turn_events.extinguish_event import ExtinguishEvent
@@ -232,6 +233,10 @@ class JSONSerializer(object):
         return event
 
     @staticmethod
+    def _deserialize_dismount_vehicle_event(payload: Dict) -> DismountVehicleEvent:
+        return DismountVehicleEvent(payload['_vehicle_type'], player_index=payload['_player_index'])
+
+    @staticmethod
     def deserialize(payload: Dict) -> object:
         """
         Grab an object and deserialize it.
@@ -295,6 +300,8 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_identify_event(payload)
         elif object_type == RideVehicleEvent.__name__:
             return JSONSerializer._deserialize_ride_vehicle_event(payload)
+        elif object_type == DismountVehicleEvent.__name__:
+            return JSONSerializer._deserialize_dismount_vehicle_event(payload)
 
         logger.warning(f"Could not deserialize object {object_type}, not of recognized type.")
 

@@ -1,4 +1,5 @@
 from src.action_events.identify_event import IdentifyEvent
+from src.action_events.turn_events.dismount_vehicle_event import DismountVehicleEvent
 from src.action_events.turn_events.drive_ambulance_event import DriveAmbulanceEvent
 from src.action_events.turn_events.ride_vehicle_event import RideVehicleEvent
 from src.controllers.identify_controller import IdentifyController
@@ -108,12 +109,31 @@ class TileInputController(GameStateObserver):
                 tile.drive_ambulance_here_button.on_click(self.execute_drive_ambulance_event, tile_model)
                 tile.identify_button.on_click(self.execute_identify_event, tile_model)
                 tile.ride_vehicle_button.on_click(self.ride_vehicle, tile_model)
+                tile.dismount_vehicle_button.on_click(self.dismount_vehicle, tile_model)
 
         if not tile.menu_shown:
             tile.menu_shown = True
             if self.last_tile:
                 self.last_tile.menu_shown = False
             self.last_tile = tile
+
+    def dismount_vehicle(self, tile_sprite: TileSprite):
+        game_board = GameStateModel.instance().game_board
+        tile_model: TileModel = game_board.get_tile_at(tile_sprite.row, tile_sprite.column)
+
+        event = None
+        if tile_model.space_kind == SpaceKindEnum.AMBULANCE_PARKING:
+            event = DismountVehicleEvent("AMBULANCE", player=self.fireman)
+        elif tile_model.space_kind == SpaceKindEnum.ENGINE_PARKING:
+            event = DismountVehicleEvent("ENGINE", player=self.fireman)
+
+        if not event:
+            return
+
+        if Networking.get_instance().is_host:
+            Networking.get_instance().send_to_all_client(event)
+        else:
+            Networking.get_instance().client.send(event)
 
     def ride_vehicle(self, tile_sprite: TileSprite):
         game_board = GameStateModel.instance().game_board

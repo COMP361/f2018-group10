@@ -62,6 +62,9 @@ class TileSprite(Interactable, TileObserver):
                                                            Color.ORANGE))
         self.ride_vehicle_button = RectButton(self.rect.x, self.rect.y, 120, 25, Color.BLACK, 0,
                                               Text(pygame.font.SysFont('Arial', 15), "Ride Vehicle", Color.ORANGE))
+
+        self.dismount_vehicle_button = RectButton(self.rect.x, self.rect.y, 120, 25, Color.BLACK, 0,
+                                              Text(pygame.font.SysFont('Arial', 15), "Dismount Vehicle", Color.ORANGE))
         self.identify_button.disable()
         self.move_button.disable()
         self.extinguish_button.disable()
@@ -70,6 +73,7 @@ class TileSprite(Interactable, TileObserver):
         self.drive_ambulance_here_button.disable()
         self.drive_engine_here_button.disable()
         self.ride_vehicle_button.disable()
+        self.dismount_vehicle_button.disable()
 
     def __str__(self):
         return f"TileSprite at: {self.row},{self.column}"
@@ -192,6 +196,12 @@ class TileSprite(Interactable, TileObserver):
                 self.ride_vehicle_button.rect.y = self.rect.y + offset
                 offset += 20
 
+            if self.dismount_vehicle_button.enabled:
+                screen.blit(self.dismount_vehicle_button.image, self.dismount_vehicle_button.rect)
+                self.dismount_vehicle_button.rect.x = self.rect.x
+                self.dismount_vehicle_button.rect.y = self.rect.y + offset
+                offset += 20
+
     def update(self, event_queue: EventQueue):
         self.sprite_grp.update(event_queue)
 
@@ -206,6 +216,7 @@ class TileSprite(Interactable, TileObserver):
         self.move_button.update(event_queue)
         self.identify_button.update(event_queue)
         self.ride_vehicle_button.update(event_queue)
+        self.dismount_vehicle_button.update(event_queue)
 
     def tile_status_changed(self, status: SpaceStatusEnum):
         new_surf = pygame.Surface([self._non_highlight_image.get_width(), self._non_highlight_image.get_height()])
