@@ -20,7 +20,6 @@ from src.observers.player_observer import PlayerObserver
 
 class LobbyScene(PlayerObserver, GameStateObserver):
 
-
     def __init__(self, screen, current_player: PlayerModel):
         super().__init__()
         self._current_player = current_player
@@ -87,7 +86,7 @@ class LobbyScene(PlayerObserver, GameStateObserver):
             self.isReady = False
             self.buttonReady.change_color(Color.GREY)
             self._current_player.status = PlayerStatusEnum.NOT_READY
-            event = ReadyEvent(self._current_player,False)
+            event = ReadyEvent(self._current_player, False)
             if self._current_player.ip == GameStateModel.instance().host.ip:
                 event.execute()
                 Networking.get_instance().send_to_all_client(event)
@@ -120,6 +119,7 @@ class LobbyScene(PlayerObserver, GameStateObserver):
 
         self._init_sprites()
 
+
     def _init_start_game_button(self):
         """Button for starting the game once all players have clicked ready."""
         box_size = (130, 48)
@@ -146,6 +146,10 @@ class LobbyScene(PlayerObserver, GameStateObserver):
         else:
             user_box = RectLabel(rect[0], rect[1], rect[2], rect[3], "media/specialist_cards/family.png")
         return user_box
+
+    def _update_background_player(self, rect):
+        pass
+
 
     def get_path_from_character_enum(self, enum: PlayerRoleEnum):
         if enum == PlayerRoleEnum.CAFS:
@@ -296,4 +300,5 @@ class LobbyScene(PlayerObserver, GameStateObserver):
         pass
 
     def player_role_changed(self, role):
-        pass
+        self._init_sprites()
+        # self._update_background_player()
