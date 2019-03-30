@@ -41,8 +41,6 @@ class TileSprite(Interactable, TileObserver):
         self._mouse_pos = (0, 0)  # For keeping track of previous location.
         self.is_scrolling = False
 
-
-
         # ------- POP-UP MENU -------- #
         self.menu_shown = False
         self.identify_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
@@ -152,7 +150,6 @@ class TileSprite(Interactable, TileObserver):
         if self.menu_shown:
             offset = 0
 
-
             if self.move_button.enabled:
                 screen.blit(self.move_button.image, self.move_button.rect)
                 self.move_button.rect.x = self.rect.x
@@ -190,9 +187,9 @@ class TileSprite(Interactable, TileObserver):
                 offset += 20
 
             if self.ride_vehicle_button.enabled:
-                screen.blit(self.ride_vehicle_button.image, self.drive_ambulance_here_button.rect)
-                self.drive_ambulance_here_button.rect.x = self.rect.x
-                self.drive_ambulance_here_button.rect.y = self.rect.y + offset
+                screen.blit(self.ride_vehicle_button.image, self.ride_vehicle_button.rect)
+                self.ride_vehicle_button.rect.x = self.rect.x
+                self.ride_vehicle_button.rect.y = self.rect.y + offset
                 offset += 20
 
     def update(self, event_queue: EventQueue):
@@ -208,6 +205,7 @@ class TileSprite(Interactable, TileObserver):
         self.pickup_victim_button.update(event_queue)
         self.move_button.update(event_queue)
         self.identify_button.update(event_queue)
+        self.ride_vehicle_button.update(event_queue)
 
     def tile_status_changed(self, status: SpaceStatusEnum):
         new_surf = pygame.Surface([self._non_highlight_image.get_width(), self._non_highlight_image.get_height()])

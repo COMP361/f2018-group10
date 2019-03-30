@@ -15,6 +15,7 @@ from src.action_events.turn_events.extinguish_event import ExtinguishEvent
 from src.action_events.turn_events.move_event import MoveEvent
 from src.action_events.turn_events.pick_up_victim_event import PickupVictimEvent
 from src.action_events.turn_events.open_door_event import OpenDoorEvent
+from src.action_events.turn_events.ride_vehicle_event import RideVehicleEvent
 from src.action_events.vehicle_placed_event import VehiclePlacedEvent
 from src.models.game_board.door_model import DoorModel
 from src.models.game_board.wall_model import WallModel
@@ -223,6 +224,12 @@ class JSONSerializer(object):
         event = IdentifyEvent(payload['row'],payload['column'])
         return event
 
+    @staticmethod
+    def _deserialize_ride_vehicle_event(payload: Dict) -> RideVehicleEvent:
+        player_index = payload['_player_index']
+        vehicle_type = payload['_vehicle_type']
+        event = RideVehicleEvent(vehicle_type=vehicle_type, player_index=player_index)
+        return event
 
     @staticmethod
     def deserialize(payload: Dict) -> object:
@@ -286,6 +293,8 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_drive_ambulance_event(payload)
         elif object_type == IdentifyEvent.__name__:
             return JSONSerializer._deserialize_identify_event(payload)
+        elif object_type == RideVehicleEvent.__name__:
+            return JSONSerializer._deserialize_ride_vehicle_event(payload)
 
         logger.warning(f"Could not deserialize object {object_type}, not of recognized type.")
 

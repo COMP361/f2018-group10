@@ -99,10 +99,18 @@ class VehicleController(object):
                 elif not success:
                     tile_sprite.highlight_color = None
 
-    def _player_is_in_ambulance_space(self):
+    def _player_is_in_ambulance_space(self, first_tile: TileModel):
+        game_board: GameBoardModel = GameStateModel.instance().game_board
         player = self.current_player
+        second_tile = game_board.get_other_parking_tile(first_tile)
+
         ambulance_row = GameStateModel.instance().game_board.ambulance.row
         ambulance_column = GameStateModel.instance().game_board.ambulance.column
+        row_match = player.row == first_tile.row or player.row == second_tile.row
+        column_match = player.column == first_tile.column or player.row == second_tile.column
+        if not row_match or not column_match:
+            return False
+
         row_match = player.row == ambulance_row or player.row == ambulance_row + 1
         column_match = player.column == ambulance_column or player.row == ambulance_column + 1
         return row_match and column_match
@@ -151,11 +159,12 @@ class VehicleController(object):
             return
 
         if parking_type == SpaceKindEnum.AMBULANCE_PARKING:
-            if self._player_is_in_ambulance_space():
+            if self._player_is_in_ambulance_space(first_tile):
                 # Display some kind of prompt for riding the ambulance
-                pass
+                tile_sprite.ride_vehicle_button.enable()
             else:
                 # Display some kind of prompt for moving the ambulance to here
+                tile_sprite.ride_vehicle_button.disable()
                 tile_sprite.drive_ambulance_here_button.enable()
 
         elif parking_type == SpaceKindEnum.ENGINE_PARKING:
