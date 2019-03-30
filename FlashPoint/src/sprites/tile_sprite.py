@@ -184,6 +184,12 @@ class TileSprite(Interactable, TileObserver):
                 self.drive_ambulance_here_button.rect.y = self.rect.y + offset
                 offset += 20
 
+            if self.drive_engine_here_button.enabled:
+                screen.blit(self.drive_ambulance_here_button.image, self.drive_ambulance_here_button.rect)
+                self.drive_ambulance_here_button.rect.x = self.rect.x
+                self.drive_ambulance_here_button.rect.y = self.rect.y + offset
+                offset += 20
+
             if self.identify_button.enabled:
                 screen.blit(self.identify_button.image, self.identify_button.rect)
                 self.identify_button.rect.x = self.rect.x
@@ -217,6 +223,7 @@ class TileSprite(Interactable, TileObserver):
         self.identify_button.update(event_queue)
         self.ride_vehicle_button.update(event_queue)
         self.dismount_vehicle_button.update(event_queue)
+        self.drive_engine_here_button.update(event_queue)
 
     def tile_status_changed(self, status: SpaceStatusEnum):
         new_surf = pygame.Surface([self._non_highlight_image.get_width(), self._non_highlight_image.get_height()])
