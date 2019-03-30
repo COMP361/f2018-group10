@@ -1,4 +1,6 @@
 import random
+import logging
+
 
 from src.action_events.knock_down_event import KnockDownEvent
 from src.action_events.replenish_poi_event import ReplenishPOIEvent
@@ -14,9 +16,26 @@ from src.constants.state_enums import GameStateEnum, SpaceStatusEnum, WallStatus
 from src.action_events.turn_events.turn_event import TurnEvent
 from src.models.game_state_model import GameStateModel
 
+logger = logging.getLogger("FlashPoint")
+
 
 class EndTurnAdvanceFireEvent(TurnEvent):
+    """
+    Event that updates the game state at the end of a turn.
 
+    Steps:
+        1)start the AdvanceFire
+        2)knockdown event
+        3)replenish POI
+        4)retain and replenish player's AP
+        5)call player_next
+
+     A seed for the random number generator is used to make sure that random numbers stay consistent across machines.
+     The person who ended their turn sets the seed, then all other players will see that the seed has already been
+     set, and simply use it instead of setting their own. Once the seed has been set, it is set forever, globally.
+     Calls to random.seed(seed) will reset the seed.
+
+    """
     def __init__(self, seed: int = 0):
         super().__init__()
         self.player = GameStateModel.instance().players_turn
@@ -25,6 +44,7 @@ class EndTurnAdvanceFireEvent(TurnEvent):
         self.initial_tile: TileModel = None
 
         if seed == 0:
+
             self.seed = random.randint(1, 6969)
         else:
             self.seed = seed
@@ -36,56 +56,64 @@ class EndTurnAdvanceFireEvent(TurnEvent):
         self.black_dice = self.game_state.roll_black_dice()
         self.directions = ["North", "South", "East", "West"]
 
-    def execute(self):
-        """
-        Steps:
-        1)start the AdvanceFire
-        2)knockdown event
-        3)replenish POI
-        4)retain and replenish player's AP
-        5)call player_next
-        :return:
-        """
+    def _main_phase_end_turn(self):
+        # ------ AdvanceFire ------ #
+        # Change state of tile depending on previous state
+        self.initial_tile = self.board.get_tile_at(self.red_dice, self.black_dice)
+        logger.info(f"Smoke placed: {self.initial_tile.row}, {self.initial_tile.column}")
+        self.advance_on_tile(self.initial_tile)
+        self.flashover()
+        self.affect_damages()
+
+        # ------ ReplenishPOI ------ #
+        rp_event = ReplenishPOIEvent(self.seed)
+        rp_event.execute()
+
         # retain up to a maximum of 4 AP
         # as the turn is ending and
         # replenish player's AP by 4
+        if self.player.ap > 4:
+            self.player.ap = 4
+
+        self.player.ap += 4
+
+    def _placing_players_end_turn(self):
+        # If the last player has chosen a location, move the game into the next phase.
+        if self.game_state.rules == GameKindEnum.EXPERIENCED:
+            logger.info("Game phase has moved to PLACING_VEHICLES")
+            self.game_state.state = GameStateEnum.PLACING_VEHICLES
+        else:
+            logger.info("Game phase has moved to MAIN_GAME")
+            self.game_state.state = GameStateEnum.MAIN_GAME
+
+    def _placing_vehicles_end_turn(self):
+        # Don't call the next player. Wait until the host chooses the positions.
+        if self.game_state.vehicles_have_been_placed():
+            logger.info("Game phase has moved to MAIN_GAME")
+            self.game_state.state = GameStateEnum.MAIN_GAME
+        else:
+            logger.info("Not all vehicles have been placed. Not moving to next game phase.")
+
+    def execute(self):
+        logger.info("Executing EndTurnAdvanceFireEvent")
+
         if self.game_state.state == GameStateEnum.MAIN_GAME:
-
-            # ------ AdvanceFire ------ #
-            # Change state of tile depending on previous state
-            self.initial_tile = self.board.get_tile_at(self.red_dice, self.black_dice)
-            self.advance_on_tile(self.initial_tile)
-            self.flashover()
-            self.affect_damages()
-
-            # ------ ReplenishPOI ------ #
-            rp_event = ReplenishPOIEvent(self.seed)
-            rp_event.execute()
-
-            if self.player.ap > 4:
-                self.player.ap = 4
-
-            self.player.ap += 4
+            self._main_phase_end_turn()
 
         elif (self.game_state.state == GameStateEnum.PLACING_PLAYERS
               and self.game_state.all_players_have_chosen_location()):
-
-                # If the last player has chosen a location, move the game into the next phase.
-                if self.game_state.rules == GameKindEnum.EXPERIENCED:
-                    self.game_state.state = GameStateEnum.PLACING_VEHICLES
-                else:
-                    self.game_state.state = GameStateEnum.MAIN_GAME
-
+            self._placing_players_end_turn()
+        elif not self.game_state.all_players_have_chosen_location():
+            logger.info("Not all players have chosen starting location, not moving to next game phase.")
         elif self.game_state.state == GameStateEnum.PLACING_VEHICLES:
-            # Don't call the next player. Wait until the host chooses the positions.
-            if self.game_state.vehicles_have_been_placed():
-                self.game_state.state = GameStateEnum.MAIN_GAME
+            self._placing_vehicles_end_turn()
 
         # call next player
         self.game_state.next_player()
 
     def advance_on_tile(self, target_tile: TileModel):
         tile_status = target_tile.space_status
+
         # Safe -> Smoke
         if tile_status == SpaceStatusEnum.SAFE:
             target_tile.space_status = SpaceStatusEnum.SMOKE
@@ -99,6 +127,7 @@ class EndTurnAdvanceFireEvent(TurnEvent):
             self.explosion(target_tile)
 
     def explosion(self, origin_tile: TileModel):
+        logger.info(f"Explosion occurred on {origin_tile}")
         for direction, obstacle in origin_tile.adjacent_edge_objects.items():
             # fire does not move to the neighbouring tile
             # damaging wall present along the tile
@@ -199,6 +228,7 @@ class EndTurnAdvanceFireEvent(TurnEvent):
                         pass
 
                     if nb_tile.space_status == SpaceStatusEnum.FIRE:
+                        logger.info(f"Flashover on tile {tile}")
                         tile.space_status = SpaceStatusEnum.FIRE
                         num_converted += 1
                         break
@@ -219,6 +249,7 @@ class EndTurnAdvanceFireEvent(TurnEvent):
 
             for model in assoc_models:
                 if isinstance(model, VictimModel):
+                    logger.info(f"{model} was lost.")
                     self.game_state.victims_lost = self.game_state.victims_lost + 1
                     model: VictimModel = model
                     model.state = VictimStateEnum.LOST
@@ -243,8 +274,8 @@ class EndTurnAdvanceFireEvent(TurnEvent):
                         tile.remove_associated_model(new_victim)
                         self.board.remove_poi_or_victim(new_victim)
                         self.game_state.victims_lost = self.game_state.victims_lost + 1
-
-
+                        logger.info(f"{new_victim} was lost.")
+                    logger.info(f"{model} was removed from the game.")
                 else:
                     pass
 

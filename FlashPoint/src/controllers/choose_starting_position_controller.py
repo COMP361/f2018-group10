@@ -1,5 +1,7 @@
 import pygame
 
+from src.UIComponents.interactable import Interactable
+from src.controllers.controller import Controller
 from src.sprites.tile_sprite import TileSprite
 from src.core.networking import Networking
 from src.UIComponents.rect_label import RectLabel
@@ -14,11 +16,13 @@ import src.constants.color as Color
 from src.UIComponents.text import Text
 
 
-class ChooseStartingPositionController(object):
+class ChooseStartingPositionController(Controller):
 
     _instance = None
 
     def __init__(self, current_player: PlayerModel):
+        super().__init__(current_player)
+
         if ChooseStartingPositionController._instance:
             raise Exception("ChooseStartingPositionController is a singleton")
         self.current_player = current_player
@@ -44,19 +48,21 @@ class ChooseStartingPositionController(object):
                 tile_model = GameStateModel.instance().game_board.get_tile_at(j, i)
                 tile_sprite = self.game_board_sprite.grid.grid[i][j]
 
-                success = self._run_checks(tile_sprite, tile_model)
+                success = self.run_checks(tile_model)
 
                 if success and not tile_sprite.highlight_color:
                     tile_sprite.highlight_color = Color.GREEN
                 elif not success:
                     tile_sprite.highlight_color = None
 
-    def _run_checks(self, tile_sprite: TileSprite, tile_model: TileModel) -> bool:
+    def send_event_and_close_menu(self, tile_model: TileModel, menu_to_close: Interactable):
+        pass
+
+    def run_checks(self, tile_model: TileModel) -> bool:
         if GameStateModel.instance().state != GameStateEnum.PLACING_PLAYERS:
             return False
 
         if self.current_player != GameStateModel.instance().players_turn:
-            # print("Not this players turn")
             return False
 
         # Check if any Players are in this tile
@@ -71,10 +77,10 @@ class ChooseStartingPositionController(object):
         if not GameStateModel.instance().players_turn.has_pos:
             tile_model = GameStateModel.instance().game_board.get_tile_at(tile_sprite.row, tile_sprite.column)
 
-            if not self._run_checks(tile_sprite, tile_model):
+            if not self.run_checks(tile_model):
                 return
 
-            event = ChooseStartingPositionEvent(tile_model)
+            event = ChooseStartingPositionEvent(tile_model.row, tile_model.column)
             self.choose_prompt.kill()
 
             if Networking.get_instance().is_host:

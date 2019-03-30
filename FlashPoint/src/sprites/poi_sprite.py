@@ -30,7 +30,6 @@ class POISprite(pygame.sprite.Sprite, POIObserver):
                 # Replace this sprite with a victim sprite.
                 victim_sprite = VictimSprite(victim.row, victim.column)
                 victim.add_observer(victim_sprite)
-                print(victim_sprite.row, victim_sprite.column)
                 for group in self.groups():
                     group.add(victim_sprite)
         self.kill()

@@ -13,7 +13,15 @@ from src.models.game_units.victim_model import VictimModel
 
 
 class AdvanceFireEvent(ActionEvent):
+    """
 
+    $$$$$$$$$$$$$$$$$$$$
+
+    DO NOT USE: SEE EndTurnAdvanceFireEvent instead.
+
+    $$$$$$$$$$$$$$$$$$$$
+
+    """
     def __init__(self, red_dice: int = None, black_dice: int = None):
         super().__init__()
         self.game_state: GameStateModel = GameStateModel.instance()

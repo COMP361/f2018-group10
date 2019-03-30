@@ -4,7 +4,7 @@ import src.constants.color as Color
 from src.models.game_board.null_model import NullModel
 from src.models.game_units.victim_model import VictimModel
 from src.observers.player_observer import PlayerObserver
-from src.constants.state_enums import PlayerStatusEnum, PlayerRoleEnum
+from src.constants.state_enums import PlayerStatusEnum, PlayerRoleEnum, GameKindEnum
 from src.models.model import Model
 
 
@@ -81,6 +81,14 @@ class PlayerModel(Model):
         if isinstance(self.carrying_victim, VictimModel):
             self.carrying_victim.set_pos(row, column)
         self._notify_position()
+
+    def set_initial_ap(self, game_kind: GameKindEnum):
+        """Set the initial AP for this player"""
+        self.ap = 4
+
+        if game_kind == GameKindEnum.EXPERIENCED:
+            # TODO: Set AP based on role.
+            pass
 
     @property
     def column(self) -> int:

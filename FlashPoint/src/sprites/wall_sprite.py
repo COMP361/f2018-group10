@@ -25,12 +25,12 @@ class WallSprite(pygame.sprite.Sprite, WallObserver):
         self._current_player = self._game.players_turn
         self._button = None
         self.tile_model = tile_model
-        self.damaged = False
-        self.destroyed = False
         self.id = id
         self.wall_model = wall_model
         self.wall_model.add_observer(self)
 
+        self.damaged = self.wall_model.wall_status == WallStatusEnum.DAMAGED
+        self.destroyed = self.wall_model.wall_status == WallStatusEnum.DESTROYED
         self.tile_sprite = tile_sprite
         self._prev_x = self.tile_sprite.rect.x
         self._prev_y = self.tile_sprite.rect.y

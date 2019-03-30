@@ -1,28 +1,29 @@
-from src.constants.state_enums import GameStateEnum
-from src.core.event_queue import EventQueue
+from src.UIComponents.interactable import Interactable
+from src.action_events.turn_events.drop_victim_event import DropVictimEvent
+from src.action_events.turn_events.pick_up_victim_event import PickupVictimEvent
+from src.controllers.controller import Controller
+from src.core.networking import Networking
 from src.models.game_board.tile_model import TileModel
 from src.models.game_state_model import GameStateModel
+from src.models.game_units.player_model import PlayerModel
 from src.models.game_units.victim_model import VictimModel
 from src.sprites.tile_sprite import TileSprite
 
 
-class VictimController(object):
+class VictimController(Controller):
+
     _instance = None
 
-    def __init__(self):
+    def __init__(self, current_player: PlayerModel):
+        super().__init__(current_player)
         if VictimController._instance:
             raise Exception("Victim Controller is a singleton")
 
         VictimController._instance = self
-        self.fireman = GameStateModel.instance().players_turn
-
-        self.action_tile: TileSprite = None
-        self.can_drop = False
-        self.can_pickup = False
 
     @classmethod
     def instance(cls):
-        return cls.instance()
+        return cls._instance
 
     def check_pickup(self, tile: TileModel) -> bool:
         game: GameStateModel = GameStateModel.instance()
@@ -49,37 +50,40 @@ class VictimController(object):
 
         return False
 
-    def process_input(self, tile: TileSprite):
-        if self.action_tile:
-            self.action_tile.disable_drop()
-            self.action_tile.disable_pickup()
-            self.action_tile = None
+    def send_event_and_close_menu(self, tile_model: TileModel, menu_to_close: Interactable):
+        victim = [model for model in tile_model.associated_models if isinstance(model, VictimModel)][0]
+        is_carrying = isinstance(self._current_player.carrying_victim, VictimModel)
 
-        tile_model: TileModel = GameStateModel.instance().game_board.get_tile_at(tile.row, tile.column)
-
-        if self.check_drop(tile_model):
-            self.can_drop = True
-            self.can_pickup = False
-            self.action_tile = tile
-            self.action_tile.drop_victim_button.enable()
+        check_func = self.check_drop if is_carrying else self.check_pickup
+        if not check_func(tile_model):
+            menu_to_close.disable()
             return
 
-        elif self.check_pickup(tile_model):
-            self.can_pickup = True
-            self.can_drop = False
-            self.action_tile = tile
-            self.action_tile.pickup_victim_button.enable()
+        event = DropVictimEvent(victim) if is_carrying else PickupVictimEvent(victim)
 
+        if Networking.get_instance().is_host:
+            Networking.get_instance().send_to_all_client(event)
         else:
-            self.can_drop = False
-            self.can_pickup = False
-            tile.pickup_victim_button.disable()
-            tile.drop_victim_button.disable()
+            Networking.get_instance().client.send(event)
 
-    def update(self, event_queue: EventQueue):
-        if GameStateModel.instance().state != GameStateEnum.MAIN_GAME:
-            return
+        menu_to_close.disable()
 
+    def run_checks(self, tile_model: TileModel) -> bool:
+        """Not used since this class has two separate checks."""
+        pass
 
+    def process_input(self, tile_sprite: TileSprite):
+        tile_model: TileModel = GameStateModel.instance().game_board.get_tile_at(tile_sprite.row, tile_sprite.column)
 
+        button = None
+        if self.check_drop(tile_model):
+            button = tile_sprite.drop_victim_button
+        elif self.check_pickup(tile_model):
+            button = tile_sprite.pickup_victim_button
 
+        if button:
+            button.enable()
+            button.on_click(self.send_event_and_close_menu(tile_model, button))
+        else:
+            tile_sprite.pickup_victim_button.disable()
+            tile_sprite.drop_victim_button.disable()

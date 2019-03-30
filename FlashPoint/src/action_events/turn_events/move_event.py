@@ -1,5 +1,6 @@
 from typing import List
 import time
+import logging
 
 from src.action_events.turn_events.turn_event import TurnEvent
 from src.constants.state_enums import SpaceStatusEnum, POIIdentityEnum, SpaceKindEnum, DoorStatusEnum, VictimStateEnum
@@ -10,6 +11,8 @@ from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 from src.models.game_units.poi_model import POIModel
 from src.models.game_units.victim_model import VictimModel
+
+logger = logging.getLogger("FlashPoint")
 
 
 class DijkstraTile(object):
@@ -124,7 +127,8 @@ class MoveEvent(TurnEvent):
                 self.destination = d_tile
 
     def execute(self):
-        print("Executing MoveEvent")
+        logger.info(f"Executing MoveEvent from ({self.fireman.row}, "
+                    f"{self.fireman.column}) to ({self.destination.row}, {self.destination.column})")
         # initialize the Dijkstra tiles
         self._init_dijkstra_tiles(self.destination)
         # Insert the Dijkstra tiles
@@ -295,20 +299,7 @@ class MoveEvent(TurnEvent):
                     # from the board and the tile. If it is a Victim,
                     # remove the POI from the board, tile and
                     # add a Victim in its place.
-                    new_victim = None
-
-                    # If the POI is a Victim, instantiate a VictimModel
-                    # and add it to the tile, board.
-                    if assoc_model.identity == POIIdentityEnum.VICTIM:
-                        new_victim = VictimModel(VictimStateEnum.ON_BOARD)
-                        new_victim.set_pos(d_tile.tile_model.row, d_tile.tile_model.column)
-                        d_tile.tile_model.add_associated_model(new_victim)
-                        self.game.game_board.add_poi_or_victim(new_victim)
-
-                    assoc_model.reveal(new_victim)
-
-                    d_tile.tile_model.remove_associated_model(assoc_model)
-                    self.game.game_board.remove_poi_or_victim(assoc_model)
+                    self.game.game_board.flip_poi(assoc_model)
 
             # Put to sleep so that we can see the
             # player move through the individual tiles

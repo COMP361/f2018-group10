@@ -1,10 +1,13 @@
 import random
+import logging
 from typing import Tuple
 
-from src.action_events.advance_fire_event import AdvanceFireEvent
+from src.action_events.end_turn_advance_fire import EndTurnAdvanceFireEvent
 from src.constants.state_enums import GameKindEnum, SpaceStatusEnum, DifficultyLevelEnum
 from src.models.game_state_model import GameStateModel
 from src.action_events.action_event import ActionEvent
+
+logger = logging.getLogger("FlashPoint")
 
 
 class FirePlacementEvent(ActionEvent):
@@ -15,6 +18,7 @@ class FirePlacementEvent(ActionEvent):
         self.board = GameStateModel.instance().game_board
 
     def execute(self):
+        logger.info("Executing FirePlacementEvent")
         game = GameStateModel.instance()
         if game.rules == GameKindEnum.FAMILY:
             game.game_board.set_fires_family()
@@ -33,7 +37,7 @@ class FirePlacementEvent(ActionEvent):
             self.set_fires_heroic_veteran_recruit(num_haz)
 
     def set_fires_heroic_veteran_recruit(self, num_hazmat):
-        advance_event = AdvanceFireEvent()
+        advance_event = EndTurnAdvanceFireEvent()
         # first fire
         tile = self._experienced_placement()
 
@@ -81,13 +85,6 @@ class FirePlacementEvent(ActionEvent):
             advance_event.red_dice = tile[1]
 
             advance_event.explosion(self.board.get_tile_at(tile[0], tile[1]))
-
-        # for i in range(num_hazmat):
-        #     tile = [ self._roll_red_dice(), self._roll_black_dice()]
-        #     while self.board.get_tile_at(tile[0], tile[1]).space_status == SpaceStatusEnum.FIRE:
-        #         tile = [self._roll_red_dice(), self._roll_black_dice()]
-        #
-        #     self.board.get_tile_at(tile[0], tile[1]).set_hazmat()
 
     def _experienced_placement(self) -> Tuple[int, int]:
 

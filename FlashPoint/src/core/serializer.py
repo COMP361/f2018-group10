@@ -1,17 +1,23 @@
 import enum
 import json
+import pygame
 from typing import Dict
+import logging
 
+from src.action_events.identify_event import IdentifyEvent
+from src.action_events.place_hazmat_event import PlaceHazmatEvent
 from src.action_events.end_turn_advance_fire import EndTurnAdvanceFireEvent
 from src.action_events.set_initial_poi_family_event import SetInitialPOIFamilyEvent
 from src.action_events.turn_events.chop_event import ChopEvent
 from src.action_events.turn_events.close_door_event import CloseDoorEvent
+from src.action_events.turn_events.dismount_vehicle_event import DismountVehicleEvent
 from src.action_events.turn_events.drive_ambulance_event import DriveAmbulanceEvent
 from src.action_events.turn_events.drop_victim_event import DropVictimEvent
 from src.action_events.turn_events.extinguish_event import ExtinguishEvent
 from src.action_events.turn_events.move_event import MoveEvent
 from src.action_events.turn_events.pick_up_victim_event import PickupVictimEvent
 from src.action_events.turn_events.open_door_event import OpenDoorEvent
+from src.action_events.turn_events.ride_vehicle_event import RideVehicleEvent
 from src.action_events.vehicle_placed_event import VehiclePlacedEvent
 from src.models.game_board.door_model import DoorModel
 from src.models.game_board.wall_model import WallModel
@@ -28,6 +34,9 @@ from src.constants.state_enums import DifficultyLevelEnum, GameKindEnum, PlayerS
     DoorStatusEnum, SpaceKindEnum, SpaceStatusEnum, ArrowDirectionEnum
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
+from src.sprites.hazmat_sprite import HazmatSprite
+
+logger = logging.getLogger("FlashPoint")
 
 
 class JSONSerializer(object):
@@ -108,11 +117,7 @@ class JSONSerializer(object):
 
     @staticmethod
     def _deserialize_choose_position_event(payload: Dict):
-        tile_dict = payload['tile']
-        tile: TileModel = GameStateModel.instance().game_board.get_tile_at(tile_dict['_row'], tile_dict['_column'])
-        # GameStateModel.instance().game_board.set_single_tile_adjacencies(tile)
-        event = ChooseStartingPositionEvent(tile)
-        return event
+        return ChooseStartingPositionEvent(payload['_row'], payload['_column'])
 
     @staticmethod
     def _deserialize_move_event(payload: Dict):
@@ -171,7 +176,6 @@ class JSONSerializer(object):
         door: DoorModel = JSONSerializer.deserialize(payload['door'])
         return CloseDoorEvent(door)
 
-
     @staticmethod
     def _deserialize_end_turn_advance_fire_event(payload: Dict) -> EndTurnAdvanceFireEvent:
         seed: int = payload['seed']
@@ -194,6 +198,11 @@ class JSONSerializer(object):
         return SetInitialPOIFamilyEvent(seed)
 
     @staticmethod
+    def _deserialize_place_hazmat_event(payload: Dict) -> PlaceHazmatEvent:
+        seed = payload['seed']
+        return PlaceHazmatEvent(seed)
+
+    @staticmethod
     def _deserialize_vehicle_placed_event(payload: Dict) -> VehiclePlacedEvent:
         event: VehiclePlacedEvent = VehiclePlacedEvent()
         event._vehicle_type = payload['_vehicle_type']
@@ -209,6 +218,22 @@ class JSONSerializer(object):
         return event
 
     @staticmethod
+    def _deserialize_identify_event(payload: Dict) -> IdentifyEvent:
+        event = IdentifyEvent(payload['row'],payload['column'])
+        return event
+
+    @staticmethod
+    def _deserialize_ride_vehicle_event(payload: Dict) -> RideVehicleEvent:
+        player_index = payload['_player_index']
+        vehicle_type = payload['_vehicle_type']
+        event = RideVehicleEvent(vehicle_type=vehicle_type, player_index=player_index)
+        return event
+
+    @staticmethod
+    def _deserialize_dismount_vehicle_event(payload: Dict) -> DismountVehicleEvent:
+        return DismountVehicleEvent(payload['_vehicle_type'], player_index=payload['_player_index'])
+
+    @staticmethod
     def deserialize(payload: Dict) -> object:
         """
         Grab an object and deserialize it.
@@ -218,10 +243,6 @@ class JSONSerializer(object):
         Add to this case statement to be able to deserialize your object type.
         """
         object_type = payload["class"]
-        # print(object_type)
-        # if GameStateModel.instance():
-        #     GameStateModel.instance().game_board.set_adjacencies(GameStateModel.instance().game_board.get_tiles())
-
         # --------------MODELS----------------
         if object_type == PlayerModel.__name__:
             return JSONSerializer._deserialize_player(payload)
@@ -266,12 +287,20 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_close_door_event(payload)
         elif object_type == SetInitialPOIFamilyEvent.__name__:
             return JSONSerializer._deserialize_set_initial_poi_family_event(payload)
+        elif object_type == PlaceHazmatEvent.__name__:
+            return JSONSerializer._deserialize_place_hazmat_event(payload)
         elif object_type == VehiclePlacedEvent.__name__:
             return JSONSerializer._deserialize_vehicle_placed_event(payload)
         elif object_type == DriveAmbulanceEvent.__name__:
             return JSONSerializer._deserialize_drive_ambulance_event(payload)
+        elif object_type == IdentifyEvent.__name__:
+            return JSONSerializer._deserialize_identify_event(payload)
+        elif object_type == RideVehicleEvent.__name__:
+            return JSONSerializer._deserialize_ride_vehicle_event(payload)
+        elif object_type == DismountVehicleEvent.__name__:
+            return JSONSerializer._deserialize_dismount_vehicle_event(payload)
 
-        print(f"WARNING: Could not deserialize object {object_type}, not of recognized type.")
+        logger.warning(f"Could not deserialize object {object_type}, not of recognized type.")
 
     @staticmethod
     def _safe_tile_serialize(tile: TileModel):
@@ -285,11 +314,14 @@ class JSONSerializer(object):
             '_associated_models': [JSONSerializer.serialize(obj) for obj in tile.associated_models],
             '_visit_count': tile.visit_count,
             '_adjacent_edge_objects': JSONSerializer.serialize(tile.adjacent_edge_objects),
-          #   '_arrow_dirn': {"name": type(ArrowDirectionEnum).__name__, "value": tile.arrow_dirn.value}
+            '_arrow_dirn': {"name": type(ArrowDirectionEnum).__name__, "value": tile.arrow_dirn.value}
         }
 
     @staticmethod
     def _safe_dict(obj):
+
+        if isinstance(obj, HazmatSprite):
+            print("fuck")
 
         if isinstance(obj, Observer):
             return {"class": type(obj).__name__}

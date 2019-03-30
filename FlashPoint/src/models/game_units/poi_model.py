@@ -5,6 +5,10 @@ from src.observers.poi_observer import POIObserver
 from src.constants.state_enums import POIStatusEnum, POIIdentityEnum
 from src.models.model import Model
 
+import logging
+
+logger = logging.getLogger("FlashPoint")
+
 
 class POIModel(Model):
 
@@ -24,6 +28,7 @@ class POIModel(Model):
         return all([self.row == other.row, self.column==other.column, self.identity == other.identity, self.status == other.status])
 
     def reveal(self, victim_model: VictimModel):
+        logger.info(f"{self} revealed.")
         if self._status == POIStatusEnum.HIDDEN:
             self._status = POIStatusEnum.REVEALED
             self._notify_status(victim_model)

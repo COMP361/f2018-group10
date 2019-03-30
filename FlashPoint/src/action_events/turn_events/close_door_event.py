@@ -1,6 +1,10 @@
+import logging
+
 from src.action_events.turn_events.turn_event import TurnEvent
 from src.models.game_board.door_model import DoorModel
 from src.models.game_state_model import GameStateModel
+
+logger = logging.getLogger("FlashPoint")
 
 
 class CloseDoorEvent(TurnEvent):
@@ -12,6 +16,6 @@ class CloseDoorEvent(TurnEvent):
         self.fireman = game.players_turn
 
     def execute(self):
-        print("Executing CloseDoorEvent")
+        logger.info("Executing CloseDoorEvent")
         self.door.close_door()
         self.fireman.ap = self.fireman.ap - 1
