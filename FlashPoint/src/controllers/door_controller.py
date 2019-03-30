@@ -8,7 +8,7 @@ from src.action_events.turn_events.turn_event import TurnEvent
 from src.core.event_queue import EventQueue
 from src.core.networking import Networking
 from src.models.game_board.door_model import DoorModel
-from src.sprites.hud.door_sprite import DoorSprite
+from src.sprites.door_sprite import DoorSprite
 from src.sprites.game_board import GameBoard
 from src.models.game_units.player_model import PlayerModel
 from src.constants.state_enums import GameStateEnum, DoorStatusEnum

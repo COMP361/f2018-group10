@@ -23,24 +23,18 @@ class GameBoardModel(Model):
     etc. This class is created inside of GameStateModel.
     """
 
-    def __init__(self, game_type: GameKindEnum, type: GameBoardTypeEnum):
+    def __init__(self, board_type: GameBoardTypeEnum):
         super().__init__()
         self._dimensions = (8, 10)
         self._ambulance_spots = []
         self._engine_spots = []
-        self._board_type = type
+        self._board_type = board_type
 
-        if game_type == GameKindEnum.FAMILY:
-            if self._board_type == GameBoardTypeEnum.ORIGINAL:
-                self._tiles = self._init_all_tiles_family_classic()
-            else:
-                self._tiles = self._init_all_tiles_experienced_classic()
-
+        if self._board_type == GameBoardTypeEnum.ORIGINAL:
+            self._tiles = self._init_all_tiles_original_board()
         else:
-            if self._board_type == GameBoardTypeEnum.ORIGINAL:
-                self._tiles = self._init_all_tiles_family_classic()
-            else:
-                self._tiles = self._init_all_tiles_experienced_classic()
+            self._tiles = self._init_all_tiles_alternative_board()
+
 
         self._poi_bank = GameBoardModel._init_pois()
         self._active_pois = []
@@ -144,8 +138,8 @@ class GameBoardModel(Model):
         outdoor = any([row == 0, row == self._dimensions[0]-1, column == 0, column == self._dimensions[1]-1])
         return SpaceKindEnum.OUTDOOR if outdoor else SpaceKindEnum.INDOOR
 
-    def _init_all_tiles_family_classic(self) -> List[List[TileModel]]:
-        """Create all tiles and set their adjacency. """
+    def _init_all_tiles_original_board(self) -> List[List[TileModel]]:
+        """Create all tiles for the original board and set their adjacency."""
         tiles = []
 
         for i in range(self._dimensions[0]):
@@ -173,13 +167,16 @@ class GameBoardModel(Model):
                 tiles[i][right].set_adjacent_edge_obstacle("West", wall)
 
         # setting the ambulance and engine parking spaces
-        self.set_parking_spaces("media/board_layouts/family_engine_ambulance_locations.json", tiles)
+        self.set_parking_spaces("media/board_layouts/original_engine_ambulance_locations.json", tiles)
 
         # setting the doors present on the outside of the house EXPLICITLY
-        self.set_outside_doors("media/board_layouts/family_outside_door_locations.json", tiles)
+        self.set_outside_doors("media/board_layouts/original_outside_door_locations.json", tiles)
 
         # setting the walls and doors present inside the house
-        self.set_inside_walls_doors("media/board_layouts/family_inside_walls_doors.json", tiles)
+        self.set_inside_walls_doors("media/board_layouts/original_inside_walls_doors.json", tiles)
+
+        # setting the arrow directions given for the inside tiles
+        self.set_all_tiles_arrows("media/board_layouts/tile_arrow_directions.json", tiles)
 
         return tiles
 
@@ -292,8 +289,8 @@ class GameBoardModel(Model):
         for coord, direction in [(first_pair, first_dirn), (second_pair, second_dirn)]:
             tiles[coord[0]][coord[1]].set_adjacent_edge_obstacle(direction, obstacle)
 
-    def _init_all_tiles_experienced_classic(self) -> List[List[TileModel]]:
-        """Create all tiles for the experienced board
+    def _init_all_tiles_alternative_board(self) -> List[List[TileModel]]:
+        """Create all tiles for the alternative board
             and set their adjacencies."""
         tiles = []
 
@@ -322,16 +319,16 @@ class GameBoardModel(Model):
                 tiles[i][right].set_adjacent_edge_obstacle("West", wall)
 
         # setting the ambulance and engine parking spaces
-        self.set_parking_spaces("media/board_layouts/experienced_engine_ambulance_locations.json", tiles)
+        self.set_parking_spaces("media/board_layouts/alternative_engine_ambulance_locations.json", tiles)
 
         # setting the doors present on the outside of the house EXPLICITLY
-        self.set_outside_doors("media/board_layouts/experienced_outside_door_locations.json", tiles)
+        self.set_outside_doors("media/board_layouts/alternative_outside_door_locations.json", tiles)
 
         # setting the walls and doors present inside the house
-        self.set_inside_walls_doors("media/board_layouts/experienced_inside_walls_doors.json", tiles)
+        self.set_inside_walls_doors("media/board_layouts/alternative_inside_walls_doors.json", tiles)
 
         # setting the arrow directions given for the inside tiles
-        self.set_all_tiles_arrows("media/board_layouts/experienced_tile_arrow_directions.json", tiles)
+        self.set_all_tiles_arrows("media/board_layouts/tile_arrow_directions.json", tiles)
 
         return tiles
 
@@ -340,7 +337,7 @@ class GameBoardModel(Model):
         return self._tiles[row][column]
 
     def set_fires_family(self):
-        """Set all necessary tiles to on fire when starting a classic family game."""
+        """Set all necessary tiles to on fire when starting a family game."""
         locations = GameBoardModel._load_family_fire_locations()
 
         for location in locations:
@@ -439,7 +436,7 @@ class GameBoardModel(Model):
                 elif tile_dirn == "North-West":
                     tile_dirn = ArrowDirectionEnum.NORTH_WEST
                 else:
-                    tile_dirn = None
+                    tile_dirn = ArrowDirectionEnum.NO_DIRECTION
 
                 tiles[row_num][col_num].arrow_dirn = tile_dirn
 
@@ -499,3 +496,19 @@ class GameBoardModel(Model):
             return 0
 
         return 1 if first_orientation != second_orientation else 2
+
+    def flip_poi(self, poi: POIModel):
+        """Reveal a POI adding Victims if necessary"""
+        new_victim = None
+        tile_model = self.get_tile_at(poi.row, poi.column)
+        # If the POI is a Victim, instantiate a VictimModel
+        # and add it to the tile, board.
+        if poi.identity == POIIdentityEnum.VICTIM:
+            new_victim = VictimModel(VictimStateEnum.ON_BOARD)
+            new_victim.set_pos(poi.row, poi.column)
+            tile_model.add_associated_model(new_victim)
+            self.add_poi_or_victim(new_victim)
+        poi.reveal(new_victim)
+
+        tile_model.remove_associated_model(poi)
+        self.remove_poi_or_victim(poi)

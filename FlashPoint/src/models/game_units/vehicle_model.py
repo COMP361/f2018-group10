@@ -18,7 +18,6 @@ class VehicleModel(Model):
         self._is_vertical = False
         self._row = -7
         self._column = -7
-        self._driver: PlayerModel = None
         self._passengers: List[PlayerModel] = []
 
     @property
@@ -48,27 +47,11 @@ class VehicleModel(Model):
         self._row = parking_spot[0]
         self._column = parking_spot[1]
 
-        # Maintain the driver being in the front and the passengers in the back
-
-        if self.driver:
-            if self.orientation == VehicleOrientationEnum.VERTICAL:
-                self.driver.set_pos(self.row + 1, self.column)
-            elif self.orientation == VehicleOrientationEnum.HORIZONTAL:
-                self.driver.set_pos(self.row, self.column+1)
-
         if self.passengers:
             for passenger in self._passengers:
                 passenger.set_pos(self.row, self.column)
 
         self._notify_pos()
-
-    @property
-    def driver(self) -> PlayerModel:
-        return self._driver
-
-    @driver.setter
-    def driver(self, player: PlayerModel):
-        self._driver = player
 
     @property
     def passengers(self) -> List[PlayerModel]:
