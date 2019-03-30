@@ -1,6 +1,7 @@
 import pygame
 
 import src.constants.color as Color
+
 from src.core.custom_event import CustomEvent
 from src.core.event_queue import EventQueue
 from src.action_events.ready_event import ReadyEvent
@@ -15,15 +16,16 @@ from src.constants.change_scene_enum import ChangeSceneEnum
 from src.core.networking import Networking
 from src.action_events.start_game_event import StartGameEvent
 from src.observers.game_state_observer import GameStateObserver
-from src.observers.player_observer import PlayerObserver
+from src.sprites.player_box import PlayerBox
 
 
-class LobbyScene(PlayerObserver, GameStateObserver):
+class LobbyScene(GameStateObserver):
 
     def __init__(self, screen, current_player: PlayerModel):
         super().__init__()
         self._current_player = current_player
         self._game = GameStateModel.instance()
+        self.player_boxes = []
 
         if Networking.get_instance().is_host:
             self._current_player.color = Color.BLUE
@@ -119,7 +121,6 @@ class LobbyScene(PlayerObserver, GameStateObserver):
 
         self._init_sprites()
 
-
     def _init_start_game_button(self):
         """Button for starting the game once all players have clicked ready."""
         box_size = (130, 48)
@@ -138,44 +139,44 @@ class LobbyScene(PlayerObserver, GameStateObserver):
 
         self.sprite_grp.add(self.this_img)
 
-    def _init_background_player(self, rect):
+    # def _init_background_player(self, rect):
+    #
+    #     if not self._game.rules == GameKindEnum.FAMILY and self._current_player.character:
+    #         role_path = self.get_path_from_character_enum(self._current_player.character)
+    #         user_box = RectLabel(rect[0], rect[1], rect[2], rect[3], role_path)
+    #     else:
+    #         user_box = RectLabel(rect[0], rect[1], rect[2], rect[3], "media/specialist_cards/family.png")
+    #     return user_box
+    #
+    # def _update_background_player(self, rect):
+    #     pass
+    #
+    #
+    # def get_path_from_character_enum(self, enum: PlayerRoleEnum):
+    #     if enum == PlayerRoleEnum.CAFS:
+    #         return "media/specialist_cards/cafs_firefighter.png"
+    #     elif enum == PlayerRoleEnum.CAPTAIN:
+    #         return "media/specialist_cards/fire_captain.png"
+    #
+    #     elif enum == PlayerRoleEnum.GENERALIST:
+    #         return "media/specialist_cards/generalist.png"
+    #     elif enum == PlayerRoleEnum.DRIVER:
+    #         return "media/specialist_cards/driver_operator.png"
+    #     elif enum == PlayerRoleEnum.HAZMAT:
+    #         return "media/specialist_cards/hazmat_technician.png"
+    #     elif enum == PlayerRoleEnum.IMAGING:
+    #         return "media/specialist_cards/imaging_technician.png"
+    #     elif enum == PlayerRoleEnum.PARAMEDIC:
+    #         return "media/specialist_cards/paramedic.png"
+    #     elif enum == PlayerRoleEnum.RESCUE:
+    #         return "media/specialist_cards/rescue_specialist.png"
 
-        if not self._game.rules == GameKindEnum.FAMILY and self._current_player.character:
-            role_path = self.get_path_from_character_enum(self._current_player.character)
-            user_box = RectLabel(rect[0], rect[1], rect[2], rect[3], role_path)
-        else:
-            user_box = RectLabel(rect[0], rect[1], rect[2], rect[3], "media/specialist_cards/family.png")
-        return user_box
-
-    def _update_background_player(self, rect):
-        pass
-
-
-    def get_path_from_character_enum(self, enum: PlayerRoleEnum):
-        if enum == PlayerRoleEnum.CAFS:
-            return "media/specialist_cards/cafs_firefighter.png"
-        elif enum == PlayerRoleEnum.CAPTAIN:
-            return "media/specialist_cards/fire_captain.png"
-
-        elif enum == PlayerRoleEnum.GENERALIST:
-            return "media/specialist_cards/generalist.png"
-        elif enum == PlayerRoleEnum.DRIVER:
-            return "media/specialist_cards/driver_operator.png"
-        elif enum == PlayerRoleEnum.HAZMAT:
-            return "media/specialist_cards/hazmat_technician.png"
-        elif enum == PlayerRoleEnum.IMAGING:
-            return "media/specialist_cards/imaging_technician.png"
-        elif enum == PlayerRoleEnum.PARAMEDIC:
-            return "media/specialist_cards/paramedic.png"
-        elif enum == PlayerRoleEnum.RESCUE:
-            return "media/specialist_cards/rescue_specialist.png"
-
-    def _init_text_box(self, position, text, color):
-        box_size = (position[2], position[3])
-
-        user_box = RectLabel(position[0], position[1], box_size[0], box_size[1], color, 0,
-                             Text(pygame.font.SysFont('Arial', 20), text, (0, 255, 0, 0)))
-        return user_box
+    # def _init_text_box(self, position, text, color):
+    #     box_size = (position[2], position[3])
+    #
+    #     user_box = RectLabel(position[0], position[1], box_size[0], box_size[1], color, 0,
+    #                          Text(pygame.font.SysFont('Arial', 20), text, (0, 255, 0, 0)))
+    #     return user_box
 
     def _init_selec_char(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
         box_size = (130, 48)
@@ -212,15 +213,16 @@ class LobbyScene(PlayerObserver, GameStateObserver):
                     (400, 289, 150, 32), (780, 289, 150, 32), (1080, 364, 150, 32)]
         background_pos = [(565, 375, 200, 250), (100, 164, 150, 200), (400, 89, 150, 200),
                           (780, 89, 150, 200), (1080, 164, 150, 200)]
-
-        self.sprite_grp.add(self._init_text_box(text_pos[0], self._current_player.nickname, self._current_player.color))
-        self.sprite_grp.add(self._init_background_player(background_pos[0]))
+        self.player_boxes = []
+        self.player_boxes.append(PlayerBox(text_pos[0], background_pos[0], self._current_player.nickname,
+                                           self._current_player, self._current_player.color))
 
         players = [x for x in GameStateModel.instance().players if x.ip != self._current_player.ip]
         i = 1
         for player in players:
-            self.sprite_grp.add(self._init_text_box(text_pos[i], player.nickname, player.color))
-            self.sprite_grp.add(self._init_background_player(background_pos[i]))
+            self.player_boxes.append(PlayerBox(text_pos[i], background_pos[i], player.nickname, player, player.color))
+            # self.sprite_grp.add(self._init_text_box(text_pos[i], player.nickname, player.color))
+            # self.sprite_grp.add(self._init_background_player(background_pos[i]))
             i += 1
 
     def not_enough_players_ready_prompt(self):
@@ -237,6 +239,10 @@ class LobbyScene(PlayerObserver, GameStateObserver):
 
     def draw(self, screen):
         self.sprite_grp.draw(screen)
+
+        for box in self.player_boxes:
+            box.draw(screen)
+
         self.chat_box.draw(screen)
 
         if self.players_not_ready_prompt:
@@ -250,8 +256,8 @@ class LobbyScene(PlayerObserver, GameStateObserver):
                 self.start_button.enable()
                 self.start_button.change_color(Color.GREEN)
             else:
-               self.start_button.disable()
-               self.start_button.change_color(Color.GREY)
+                self.start_button.disable()
+                self.start_button.change_color(Color.GREY)
 
         self.chat_box.update(event_queue)
 
@@ -278,27 +284,5 @@ class LobbyScene(PlayerObserver, GameStateObserver):
     def dead_victims(self, victims_dead: int):
         pass
 
-    def player_status_changed(self, status: PlayerStatusEnum):
+    def player_list_changed(self):
         pass
-
-    def player_ap_changed(self, updated_ap: int):
-        pass
-
-    def player_special_ap_changed(self, updated_ap: int):
-        pass
-
-    def player_position_changed(self, row: int, column: int):
-        pass
-
-    def player_wins_changed(self, wins: int):
-        pass
-
-    def player_losses_changed(self, losses: int):
-        pass
-
-    def player_carry_changed(self, carry):
-        pass
-
-    def player_role_changed(self, role):
-        self._init_sprites()
-        # self._update_background_player()

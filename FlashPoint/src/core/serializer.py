@@ -4,6 +4,7 @@ import pygame
 from typing import Dict
 import logging
 
+from src.action_events.choose_character_event import ChooseCharacterEvent
 from src.action_events.identify_event import IdentifyEvent
 from src.action_events.place_hazmat_event import PlaceHazmatEvent
 from src.action_events.end_turn_advance_fire import EndTurnAdvanceFireEvent
@@ -31,7 +32,7 @@ from src.action_events.chat_event import ChatEvent
 from src.action_events.dummy_event import DummyEvent
 from src.action_events.join_event import JoinEvent
 from src.constants.state_enums import DifficultyLevelEnum, GameKindEnum, PlayerStatusEnum, WallStatusEnum, \
-    DoorStatusEnum, SpaceKindEnum, SpaceStatusEnum, ArrowDirectionEnum
+    DoorStatusEnum, SpaceKindEnum, SpaceStatusEnum, ArrowDirectionEnum, PlayerRoleEnum
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 from src.sprites.hazmat_sprite import HazmatSprite
@@ -209,7 +210,6 @@ class JSONSerializer(object):
         event._row = payload['_row']
         event._column = payload['_column']
         return event
-
     @staticmethod
     def _deserialize_drive_ambulance_event(payload: Dict) -> DriveAmbulanceEvent:
         event = DriveAmbulanceEvent()
@@ -232,6 +232,10 @@ class JSONSerializer(object):
     @staticmethod
     def _deserialize_dismount_vehicle_event(payload: Dict) -> DismountVehicleEvent:
         return DismountVehicleEvent(payload['_vehicle_type'], player_index=payload['_player_index'])
+
+    @staticmethod
+    def _deserialize_choose_character_event(payload: Dict) -> ChooseCharacterEvent:
+        return ChooseCharacterEvent(PlayerRoleEnum(payload['_role']['value']), payload['_player_index'])
 
     @staticmethod
     def deserialize(payload: Dict) -> object:
@@ -299,6 +303,8 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_ride_vehicle_event(payload)
         elif object_type == DismountVehicleEvent.__name__:
             return JSONSerializer._deserialize_dismount_vehicle_event(payload)
+        elif object_type == ChooseCharacterEvent.__name__:
+            return JSONSerializer._deserialize_choose_character_event(payload)
 
         logger.warning(f"Could not deserialize object {object_type}, not of recognized type.")
 
