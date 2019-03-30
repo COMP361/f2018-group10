@@ -1,5 +1,6 @@
 import enum
 import json
+import pygame
 from typing import Dict
 import logging
 
@@ -33,7 +34,7 @@ from src.constants.state_enums import DifficultyLevelEnum, GameKindEnum, PlayerS
     DoorStatusEnum, SpaceKindEnum, SpaceStatusEnum, ArrowDirectionEnum
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
-
+from src.sprites.hazmat_sprite import HazmatSprite
 
 logger = logging.getLogger("FlashPoint")
 
@@ -116,11 +117,7 @@ class JSONSerializer(object):
 
     @staticmethod
     def _deserialize_choose_position_event(payload: Dict):
-        tile_dict = payload['tile']
-        tile: TileModel = GameStateModel.instance().game_board.get_tile_at(tile_dict['_row'], tile_dict['_column'])
-        # GameStateModel.instance().game_board.set_single_tile_adjacencies(tile)
-        event = ChooseStartingPositionEvent(tile)
-        return event
+        return ChooseStartingPositionEvent(payload['_row'], payload['_column'])
 
     @staticmethod
     def _deserialize_move_event(payload: Dict):
@@ -322,6 +319,9 @@ class JSONSerializer(object):
 
     @staticmethod
     def _safe_dict(obj):
+
+        if isinstance(obj, HazmatSprite):
+            print("fuck")
 
         if isinstance(obj, Observer):
             return {"class": type(obj).__name__}

@@ -13,7 +13,7 @@ from src.observers.tile_observer import TileObserver
 from src.UIComponents.file_importer import FileImporter
 
 
-class HazmatSprite(pygame.sprite.Sprite, TileObserver):
+class HazmatSprite(TileObserver, pygame.sprite.Sprite):
 
     def __init__(self, tile_model: TileModel):
         super().__init__()

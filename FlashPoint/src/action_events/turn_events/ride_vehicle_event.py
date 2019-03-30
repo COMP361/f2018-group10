@@ -13,22 +13,14 @@ logger = logging.getLogger("FlashPoint")
 
 class RideVehicleEvent(ActionEvent):
     """Add given player to the specified vehicle"""
-    def __init__(self, vehicle: VehicleModel=None, vehicle_type: str = None, player: PlayerModel=None, player_index=None):
+    def __init__(self, vehicle_type: str, player: PlayerModel = None, player_index=None):
         super().__init__()
         if player:
             self._player_index = GameStateModel.instance().players.index(player)
         elif player_index is not None:
             self._player_index = player_index
 
-        if vehicle:
-            if isinstance(vehicle, AmbulanceModel):
-                self._vehicle_type = "AMBULANCE"
-            elif isinstance(vehicle, EngineModel):
-                self._vehicle_type = "ENGINE"
-            else:
-                raise Exception(f"Unrecognized type: {vehicle.__class__} was passed as a vehicle.")
-        elif vehicle_type:
-            self._vehicle_type = vehicle_type
+        self._vehicle_type = vehicle_type
 
     def execute(self, *args, **kwargs):
         logger.info("Executing RideVehicleEvent")
