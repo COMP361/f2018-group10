@@ -64,7 +64,7 @@ class CharacterScene(Scene):
             EventQueue.post(CustomEvent(ChangeSceneEnum.LOBBYSCENE))
 
             event = ChooseCharacterEvent(self.character_enum, self._game.players.index(self._current_player))
-            
+
             if Networking.get_instance().is_host:
                 Networking.get_instance().send_to_all_client(event)
             else:
