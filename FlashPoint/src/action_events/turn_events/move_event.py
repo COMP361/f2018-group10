@@ -261,6 +261,9 @@ class MoveEvent(TurnEvent):
         """
         shortest_path.pop(0)
         for d_tile in shortest_path:
+            # update the position of the fireman
+            self.fireman.set_pos(d_tile.tile_model.row, d_tile.tile_model.column)
+
             # Two separate cases depending on whether
             # fireman is carrying a victim or not
 
@@ -287,9 +290,6 @@ class MoveEvent(TurnEvent):
                     self.fireman.ap = self.fireman.ap - 1
                 else:
                     self.fireman.ap = self.fireman.ap - 2
-
-            # update the position of the fireman
-            self.fireman.set_pos(d_tile.tile_model.row, d_tile.tile_model.column)
 
             # Check the associated models of the tile.
             # If it contains any POIs, flip them over.
