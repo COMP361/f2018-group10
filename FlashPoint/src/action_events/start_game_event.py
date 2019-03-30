@@ -14,6 +14,7 @@ class StartGameEvent(ActionEvent):
     """Event to signal every client to start game."""
 
     def execute(self):
+        print()
         logging.info("Executing StartGameEvent.")
         GameStateModel.instance().state = GameStateEnum.PLACING_PLAYERS
         EventQueue.block()

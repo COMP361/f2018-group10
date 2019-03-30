@@ -15,5 +15,6 @@ class ChatEvent(ActionEvent):
         self._message = message
 
     def execute(self):
+        print()
         logger.info("Executing ChatEvent")
         GameStateModel.instance().add_chat_message(self._message, self._sender)

@@ -4,6 +4,8 @@ from typing import Tuple
 
 from src.action_events.end_turn_advance_fire import EndTurnAdvanceFireEvent
 from src.constants.state_enums import GameKindEnum, SpaceStatusEnum, DifficultyLevelEnum
+from src.models.game_board.game_board_model import GameBoardModel
+from src.models.game_board.tile_model import TileModel
 from src.models.game_state_model import GameStateModel
 from src.action_events.action_event import ActionEvent
 
@@ -15,125 +17,137 @@ class FirePlacementEvent(ActionEvent):
 
     def __init__(self):
         super().__init__()
-        self.board = GameStateModel.instance().game_board
+        self.board: GameBoardModel = GameStateModel.instance().game_board
 
     def execute(self):
+        print()
         logger.info("Executing FirePlacementEvent")
-        game = GameStateModel.instance()
+        game: GameStateModel = GameStateModel.instance()
         if game.rules == GameKindEnum.FAMILY:
             game.game_board.set_fires_family()
-
         else:
-            num_haz = 0
-            if game.difficulty_level == DifficultyLevelEnum.RECRUIT:
-                num_haz = 3
+            self._set_fires_heroic_veteran_recruit(game.difficulty_level)
 
-            elif game.difficulty_level == DifficultyLevelEnum.VETERAN:
-                num_haz = 4
-
-            elif game.difficulty_level == DifficultyLevelEnum.HEROIC:
-                num_haz = 5
-
-            self.set_fires_heroic_veteran_recruit(num_haz)
-
-    def set_fires_heroic_veteran_recruit(self, num_hazmat):
+    def _set_fires_heroic_veteran_recruit(self, difficulty_lvl: DifficultyLevelEnum):
         advance_event = EndTurnAdvanceFireEvent()
-        # first fire
-        tile = self._experienced_placement()
+        # First explosion:
+        # Roll the black dice to determine where the
+        # first explosion will take place. Set the tile on fire, turn
+        # hotspot to true and cause an explosion on that tile.
+        logger.info("First explosion")
+        tile_pos = self._first_explosion_dice_roll()
+        tile = self.board.get_tile_at(tile_pos[0], tile_pos[1])
+        self._perform_fire_hotspot_explosion(tile, advance_event)
 
-        advance_event.black_dice = tile[0]
-        advance_event.red_dice = tile[1]
+        # Second explosion:
+        # Roll both dice to determine the target space. Keep rolling
+        # until you get a non-fire space. Set the tile on fire, turn
+        # hotspot to true and cause an explosion on that tile.
+        logger.info("\nSecond explosion")
+        tile_pos = [self._roll_red_dice(), self._roll_black_dice()]
+        while self.board.get_tile_at(tile_pos[0], tile_pos[1]).space_status == SpaceStatusEnum.FIRE:
+            tile_pos = [self._roll_red_dice(), self._roll_black_dice()]
 
-        advance_event.explosion(self.board.get_tile_at(tile[0], tile[1]))
+        tile = self.board.get_tile_at(tile_pos[0], tile_pos[1])
+        self._perform_fire_hotspot_explosion(tile, advance_event)
 
-        # second fire
-        tile = [self._roll_red_dice(), self._roll_black_dice()]
-        while self.board.get_tile_at(tile[0], tile[1]).space_status == SpaceStatusEnum.FIRE:
-            tile = [self._roll_red_dice(), self._roll_black_dice()]
+        # Third explosion:
+        # Flip over the black dice from the previous roll to get
+        # the new column. Roll the red dice. Keep rolling until you
+        # get a non-fire space. Set the tile on fire, turn
+        # hotspot to true and cause an explosion on that tile.
+        logger.info("\nThird explosion")
+        column = self._determine_black_dice_opposite_face(tile_pos[1])
+        tile_pos = [self._roll_red_dice(), column]
+        while self.board.get_tile_at(tile_pos[0], tile_pos[1]).space_status == SpaceStatusEnum.FIRE:
+            tile_pos = [self._roll_red_dice(), column]
 
-        self.board.get_tile_at(tile[0], tile[1]).space_status = SpaceStatusEnum.FIRE
-        # self.board.get_tile_at(tile[0], tile[1]).hot_spot()
+        tile = self.board.get_tile_at(tile_pos[0], tile_pos[1])
+        self._perform_fire_hotspot_explosion(tile, advance_event)
 
-        advance_event.black_dice = tile[0]
-        advance_event.red_dice = tile[1]
+        # Conditional fourth explosion:
+        # Only happens if playing at the Heroic level. Roll both
+        # dice to determine target space. Keep rolling until you
+        # get a non-fire space. Set the tile on fire, turn
+        # hotspot to true and cause an explosion on that tile.
+        if difficulty_lvl == DifficultyLevelEnum.HEROIC:
+            logger.info("\nFourth explosion")
+            tile_pos = [self._roll_red_dice(), self._roll_black_dice()]
+            while self.board.get_tile_at(tile_pos[0], tile_pos[1]).space_status == SpaceStatusEnum.FIRE:
+                tile_pos = [self._roll_red_dice(), self._roll_black_dice()]
 
-        advance_event.explosion(self.board.get_tile_at(tile[0], tile[1]))
+            tile = self.board.get_tile_at(tile_pos[0], tile_pos[1])
+            self._perform_fire_hotspot_explosion(tile, advance_event)
 
-        # third fire
-        zero = ((tile[0] + 3) % 8) + 1
-        tile = [self._roll_red_dice(), zero]
-        while self.board.get_tile_at(tile[0], tile[1]).space_status == SpaceStatusEnum.FIRE:
-            tile = [ self._roll_red_dice(), zero]
-        self.board.get_tile_at(tile[0], tile[1]).space_status = SpaceStatusEnum.FIRE
-        # self.board.get_tile_at(tile[0], tile[1]).hot_spot()
+    def _determine_black_dice_opposite_face(self, prev_roll: int) -> int:
+        """
+        Gives the opposite face on the black dice
+        for the number prev_roll. (Based on the Koplow d8 -
+        https://boardgamegeek.com/article/27926069#27926069)
 
-        advance_event.black_dice = tile[0]
-        advance_event.red_dice = tile[1]
+        :param prev_roll: Number that the black dice rolled previously.
+        :return: Number opposite to the previous roll.
+        """
+        if prev_roll == 1:
+            return 6
+        elif prev_roll == 2:
+            return 5
+        elif prev_roll == 3:
+            return 8
+        elif prev_roll == 4:
+            return 7
+        elif prev_roll == 5:
+            return 2
+        elif prev_roll == 6:
+            return 1
+        elif prev_roll == 7:
+            return 4
+        elif prev_roll == 8:
+            return 3
 
-        advance_event.explosion(self.board.get_tile_at(tile[0], tile[1]))
+    def _perform_fire_hotspot_explosion(self, tile: TileModel, advance_event: EndTurnAdvanceFireEvent):
+        """
+        Set the tile on fire, turn hotspot to true and
+        cause an explosion on that tile.
 
-        # optional 4th fire
-        if num_hazmat == 5:
-            tile = [self._roll_red_dice(), self._roll_black_dice()]
-            while self.board.get_tile_at(tile[0], tile[1]).space_status == SpaceStatusEnum.FIRE:
-                tile = [self._roll_red_dice(), self._roll_black_dice()]
+        :param tile: Target tile
+        :param advance_event: Advance event to access explosion
+        :return:
+        """
+        tile.space_status = SpaceStatusEnum.FIRE
+        tile.is_hotspot = True
+        advance_event.explosion(tile)
 
-            self.board.get_tile_at(tile[0], tile[1]).space_status = SpaceStatusEnum.FIRE
-            # self.board.get_tile_at(tile[0], tile[1]).hot_spot()
+    def _first_explosion_dice_roll(self) -> Tuple[int, int]:
+        """
+        Rolling the black dice to determine the
+        location of the first explosion.
 
-            advance_event.black_dice = tile[0]
-            advance_event.red_dice = tile[1]
-
-            advance_event.explosion(self.board.get_tile_at(tile[0], tile[1]))
-
-    def _experienced_placement(self) -> Tuple[int, int]:
-
+        :return: Location of first explosion
+        """
         roll = self._roll_black_dice()
         if roll == 1:
-            self.board.get_tile_at(3, 3).space_status = SpaceStatusEnum.FIRE
-            # self.board.get_tile_at(3, 3).hot_spot()
             return 3, 3
 
         elif roll == 2:
-
-            self.board.get_tile_at(3, 4).space_status = SpaceStatusEnum.FIRE
-            # self.board.get_tile_at(3, 4).hot_spot()
             return 3, 4
 
         elif roll == 3:
-
-            self.board.get_tile_at(3, 5).space_status = SpaceStatusEnum.FIRE
-            # self.board.get_tile_at(3, 5).hot_spot()
             return 3, 5
 
         elif roll == 4:
-
-            self.board.get_tile_at(3, 6).space_status = SpaceStatusEnum.FIRE
-            # self.board.get_tile_at(3, 6).hot_spot()
             return 3, 6
 
         elif roll == 5:
-
-            self.board.get_tile_at(4, 6).space_status = SpaceStatusEnum.FIRE
-            # self.board.get_tile_at(4, 6).hot_spot()
             return 4, 6
 
         elif roll == 6:
-
-            self.board.get_tile_at(4, 5).space_status = SpaceStatusEnum.FIRE
-            # self.board.get_tile_at(4, 5).hot_spot()
             return 4, 5
 
         elif roll == 7:
-
-            self.board.get_tile_at(4, 4).space_status = SpaceStatusEnum.FIRE
-            # self.board.get_tile_at(4, 4).hot_spot()
             return 4, 4
 
         elif roll == 8:
-
-            self.board.get_tile_at(4, 3).space_status = SpaceStatusEnum.FIRE
-            # self.board.get_tile_at(4, 3).hot_spot()
             return 4, 3
 
     @staticmethod
