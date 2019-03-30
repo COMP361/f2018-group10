@@ -23,6 +23,7 @@ class ArrowDirectionEnum(Enum):
     SOUTH_WEST = auto()
     WEST = auto()
     NORTH_WEST = auto()
+    NO_DIRECTION = auto()
 
 
 class DoorStatusEnum(Enum):

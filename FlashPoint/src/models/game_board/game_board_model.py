@@ -439,7 +439,7 @@ class GameBoardModel(Model):
                 elif tile_dirn == "North-West":
                     tile_dirn = ArrowDirectionEnum.NORTH_WEST
                 else:
-                    tile_dirn = None
+                    tile_dirn = ArrowDirectionEnum.NO_DIRECTION
 
                 tiles[row_num][col_num].arrow_dirn = tile_dirn
 
