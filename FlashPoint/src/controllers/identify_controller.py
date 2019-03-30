@@ -60,3 +60,5 @@ class IdentifyController(Controller):
             tile_sprite.identify_button.enable()
         else:
             tile_sprite.identify_button.disable()
+
+        tile_sprite.identify_button.on_click(self.send_event_and_close_menu, tile_model, tile_sprite.identify_button)

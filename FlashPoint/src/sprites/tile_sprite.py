@@ -42,14 +42,13 @@ class TileSprite(Interactable, TileObserver):
         self.is_scrolling = False
 
         # ------- POP-UP MENU -------- #
-        self.menu_shown = False
         self.identify_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
                                        Text(pygame.font.SysFont('Arial', 20), "Identify", Color.ORANGE))
 
         self.move_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
                                       Text(pygame.font.SysFont('Arial', 15), "Move Here", Color.ORANGE))
         self.extinguish_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
-                                            Text(pygame.font.SysFont('Arial', 15), "Extinguish Fire", Color.ORANGE))
+                                            Text(pygame.font.SysFont('Arial', 15), "Extinguish", Color.ORANGE))
         self.pickup_victim_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
                                                Text(pygame.font.SysFont('Arial', 15), "Pickup Victim", Color.ORANGE))
         self.drop_victim_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
@@ -101,6 +100,7 @@ class TileSprite(Interactable, TileObserver):
             return False
 
     def disable_all(self):
+        # Disable all buttons
         self.identify_button.disable()
         self.move_button.disable()
         self.extinguish_button.disable()
@@ -110,6 +110,17 @@ class TileSprite(Interactable, TileObserver):
         self.drive_engine_here_button.disable()
         self.ride_vehicle_button.disable()
         self.dismount_vehicle_button.disable()
+
+        # Important! Reset the on_clicks
+        self.identify_button.on_click(None)
+        self.move_button.on_click(None)
+        self.extinguish_button.on_click(None)
+        self.pickup_victim_button.on_click(None)
+        self.drop_victim_button.on_click(None)
+        self.drive_ambulance_here_button.on_click(None)
+        self.drive_engine_here_button.on_click(None)
+        self.ride_vehicle_button.on_click(None)
+        self.dismount_vehicle_button.on_click(None)
 
     def tile_assoc_models_changed(self, assoc_models: List[Model]):
         pass
@@ -214,10 +225,6 @@ class TileSprite(Interactable, TileObserver):
     def update(self, event_queue: EventQueue):
         self.sprite_grp.update(event_queue)
 
-        self._scroll()
-        if self.is_clicked():
-            self.click()
-
         self.drive_ambulance_here_button.update(event_queue)
         self.drop_victim_button.update(event_queue)
         self.extinguish_button.update(event_queue)
@@ -227,6 +234,10 @@ class TileSprite(Interactable, TileObserver):
         self.ride_vehicle_button.update(event_queue)
         self.dismount_vehicle_button.update(event_queue)
         self.drive_engine_here_button.update(event_queue)
+
+        self._scroll()
+        if self.is_clicked():
+            self.click()
 
     def tile_status_changed(self, status: SpaceStatusEnum):
         new_surf = pygame.Surface([self._non_highlight_image.get_width(), self._non_highlight_image.get_height()])

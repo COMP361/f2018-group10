@@ -37,7 +37,7 @@ class ExtinguishController(Controller):
         player_tile: TileModel = GameStateModel.instance().game_board.get_tile_at(self.current_player.row,
                                                                                   self.current_player.column)
 
-        if player_tile not in player_tile.adjacent_tiles.values():
+        if tile_model not in player_tile.adjacent_tiles.values():
             return False
 
         if self.current_player.ap < 1:
@@ -110,4 +110,4 @@ class ExtinguishController(Controller):
             return
 
         tile_sprite.extinguish_button.enable()
-        tile_sprite.extinguish_button.on_click(tile_sprite.extinguish_button)
+        tile_sprite.extinguish_button.on_click(self.send_event_and_close_menu, tile_model, tile_sprite.extinguish_button)

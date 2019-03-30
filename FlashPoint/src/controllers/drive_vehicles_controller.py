@@ -147,8 +147,4 @@ class DriveVehiclesController(Controller):
         if button:
             button.enable()
             button.on_click(self.send_event_and_close_menu, tile_model, button)
-        else:
-            tile_sprite.dismount_vehicle_button.disable()
-            tile_sprite.ride_vehicle_button.disable()
-            tile_sprite.drive_engine_here_button.disable()
-            tile_sprite.drive_ambulance_here_button.disable()
+

@@ -65,7 +65,10 @@ class VehiclePlacementController(Controller):
         game_board: GameBoardModel = GameStateModel.instance().game_board
 
         spot_list = game_board.engine_spots if self.ambulance_placed else game_board.ambulance_spots
-        parking_spot = [spot for spot in spot_list if tile_model in spot][0]
+        parking_spot = [spot for spot in spot_list if tile_model in spot]
+        if not parking_spot:
+            return
+        parking_spot = parking_spot[0]
         vehicle = game_board.engine if self.ambulance_placed else game_board.ambulance
         event = VehiclePlacedEvent(vehicle, parking_spot)
 
@@ -76,10 +79,9 @@ class VehiclePlacementController(Controller):
 
         if not self.ambulance_placed:
             self.ambulance_placed = True
-            self.choose_ambulance_prompt.kill()
+
         elif not self.engine_placed:
             self.engine_placed = True
-            self.choose_engine_prompt.kill()
 
     def _check_highlight(self, tile_model: TileModel, vehicle_type: str):
         if vehicle_type == "AMBULANCE":
@@ -110,9 +112,11 @@ class VehiclePlacementController(Controller):
         if not self.run_checks(tile_model):
             return
 
+
         self.send_event_and_close_menu(tile_model, None)
 
     def enable_prompts(self):
+        self.game_board_sprite.add(self.choose_engine_prompt)
         self.game_board_sprite.add(self.choose_ambulance_prompt)
         self.game_board_sprite.add(self.wait_prompt)
 
