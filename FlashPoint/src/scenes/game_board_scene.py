@@ -78,6 +78,9 @@ class GameBoardScene(GameBoardObserver):
         if Networking.get_instance().is_host:
             GameStateModel.instance()._notify_player_index()
 
+        for player in self._game.players:
+            player.set_initial_ap(self._game.rules)
+
     def notify_active_poi(self, active_pois: List[POIModel]):
         # Removes are already handled by the sprites themselves, therefore only need to deal with adds.
         for sprite in self.game_board_sprite:
