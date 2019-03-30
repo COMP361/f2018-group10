@@ -24,17 +24,14 @@ class DoorSprite(pygame.sprite.Sprite, DoorObserver):
         self._current_player = self._game.players_turn
         self._button = None
         self.tile_model = tile_model
-        self.open = False
-        self.closed = False
-        self.destroyed = False
         self.id = id
         self.door_model = door_model
         self.door_model.add_observer(self)
 
-        if self.door_model.door_status == DoorStatusEnum.OPEN:
-            self.door_model.open_door()
-        else:
-            self.door_model.close_door()
+        self.open = self.door_model.door_status == DoorStatusEnum.OPEN
+        self.closed = self.door_model.door_status == DoorStatusEnum.CLOSED
+        self.destroyed = self.door_model.door_status == DoorStatusEnum.DESTROYED
+
         self.marker = None
         self.tile_sprite = tile_sprite
         self._prev_x = self.tile_sprite.rect.x

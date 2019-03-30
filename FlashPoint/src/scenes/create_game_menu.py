@@ -34,8 +34,12 @@ class CreateGameMenu(Scene):
         self.buttonRecruit.on_click(self.create_new_game, GameKindEnum.EXPERIENCED, DifficultyLevelEnum.RECRUIT)
         self.buttonVeteran.on_click(self.create_new_game, GameKindEnum.EXPERIENCED, DifficultyLevelEnum.VETERAN)
         self.buttonHeroic.on_click(self.create_new_game, GameKindEnum.EXPERIENCED, DifficultyLevelEnum.HEROIC)
-        self.buttonFamily.on_click(self.create_new_game, GameKindEnum.EXPERIENCED)
-        self.buttonBack.on_click(Networking.get_instance().disconnect)
+        self.buttonFamily.on_click(self.create_new_game, GameKindEnum.FAMILY)
+        self.buttonBack.on_click(self._disconnect_and_back)
+
+    def _disconnect_and_back(self):
+        Networking.get_instance().disconnect()
+        EventQueue.post(CustomEvent(ChangeSceneEnum.HOSTMENUSCENE))
 
     # ------------- GAME CREATE/LOAD STUFF ---------- #
 
