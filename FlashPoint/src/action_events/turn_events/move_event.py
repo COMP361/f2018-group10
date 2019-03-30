@@ -127,6 +127,7 @@ class MoveEvent(TurnEvent):
                 self.destination = d_tile
 
     def execute(self):
+        print()
         logger.info(f"Executing MoveEvent from ({self.fireman.row}, "
                     f"{self.fireman.column}) to ({self.destination.row}, {self.destination.column})")
         # initialize the Dijkstra tiles

@@ -22,6 +22,7 @@ class DismountVehicleEvent(ActionEvent):
         self._vehicle_type = vehicle_type
 
     def execute(self, *args, **kwargs):
+        print()
         logger.info("Executing DismountVehicleEvent")
         player = self._game.players[self._player_index]
         game_board: GameBoardModel = self._game.game_board
