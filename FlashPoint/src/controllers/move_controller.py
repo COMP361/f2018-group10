@@ -224,3 +224,6 @@ class MoveController(PlayerObserver):
 
     def player_losses_changed(self, losses: int):
         pass
+
+    def player_role_changed(self, role):
+        pass

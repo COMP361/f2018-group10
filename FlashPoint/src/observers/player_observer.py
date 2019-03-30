@@ -37,3 +37,7 @@ class PlayerObserver(Observer, ABC):
     @abstractmethod
     def player_carry_changed(self, carry):
         pass
+
+    @abstractmethod
+    def player_role_changed(self, role):
+        pass

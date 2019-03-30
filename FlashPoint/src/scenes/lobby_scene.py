@@ -4,7 +4,7 @@ import src.constants.color as Color
 from src.core.custom_event import CustomEvent
 from src.core.event_queue import EventQueue
 from src.action_events.ready_event import ReadyEvent
-from src.constants.state_enums import GameKindEnum, PlayerStatusEnum, PlayerRoleEnum
+from src.constants.state_enums import GameKindEnum, PlayerStatusEnum, PlayerRoleEnum, GameStateEnum
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 from src.UIComponents.rect_button import RectButton
@@ -14,10 +14,15 @@ from src.UIComponents.chat_box import ChatBox
 from src.constants.change_scene_enum import ChangeSceneEnum
 from src.core.networking import Networking
 from src.action_events.start_game_event import StartGameEvent
+from src.observers.game_state_observer import GameStateObserver
+from src.observers.player_observer import PlayerObserver
 
 
-class LobbyScene(object):
+class LobbyScene(PlayerObserver, GameStateObserver):
+
+
     def __init__(self, screen, current_player: PlayerModel):
+        super().__init__()
         self._current_player = current_player
         self._game = GameStateModel.instance()
 
@@ -253,3 +258,42 @@ class LobbyScene(object):
             self._init_all(reuse=True)
 
         self.sprite_grp.update(event_queue)
+
+    def notify_player_index(self, player_index: int):
+        pass
+
+    def notify_game_state(self, game_state: GameStateEnum):
+        pass
+
+    def damage_changed(self, new_damage: int):
+        pass
+
+    def saved_victims(self, victims_saved: int):
+        pass
+
+    def dead_victims(self, victims_dead: int):
+        pass
+
+    def player_status_changed(self, status: PlayerStatusEnum):
+        pass
+
+    def player_ap_changed(self, updated_ap: int):
+        pass
+
+    def player_special_ap_changed(self, updated_ap: int):
+        pass
+
+    def player_position_changed(self, row: int, column: int):
+        pass
+
+    def player_wins_changed(self, wins: int):
+        pass
+
+    def player_losses_changed(self, losses: int):
+        pass
+
+    def player_carry_changed(self, carry):
+        pass
+
+    def player_role_changed(self, role):
+        pass
