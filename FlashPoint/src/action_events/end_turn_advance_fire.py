@@ -60,7 +60,6 @@ class EndTurnAdvanceFireEvent(TurnEvent):
         # ------ AdvanceFire ------ #
         # Change state of tile depending on previous state
         self.initial_tile = self.board.get_tile_at(self.red_dice, self.black_dice)
-        logger.info(f"Smoke placed: {self.initial_tile.row}, {self.initial_tile.column}")
         self.advance_on_tile(self.initial_tile)
         self.flashover()
         self.affect_damages()
