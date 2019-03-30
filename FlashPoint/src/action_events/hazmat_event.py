@@ -1,9 +1,11 @@
+import logging
+
 from src.action_events.action_event import ActionEvent
-from src.models.game_board.game_board_model import GameBoardModel
 from src.models.game_board.tile_model import TileModel
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.hazmat_model import HazmatModel
-from src.models.game_units.poi_model import POIModel
+
+logger = logging.getLogger("FlashPoint")
 
 
 class HazmatEvent(ActionEvent):
@@ -16,8 +18,7 @@ class HazmatEvent(ActionEvent):
         self.current_player = GameStateModel.instance().players_turn
 
     def execute(self):
-
-
+        logger.info("Executing HazmatEvent")
         self.current_player.ap -= 2
 
         tile_model: TileModel = self.game_board.get_tile_at(self.row, self.column)
@@ -25,6 +26,7 @@ class HazmatEvent(ActionEvent):
         for model in tile_model.associated_models:
             if isinstance(model, HazmatModel):
                 tile_model.associated_models.remove(model)
+                logger.info(f"Hazmat at: {tile_model.row}, {tile_model.column} removed.")
 
 
 

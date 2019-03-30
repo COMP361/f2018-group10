@@ -62,7 +62,7 @@ class TileSprite(Interactable, TileObserver):
         self.ride_vehicle_button = RectButton(self.rect.x, self.rect.y, 120, 25, Color.BLACK, 0,
                                               Text(pygame.font.SysFont('Arial', 15), "Ride Vehicle", Color.ORANGE))
         self.hazmat_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
-                                       Text(pygame.font.SysFont('Arial', 20), "Remove Hazmat", Color.ORANGE))
+                                        Text(pygame.font.SysFont('Arial', 20), "Remove Hazmat", Color.ORANGE))
 
         self.dismount_vehicle_button = RectButton(self.rect.x, self.rect.y, 120, 25, Color.BLACK, 0,
                                               Text(pygame.font.SysFont('Arial', 15), "Dismount Vehicle", Color.ORANGE))
@@ -112,6 +112,7 @@ class TileSprite(Interactable, TileObserver):
         self.drive_engine_here_button.disable()
         self.ride_vehicle_button.disable()
         self.dismount_vehicle_button.disable()
+        self.hazmat_button.disable()
 
         # Important! Reset the on_clicks
         self.identify_button.on_click(None)
@@ -123,6 +124,7 @@ class TileSprite(Interactable, TileObserver):
         self.drive_engine_here_button.on_click(None)
         self.ride_vehicle_button.on_click(None)
         self.dismount_vehicle_button.on_click(None)
+        self.hazmat_button.on_click(None)
 
     def tile_assoc_models_changed(self, assoc_models: List[Model]):
         pass
@@ -224,11 +226,11 @@ class TileSprite(Interactable, TileObserver):
             self.dismount_vehicle_button.rect.y = self.rect.y + offset
             offset += 20
 
-            if self.hazmat_button.enabled:
-                screen.blit(self.hazmat_button.image, self.hazmat_button.rect)
-                self.hazmat_button.rect.x = self.rect.x
-                self.hazmat_button.rect.y = self.rect.y + offset
-                offset += 20
+        if self.hazmat_button.enabled:
+            screen.blit(self.hazmat_button.image, self.hazmat_button.rect)
+            self.hazmat_button.rect.x = self.rect.x
+            self.hazmat_button.rect.y = self.rect.y + offset
+            offset += 20
 
     def update(self, event_queue: EventQueue):
         self.sprite_grp.update(event_queue)

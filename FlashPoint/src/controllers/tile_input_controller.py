@@ -41,6 +41,7 @@ class TileInputController(GameStateObserver, Controller):
             VehiclePlacementController(current_player)
             DriveVehiclesController(current_player)
             IdentifyController(current_player)
+            HazmatController(current_player)
 
         GameStateModel.instance().add_observer(self)
         # Force notify observers
@@ -88,6 +89,7 @@ class TileInputController(GameStateObserver, Controller):
         if GameStateModel.instance().rules == GameKindEnum.EXPERIENCED:
             IdentifyController.instance().process_input(tile_sprite)
             DriveVehiclesController.instance().process_input(tile_sprite)
+            HazmatController.instance().process_input(tile_sprite)
 
     def notify_player_index(self, player_index: int):
         pass
