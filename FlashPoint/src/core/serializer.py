@@ -314,7 +314,7 @@ class JSONSerializer(object):
             '_associated_models': [JSONSerializer.serialize(obj) for obj in tile.associated_models],
             '_visit_count': tile.visit_count,
             '_adjacent_edge_objects': JSONSerializer.serialize(tile.adjacent_edge_objects),
-          #   '_arrow_dirn': {"name": type(ArrowDirectionEnum).__name__, "value": tile.arrow_dirn.value}
+            '_arrow_dirn': {"name": type(ArrowDirectionEnum).__name__, "value": tile.arrow_dirn.value}
         }
 
     @staticmethod

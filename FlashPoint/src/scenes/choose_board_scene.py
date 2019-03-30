@@ -68,7 +68,7 @@ class ChooseBoard(object):
 
     @staticmethod
     def set_and_continue(board_type : GameBoardTypeEnum):
-        GameStateModel.instance().game_board = GameBoardModel(GameStateModel.instance().rules, board_type)
+        GameStateModel.instance().game_board = GameBoardModel(board_type)
         EventQueue.post(CustomEvent(ChangeSceneEnum.SETMAXPLAYERSCENE))
 
     def draw(self, screen):

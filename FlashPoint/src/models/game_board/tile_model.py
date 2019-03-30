@@ -41,7 +41,7 @@ class TileModel(Model):
             "South": NullModel(),
         }
 
-        self._arrow_dirn: ArrowDirectionEnum = None
+        self._arrow_dirn = ArrowDirectionEnum.NO_DIRECTION
 
     def __str__(self):
         return f"Tile at: ({self.row}, {self.column})"
