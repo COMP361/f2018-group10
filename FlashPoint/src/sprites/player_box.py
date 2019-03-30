@@ -31,19 +31,6 @@ class PlayerBox(PlayerObserver):
                                         self.background_position[2],
                                         self.background_position[3],
                                         "media/specialist_cards/family.png")
-    # def _init_background(self, role):
-    #     print(f"role is {role}")
-    #     user_box = None
-    #     if self._game.rules != GameKindEnum.FAMILY and role:
-    #         print(f"the character role changed to: {role}")
-    #         role_path = self.get_path_from_character_enum(role)
-    #         user_box = RectLabel(self.background_position[0], self.background_position[1], self.background_position[2],
-    #                              self.background_position[3], role_path)
-    #     # else:
-    #     #     user_box = RectLabel(self.background_position[0], self.background_position[1], self.background_position[2],
-    #     #                       self.background_position[3], "media/specialist_cards/family.png")
-    #     if user_box:
-    #         return user_box
 
     def _init_text_box(self, color: Color):
 
@@ -103,5 +90,5 @@ class PlayerBox(PlayerObserver):
         role_path = self.get_path_from_character_enum(role)
 
         self.background = (RectLabel(self.background_position[0], self.background_position[1], self.background_position[2],
-                                 self.background_position[3], role_path))
+                                     self.background_position[3], role_path))
 
