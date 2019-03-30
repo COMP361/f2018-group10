@@ -3,6 +3,7 @@ import json
 from typing import Dict
 import logging
 
+from src.action_events.hazmat_event import HazmatEvent
 from src.action_events.identify_event import IdentifyEvent
 from src.action_events.place_hazmat_event import PlaceHazmatEvent
 from src.action_events.end_turn_advance_fire import EndTurnAdvanceFireEvent
@@ -223,6 +224,11 @@ class JSONSerializer(object):
         event = IdentifyEvent(payload['row'],payload['column'])
         return event
 
+    @staticmethod
+    def _deserialize_hazmat_event(payload: Dict) -> HazmatEvent:
+        event = HazmatEvent(payload['row'], payload['column'])
+        return event
+
 
     @staticmethod
     def deserialize(payload: Dict) -> object:
@@ -286,6 +292,8 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_drive_ambulance_event(payload)
         elif object_type == IdentifyEvent.__name__:
             return JSONSerializer._deserialize_identify_event(payload)
+        elif object_type == HazmatEvent.__name__:
+            return JSONSerializer._deserialize_hazmat_event(payload)
 
         logger.warning(f"Could not deserialize object {object_type}, not of recognized type.")
 

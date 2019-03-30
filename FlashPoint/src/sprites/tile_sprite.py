@@ -59,6 +59,9 @@ class TileSprite(Interactable, TileObserver):
 
         self.drive_ambulance_here_button = RectButton(self.rect.x, self.rect.y, 120, 25, Color.BLACK, 0,
                                              Text(pygame.font.SysFont('Arial', 15), "Drive Ambulance Here", Color.ORANGE))
+        self.hazmat_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
+                                       Text(pygame.font.SysFont('Arial', 20), "Remove Hazmat", Color.ORANGE))
+        self.hazmat_button.disable()
         self.identify_button.disable()
         self.move_button.disable()
         self.extinguish_button.disable()
@@ -182,6 +185,12 @@ class TileSprite(Interactable, TileObserver):
                 self.identify_button.rect.y = self.rect.y + offset
                 offset += 20
 
+            if self.hazmat_button.enabled:
+                screen.blit(self.hazmat_button.image, self.hazmat_button.rect)
+                self.hazmat_button.rect.x = self.rect.x
+                self.hazmat_button.rect.y = self.rect.y + offset
+                offset += 20
+
     def update(self, event_queue: EventQueue):
         self.sprite_grp.update(event_queue)
 
@@ -195,6 +204,7 @@ class TileSprite(Interactable, TileObserver):
         self.pickup_victim_button.update(event_queue)
         self.move_button.update(event_queue)
         self.identify_button.update(event_queue)
+        self.hazmat_button.update(event_queue)
 
     def tile_status_changed(self, status: SpaceStatusEnum):
         new_surf = pygame.Surface([self._non_highlight_image.get_width(), self._non_highlight_image.get_height()])
