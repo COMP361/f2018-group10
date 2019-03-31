@@ -74,7 +74,7 @@ class FireDeckGunEvent(TurnEvent):
 
     def _set_target_tile(self):
         """
-        Determine the tile which will be the
+        Set the tile which will be the
         target for the firing of the deck gun.
 
         :return:

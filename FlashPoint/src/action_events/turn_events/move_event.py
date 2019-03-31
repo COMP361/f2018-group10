@@ -3,7 +3,8 @@ import time
 import logging
 
 from src.action_events.turn_events.turn_event import TurnEvent
-from src.constants.state_enums import SpaceStatusEnum, POIIdentityEnum, SpaceKindEnum, DoorStatusEnum, VictimStateEnum
+from src.constants.state_enums import SpaceStatusEnum, SpaceKindEnum, DoorStatusEnum, VictimStateEnum, \
+    GameKindEnum
 from src.models.game_board.door_model import DoorModel
 from src.models.game_board.null_model import NullModel
 from src.models.game_board.tile_model import TileModel
@@ -268,22 +269,16 @@ class MoveEvent(TurnEvent):
             # Two separate cases depending on whether
             # fireman is carrying a victim or not
 
-            # Fireman is carrying a victim
+            # Fireman is carrying a victim -
             # 2 AP to carry victim through Safe or
-            # Smoke space. If victim carried outside
-            # of building, victim has been saved.
-            # Increment number of victims saved in game
-            # state and dissociate victim from player.
+            # Smoke space. Handle the case for when
+            # victim is carried outside of the building
+            # depending on the game mode.
             if isinstance(self.fireman.carrying_victim, VictimModel):
                 if d_tile.tile_model.space_status != SpaceStatusEnum.FIRE:
                     self.fireman.ap = self.fireman.ap - 2
                     if d_tile.tile_model.space_kind != SpaceKindEnum.INDOOR:
-                        self.fireman.carrying_victim.state = VictimStateEnum.RESCUED
-                        self.game.victims_saved = self.game.victims_saved + 1
-                        # remove the victim from the list of active POIs on the board
-                        # and disassociate the victim from the player
-                        self.game.game_board.remove_poi_or_victim(self.fireman.carrying_victim)
-                        self.fireman.carrying_victim = NullModel()
+                        self.resolve_victim_while_traveling(d_tile.tile_model)
 
             # fireman is not carrying a victim
             else:
@@ -305,3 +300,46 @@ class MoveEvent(TurnEvent):
             # Put to sleep so that we can see the
             # player move through the individual tiles
             time.sleep(0.75)
+
+    def resolve_victim_while_traveling(self, target_tile: TileModel):
+        """
+        Family mode:
+        If victim carried outside of building, victim has been saved.
+        Experienced mode:
+        If victim carried to ambulance, victim has been saved.
+
+        Both cases:
+        Increment number of victims saved in game state and
+        dissociate victim from player.
+
+        :param target_tile: Tile to which player travels with the victim
+        :return:
+        """
+        if self.game.rules == GameKindEnum.EXPERIENCED:
+            if target_tile.space_kind != SpaceKindEnum.AMBULANCE_PARKING:
+                return
+
+            # Target space is an Ambulance Parking spot.
+            # If the target space does not match either
+            # of the ambulance's current location tiles,
+            # then the victim has not been brought to the
+            # ambulance.
+            game_board = self.game.game_board
+            amb_first_tile = game_board.get_tile_at(game_board.ambulance.row, game_board.ambulance.column)
+            amb_second_tile = game_board.get_other_parking_tile(amb_first_tile)
+            eq_to_first = target_tile.row == amb_first_tile.row and target_tile.column == amb_first_tile.column
+            eq_to_second = target_tile.row == amb_second_tile.row and target_tile.column == amb_second_tile.column
+            if not eq_to_first and not eq_to_second:
+                return
+
+        # For Family mode, can directly come here
+        # without the above checks.
+        # For Experienced mode, we only reach here
+        # if the target space is equal to one of
+        # the ambulance's current location tiles.
+        self.fireman.carrying_victim.state = VictimStateEnum.RESCUED
+        self.game.victims_saved = self.game.victims_saved + 1
+        # remove the victim from the list of active POIs on the board
+        # and disassociate the victim from the player
+        self.game.game_board.remove_poi_or_victim(self.fireman.carrying_victim)
+        self.fireman.carrying_victim = NullModel()
