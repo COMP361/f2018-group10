@@ -60,15 +60,21 @@ class CharacterScene(Scene):
 
     def confirm(self):
         if self.character_enum:
+            players = self._game.players
+            accept = True #This is a boolean flag
+            for player in players:
+                if player.role == self.character_enum:
+                    accept = False
 
-            EventQueue.post(CustomEvent(ChangeSceneEnum.LOBBYSCENE))
+            if accept: #means no one took this character
+                EventQueue.post(CustomEvent(ChangeSceneEnum.LOBBYSCENE))
 
-            event = ChooseCharacterEvent(self.character_enum, self._game.players.index(self._current_player))
+                event = ChooseCharacterEvent(self.character_enum, self._game.players.index(self._current_player))
 
-            if Networking.get_instance().is_host:
-                Networking.get_instance().send_to_all_client(event)
-            else:
-                Networking.get_instance().send_to_server(event)
+                if Networking.get_instance().is_host:
+                    Networking.get_instance().send_to_all_client(event)
+                else:
+                    Networking.get_instance().send_to_server(event)
 
         # else:
         #     error_label: RectLabel = RectLabel(300, 150, 500, 150, Color.BLACK, 0,
