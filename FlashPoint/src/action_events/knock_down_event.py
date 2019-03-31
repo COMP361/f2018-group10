@@ -1,7 +1,7 @@
 import logging
 import random
 from src.action_events.action_event import ActionEvent
-from src.constants.state_enums import VictimStateEnum
+from src.constants.state_enums import VictimStateEnum, GameKindEnum
 from src.models.game_board.null_model import NullModel
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.victim_model import VictimModel
@@ -33,17 +33,26 @@ class KnockDownEvent(ActionEvent):
 
             self.game.victims_lost = self.game.victims_lost + 1
 
+        # Family mode:
         # get the closest ambulance spots to the player.
         # if there is only one closest spot, set the
         # player's location to that of the closest spot.
         # else, assign a random closest spot to the player.
-        player_tile = self.game.game_board.get_tile_at(self.player.row, self.player.column)
-        closest_ambulance_spots = self.game.game_board.find_closest_parking_spots("Ambulance", player_tile)
-        if len(closest_ambulance_spots) == 1:
-            amb_spot = closest_ambulance_spots[0]
-            self.player.set_pos(amb_spot.row, amb_spot.column)
+        if self.game.rules == GameKindEnum.FAMILY:
+            player_tile = self.game.game_board.get_tile_at(self.player.row, self.player.column)
+            closest_ambulance_spots = self.game.game_board.find_closest_parking_spots("Ambulance", player_tile)
+            if len(closest_ambulance_spots) == 1:
+                amb_spot = closest_ambulance_spots[0]
+                self.player.set_pos(amb_spot.row, amb_spot.column)
 
+            else:
+                rand_index = random.randint(0, len(closest_ambulance_spots)-1)
+                amb_spot = closest_ambulance_spots[rand_index]
+                self.player.set_pos(amb_spot.row, amb_spot.column)
+
+        # Experienced mode:
+        # Player's location is set to that of the
+        # ambulance's current location.
         else:
-            rand_index = random.randint(0, len(closest_ambulance_spots)-1)
-            amb_spot = closest_ambulance_spots[rand_index]
-            self.player.set_pos(amb_spot.row, amb_spot.column)
+            ambulance = self.game.game_board.ambulance
+            self.player.set_pos(ambulance.row, ambulance.column)
