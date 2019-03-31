@@ -1,4 +1,3 @@
-import random
 import logging
 from typing import Tuple
 
@@ -57,7 +56,7 @@ class FirePlacementEvent(ActionEvent):
         # get a non-fire space. Set the tile on fire, turn
         # hotspot to true and cause an explosion on that tile.
         logger.info("\nThird explosion")
-        column = self._determine_black_dice_opposite_face(tile_pos[1])
+        column = self.game.determine_black_dice_opposite_face(tile_pos[1])
         tile_pos = [self.game.roll_red_dice(), column]
         while self.board.get_tile_at(tile_pos[0], tile_pos[1]).space_status == SpaceStatusEnum.FIRE:
             tile_pos = [self.game.roll_red_dice(), column]
@@ -78,32 +77,6 @@ class FirePlacementEvent(ActionEvent):
 
             tile = self.board.get_tile_at(tile_pos[0], tile_pos[1])
             self._perform_fire_hotspot_explosion(tile, advance_event)
-
-    def _determine_black_dice_opposite_face(self, prev_roll: int) -> int:
-        """
-        Gives the opposite face on the black dice
-        for the number prev_roll. (Based on the Koplow d8 -
-        https://boardgamegeek.com/article/27926069#27926069)
-
-        :param prev_roll: Number that the black dice rolled previously.
-        :return: Number opposite to the previous roll.
-        """
-        if prev_roll == 1:
-            return 6
-        elif prev_roll == 2:
-            return 5
-        elif prev_roll == 3:
-            return 8
-        elif prev_roll == 4:
-            return 7
-        elif prev_roll == 5:
-            return 2
-        elif prev_roll == 6:
-            return 1
-        elif prev_roll == 7:
-            return 4
-        elif prev_roll == 8:
-            return 3
 
     def _perform_fire_hotspot_explosion(self, tile: TileModel, advance_event: EndTurnAdvanceFireEvent):
         """

@@ -288,3 +288,29 @@ class GameStateModel(Model):
         ambulance_placed = self.game_board.ambulance.orientation != VehicleOrientationEnum.UNSET
         engine_placed = self.game_board.engine.orientation != VehicleOrientationEnum.UNSET
         return ambulance_placed and engine_placed
+
+    def determine_black_dice_opposite_face(self, prev_roll: int) -> int:
+        """
+        Gives the opposite face on the black dice
+        for the number prev_roll. (Based on the Koplow d8 -
+        https://boardgamegeek.com/article/27926069#27926069)
+
+        :param prev_roll: Number that the black dice rolled previously.
+        :return: Number opposite to the previous roll.
+        """
+        if prev_roll == 1:
+            return 6
+        elif prev_roll == 2:
+            return 5
+        elif prev_roll == 3:
+            return 8
+        elif prev_roll == 4:
+            return 7
+        elif prev_roll == 5:
+            return 2
+        elif prev_roll == 6:
+            return 1
+        elif prev_roll == 7:
+            return 4
+        elif prev_roll == 8:
+            return 3
