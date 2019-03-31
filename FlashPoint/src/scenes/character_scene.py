@@ -24,7 +24,7 @@ class CharacterScene(Scene):
         self._init_background()
         self._game = GameStateModel.instance()
 
-        self.create_label(0, 0, 100, 150)
+        self.create_label(0, 0, 100, 150, 1)
         self.create_butn_img(250, 150, 99, 150,
                              "media/specialist_cards/cafs_firefighter.png", 1)
 
@@ -60,13 +60,13 @@ class CharacterScene(Scene):
 
     def confirm(self):
         if self.character_enum:
-            players = self._game.players
-            accept = True #This is a boolean flag
-            for player in players:
-                if player.role == self.character_enum:
-                    accept = False
 
-            if accept: #means no one took this character
+            accept = True  # This is a boolean flag
+
+            if any([player.role == self.character_enum for player in self._game.players]):
+                accept = False
+
+            if accept:  # means no one took this character
                 EventQueue.post(CustomEvent(ChangeSceneEnum.LOBBYSCENE))
 
                 event = ChooseCharacterEvent(self.character_enum, self._game.players.index(self._current_player))
@@ -89,41 +89,44 @@ class CharacterScene(Scene):
         self.sprite_grp.add(background_box)
 
     def create_butn_img(self, x, y, width, height, path: str, count: int):
-        label = self.create_label(x, y, width, height)
+        label = self.create_label(x, y, width, height, count)
         self.label_grp.add(label)
         self.sprite_grp.add(label)
 
         box_size = (width, height)
         self.this_img = RectButton(x, y, box_size[0], box_size[1], path)
 
-        role: PlayerRoleEnum = None
-        if count == 1:
-            role = PlayerRoleEnum.CAFS
-
-        elif count == 2:
-            role = PlayerRoleEnum.DRIVER
-
-        elif count == 3:
-            role = PlayerRoleEnum.CAPTAIN
-
-        elif count == 4:
-            role = PlayerRoleEnum.GENERALIST
-
-        elif count == 5:
-            role = PlayerRoleEnum.HAZMAT
-
-        elif count == 6:
-            role = PlayerRoleEnum.IMAGING
-
-        elif count == 7:
-            role = PlayerRoleEnum.PARAMEDIC
-
-        else:
-            role = PlayerRoleEnum.RESCUE
+        role: PlayerRoleEnum = self.decide_enum(count)
 
         self.this_img.on_click(self.click_img, label, role)
 
         self.sprite_grp.add(self.this_img)
+
+    @staticmethod
+    def decide_enum(count: int):
+        if count == 1:
+            return PlayerRoleEnum.CAFS
+
+        elif count == 2:
+            return PlayerRoleEnum.DRIVER
+
+        elif count == 3:
+            return PlayerRoleEnum.CAPTAIN
+
+        elif count == 4:
+            return PlayerRoleEnum.GENERALIST
+
+        elif count == 5:
+            return PlayerRoleEnum.HAZMAT
+
+        elif count == 6:
+            return PlayerRoleEnum.IMAGING
+
+        elif count == 7:
+            return PlayerRoleEnum.PARAMEDIC
+
+        else:
+            return PlayerRoleEnum.RESCUE
 
     def _init_btn_back(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
         box_size = (130, 48)
@@ -144,16 +147,37 @@ class CharacterScene(Scene):
                                         Text(pygame.font.SysFont('Arial', 20), text, color_text))
         self.sprite_grp.add(self.buttonConfirm)
 
-    def create_label(self, x_pos: int, y_pos: int, width: int, height: int):
-        return RectLabel(x_pos - 15, y_pos - 15, width + 30, height + 30, Color.BLACK)
+    def create_label(self, x_pos: int, y_pos: int, width: int, height: int, count: int):
+
+        role: PlayerRoleEnum = self.decide_enum(count)
+
+        accept = True
+
+        if any([player.role == role for player in self._game.players]):
+            accept = False
+
+        if not accept:
+            return RectLabel(x_pos - 15, y_pos - 15, width + 30, height + 30, Color.RED)
+        else:
+            return RectLabel(x_pos - 15, y_pos - 15, width + 30, height + 30, Color.GREEN)
 
     def click_img(self, btn, enum: PlayerRoleEnum):
-
+        i = 1
         for sprite in self.label_grp:
+            role = self.decide_enum(i)
+            accept = True
+            if any([player.role == role for player in self._game.players]):
+                accept = False
             if isinstance(sprite, RectLabel):
-                sprite.change_color(Color.BLACK)
+                if accept:
+                    sprite.change_color(Color.GREEN)
+                else:
+                    sprite.change_color(Color.RED)
+
+            i += 1
 
         if isinstance(btn, RectLabel):
-            btn.change_color(Color.WHITE)
+            if not btn.background == Color.RED:
+                btn.change_color(Color.WHITE)
 
         self.character_enum = enum
