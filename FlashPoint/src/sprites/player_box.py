@@ -20,17 +20,10 @@ class PlayerBox(PlayerObserver):
         self.txt_pos = text_position
         self.background_position = background_position
         self.text_box = self._init_text_box(color)
-        if self._assoc_player.role:
-            self.background = RectLabel(self.background_position[0], self.background_position[1],
-                                        self.background_position[2],
-                                        self.background_position[3],
-                                        self.get_path_from_character_enum(self._assoc_player.role))
-
-        else:
-            self.background = RectLabel(self.background_position[0], self.background_position[1],
-                                        self.background_position[2],
-                                        self.background_position[3],
-                                        "media/specialist_cards/family.png")
+        self.background = RectLabel(self.background_position[0], self.background_position[1],
+                                    self.background_position[2],
+                                    self.background_position[3],
+                                    self.get_path_from_character_enum(self._assoc_player.role))
 
     def _init_text_box(self, color: Color):
 
@@ -58,6 +51,8 @@ class PlayerBox(PlayerObserver):
             return "media/specialist_cards/paramedic.png"
         elif enum == PlayerRoleEnum.RESCUE:
             return "media/specialist_cards/rescue_specialist.png"
+        elif enum == PlayerRoleEnum.FAMILY:
+            return "media/specialist_cards/family.png"
 
     def draw(self, screen):
         self.text_box.draw(screen)
