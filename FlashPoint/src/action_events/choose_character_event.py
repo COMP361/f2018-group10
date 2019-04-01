@@ -24,3 +24,4 @@ class ChooseCharacterEvent(ActionEvent):
     def execute(self):
         logger.info("Executing ChooseCharacterEvent")
         self.curr_player.role = self._role
+        logger.info(f"Player: {self.curr_player.nickname} now has role: {self.curr_player.role}")

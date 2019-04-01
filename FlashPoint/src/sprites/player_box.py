@@ -86,7 +86,6 @@ class PlayerBox(PlayerObserver):
         pass
 
     def player_role_changed(self, role: PlayerRoleEnum):
-        print(f"role change is now: {role}")
         role_path = self.get_path_from_character_enum(role)
 
         self.background = (RectLabel(self.background_position[0], self.background_position[1], self.background_position[2],
