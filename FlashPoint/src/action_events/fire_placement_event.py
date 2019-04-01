@@ -1,4 +1,5 @@
 import logging
+import random
 from typing import Tuple
 
 from src.action_events.end_turn_advance_fire import EndTurnAdvanceFireEvent
@@ -14,8 +15,15 @@ logger = logging.getLogger("FlashPoint")
 class FirePlacementEvent(ActionEvent):
     """Event for placing fires at the beginning of the game."""
 
-    def __init__(self):
+    def __init__(self, seed: int = 0):
         super().__init__()
+        if seed == 0:
+            self.seed = random.randint(1, 6969)
+        else:
+            self.seed = seed
+
+        # Pick random location: roll dice
+        random.seed(self.seed)
         self.game: GameStateModel = GameStateModel.instance()
         self.board: GameBoardModel = self.game.game_board
 
