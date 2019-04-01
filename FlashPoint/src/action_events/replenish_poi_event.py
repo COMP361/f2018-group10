@@ -1,4 +1,5 @@
 import logging
+import random
 
 from src.action_events.action_event import ActionEvent
 from src.constants.state_enums import SpaceStatusEnum, POIIdentityEnum, VictimStateEnum
@@ -10,9 +11,15 @@ logger = logging.getLogger("FlashPoint")
 
 class ReplenishPOIEvent(ActionEvent):
 
-    def __init__(self, seed: int):
+    def __init__(self, seed: int = 0):
         super().__init__()
-        self.seed = seed
+        if seed == 0:
+            self.seed = random.randint(1, 6969)
+        else:
+            self.seed = seed
+
+        # Pick random location: roll dice
+        random.seed(self.seed)
         self.game: GameStateModel = GameStateModel.instance()
         self.board = self.game.game_board
 
