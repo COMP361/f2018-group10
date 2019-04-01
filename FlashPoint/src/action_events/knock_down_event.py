@@ -11,8 +11,15 @@ logger = logging.getLogger("FlashPoint")
 
 class KnockDownEvent(ActionEvent):
 
-    def __init__(self, player_ip: str):
+    def __init__(self, player_ip: str, seed: int = 0):
         super().__init__()
+        if seed == 0:
+            self.seed = random.randint(1, 6969)
+        else:
+            self.seed = seed
+
+        # Pick random location: roll dice
+        random.seed(self.seed)
         self.game: GameStateModel = GameStateModel.instance()
         self.player = self.game.get_player_by_ip(player_ip)
 
