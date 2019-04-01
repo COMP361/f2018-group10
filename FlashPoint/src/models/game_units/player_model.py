@@ -25,7 +25,7 @@ class PlayerModel(Model):
         self._wins = 0
         self._losses = 0
         self._carrying_victim = NullModel()
-        self.character: PlayerRoleEnum = None
+        self._role: PlayerRoleEnum = PlayerRoleEnum.FAMILY
 
     def __eq__(self, other):
         x = [other.ip == self.ip, other.nickname == self.nickname]
@@ -67,9 +67,22 @@ class PlayerModel(Model):
         for obs in self.observers:
             obs.player_carry_changed(self.carrying_victim)
 
+    def _notify_role(self):
+        for obs in self.observers:
+            obs.player_role_changed(self.role)
+
     @property
     def observers(self) -> List[PlayerObserver]:
         return self._observers
+
+    @property
+    def role(self):
+        return self._role
+
+    @role.setter
+    def role(self, new_role: PlayerRoleEnum):
+        self._role = new_role
+        self._notify_role()
 
     @property
     def row(self) -> int:
