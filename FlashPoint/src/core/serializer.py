@@ -4,6 +4,7 @@ import pygame
 from typing import Dict
 import logging
 
+from src.action_events.hazmat_event import HazmatEvent
 from src.action_events.choose_character_event import ChooseCharacterEvent
 from src.action_events.identify_event import IdentifyEvent
 from src.action_events.place_hazmat_event import PlaceHazmatEvent
@@ -229,6 +230,11 @@ class JSONSerializer(object):
         vehicle_type = payload['_vehicle_type']
         event = RideVehicleEvent(vehicle_type=vehicle_type, player_index=player_index)
         return event
+    @staticmethod
+    def _deserialize_hazmat_event(payload: Dict) -> HazmatEvent:
+        event = HazmatEvent(payload['row'], payload['column'])
+        return event
+
 
     @staticmethod
     def _deserialize_dismount_vehicle_event(payload: Dict) -> DismountVehicleEvent:
@@ -306,6 +312,8 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_dismount_vehicle_event(payload)
         elif object_type == ChooseCharacterEvent.__name__:
             return JSONSerializer._deserialize_choose_character_event(payload)
+        elif object_type == HazmatEvent.__name__:
+            return JSONSerializer._deserialize_hazmat_event(payload)
 
         logger.warning(f"Could not deserialize object {object_type}, not of recognized type.")
 

@@ -1,8 +1,11 @@
+import logging
+
 from src.constants.state_enums import VictimStateEnum
 from src.models.model import Model
 from typing import List
 from src.observers.victim_observer import VictimObserver
 
+logger = logging.getLogger("FlashPoint")
 
 class VictimModel(Model):
 
@@ -22,6 +25,7 @@ class VictimModel(Model):
     @state.setter
     def state(self, current_state: VictimStateEnum):
         self._state = current_state
+        logger.info(self.__str__() + " state: {state}".format(state=self.state))
         for obs in self.observers:
             obs.victim_state_changed(self.state)
 
@@ -36,6 +40,7 @@ class VictimModel(Model):
     def set_pos(self, row: int, column: int):
         self._row = row
         self._column = column
+        logger.info(self.__str__())
         for obs in self.observers:
             obs.victim_position_changed(self._row, self._column)
 

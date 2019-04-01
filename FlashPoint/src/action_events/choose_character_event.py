@@ -22,6 +22,7 @@ class ChooseCharacterEvent(ActionEvent):
         self.curr_player: PlayerModel = self._game.players[player_index]
 
     def execute(self):
+        print()
         logger.info("Executing ChooseCharacterEvent")
         self.curr_player.role = self._role
         logger.info(f"Player: {self.curr_player.nickname} now has role: {self.curr_player.role}")

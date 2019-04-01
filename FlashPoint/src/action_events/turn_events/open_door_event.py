@@ -16,6 +16,7 @@ class OpenDoorEvent(TurnEvent):
         self.fireman = game.players_turn
 
     def execute(self):
+        print()
         logger.info("Executing OpenDoorEvent")
         door = self.door
         fireman = self.fireman

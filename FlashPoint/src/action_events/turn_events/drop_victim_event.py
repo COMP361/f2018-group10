@@ -17,6 +17,7 @@ class DropVictimEvent(TurnEvent):
         self.player = game.players_turn
 
     def execute(self):
+        print()
         logger.info("Executing Drop Victim Event")
         self.victim_tile.add_associated_model(self.player.carrying_victim)
 

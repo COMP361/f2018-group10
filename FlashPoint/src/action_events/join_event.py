@@ -14,6 +14,7 @@ class JoinEvent(ActionEvent):
         self.player = player
 
     def execute(self):
+        print()
         logger.info(f"Executing JoinEvent: {self.player.nickname} has joined the game.")
         self.player.color = None
 

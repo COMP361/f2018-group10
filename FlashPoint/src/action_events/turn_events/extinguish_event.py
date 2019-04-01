@@ -18,6 +18,7 @@ class ExtinguishEvent(TurnEvent):
         self.extinguish_space: TileModel = game.game_board.get_tile_at(extinguish_space.row, extinguish_space.column)
 
     def execute(self):
+        print()
         logger.info(f"Executing ExtinguishEvent on {self.extinguish_space}")
         fireman = self.fireman
         extinguish_space = self.extinguish_space
