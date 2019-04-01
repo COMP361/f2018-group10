@@ -39,6 +39,13 @@ class PlayerModel(Model):
         player_color = "Player color: {color}\n".format(color=self.color)
         return '\n'.join([player_pos, player_ap, player_carrying_victim, player_status, player_color])
 
+
+    def _notify_all_observers(self):
+        self._notify_ap()
+        self._notify_position()
+        self._notify_special_ap()
+        self._notify_status()
+
     def _notify_position(self):
         for obs in self.observers:
             obs.player_position_changed(self.row, self.column)

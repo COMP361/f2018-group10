@@ -1,3 +1,5 @@
+from typing import Optional, List
+
 import pygame
 
 import src.constants.color as Color
@@ -24,6 +26,13 @@ class LobbyScene(GameStateObserver):
     def __init__(self, screen, current_player: PlayerModel):
         super().__init__()
         self._current_player = current_player
+
+
+        # if saved_game:
+        #     self._game = self.init_game_state()
+        # else:
+        #     self._game = GameStateModel.instance()
+
         self._game = GameStateModel.instance()
         self.player_boxes = []
 
@@ -31,6 +40,7 @@ class LobbyScene(GameStateObserver):
             self._current_player.color = Color.BLUE
             self._game.host.color = Color.BLUE
             self._current_player.status = PlayerStatusEnum.READY
+
 
         self._player_count = len(self._game.players)
         self.isReady = False

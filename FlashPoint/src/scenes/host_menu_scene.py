@@ -22,6 +22,7 @@ class HostMenuScene(Scene):
         self._init_btn_login(575, 371, "Load Game", Color.STANDARDBTN, Color.BLACK)
         self._init_btn_back(20, 20, "Back", Color.STANDARDBTN, Color.BLACK)
 
+
         self.buttonNewGame.on_click(EventQueue.post, CustomEvent(ChangeSceneEnum.CREATEGAMEMENU))
         self.buttonLogin.on_click(EventQueue.post, CustomEvent(ChangeSceneEnum.LOADGAME))
         self.buttonBack.on_click(self.go_back)

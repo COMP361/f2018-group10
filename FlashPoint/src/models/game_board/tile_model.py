@@ -91,6 +91,7 @@ class TileModel(Model):
         logger.info(self.__str__() + " status: %s", space_status.name)
         self._notify_status()
 
+
     @property
     def is_hotspot(self):
         return self._is_hotspot

@@ -39,18 +39,24 @@ class GameStateModel(Model):
             self._damage = 0
             self._max_damage = 24
             self._chat_history = []
+            self._saved_players = []
             self._state = GameStateEnum.READY_TO_JOIN
-
+            s = f"{self._host.row}, {self._host.column}"
             GameStateModel._instance = self
         else:
             raise Exception("GameStateModel is a Singleton")
+
+    def notify_all_observers(self):
+        self._notify_state()
+        self._game_board.notify_all_observers()
+
 
     def _notify_player_index(self):
         for obs in self._observers:
             obs.notify_player_index(self._players_turn_index)
 
     def _notify_state(self):
-        for obs in self.observers:
+        for obs in self._observers:
             obs.notify_game_state(self._state)
 
     @staticmethod
@@ -92,6 +98,11 @@ class GameStateModel(Model):
         with GameStateModel.lock:
             return self._host
 
+    @host.setter
+    def host(self,host:PlayerModel):
+        self._host = host
+
+
     @property
     def max_players(self) -> int:
         with GameStateModel.lock:
@@ -107,12 +118,18 @@ class GameStateModel(Model):
         with GameStateModel.lock:
             return self._players
 
+    @players.setter
+    def players(self,list:List[PlayerModel]):
+        self._players = list
+
     def add_player(self, player: PlayerModel):
         """Add a player to the current game."""
         with GameStateModel.lock:
             if len(self._players) == self._max_desired_players:
                 raise TooManyPlayersException(player)
             self._players.append(player)
+
+
 
     def get_player_by_ip(self, ip: str) -> PlayerModel:
         with GameStateModel.lock:
@@ -220,6 +237,8 @@ class GameStateModel(Model):
     def damage(self) -> int:
         with GameStateModel.lock:
             return self._damage
+
+
 
     @damage.setter
     def damage(self, damage: int):

@@ -12,6 +12,8 @@ from src.observers.GameBoardObserver import GameBoardObserver
 from src.action_events.place_hazmat_event import PlaceHazmatEvent
 from src.action_events.set_initial_poi_family_event import SetInitialPOIFamilyEvent
 from src.controllers.chop_controller import ChopController
+from src.controllers.move_controller import MoveController
+from src.controllers.win_lose_controller import WinLoseController
 from src.controllers.door_controller import DoorController
 from src.sprites.poi_sprite import POISprite
 from src.controllers.tile_input_controller import TileInputController
@@ -30,10 +32,10 @@ from src.sprites.hud.player_state import PlayerState
 from src.sprites.hud.current_player_state import CurrentPlayerState
 from src.sprites.hud.time_bar import TimeBar
 from src.sprites.hud.ingame_states import InGameStates
-import src.constants.color as Color
 from src.UIComponents.rect_button import RectButton
 from src.UIComponents.text import Text
 from src.sprites.notify_player_turn import NotifyPlayerTurn
+import src.constants.color as Color
 
 
 class GameBoardScene(GameBoardObserver):
@@ -77,6 +79,7 @@ class GameBoardScene(GameBoardObserver):
 
         if Networking.get_instance().is_host:
             GameStateModel.instance()._notify_player_index()
+            self.state_controller = WinLoseController()
 
         for player in self._game.players:
             player.set_initial_ap(self._game.rules)
@@ -110,7 +113,7 @@ class GameBoardScene(GameBoardObserver):
         self.active_sprites.add(self.menu_btn)
 
     def _save(self):
-        """Save the current game state to the hosts machine"""
+
         with open(self._save_games_file, mode='r+', encoding='utf-8') as myFile:
             temp = json.load(myFile)
             game_data = JSONSerializer.serialize(self._game)

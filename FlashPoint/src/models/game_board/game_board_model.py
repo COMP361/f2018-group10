@@ -15,6 +15,7 @@ from src.constants.state_enums import GameKindEnum, SpaceKindEnum, SpaceStatusEn
 from src.models.game_board.wall_model import WallModel
 from src.models.game_board.door_model import DoorModel
 from src.models.game_units.victim_model import VictimModel
+from src.models.model import Model
 
 
 class GameBoardModel(Model):
@@ -40,6 +41,35 @@ class GameBoardModel(Model):
         self._active_pois = []
         self._ambulance = AmbulanceModel((8, 10))
         self._engine = EngineModel((8, 10))
+
+
+    def notify_all_observers(self):
+        self._notify_active_poi()
+        self._notify_walls_and_tiles()
+
+
+    def _notify_walls_and_tiles(self):
+
+        for tile in self.tiles:
+            for obs in tile.observers:
+                obs.tile_status_changed(tile.space_status)
+
+            for edge in tile.adjacent_edge_objects.values():
+                if isinstance(edge, NullModel):
+                    continue
+
+                if isinstance(edge, WallModel):
+                    for obs in edge.observers:
+                        obs.wall_status_changed(edge.wall_status)
+                elif isinstance(edge, DoorModel):
+                    for obs in edge.observers:
+                        obs.door_status_changed(edge.door_status)
+
+    # def _notify_pois(self):
+    #     for poi in self.active_pois:
+    #         for obs in poi.observers:
+    #             obs.poi_status_changed(poi.status)
+    #             obs.poi_position_changed(poi.row, poi.column)
 
     def _notify_active_poi(self):
         for obs in self.observers:
@@ -71,6 +101,9 @@ class GameBoardModel(Model):
             for column in range(len(self._tiles[row])):
                 tile_list.append(self.get_tile_at(row, column))
         return tile_list
+    @tiles.setter
+    def tiles(self, tiles):
+        self._tiles = tiles
 
     @property
     def ambulance_spots(self) -> List[Tuple[TileModel]]:
@@ -83,6 +116,10 @@ class GameBoardModel(Model):
     @property
     def active_pois(self):
         return self._active_pois
+
+    @active_pois.setter
+    def active_pois(self,list:List[POIModel]) -> List[POIModel]:
+        self._active_pois = list
 
     def add_poi_or_victim(self, poi_or_victim):
         self._active_pois.append(poi_or_victim)
