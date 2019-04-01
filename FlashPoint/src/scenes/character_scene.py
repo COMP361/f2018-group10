@@ -154,9 +154,9 @@ class CharacterScene(Scene):
         else:
             return RectLabel(x_pos - 15, y_pos - 15, width + 30, height + 30, Color.GREEN)
 
-    def set_color(self, sprite: pygame.sprite.Sprite, i: int):
+    def set_color(self, sprite: pygame.sprite.Sprite, i: int=0, enum:PlayerRoleEnum=None):
         accept = True
-        role = self.decide_enum(i)
+        role = self.decide_enum(i) if i else enum
         if any([player.role == role for player in self._game.players]):
             accept = False
         if isinstance(sprite, RectLabel):
@@ -164,14 +164,14 @@ class CharacterScene(Scene):
                 sprite.change_color(Color.GREEN)
             else:
                 sprite.change_color(Color.RED)
+            if self.character_enum == role:
+                sprite.change_color(Color.WHITE)
 
     def click_img(self, btn, enum: PlayerRoleEnum):
-        if isinstance(btn, RectLabel):
-            if not btn.background == Color.RED:
-                btn.change_color(Color.WHITE)
-
         self.character_enum = enum
+        self.set_color(btn, enum=enum)
 
     def update(self, event_queue: EventQueue):
-        for i, sprite in enumerate(self.label_grp):
+        for i, sprite in enumerate(self.label_grp, 1):
             self.set_color(sprite, i)
+        self.sprite_grp.update(event_queue)
