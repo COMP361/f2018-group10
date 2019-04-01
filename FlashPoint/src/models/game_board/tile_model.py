@@ -1,12 +1,15 @@
 from typing import Optional, List
 
+from src.models.game_units.poi_model import POIModel
+from src.models.game_units.victim_model import VictimModel
 from src.models.game_board.door_model import DoorModel
 from src.models.game_board.wall_model import WallModel
+from src.models.game_units.hazmat_model import HazmatModel
 from src.models.model import Model
 from src.core.flashpoint_exceptions import TilePositionOutOfBoundsException
 from src.models.game_board.edge_obstacle_model import EdgeObstacleModel
 from src.models.game_board.null_model import NullModel
-from src.constants.state_enums import SpaceKindEnum, DoorStatusEnum, WallStatusEnum
+from src.constants.state_enums import SpaceKindEnum, DoorStatusEnum, WallStatusEnum, ArrowDirectionEnum
 from src.constants.state_enums import SpaceStatusEnum
 from src.observers.tile_observer import TileObserver
 
@@ -21,7 +24,6 @@ class TileModel(Model):
         self._space_kind = space_kind
         self._space_status = SpaceStatusEnum.SAFE
         self._is_hotspot = False
-        self._has_hazmat = False
         self._associated_models = []
         self._visit_count = 0
 
@@ -39,17 +41,15 @@ class TileModel(Model):
             "South": NullModel(),
         }
 
-    def set_hazmat(self):
-        self._has_hazmat = True
-
-    def hot_spot(self):
-        self._is_hotspot = True
+        self._arrow_dirn = ArrowDirectionEnum.NO_DIRECTION
 
     def __str__(self):
-        tile_pos = "Tile at: ({row}, {column})".format(row=self.row, column=self.column)
-        tile_state = "Space status: {status}".format(status=self.space_status)
-        tile_kind = "Space kind: {kind}\n".format(kind=self.space_kind)
-        return '\n'.join([tile_pos, tile_state, tile_kind])
+        return f"Tile at: ({self.row}, {self.column})"
+
+    def __eq__(self, other):
+        if isinstance(other, TileModel):
+            return self.row == other.row and self.column == other.column
+        return False
 
     def _notify_status(self):
         for obs in self.observers:
@@ -58,10 +58,6 @@ class TileModel(Model):
     def _notify_assoc_models(self):
         for obs in self.observers:
             obs.tile_assoc_models_changed(self.associated_models)
-
-    @property
-    def hazmat(self) -> bool:
-        return self._has_hazmat
 
     @property
     def observers(self) -> List[TileObserver]:
@@ -92,7 +88,6 @@ class TileModel(Model):
         self._space_status = space_status
         self._notify_status()
 
-
     @property
     def is_hotspot(self):
         return self._is_hotspot
@@ -104,6 +99,14 @@ class TileModel(Model):
     @property
     def adjacent_edge_objects(self):
         return self._adjacent_edge_objects
+
+    @property
+    def arrow_dirn(self):
+        return self._arrow_dirn
+
+    @arrow_dirn.setter
+    def arrow_dirn(self, arrow_dirn: ArrowDirectionEnum):
+        self._arrow_dirn = arrow_dirn
 
     @property
     def north_tile(self):
@@ -176,9 +179,9 @@ class TileModel(Model):
         Get the TileModel in a specified direction.
         "raise TilePositionOutOfBoundsException: If there is no Tile in that direction.
         """
-        tile = self._adjacent_tiles.get(direction, None)
-        if not tile:
-            raise TilePositionOutOfBoundsException(self, direction)
+        tile = self._adjacent_tiles.get(direction, NullModel)
+        if isinstance(tile, NullModel):
+            raise TilePositionOutOfBoundsException(tile, direction)
         return tile
 
     def get_obstacle_in_direction(self, direction: str) -> Optional['EdgeObstacleModel']:
@@ -215,7 +218,7 @@ class TileModel(Model):
     def add_associated_model(self, model: Model):
         # The model's observers will take care
         # of redrawing the model in the new location
-        model.set_position(self.row, self.column)
+
         self._associated_models.append(model)
         self._notify_assoc_models()
 
@@ -235,3 +238,9 @@ class TileModel(Model):
 
     def reset_adjacencies(self):
         self._adjacent_tiles = {}
+
+    def has_poi_or_victim(self) -> bool:
+        for model in self.associated_models:
+            if isinstance(model, POIModel) or isinstance(model, VictimModel):
+                return True
+        return False

@@ -1,5 +1,6 @@
 from typing import List
 import time
+import logging
 
 from src.action_events.turn_events.turn_event import TurnEvent
 from src.constants.state_enums import SpaceStatusEnum, POIIdentityEnum, SpaceKindEnum, DoorStatusEnum, VictimStateEnum
@@ -10,6 +11,8 @@ from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 from src.models.game_units.poi_model import POIModel
 from src.models.game_units.victim_model import VictimModel
+
+logger = logging.getLogger("FlashPoint")
 
 
 class DijkstraTile(object):
@@ -124,8 +127,9 @@ class MoveEvent(TurnEvent):
                 self.destination = d_tile
 
     def execute(self):
+        logger.info(f"Executing MoveEvent from ({self.fireman.row}, "
+                    f"{self.fireman.column}) to ({self.destination.row}, {self.destination.column})")
         # initialize the Dijkstra tiles
-        GameStateModel.lock.acquire()
         self._init_dijkstra_tiles(self.destination)
         # Insert the Dijkstra tiles
         # into the priority queue
@@ -152,8 +156,6 @@ class MoveEvent(TurnEvent):
 
         shortest_path = self.shortest_path()
         self.traverse_shortest_path(shortest_path)
-
-        GameStateModel.lock.release()
 
     def relax_cost(self, direction: str, first_tile: DijkstraTile, second_tile: DijkstraTile):
         """
@@ -293,20 +295,11 @@ class MoveEvent(TurnEvent):
             # If it contains any POIs, flip them over.
             for assoc_model in d_tile.tile_model.associated_models:
                 if isinstance(assoc_model, POIModel):
-                    assoc_model.reveal()
                     # If the POI is a False Alarm, simply remove it
                     # from the board and the tile. If it is a Victim,
                     # remove the POI from the board, tile and
                     # add a Victim in its place.
-                    d_tile.tile_model.remove_associated_model(assoc_model)
-                    self.game.game_board.remove_poi_or_victim(assoc_model)
-
-                    # If the POI is a Victim, instantiate a VictimModel
-                    # and add it to the tile, board.
-                    if assoc_model.identity == POIIdentityEnum.VICTIM:
-                        new_victim = VictimModel(VictimStateEnum.ON_BOARD)
-                        d_tile.tile_model.add_associated_model(new_victim)
-                        self.game.game_board.add_poi_or_victim(new_victim)
+                    self.game.game_board.flip_poi(assoc_model)
 
             # Put to sleep so that we can see the
             # player move through the individual tiles

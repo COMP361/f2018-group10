@@ -3,8 +3,8 @@ from typing import List
 import pygame
 
 import src.constants.color as Color
-from src.UIComponents.interactable import Interactable
 from src.UIComponents.rect_button import RectButton
+from src.constants.state_enums import GameBoardTypeEnum
 from src.core.event_queue import EventQueue
 from src.models.game_board.door_model import DoorModel
 from src.models.game_board.wall_model import WallModel
@@ -12,7 +12,7 @@ from src.models.game_state_model import GameStateModel
 
 from src.UIComponents.spritesheet import Spritesheet
 from src.models.game_units.player_model import PlayerModel
-from src.sprites.hud.door_sprite import DoorSprite
+from src.sprites.door_sprite import DoorSprite
 from src.sprites.tile_sprite import TileSprite
 from src.sprites.wall_sprite import WallSprite
 
@@ -43,7 +43,9 @@ class GridSprite(pygame.sprite.Group):
         """Initialize a grid of Tiles, add to self Sprite Group."""
         grid = []
         x_offset = 0
-        tile_images = Spritesheet("media/boards/board1.png", 10, 8).cell_images
+        boardType = GameStateModel.instance().game_board.board_type
+        filePath = self.choose_board(boardType)
+        tile_images = Spritesheet(filePath, 10, 8).cell_images
 
         for i in range(0, self.width):
             grid.append([])
@@ -62,32 +64,26 @@ class GridSprite(pygame.sprite.Group):
                 if east_obstacle:
                     if isinstance(east_obstacle, DoorModel):
                         door = DoorSprite(east_obstacle, "vertical", tile_sprite, tile_model, (j, i, "East"))
-                        door.button = RectButton(x_offset + 128-5, y_offset, 14, 125, Color.BLACK)
-                        door.button.on_click(door.process_input)
+                        door.button = RectButton(x_offset + 128 - 5, y_offset, 14, 125, Color.BLACK)
                         self.door_buttons.append(door.button_input)
                         self.doors.append(door)
 
                     if isinstance(east_obstacle, WallModel):
                         wall = WallSprite(east_obstacle, "vertical", tile_sprite, tile_model, (j, i, "East"))
                         wall.button = RectButton(x_offset + 128 - 5, y_offset, 14, 125, Color.BLACK)
-                        # wall.button.set_transparent_background(True)
-                       # wall.button.on_click(wall.process_input)
                         self.wall_buttons.append(wall.button)
                         self.walls.append(wall)
 
                 if south_obstacle:
                     if isinstance(south_obstacle, DoorModel):
                         door = DoorSprite(south_obstacle, "horizontal", tile_sprite, tile_model, (j, i, "South"))
-                        door.button = RectButton(x_offset, y_offset+ 128-5, 125, 14, Color.BLACK)
-                        door.button.on_click(door.process_input)
+                        door.button = RectButton(x_offset, y_offset + 128 - 5, 125, 14, Color.BLACK)
                         self.door_buttons.append(door.button_input)
                         self.doors.append(door)
 
                     if isinstance(south_obstacle, WallModel):
                         wall = WallSprite(south_obstacle, "horizontal", tile_sprite, tile_model, (j, i, "South"))
                         wall.button = RectButton(x_offset, y_offset + 128 - 5, 125, 14, Color.BLACK)
-                        #wall.button.on_click(wall.process_input)
-                        # wall.button.set_transparent_background(True)
                         self.wall_buttons.append(wall.button)
                         self.walls.append(wall)
 
@@ -128,6 +124,20 @@ class GridSprite(pygame.sprite.Group):
         for door in self.doors:
             door.update(event_queue)
 
+
+    def choose_board(self,type :GameBoardTypeEnum):
+        if(type == GameBoardTypeEnum.ORIGINAL):
+            str = "media/boards/board1.png"
+            return str
+        else:
+            str = "media/boards/board2.png"
+            return str
+
+
     @property
     def get_walls(self) -> List[WallSprite]:
         return self.walls
+
+    @property
+    def get_doors(self) -> List[DoorSprite]:
+        return self.doors

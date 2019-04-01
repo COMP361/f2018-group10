@@ -53,7 +53,7 @@ class Interactable(pygame.sprite.Sprite):
 
             for event in event_queue:
                 if not isinstance(event, ChangeSceneEnum):
-                    if event.type == pygame.MOUSEBUTTONUP and not self._clicked:
+                    if event.type == pygame.MOUSEBUTTONUP and event.button == 1 and not self._clicked:
                         self._clicked = True
                         self.click()
 
@@ -148,7 +148,6 @@ class Interactable(pygame.sprite.Sprite):
         Disables the event hook
         :return:
         """
-        # print(f"Disabling: {self}")
         self._is_enabled = False
 
     def resize_rect(self, rect: pygame.rect.Rect):

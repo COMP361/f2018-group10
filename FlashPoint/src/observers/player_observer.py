@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from src.constants.state_enums import PlayerStatusEnum
+from src.constants.state_enums import PlayerStatusEnum, PlayerRoleEnum
 from src.observers.observer import Observer
 
 
@@ -32,4 +32,12 @@ class PlayerObserver(Observer, ABC):
 
     @abstractmethod
     def player_losses_changed(self, losses: int):
+        pass
+
+    @abstractmethod
+    def player_carry_changed(self, carry):
+        pass
+
+    @abstractmethod
+    def player_role_changed(self, role: PlayerRoleEnum):
         pass

@@ -1,10 +1,10 @@
-from typing import Tuple, List
+from typing import Tuple, List, Union
 
 import src.constants.color as Color
 from src.models.game_board.null_model import NullModel
 from src.models.game_units.victim_model import VictimModel
 from src.observers.player_observer import PlayerObserver
-from src.constants.state_enums import PlayerStatusEnum, PlayerRoleEnum
+from src.constants.state_enums import PlayerStatusEnum, PlayerRoleEnum, GameKindEnum
 from src.models.model import Model
 
 
@@ -13,18 +13,17 @@ class PlayerModel(Model):
     def __init__(self, ip: str, nickname: str):
         super().__init__()
         self._ip = ip
-        self._row = 0
-        self._column = 0
+        self._row = -1
+        self._column = -1
         self._nickname = nickname
         self._color = Color.WHITE  # White by default (not racist I swear)
         self._status = PlayerStatusEnum.NOT_READY
-        self._ap = 4
+        self._ap = 0
         self._special_ap = 0
         self._wins = 0
         self._losses = 0
         self._carrying_victim = NullModel()
-        self._character: PlayerRoleEnum = None
-
+        self._role: PlayerRoleEnum = None
 
     def __eq__(self, other):
         x = [other.ip == self.ip, other.nickname == self.nickname]
@@ -62,18 +61,26 @@ class PlayerModel(Model):
         for obs in self.observers:
             obs.player_losses_changed(self.losses)
 
+    def _notify_carry(self):
+        for obs in self.observers:
+            obs.player_carry_changed(self.carrying_victim)
+
+    def _notify_role(self):
+        for obs in self.observers:
+            obs.player_role_changed(self.role)
+
     @property
     def observers(self) -> List[PlayerObserver]:
         return self._observers
 
-
     @property
-    def character(self) -> PlayerRoleEnum:
-        return self._character
+    def role(self):
+        return self._role
 
-    @character.setter
-    def character(self,role:PlayerRoleEnum):
-        self._character = role
+    @role.setter
+    def role(self, new_role: PlayerRoleEnum):
+        self._role = new_role
+        self._notify_role()
 
     @property
     def row(self) -> int:
@@ -85,12 +92,24 @@ class PlayerModel(Model):
         self._row = row
         self._column = column
         if isinstance(self.carrying_victim, VictimModel):
-            self.carrying_victim.set_position(row, column)
+            self.carrying_victim.set_pos(row, column)
         self._notify_position()
+
+    def set_initial_ap(self, game_kind: GameKindEnum):
+        """Set the initial AP for this player"""
+        self.ap = 4
+
+        if game_kind == GameKindEnum.EXPERIENCED:
+            # TODO: Set AP based on role.
+            pass
 
     @property
     def column(self) -> int:
         return self._column
+
+    @property
+    def has_pos(self) -> bool:
+        return (self.row >= 0) and (self.column >= 0)
 
     @property
     def ip(self) -> str:
@@ -162,10 +181,10 @@ class PlayerModel(Model):
         self._notify_status()
 
     @property
-    def carrying_victim(self) -> VictimModel:
+    def carrying_victim(self) -> Union[VictimModel, NullModel]:
         return self._carrying_victim
 
     @carrying_victim.setter
     def carrying_victim(self, victim: VictimModel):
         self._carrying_victim = victim
-        
+        self._notify_carry()

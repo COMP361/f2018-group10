@@ -1,6 +1,6 @@
-from src.constants.state_enums import DirectionEnum, GameKindEnum
+from src.action_events.action_event import ActionEvent
+from src.constants.state_enums import GameKindEnum
 from src.models.game_units.player_model import PlayerModel
-
 
 
 class FlashPointBaseException(Exception):
@@ -9,6 +9,13 @@ class FlashPointBaseException(Exception):
     """
 
     def __init__(self, message: str):
+        super().__init__(message)
+
+
+class WrongEventInstantiation(FlashPointBaseException):
+    """Class to tell you you can't instantiate a certain event"""
+    def __init__(self, event: ActionEvent):
+        message = f"illegal to instantiate event: {event}"
         super().__init__(message)
 
 

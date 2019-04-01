@@ -1,7 +1,5 @@
 from enum import Enum, auto
 
-import pygame
-
 
 class ChangeSceneEnum(Enum):
     STARTSCENE = auto()
@@ -17,4 +15,4 @@ class ChangeSceneEnum(Enum):
     SETMAXPLAYERSCENE = auto()
     LOSESCENE = auto()
     WINSCENE = auto()
-
+    CHOOSEBOARDSCENE = auto()

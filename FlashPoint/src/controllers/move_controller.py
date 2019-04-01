@@ -1,8 +1,11 @@
 from typing import List
 
 import src.constants.color as Color
-from src.action_events.turn_events.move_event import DijkstraTile, PriorityQueue
+from src.UIComponents.interactable import Interactable
+from src.action_events.turn_events.move_event import DijkstraTile, PriorityQueue, MoveEvent
 from src.constants.state_enums import PlayerStatusEnum
+from src.controllers.controller import Controller
+from src.core.networking import Networking
 
 from src.models.game_units.victim_model import VictimModel
 from src.observers.player_observer import PlayerObserver
@@ -17,22 +20,24 @@ from src.models.game_state_model import GameStateModel
 from src.sprites.game_board import GameBoard
 
 
-class MoveController(PlayerObserver):
+class MoveController(PlayerObserver, Controller):
 
     _instance = None
 
     def __init__(self, current_player: PlayerModel):
+        super().__init__(current_player)
+
         if MoveController._instance:
             raise Exception("MoveController is a singleton")
+
         self.game_board_sprite = GameBoard.instance()
         self.current_player = current_player
         self.moveable_tiles = self._determine_reachable_tiles(
             self.current_player.row, self.current_player.column, self.current_player.ap)
         self.current_player.add_observer(self)
         GameStateModel.instance().game_board.reset_tiles_visit_count()
+
         MoveController._instance = self
-        self.move_to = None
-        self.is_moveable = False
 
     @classmethod
     def instance(cls):
@@ -158,44 +163,50 @@ class MoveController(PlayerObserver):
 
         return False
 
-    def _run_checks(self, tile_model: TileModel) -> bool:
-        if self.current_player != GameStateModel.instance().players_turn:
-            return False
-        return tile_model in self.moveable_tiles
-
-    def process_input(self, tile_sprite: TileSprite):
-        tile_model = GameStateModel.instance().game_board.get_tile_at(tile_sprite.row, tile_sprite.column)
-
-        # close the menu when other tile is clicked
-        if self.move_to:
-            self.move_to.disable_move()
-            self.move_to = None
-
-        if not self._run_checks(tile_model):
-            tile_sprite.disable_move()
-            self.is_moveable = False
-            return
-
-        self.move_to = tile_sprite
-        self.move_to.enable_move()
-        self.is_moveable = True
-
-    def update(self, event_queue: EventQueue):
-        if GameStateModel.instance().state != GameStateEnum.MAIN_GAME:
-            return
-
+    def _apply_highlight(self):
         for column in range(len(self.game_board_sprite.grid.grid)):  # First make them all hover_color to red
             for row in range(len(self.game_board_sprite.grid.grid[column])):
 
                 tile_model = GameStateModel.instance().game_board.get_tile_at(row, column)
                 tile = self.game_board_sprite.grid.grid[column][row]
-                if self._run_checks(tile_model):
+                if self.run_checks(tile_model):
                     tile.highlight_color = Color.GREEN
-                elif not self._run_checks(tile_model):
+                elif not self.run_checks(tile_model):
                     tile.highlight_color = None
 
-    def player_status_changed(self, status: PlayerStatusEnum):
-        pass
+    def run_checks(self, tile_model: TileModel) -> bool:
+        if self.current_player != GameStateModel.instance().players_turn:
+            return False
+        return tile_model in self.moveable_tiles
+
+    def send_event_and_close_menu(self, tile_model: TileModel, menu_to_close: Interactable):
+        if not self.run_checks(tile_model):
+            menu_to_close.disable()
+            return
+
+        event = MoveEvent(tile_model, self.moveable_tiles)
+
+        if Networking.get_instance().is_host:
+            Networking.get_instance().send_to_all_client(event)
+        else:
+            Networking.get_instance().send_to_server(event)
+
+        menu_to_close.disable()
+
+    def process_input(self, tile_sprite: TileSprite):
+        tile_model = GameStateModel.instance().game_board.get_tile_at(tile_sprite.row, tile_sprite.column)
+
+        if not self.run_checks(tile_model):
+            tile_sprite.move_button.disable()
+            return
+
+        tile_sprite.move_button.enable()
+        tile_sprite.move_button.on_click(self.send_event_and_close_menu, tile_model, tile_sprite.move_button)
+
+    def update(self, event_queue: EventQueue):
+        if GameStateModel.instance().state != GameStateEnum.MAIN_GAME:
+            return
+        self._apply_highlight()
 
     def player_ap_changed(self, updated_ap: int):
         GameStateModel.instance().game_board.reset_tiles_visit_count()
@@ -203,11 +214,13 @@ class MoveController(PlayerObserver):
             self.current_player.row, self.current_player.column, self.current_player.ap)
         GameStateModel.instance().game_board.reset_tiles_visit_count()
 
-    def player_special_ap_changed(self, updated_ap: int):
-        pass
-
     def player_position_changed(self, x_pos: int, y_pos: int):
+        GameStateModel.instance().game_board.reset_tiles_visit_count()
+        self.moveable_tiles = self._determine_reachable_tiles(
+            self.current_player.row, self.current_player.column, self.current_player.ap)
+        GameStateModel.instance().game_board.reset_tiles_visit_count()
 
+    def player_carry_changed(self, carry):
         GameStateModel.instance().game_board.reset_tiles_visit_count()
         self.moveable_tiles = self._determine_reachable_tiles(
             self.current_player.row, self.current_player.column, self.current_player.ap)
@@ -217,4 +230,12 @@ class MoveController(PlayerObserver):
         pass
 
     def player_losses_changed(self, losses: int):
+        pass
+
+    def player_role_changed(self, role):
+        pass
+    def player_special_ap_changed(self, updated_ap: int):
+        pass
+
+    def player_status_changed(self, status: PlayerStatusEnum):
         pass

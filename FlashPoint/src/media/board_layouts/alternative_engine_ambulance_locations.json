@@ -1,0 +1,42 @@
+[
+  {
+    "first_tile": [0, 3],
+    "second_tile": [0, 4],
+    "parking_type": "Engine"
+  },
+  {
+    "first_tile": [0, 5],
+    "second_tile": [0, 6],
+    "parking_type": "Ambulance"
+  },
+  {
+    "first_tile": [2, 9],
+    "second_tile": [3, 9],
+    "parking_type": "Engine"
+  },
+  {
+    "first_tile": [4, 9],
+    "second_tile": [5, 9],
+    "parking_type": "Ambulance"
+  },
+  {
+    "first_tile": [7, 5],
+    "second_tile": [7, 6],
+    "parking_type": "Engine"
+  },
+  {
+    "first_tile": [7, 3],
+    "second_tile": [7, 4],
+    "parking_type": "Ambulance"
+  },
+  {
+    "first_tile": [4, 0],
+    "second_tile": [5, 0],
+    "parking_type": "Engine"
+  },
+  {
+    "first_tile": [2, 0],
+    "second_tile": [3, 0],
+    "parking_type": "Ambulance"
+  }
+]

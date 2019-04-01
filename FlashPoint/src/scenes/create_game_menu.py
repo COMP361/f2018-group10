@@ -31,19 +31,25 @@ class CreateGameMenu(Scene):
         self._init_btn_veteran(710, 500, "Veteran", Color.YELLOW, Color.BLACK)
         self._init_btn_heroic(845, 500, "Heroic", Color.RED, Color.BLACK)
 
-        self.buttonRecruit.on_click(self.create_new_game, GameKindEnum.RECRUIT)
-        self.buttonVeteran.on_click(self.create_new_game, GameKindEnum.VETERAN)
-        self.buttonHeroic.on_click(self.create_new_game, GameKindEnum.HEROIC)
+        self.buttonRecruit.on_click(self.create_new_game, GameKindEnum.EXPERIENCED, DifficultyLevelEnum.RECRUIT)
+        self.buttonVeteran.on_click(self.create_new_game, GameKindEnum.EXPERIENCED, DifficultyLevelEnum.VETERAN)
+        self.buttonHeroic.on_click(self.create_new_game, GameKindEnum.EXPERIENCED, DifficultyLevelEnum.HEROIC)
         self.buttonFamily.on_click(self.create_new_game, GameKindEnum.FAMILY)
-        self.buttonBack.on_click(Networking.get_instance().disconnect)
+        self.buttonBack.on_click(self._disconnect_and_back)
+
+    def _disconnect_and_back(self):
+        Networking.get_instance().disconnect()
+        EventQueue.post(CustomEvent(ChangeSceneEnum.HOSTMENUSCENE))
 
     # ------------- GAME CREATE/LOAD STUFF ---------- #
 
-    def create_new_game(self, game_kind: GameKindEnum):
+    def create_new_game(self, game_kind: GameKindEnum, diff: DifficultyLevelEnum = None):
         """Instantiate a new family game and move to the lobby scene."""
-        GameStateModel(self._current_player, 6, game_kind)
-        #GameStateModel.difficulty_level = game_kind
-        EventQueue.post(CustomEvent(ChangeSceneEnum.SETMAXPLAYERSCENE))
+        GameStateModel(self._current_player, 6, game_kind, diff)
+        if game_kind == GameKindEnum.FAMILY:
+            EventQueue.post(CustomEvent(ChangeSceneEnum.CHOOSEBOARDSCENE))
+        elif game_kind == GameKindEnum.EXPERIENCED:
+            EventQueue.post(CustomEvent(ChangeSceneEnum.CHOOSEBOARDSCENE))
 
     # ----------------------------------------------- #
 
@@ -71,14 +77,11 @@ class CreateGameMenu(Scene):
                                     Text(pygame.font.SysFont('Arial', 20), text, color_text))
         self.sprite_grp.add(self.buttonRecruit)
 
-
-
     def _init_btn_veteran(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
         box_size = (130, 48)
         self.buttonVeteran = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
                                     Text(pygame.font.SysFont('Arial', 20), text, color_text))
         self.sprite_grp.add(self.buttonVeteran)
-
 
     def _init_btn_heroic(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
         box_size = (130, 48)

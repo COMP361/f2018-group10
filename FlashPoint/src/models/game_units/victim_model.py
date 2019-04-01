@@ -13,9 +13,7 @@ class VictimModel(Model):
         self._column = -7
 
     def __str__(self):
-        victim_pos = "Victim position: ({row}, {column})".format(row=self.row, column=self.column)
-        victim_state = "Victim state: {state}\n".format(state=self.state)
-        return '\n'.join([victim_pos, victim_state])
+        return f"Victim at ({self._row}, {self._column}) "
 
     @property
     def state(self):
@@ -35,7 +33,7 @@ class VictimModel(Model):
     def column(self):
         return self._column
 
-    def set_position(self, row: int, column: int):
+    def set_pos(self, row: int, column: int):
         self._row = row
         self._column = column
         for obs in self.observers:

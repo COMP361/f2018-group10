@@ -1,10 +1,11 @@
 import pygame
 
 import src.constants.color as Color
+
 from src.core.custom_event import CustomEvent
 from src.core.event_queue import EventQueue
 from src.action_events.ready_event import ReadyEvent
-from src.constants.state_enums import GameKindEnum, PlayerStatusEnum, PlayerRoleEnum
+from src.constants.state_enums import GameKindEnum, PlayerStatusEnum, PlayerRoleEnum, GameStateEnum
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 from src.UIComponents.rect_button import RectButton
@@ -14,12 +15,17 @@ from src.UIComponents.chat_box import ChatBox
 from src.constants.change_scene_enum import ChangeSceneEnum
 from src.core.networking import Networking
 from src.action_events.start_game_event import StartGameEvent
+from src.observers.game_state_observer import GameStateObserver
+from src.sprites.player_box import PlayerBox
 
 
-class LobbyScene(object):
+class LobbyScene(GameStateObserver):
+
     def __init__(self, screen, current_player: PlayerModel):
+        super().__init__()
         self._current_player = current_player
         self._game = GameStateModel.instance()
+        self.player_boxes = []
 
         if Networking.get_instance().is_host:
             self._current_player.color = Color.BLUE
@@ -33,8 +39,7 @@ class LobbyScene(object):
         self.players_not_ready_prompt = None
         self._init_all()
 
-        if self._game.rules == GameKindEnum.RECRUIT or self._game.rules == GameKindEnum.VETERAN \
-                or self._game.rules == GameKindEnum.HEROIC:
+        if self._game.rules == GameKindEnum.EXPERIENCED:
             self.buttonSelChar.on_click(EventQueue.post, CustomEvent(ChangeSceneEnum.CHARACTERSCENE))
         if Networking.get_instance().is_host:
             self._current_player.status = PlayerStatusEnum.READY
@@ -44,7 +49,11 @@ class LobbyScene(object):
         else:
             self._current_player.status = PlayerStatusEnum.NOT_READY
             self.buttonReady.on_click(self.set_ready)
-        self.buttonBack.on_click(Networking.get_instance().disconnect)
+        self.buttonBack.on_click(self.go_back)
+
+    def go_back(self):
+        Networking.get_instance().disconnect()
+        EventQueue.post(CustomEvent(ChangeSceneEnum.STARTSCENE))
 
     def start_game(self):
         """Callback for when the host tries to start the game."""
@@ -74,17 +83,17 @@ class LobbyScene(object):
                 event.execute()
                 Networking.get_instance().send_to_all_client(event)
             else:
-                Networking.get_instance().client.send(event)
+                Networking.get_instance().send_to_server(event)
         else:
             self.isReady = False
             self.buttonReady.change_color(Color.GREY)
             self._current_player.status = PlayerStatusEnum.NOT_READY
-            event = ReadyEvent(self._current_player,False)
+            event = ReadyEvent(self._current_player, False)
             if self._current_player.ip == GameStateModel.instance().host.ip:
                 event.execute()
                 Networking.get_instance().send_to_all_client(event)
             else:
-                Networking.get_instance().client.send(event)
+                Networking.get_instance().send_to_server(event)
 
     def _init_all(self, reuse=False):
         self._init_background()
@@ -130,41 +139,6 @@ class LobbyScene(object):
 
         self.sprite_grp.add(self.this_img)
 
-    def _init_background_player(self, rect):
-
-        if not self._game.rules == GameKindEnum.FAMILY and self._current_player.character:
-            role_path = self.get_path_from_character_enum(self._current_player.character)
-            user_box = RectLabel(rect[0], rect[1], rect[2], rect[3], role_path)
-        else:
-            user_box = RectLabel(rect[0], rect[1], rect[2], rect[3], "media/specialist_cards/family.png")
-        return user_box
-
-    def get_path_from_character_enum(self, enum: PlayerRoleEnum):
-        if enum == PlayerRoleEnum.CAFS:
-            return "media/specialist_cards/cafs_firefighter.png"
-        elif enum == PlayerRoleEnum.CAPTAIN:
-            return "media/specialist_cards/fire_captain.png"
-
-        elif enum == PlayerRoleEnum.GENERALIST:
-            return "media/specialist_cards/generalist.png"
-        elif enum == PlayerRoleEnum.DRIVER:
-            return "media/specialist_cards/driver_operator.png"
-        elif enum == PlayerRoleEnum.HAZMAT:
-            return "media/specialist_cards/hazmat_technician.png"
-        elif enum == PlayerRoleEnum.IMAGING:
-            return "media/specialist_cards/imaging_technician.png"
-        elif enum == PlayerRoleEnum.PARAMEDIC:
-            return "media/specialist_cards/paramedic.png"
-        elif enum == PlayerRoleEnum.RESCUE:
-            return "media/specialist_cards/rescue_specialist.png"
-
-    def _init_text_box(self, position, text, color):
-        box_size = (position[2], position[3])
-
-        user_box = RectLabel(position[0], position[1], box_size[0], box_size[1], color, 0,
-                             Text(pygame.font.SysFont('Arial', 20), text, (0, 255, 0, 0)))
-        return user_box
-
     def _init_selec_char(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
         box_size = (130, 48)
         self.buttonSelChar = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
@@ -200,15 +174,17 @@ class LobbyScene(object):
                     (400, 289, 150, 32), (780, 289, 150, 32), (1080, 364, 150, 32)]
         background_pos = [(565, 375, 200, 250), (100, 164, 150, 200), (400, 89, 150, 200),
                           (780, 89, 150, 200), (1080, 164, 150, 200)]
-
-        self.sprite_grp.add(self._init_text_box(text_pos[0], self._current_player.nickname, self._current_player.color))
-        self.sprite_grp.add(self._init_background_player(background_pos[0]))
+        self.player_boxes = []
+        current_player = [player for player in GameStateModel.instance().players if player.ip == self._current_player.ip][0]
+        self.player_boxes.append(PlayerBox(text_pos[0], background_pos[0], self._current_player.nickname,
+                                           current_player, current_player.color))
 
         players = [x for x in GameStateModel.instance().players if x.ip != self._current_player.ip]
         i = 1
         for player in players:
-            self.sprite_grp.add(self._init_text_box(text_pos[i], player.nickname, player.color))
-            self.sprite_grp.add(self._init_background_player(background_pos[i]))
+            self.player_boxes.append(PlayerBox(text_pos[i], background_pos[i], player.nickname, player, player.color))
+            # self.sprite_grp.add(self._init_text_box(text_pos[i], player.nickname, player.color))
+            # self.sprite_grp.add(self._init_background_player(background_pos[i]))
             i += 1
 
     def not_enough_players_ready_prompt(self):
@@ -225,6 +201,10 @@ class LobbyScene(object):
 
     def draw(self, screen):
         self.sprite_grp.draw(screen)
+
+        for box in self.player_boxes:
+            box.draw(screen)
+
         self.chat_box.draw(screen)
 
         if self.players_not_ready_prompt:
@@ -238,8 +218,8 @@ class LobbyScene(object):
                 self.start_button.enable()
                 self.start_button.change_color(Color.GREEN)
             else:
-               self.start_button.disable()
-               self.start_button.change_color(Color.GREY)
+                self.start_button.disable()
+                self.start_button.change_color(Color.GREY)
 
         self.chat_box.update(event_queue)
 
@@ -250,3 +230,21 @@ class LobbyScene(object):
             self._init_all(reuse=True)
 
         self.sprite_grp.update(event_queue)
+
+    def notify_player_index(self, player_index: int):
+        pass
+
+    def notify_game_state(self, game_state: GameStateEnum):
+        pass
+
+    def damage_changed(self, new_damage: int):
+        pass
+
+    def saved_victims(self, victims_saved: int):
+        pass
+
+    def dead_victims(self, victims_dead: int):
+        pass
+
+    def player_list_changed(self):
+        pass

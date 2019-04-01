@@ -25,12 +25,12 @@ class WallSprite(pygame.sprite.Sprite, WallObserver):
         self._current_player = self._game.players_turn
         self._button = None
         self.tile_model = tile_model
-        self.damaged = False
-        self.destroyed = False
         self.id = id
         self.wall_model = wall_model
         self.wall_model.add_observer(self)
 
+        self.damaged = self.wall_model.wall_status == WallStatusEnum.DAMAGED
+        self.destroyed = self.wall_model.wall_status == WallStatusEnum.DESTROYED
         self.tile_sprite = tile_sprite
         self._prev_x = self.tile_sprite.rect.x
         self._prev_y = self.tile_sprite.rect.y
@@ -38,11 +38,11 @@ class WallSprite(pygame.sprite.Sprite, WallObserver):
                                        Text(pygame.font.SysFont('Arial', 20), "Chop Wall", Color.ORANGE))
         self.button_input.disable()
         self.can_chop = False
-        # self.button_input.on_click(self.wall_chop)
 
     @property
     def direction(self) -> str:
         return self.id[2]
+
     @property
     def wall(self):
         return self.wall_model
@@ -58,10 +58,6 @@ class WallSprite(pygame.sprite.Sprite, WallObserver):
     @button.setter
     def button(self, button):
         self._button = button
-
-    # def wall_chop(self):
-    #     self.button_input.disable()
-    #     print("Francisdadasdad")
 
     def update(self, event_queue):
         diff_x = self.tile_sprite.rect.x - self._prev_x

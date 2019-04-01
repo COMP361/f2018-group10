@@ -1,10 +1,12 @@
+import logging
 import random
 from src.action_events.action_event import ActionEvent
 from src.constants.state_enums import VictimStateEnum
 from src.models.game_board.null_model import NullModel
 from src.models.game_state_model import GameStateModel
-from src.models.game_units.player_model import PlayerModel
 from src.models.game_units.victim_model import VictimModel
+
+logger = logging.getLogger("FlashPoint")
 
 
 class KnockDownEvent(ActionEvent):
@@ -15,14 +17,19 @@ class KnockDownEvent(ActionEvent):
         self.player = self.game.get_player_by_ip(player_ip)
 
     def execute(self):
+        logger.info(f"Exceuting KnockDownEvent for player at ({self.player.row},{self.player.column})")
         # if the player was carrying a victim,
         # that victim is lost. disassociate the
         # victim from the player and increment the
         # number of victims lost.
         if isinstance(self.player.carrying_victim, VictimModel):
             self.player.carrying_victim.state = VictimStateEnum.LOST
+
+            logger.info(f"{self.player.carrying_victim} was lost.")
+
             self.game.game_board.remove_poi_or_victim(self.player.carrying_victim)
             self.player.carrying_victim = NullModel()
+
             self.game.victims_lost = self.game.victims_lost + 1
 
         # get the closest ambulance spots to the player.
