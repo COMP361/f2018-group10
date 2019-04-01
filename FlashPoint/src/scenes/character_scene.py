@@ -76,13 +76,6 @@ class CharacterScene(Scene):
                 else:
                     Networking.get_instance().send_to_server(event)
 
-        # else:
-        #     error_label: RectLabel = RectLabel(300, 150, 500, 150, Color.BLACK, 0,
-        #                             Text(pygame.font.SysFont('Arial', 45), "Please select a character", Color.RED))
-        #     self.sprite_grp.add(error_label)
-        #     time.sleep(2)
-        #     self.sprite_grp.remove_internal(error_label)
-
     def _init_background(self):
         box_size = (self.resolution[0], self.resolution[1])
         background_box = RectLabel(0, 0, box_size[0], box_size[1], "media/backgrounds/flashpoint_background.png")
@@ -161,23 +154,24 @@ class CharacterScene(Scene):
         else:
             return RectLabel(x_pos - 15, y_pos - 15, width + 30, height + 30, Color.GREEN)
 
+    def set_color(self, sprite: pygame.sprite.Sprite, i: int):
+        accept = True
+        role = self.decide_enum(i)
+        if any([player.role == role for player in self._game.players]):
+            accept = False
+        if isinstance(sprite, RectLabel):
+            if accept:
+                sprite.change_color(Color.GREEN)
+            else:
+                sprite.change_color(Color.RED)
+
     def click_img(self, btn, enum: PlayerRoleEnum):
-        i = 1
-        for sprite in self.label_grp:
-            role = self.decide_enum(i)
-            accept = True
-            if any([player.role == role for player in self._game.players]):
-                accept = False
-            if isinstance(sprite, RectLabel):
-                if accept:
-                    sprite.change_color(Color.GREEN)
-                else:
-                    sprite.change_color(Color.RED)
-
-            i += 1
-
         if isinstance(btn, RectLabel):
             if not btn.background == Color.RED:
                 btn.change_color(Color.WHITE)
 
         self.character_enum = enum
+
+    def update(self, event_queue: EventQueue):
+        for i, sprite in enumerate(self.label_grp):
+            self.set_color(sprite, i)

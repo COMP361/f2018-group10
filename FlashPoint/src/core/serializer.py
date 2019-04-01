@@ -219,7 +219,7 @@ class JSONSerializer(object):
 
     @staticmethod
     def _deserialize_identify_event(payload: Dict) -> IdentifyEvent:
-        event = IdentifyEvent(payload['row'],payload['column'])
+        event = IdentifyEvent(payload['row'], payload['column'])
         return event
 
     @staticmethod
