@@ -81,3 +81,11 @@ class WallAlreadyDestroyedException(FlashPointBaseException):
     def __init__(self):
         message = "The given wall is already destroyed."
         super().__init__(message)
+
+
+class FlippingDiceProblemException(FlashPointBaseException):
+    """Class to indicate that there is an issue when the dice are being flipped."""
+
+    def __init__(self):
+        message = "Need to look at this issue with dice flipping."
+        super().__init__(message)

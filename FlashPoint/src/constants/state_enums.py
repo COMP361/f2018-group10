@@ -23,6 +23,7 @@ class ArrowDirectionEnum(Enum):
     SOUTH_WEST = auto()
     WEST = auto()
     NORTH_WEST = auto()
+    NO_DIRECTION = auto()
 
 
 class DoorStatusEnum(Enum):
@@ -116,3 +117,10 @@ class VehicleOrientationEnum(Enum):
     VERTICAL = auto()
     HORIZONTAL = auto()
     UNSET = auto()
+
+
+class QuadrantEnum(Enum):
+    TOP_LEFT = auto()
+    TOP_RIGHT = auto()
+    BOTTOM_LEFT = auto()
+    BOTTOM_RIGHT = auto()

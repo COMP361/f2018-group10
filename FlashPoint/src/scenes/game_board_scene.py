@@ -67,14 +67,19 @@ class GameBoardScene(GameBoardObserver):
         self.chat_box = ChatBox(self._current_player)
         self.menu = None
         self._init_sprites()
-        self.tile_input_controller = TileInputController(self._current_player)
         self.chop_controller = ChopController(self._current_player)
         self.door_controller = DoorController(self._current_player)
         self._game.game_board.add_observer(self)
 
         self._game.game_board._notify_active_poi()
+
+        TileInputController(self._current_player)
+
         if Networking.get_instance().is_host:
             GameStateModel.instance()._notify_player_index()
+
+        for player in self._game.players:
+            player.set_initial_ap(self._game.rules)
 
     def notify_active_poi(self, active_pois: List[POIModel]):
         # Removes are already handled by the sprites themselves, therefore only need to deal with adds.
@@ -171,9 +176,9 @@ class GameBoardScene(GameBoardObserver):
 
         if not self.ignore_area():
             self.game_board_sprite.update(event_queue)
-            self.tile_input_controller.update(event_queue)
             self.chop_controller.update(event_queue)
             self.door_controller.update(event_queue)
+            TileInputController.update(event_queue)
 
         if self.menu and not self.menu.is_closed:
             self.menu.update(event_queue)

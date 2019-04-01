@@ -31,7 +31,7 @@ class Main(object):
 
         # Run main loop
         # FileImporter.play_music("media/music/intro_music/Kontrabandz-Get Down-kissvk.com.mp3", -1)
-        FileImporter.play_music("media/music/Get_Down.wav", -1)
+      #  FileImporter.play_music("media/music/Get_Down.wav", -1)
 
         try:
             while True:

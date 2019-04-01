@@ -1,9 +1,11 @@
+import logging
 from typing import List, Tuple
 
 from src.constants.state_enums import VehicleOrientationEnum
 from src.models.game_units.player_model import PlayerModel
 from src.models.model import Model
 
+logger = logging.getLogger("FlashPoint")
 
 class VehicleModel(Model):
     """Base class for Ambulance and Engine.
@@ -18,7 +20,6 @@ class VehicleModel(Model):
         self._is_vertical = False
         self._row = -7
         self._column = -7
-        self._driver: PlayerModel = None
         self._passengers: List[PlayerModel] = []
 
     @property
@@ -47,28 +48,14 @@ class VehicleModel(Model):
         """Moving the Vehicle moves driver and passengers as well."""
         self._row = parking_spot[0]
         self._column = parking_spot[1]
-
-        # Maintain the driver being in the front and the passengers in the back
-
-        if self.driver:
-            if self.orientation == VehicleOrientationEnum.VERTICAL:
-                self.driver.set_pos(self.row + 1, self.column)
-            elif self.orientation == VehicleOrientationEnum.HORIZONTAL:
-                self.driver.set_pos(self.row, self.column+1)
+        logger.info("Vehicle position: ({row}, {column})".format(row=self.row, column=self.column))
 
         if self.passengers:
+            logger.info("Passengers moving")
             for passenger in self._passengers:
                 passenger.set_pos(self.row, self.column)
 
         self._notify_pos()
-
-    @property
-    def driver(self) -> PlayerModel:
-        return self._driver
-
-    @driver.setter
-    def driver(self, player: PlayerModel):
-        self._driver = player
 
     @property
     def passengers(self) -> List[PlayerModel]:
