@@ -44,7 +44,6 @@ class EndTurnAdvanceFireEvent(TurnEvent):
         self.initial_tile: TileModel = None
 
         if seed == 0:
-
             self.seed = random.randint(1, 6969)
         else:
             self.seed = seed

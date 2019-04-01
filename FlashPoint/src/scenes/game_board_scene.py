@@ -1,4 +1,5 @@
 import json
+import random
 from datetime import datetime
 from typing import List
 
@@ -9,6 +10,7 @@ from src.sprites.victim_sprite import VictimSprite
 from src.models.game_units.poi_model import POIModel
 from src.observers.GameBoardObserver import GameBoardObserver
 
+from src.action_events.replenish_poi_event import ReplenishPOIEvent
 from src.action_events.place_hazmat_event import PlaceHazmatEvent
 from src.action_events.set_initial_poi_family_event import SetInitialPOIFamilyEvent
 from src.controllers.chop_controller import ChopController
@@ -58,11 +60,13 @@ class GameBoardScene(GameBoardObserver):
 
         self.active_sprites = pygame.sprite.Group()   # Maybe add separate groups for different things later
         self.game_board_sprite = GameBoard(current_player)
-        self.set_initial_poi_family()
 
         # Place hazmat event
         if self._game.rules is GameKindEnum.EXPERIENCED:
+            self.set_initial_poi_experienced()
             self.place_hazmat()
+        else:
+            self.set_initial_poi_family()
 
         self.chat_box = ChatBox(self._current_player)
         self.menu = None
@@ -202,6 +206,11 @@ class GameBoardScene(GameBoardObserver):
     def set_initial_poi_family(self):
         if Networking.get_instance().is_host:
             event = SetInitialPOIFamilyEvent()
+            Networking.get_instance().send_to_all_client(event)
+
+    def set_initial_poi_experienced(self):
+        if Networking.get_instance().is_host:
+            event = ReplenishPOIEvent(random.randint(1, 6969))
             Networking.get_instance().send_to_all_client(event)
 
     def place_hazmat(self):
