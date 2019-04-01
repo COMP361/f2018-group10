@@ -17,6 +17,7 @@ class ReadyEvent(ActionEvent):
         self._ready = ready
 
     def execute(self):
+        print()
         logger.info(f"Player: {self._player.nickname} caused ReadyEvent")
         if self._ready:
             GameStateModel.instance().get_player_by_ip(self._player.ip).status = PlayerStatusEnum.READY
