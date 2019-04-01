@@ -50,9 +50,9 @@ class TileSprite(Interactable, TileObserver):
         self.extinguish_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
                                             Text(pygame.font.SysFont('Arial', 15), "Extinguish", Color.ORANGE))
         self.pickup_victim_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
-                                               Text(pygame.font.SysFont('Arial', 15), "Pickup Victim", Color.ORANGE))
+                                               Text(pygame.font.SysFont('Arial', 15), "Move with Victim", Color.ORANGE))
         self.drop_victim_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
-                                             Text(pygame.font.SysFont('Arial', 15), "Drop Victim", Color.ORANGE))
+                                             Text(pygame.font.SysFont('Arial', 15), "Leave Victim", Color.ORANGE))
 
         self.drive_ambulance_here_button = RectButton(self.rect.x, self.rect.y, 120, 25, Color.BLACK, 0,
                                              Text(pygame.font.SysFont('Arial', 15), "Drive Ambulance Here", Color.ORANGE))

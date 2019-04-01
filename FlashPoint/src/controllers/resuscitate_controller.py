@@ -11,10 +11,11 @@ from src.models.game_board.wall_model import WallModel
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.hazmat_model import HazmatModel
 from src.models.game_units.player_model import PlayerModel
+from src.models.game_units.poi_model import POIModel
 from src.sprites.tile_sprite import TileSprite
 
 
-class HazmatController(Controller):
+class ResuscitateController(Controller):
 
     _instance = None
 
@@ -24,12 +25,12 @@ class HazmatController(Controller):
         self.board: GameBoardModel = self.game.game_board
         self._current_player = current_player
 
-        if HazmatController._instance:
-            raise Exception("HazmatController is not a singleton!")
+        if ResuscitateController._instance:
+            raise Exception("ResuscitateController is not a singleton!")
         if GameStateModel.instance().rules != GameKindEnum.EXPERIENCED:
-            raise Exception("HazmatController should not exist in Family Mode!")
+            raise Exception("ResuscitateController should not exist in Family Mode!")
 
-        HazmatController._instance = self
+        ResuscitateController._instance = self
 
     @classmethod
     def instance(cls):
@@ -46,52 +47,50 @@ class HazmatController(Controller):
         if not valid_to_identify:
             return False
 
-         # if player_tile not in tile_model.adjacent_tiles.values() and player_tile != tile_model:
-         #    return False
-        if player_tile != tile_model:
+        if player_tile not in tile_model.adjacent_tiles.values() and player_tile != tile_model:
             return False
-        #
-        # if player_tile.south_tile == tile_model:
-        #     obs = player_tile.get_obstacle_in_direction('South')
-        #     if isinstance(obs, WallModel):
-        #         if not obs.wall_status == WallStatusEnum.DESTROYED:
-        #             return False
-        #
-        #     elif isinstance(obs, DoorModel):
-        #         if obs.door_status == DoorStatusEnum.CLOSED:
-        #             return False
-        #
-        # elif player_tile.north_tile == tile_model:
-        #     obs = player_tile.get_obstacle_in_direction('North')
-        #     if isinstance(obs, WallModel):
-        #         if not obs.wall_status == WallStatusEnum.DESTROYED:
-        #             return False
-        #
-        #     elif isinstance(obs, DoorModel):
-        #         if obs.door_status == DoorStatusEnum.CLOSED:
-        #             return False
-        #
-        # elif player_tile.east_tile == tile_model:
-        #     obs = player_tile.get_obstacle_in_direction('East')
-        #     if isinstance(obs, WallModel):
-        #         if not obs.wall_status == WallStatusEnum.DESTROYED:
-        #             return False
-        #
-        #     elif isinstance(obs, DoorModel):
-        #         if obs.door_status == DoorStatusEnum.CLOSED:
-        #             return False
-        #
-        # elif player_tile.west_tile == tile_model:
-        #     obs = player_tile.get_obstacle_in_direction('West')
-        #     if isinstance(obs, WallModel):
-        #         if not obs.wall_status == WallStatusEnum.DESTROYED:
-        #             return False
-        #
-        #     elif isinstance(obs, DoorModel):
-        #         if obs.door_status == DoorStatusEnum.CLOSED:
-        #             return False
 
-        if not any([isinstance(model, HazmatModel) for model in tile_model.associated_models]):
+        if player_tile.south_tile == tile_model:
+            obs = player_tile.get_obstacle_in_direction('South')
+            if isinstance(obs, WallModel):
+                if not obs.wall_status == WallStatusEnum.DESTROYED:
+                    return False
+
+            elif isinstance(obs, DoorModel):
+                if obs.door_status == DoorStatusEnum.CLOSED:
+                    return False
+
+        elif player_tile.north_tile == tile_model:
+            obs = player_tile.get_obstacle_in_direction('North')
+            if isinstance(obs, WallModel):
+                if not obs.wall_status == WallStatusEnum.DESTROYED:
+                    return False
+
+            elif isinstance(obs, DoorModel):
+                if obs.door_status == DoorStatusEnum.CLOSED:
+                    return False
+
+        elif player_tile.east_tile == tile_model:
+            obs = player_tile.get_obstacle_in_direction('East')
+            if isinstance(obs, WallModel):
+                if not obs.wall_status == WallStatusEnum.DESTROYED:
+                    return False
+
+            elif isinstance(obs, DoorModel):
+                if obs.door_status == DoorStatusEnum.CLOSED:
+                    return False
+
+        elif player_tile.west_tile == tile_model:
+            obs = player_tile.get_obstacle_in_direction('West')
+            if isinstance(obs, WallModel):
+                if not obs.wall_status == WallStatusEnum.DESTROYED:
+                    return False
+
+            elif isinstance(obs, DoorModel):
+                if obs.door_status == DoorStatusEnum.CLOSED:
+                    return False
+
+        if not any([isinstance(model, POIModel) for model in tile_model.associated_models]):
             return False
 
         return True
