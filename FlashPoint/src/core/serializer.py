@@ -88,6 +88,7 @@ class JSONSerializer(object):
         player.special_ap = payload['_special_ap']
         player.wins = payload['_wins']
         player.losses = payload['_losses']
+        player.role = PlayerRoleEnum(payload['_role']['value'])
 
         return player
 
