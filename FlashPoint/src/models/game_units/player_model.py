@@ -1,3 +1,4 @@
+import logging
 from typing import Tuple, List, Union
 
 import src.constants.color as Color
@@ -7,6 +8,7 @@ from src.observers.player_observer import PlayerObserver
 from src.constants.state_enums import PlayerStatusEnum, PlayerRoleEnum, GameKindEnum
 from src.models.model import Model
 
+logger = logging.getLogger("FlashPoint")
 
 class PlayerModel(Model):
 
@@ -78,6 +80,7 @@ class PlayerModel(Model):
         # update their position as well
         self._row = row
         self._column = column
+        logger.info("Player {nickname} position: ({row}, {column})".format(nickname=self.nickname, row=self.row, column=self.column))
         if isinstance(self.carrying_victim, VictimModel):
             self.carrying_victim.set_pos(row, column)
         self._notify_position()
@@ -121,6 +124,7 @@ class PlayerModel(Model):
     @color.setter
     def color(self, color: Tuple):
         self._color = color
+        logger.info("Player {nickname} color: {color}".format(nickname=self.nickname, color=self.color))
 
     @property
     def wins(self) -> int:
@@ -129,6 +133,7 @@ class PlayerModel(Model):
     @wins.setter
     def wins(self, wins: int):
         self._wins = wins
+        logger.info("Player {nickname} wins: {wins}".format(nickname=self.nickname, wins=self.wins))
         self._notify_wins()
 
     @property
@@ -138,6 +143,7 @@ class PlayerModel(Model):
     @losses.setter
     def losses(self, losses: int):
         self._losses = losses
+        logger.info("Player {nickname} losses: {losses}".format(nickname=self.nickname, losses=self.losses))
         self._notify_losses()
 
     @property
@@ -147,6 +153,7 @@ class PlayerModel(Model):
     @ap.setter
     def ap(self, ap: int):
         self._ap = ap
+        logger.info("Player {nickname} AP: {ap}".format(nickname=self.nickname, ap=self.ap))
         self._notify_ap()
 
     @property
@@ -156,6 +163,7 @@ class PlayerModel(Model):
     @special_ap.setter
     def special_ap(self, special_ap: int):
         self._special_ap = special_ap
+        logger.info("Player {nickname} special AP: {sp_ap}".format(nickname=self.nickname, sp_ap=self.special_ap))
         self._notify_special_ap()
 
     @property
@@ -165,6 +173,7 @@ class PlayerModel(Model):
     @status.setter
     def status(self, status: PlayerStatusEnum):
         self._status = status
+        logger.info("Player {nickname} status: {status}".format(nickname=self.nickname, status=self.status))
         self._notify_status()
 
     @property
@@ -174,4 +183,5 @@ class PlayerModel(Model):
     @carrying_victim.setter
     def carrying_victim(self, victim: VictimModel):
         self._carrying_victim = victim
+        logger.info("Player {nickname} carrying victim: {cv}".format(nickname=self.nickname, cv=victim))
         self._notify_carry()

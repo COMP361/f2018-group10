@@ -21,5 +21,6 @@ class ChooseCharacterEvent(ActionEvent):
         self.role: PlayerRoleEnum = role
 
     def execute(self):
+        print()
         logger.info("Executing ChooseCharacterEvent")
         self.curr_player.character = self.role

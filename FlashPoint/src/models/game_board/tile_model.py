@@ -1,3 +1,4 @@
+import logging
 from typing import Optional, List
 
 from src.models.game_units.poi_model import POIModel
@@ -13,6 +14,7 @@ from src.constants.state_enums import SpaceKindEnum, DoorStatusEnum, WallStatusE
 from src.constants.state_enums import SpaceStatusEnum
 from src.observers.tile_observer import TileObserver
 
+logger = logging.getLogger("FlashPoint")
 
 class TileModel(Model):
     """Logical state of a Tile object."""
@@ -86,11 +88,17 @@ class TileModel(Model):
     @space_status.setter
     def space_status(self, space_status: SpaceStatusEnum):
         self._space_status = space_status
+        logger.info(self.__str__() + " status: %s", space_status.name)
         self._notify_status()
 
     @property
     def is_hotspot(self):
         return self._is_hotspot
+
+    @is_hotspot.setter
+    def is_hotspot(self, hotspot_bool: bool):
+        self._is_hotspot = hotspot_bool
+        logger.info(self.__str__() + " hotspot: %s", str(hotspot_bool))
 
     @property
     def adjacent_tiles(self):
@@ -220,6 +228,8 @@ class TileModel(Model):
         # of redrawing the model in the new location
 
         self._associated_models.append(model)
+        # TODO: Have to set the position of the model to that of the tile
+        # model.set_pos(self.row, self.column)
         self._notify_assoc_models()
 
     def remove_associated_model(self, model: Model):

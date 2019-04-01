@@ -88,4 +88,11 @@ class NoAvailableTileException(FlashPointBaseException):
 
     def __init__(self):
         message = "No available tile can be found."
+
+
+class FlippingDiceProblemException(FlashPointBaseException):
+    """Class to indicate that there is an issue when the dice are being flipped."""
+
+    def __init__(self):
+        message = "Need to look at this issue with dice flipping."
         super().__init__(message)
