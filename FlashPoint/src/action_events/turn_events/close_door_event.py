@@ -16,7 +16,6 @@ class CloseDoorEvent(TurnEvent):
         self.fireman = game.players_turn
 
     def execute(self):
-        print()
         logger.info("Executing CloseDoorEvent")
         self.door.close_door()
         self.fireman.ap = self.fireman.ap - 1

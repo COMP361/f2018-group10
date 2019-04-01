@@ -2,7 +2,7 @@ import pygame
 
 from src.UIComponents.rect_label import RectLabel
 from src.UIComponents.text import Text
-from src.constants.state_enums import PlayerRoleEnum, PlayerStatusEnum, GameKindEnum
+from src.constants.state_enums import PlayerRoleEnum, PlayerStatusEnum
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 from src.observers.player_observer import PlayerObserver
@@ -38,7 +38,6 @@ class PlayerBox(PlayerObserver):
             return "media/specialist_cards/cafs_firefighter.png"
         elif enum == PlayerRoleEnum.CAPTAIN:
             return "media/specialist_cards/fire_captain.png"
-
         elif enum == PlayerRoleEnum.GENERALIST:
             return "media/specialist_cards/generalist.png"
         elif enum == PlayerRoleEnum.DRIVER:
@@ -82,7 +81,5 @@ class PlayerBox(PlayerObserver):
 
     def player_role_changed(self, role: PlayerRoleEnum):
         role_path = self.get_path_from_character_enum(role)
-
         self.background = (RectLabel(self.background_position[0], self.background_position[1], self.background_position[2],
                                      self.background_position[3], role_path))
-

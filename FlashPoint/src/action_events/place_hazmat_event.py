@@ -41,7 +41,6 @@ class PlaceHazmatEvent(ActionEvent):
         :param kwargs:
         :return:
         """
-        print()
         logger.info("Executing HazMat Placement")
         level = self.game.difficulty_level
 

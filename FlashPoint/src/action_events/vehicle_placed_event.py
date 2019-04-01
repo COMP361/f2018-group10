@@ -27,7 +27,6 @@ class VehiclePlacedEvent(ActionEvent):
         self._column = min(tile.column for tile in parking_spot) if parking_spot else -1
 
     def execute(self, *args, **kwargs):
-        print()
         logger.info(f"Executing VehiclePlacedEvent: {self._vehicle_type} placed.")
 
         board_model: GameBoardModel = GameStateModel.instance().game_board

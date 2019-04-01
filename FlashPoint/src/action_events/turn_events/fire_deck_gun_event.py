@@ -10,6 +10,7 @@ from src.models.game_state_model import GameStateModel
 
 logger = logging.getLogger("FlashPoint")
 
+
 class FireDeckGunEvent(TurnEvent):
 
     def __init__(self):
@@ -56,7 +57,6 @@ class FireDeckGunEvent(TurnEvent):
         return True
 
     def execute(self, *args, **kwargs):
-        print()
         logger.info("Executing Fire Deck Gun Event")
         self._set_target_tile()
         self.target_tile.space_status = SpaceStatusEnum.SAFE

@@ -22,7 +22,6 @@ class PickupVictimEvent(TurnEvent):
         self.player: PlayerModel = game.players_turn
 
     def execute(self):
-        print()
         logger.info("Excecuting PickupVictimEvent")
         self.player.carrying_victim = self.victim
         self.victim_tile.remove_associated_model(self.victim_tile)

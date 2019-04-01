@@ -20,7 +20,6 @@ class FirePlacementEvent(ActionEvent):
         self.board: GameBoardModel = self.game.game_board
 
     def execute(self):
-        print()
         logger.info("Executing FirePlacementEvent")
         if self.game.rules == GameKindEnum.FAMILY:
             self.board.set_fires_family()
@@ -42,7 +41,7 @@ class FirePlacementEvent(ActionEvent):
         # Roll both dice to determine the target space. Keep rolling
         # until you get a non-fire space. Set the tile on fire, turn
         # hotspot to true and cause an explosion on that tile.
-        logger.info("\nSecond explosion")
+        logger.info("Second explosion")
         tile_pos = [self.game.roll_red_dice(), self.game.roll_black_dice()]
         while self.board.get_tile_at(tile_pos[0], tile_pos[1]).space_status == SpaceStatusEnum.FIRE:
             tile_pos = [self.game.roll_red_dice(), self.game.roll_black_dice()]
@@ -55,7 +54,7 @@ class FirePlacementEvent(ActionEvent):
         # the new column. Roll the red dice. Keep rolling until you
         # get a non-fire space. Set the tile on fire, turn
         # hotspot to true and cause an explosion on that tile.
-        logger.info("\nThird explosion")
+        logger.info("Third explosion")
         column = self.game.determine_black_dice_opposite_face(tile_pos[1])
         tile_pos = [self.game.roll_red_dice(), column]
         while self.board.get_tile_at(tile_pos[0], tile_pos[1]).space_status == SpaceStatusEnum.FIRE:
@@ -70,7 +69,7 @@ class FirePlacementEvent(ActionEvent):
         # get a non-fire space. Set the tile on fire, turn
         # hotspot to true and cause an explosion on that tile.
         if difficulty_lvl == DifficultyLevelEnum.HEROIC:
-            logger.info("\nFourth explosion")
+            logger.info("Fourth explosion")
             tile_pos = [self.game.roll_red_dice(), self.game.roll_black_dice()]
             while self.board.get_tile_at(tile_pos[0], tile_pos[1]).space_status == SpaceStatusEnum.FIRE:
                 tile_pos = [self.game.roll_red_dice(), self.game.roll_black_dice()]
