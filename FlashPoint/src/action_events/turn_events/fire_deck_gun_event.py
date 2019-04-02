@@ -64,7 +64,6 @@ class FireDeckGunEvent(TurnEvent):
         return True
 
     def execute(self, *args, **kwargs):
-        print()
         logger.info("Executing Fire Deck Gun Event")
         self._set_target_tile()
         self.target_tile.space_status = SpaceStatusEnum.SAFE

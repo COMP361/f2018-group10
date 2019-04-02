@@ -18,7 +18,6 @@ class RemoveHazmatEvent(ActionEvent):
         self.current_player = GameStateModel.instance().players_turn
 
     def execute(self):
-        print()
         logger.info("Executing HazmatEvent")
         self.current_player.ap -= 2
 

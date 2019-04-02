@@ -24,7 +24,6 @@ class KnockDownEvent(ActionEvent):
         self.player = self.game.get_player_by_ip(player_ip)
 
     def execute(self):
-        print()
         logger.info(f"Executing KnockDownEvent for player at ({self.player.row},{self.player.column})")
         # if the player was carrying a victim,
         # that victim is lost. disassociate the

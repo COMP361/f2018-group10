@@ -23,7 +23,6 @@ class RideVehicleEvent(ActionEvent):
         self._vehicle_type = vehicle_type
 
     def execute(self, *args, **kwargs):
-        print()
         logger.info("Executing RideVehicleEvent")
         game_state: GameStateModel = GameStateModel.instance()
         game_board: GameBoardModel = game_state.game_board
