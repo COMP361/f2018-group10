@@ -1,4 +1,5 @@
 import logging
+import random
 
 from src.action_events.turn_events.turn_event import TurnEvent
 from src.constants.state_enums import VehicleOrientationEnum, QuadrantEnum, SpaceStatusEnum, DoorStatusEnum
@@ -10,10 +11,18 @@ from src.models.game_state_model import GameStateModel
 
 logger = logging.getLogger("FlashPoint")
 
+
 class FireDeckGunEvent(TurnEvent):
 
-    def __init__(self):
+    def __init__(self, seed: int = 0):
         super().__init__()
+        if seed == 0:
+            self.seed = random.randint(1, 6969)
+        else:
+            self.seed = seed
+
+        # Pick random location: roll dice
+        random.seed(self.seed)
         self.game: GameStateModel = GameStateModel.instance()
         self.player = self.game.players_turn
         self.engine = self.game.game_board.engine
@@ -56,7 +65,6 @@ class FireDeckGunEvent(TurnEvent):
         return True
 
     def execute(self, *args, **kwargs):
-        print()
         logger.info("Executing Fire Deck Gun Event")
         self._set_target_tile()
         self.target_tile.space_status = SpaceStatusEnum.SAFE

@@ -5,7 +5,6 @@ from src.models.game_units.poi_model import POIModel
 from src.models.game_units.victim_model import VictimModel
 from src.models.game_board.door_model import DoorModel
 from src.models.game_board.wall_model import WallModel
-from src.models.game_units.hazmat_model import HazmatModel
 from src.models.model import Model
 from src.core.flashpoint_exceptions import TilePositionOutOfBoundsException
 from src.models.game_board.edge_obstacle_model import EdgeObstacleModel
@@ -234,7 +233,7 @@ class TileModel(Model):
 
         self._associated_models.append(model)
         # TODO: Have to set the position of the model to that of the tile
-        # model.set_pos(self.row, self.column)
+        model.set_pos(self.row, self.column)
         self._notify_assoc_models()
 
     def remove_associated_model(self, model: Model):

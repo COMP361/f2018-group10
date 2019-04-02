@@ -8,7 +8,7 @@ from src.models.game_units.hazmat_model import HazmatModel
 logger = logging.getLogger("FlashPoint")
 
 
-class HazmatEvent(ActionEvent):
+class RemoveHazmatEvent(ActionEvent):
 
     def __init__(self, row: int, column: int):
         super().__init__()
@@ -18,7 +18,6 @@ class HazmatEvent(ActionEvent):
         self.current_player = GameStateModel.instance().players_turn
 
     def execute(self):
-        print()
         logger.info("Executing HazmatEvent")
         self.current_player.ap -= 2
 

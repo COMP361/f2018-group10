@@ -93,7 +93,6 @@ class EndTurnAdvanceFireEvent(TurnEvent):
             logger.info("Not all vehicles have been placed. Not moving to next game phase.")
 
     def execute(self):
-        print()
         logger.info("Executing EndTurnAdvanceFireEvent")
 
         if self.game_state.state == GameStateEnum.MAIN_GAME:

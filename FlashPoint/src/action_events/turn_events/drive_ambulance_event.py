@@ -21,7 +21,6 @@ class DriveAmbulanceEvent(TurnEvent):
         self._board_model: GameBoardModel = GameStateModel.instance().game_board
 
     def execute(self, *args, **kwargs):
-        print()
         logger.info("Executing DriveAmbulance Event")
         destination_first_tile = self._board_model.get_tile_at(self._row, self._column)
         destination_second_tile = self._board_model.get_other_parking_tile(destination_first_tile)

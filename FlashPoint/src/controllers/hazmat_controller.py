@@ -1,5 +1,5 @@
 from src.UIComponents.interactable import Interactable
-from src.action_events.hazmat_event import HazmatEvent
+from src.action_events.remove_hazmat_event import RemoveHazmatEvent
 from src.action_events.turn_events.turn_event import TurnEvent
 from src.constants.state_enums import GameKindEnum, WallStatusEnum, DoorStatusEnum
 from src.controllers.controller import Controller
@@ -99,7 +99,7 @@ class HazmatController(Controller):
             menu_to_close.disable()
             return
 
-        event = HazmatEvent(tile_model.row, tile_model.column)
+        event = RemoveHazmatEvent(tile_model.row, tile_model.column)
 
         if Networking.get_instance().is_host:
             Networking.get_instance().send_to_all_client(event)

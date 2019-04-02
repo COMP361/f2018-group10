@@ -25,7 +25,7 @@ class PlayerModel(Model):
         self._wins = 0
         self._losses = 0
         self._carrying_victim = NullModel()
-        self.character: PlayerRoleEnum = None
+        self._role = PlayerRoleEnum.FAMILY
 
     def __eq__(self, other):
         x = [other.ip == self.ip, other.nickname == self.nickname]
@@ -67,9 +67,22 @@ class PlayerModel(Model):
         for obs in self.observers:
             obs.player_carry_changed(self.carrying_victim)
 
+    def _notify_role(self):
+        for obs in self.observers:
+            obs.player_role_changed(self.role)
+
     @property
     def observers(self) -> List[PlayerObserver]:
         return self._observers
+
+    @property
+    def role(self):
+        return self._role
+
+    @role.setter
+    def role(self, new_role: PlayerRoleEnum):
+        self._role = new_role
+        self._notify_role()
 
     @property
     def row(self) -> int:
@@ -173,7 +186,7 @@ class PlayerModel(Model):
     @status.setter
     def status(self, status: PlayerStatusEnum):
         self._status = status
-        logger.info("Player {nickname} status: {status}".format(nickname=self.nickname, status=self.status))
+        logger.info("Player {nickname} status: {status}".format(nickname=self.nickname, status=self.status.name))
         self._notify_status()
 
     @property
@@ -185,3 +198,12 @@ class PlayerModel(Model):
         self._carrying_victim = victim
         logger.info("Player {nickname} carrying victim: {cv}".format(nickname=self.nickname, cv=victim))
         self._notify_carry()
+
+    @property
+    def role(self) -> PlayerRoleEnum:
+        return self._role
+
+    @role.setter
+    def role(self, player_role: PlayerRoleEnum):
+        self._role = player_role
+        logger.info("Player {nickname} role: {r}".format(nickname=self.nickname, r=player_role.name))
