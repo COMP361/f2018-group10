@@ -55,15 +55,11 @@ class TileModel(Model):
 
     def _notify_status(self):
         for obs in self.observers:
-            obs.tile_status_changed(self.space_status)
+            obs.tile_status_changed(self.space_status, self.is_hotspot)
 
     def _notify_assoc_models(self):
         for obs in self.observers:
             obs.tile_assoc_models_changed(self.associated_models)
-
-    def _notify_hotspot(self):
-        for obs in self.observers:
-            obs.tile_hotspot_changed(self.is_hotspot)
 
     @property
     def observers(self) -> List[TileObserver]:
@@ -103,7 +99,7 @@ class TileModel(Model):
     def is_hotspot(self, hotspot_bool: bool):
         self._is_hotspot = hotspot_bool
         logger.info(self.__str__() + " hotspot: %s", str(hotspot_bool))
-        self._notify_hotspot()
+        self._notify_status()
 
     @property
     def adjacent_tiles(self):
