@@ -23,4 +23,4 @@ class ChooseCharacterEvent(ActionEvent):
 
     def execute(self):
         logger.info("Executing ChooseCharacterEvent")
-        self.curr_player.role = self.role
+        self.curr_player.role = self._role
