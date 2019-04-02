@@ -60,7 +60,7 @@ class CharacterScene(Scene):
     def confirm(self):
 
         if not self.character_enum == None:
-            self._current_player.character = self.character_enum
+            self._current_player.role = self.character_enum
             EventQueue.post(CustomEvent(ChangeSceneEnum.LOBBYSCENE))
 
         # else:

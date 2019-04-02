@@ -135,8 +135,8 @@ class LobbyScene(object):
 
     def _init_background_player(self, rect):
 
-        if not self._game.rules == GameKindEnum.FAMILY and self._current_player.character:
-            role_path = self.get_path_from_character_enum(self._current_player.character)
+        if not self._game.rules == GameKindEnum.FAMILY and self._current_player.role:
+            role_path = self.get_path_from_character_enum(self._current_player.role)
             user_box = RectLabel(rect[0], rect[1], rect[2], rect[3], role_path)
         else:
             user_box = RectLabel(rect[0], rect[1], rect[2], rect[3], "media/specialist_cards/family.png")
@@ -147,7 +147,6 @@ class LobbyScene(object):
             return "media/specialist_cards/cafs_firefighter.png"
         elif enum == PlayerRoleEnum.CAPTAIN:
             return "media/specialist_cards/fire_captain.png"
-
         elif enum == PlayerRoleEnum.GENERALIST:
             return "media/specialist_cards/generalist.png"
         elif enum == PlayerRoleEnum.DRIVER:
@@ -160,6 +159,8 @@ class LobbyScene(object):
             return "media/specialist_cards/paramedic.png"
         elif enum == PlayerRoleEnum.RESCUE:
             return "media/specialist_cards/rescue_specialist.png"
+        elif enum == PlayerRoleEnum.FAMILY:
+            return "media/specialist_cards/family.png"
 
     def _init_text_box(self, position, text, color):
         box_size = (position[2], position[3])

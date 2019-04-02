@@ -35,7 +35,7 @@ from src.action_events.chat_event import ChatEvent
 from src.action_events.dummy_event import DummyEvent
 from src.action_events.join_event import JoinEvent
 from src.constants.state_enums import DifficultyLevelEnum, GameKindEnum, PlayerStatusEnum, WallStatusEnum, \
-    DoorStatusEnum, SpaceKindEnum, SpaceStatusEnum, ArrowDirectionEnum
+    DoorStatusEnum, SpaceKindEnum, SpaceStatusEnum, ArrowDirectionEnum, PlayerRoleEnum
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 from src.sprites.hazmat_sprite import HazmatSprite
@@ -91,6 +91,7 @@ class JSONSerializer(object):
         player.special_ap = payload['_special_ap']
         player.wins = payload['_wins']
         player.losses = payload['_losses']
+        player.role = PlayerRoleEnum(payload["_role"]["value"])
 
         return player
 
