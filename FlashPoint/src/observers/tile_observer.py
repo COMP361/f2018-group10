@@ -16,3 +16,7 @@ class TileObserver(Observer):
     @abstractmethod
     def tile_assoc_models_changed(self, assoc_models: List[Model]):
         pass
+
+    @abstractmethod
+    def tile_hotspot_changed(self, is_hotspot: bool):
+        pass

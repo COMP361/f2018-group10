@@ -32,10 +32,7 @@ class HazmatSprite(TileObserver, pygame.sprite.Sprite):
         self.kill()
 
     def tile_status_changed(self, status: SpaceStatusEnum):
-        if status is SpaceStatusEnum.FIRE:
-            advance_fire = EndTurnAdvanceFireEvent()
-            advance_fire.explosion(self.tile_model)
+        pass
 
-            for model in self.tile_model.associated_models:
-                if isinstance(model, HazmatModel):
-                    self.tile_model.remove_associated_model(model)
+    def tile_hotspot_changed(self, is_hotspot: bool):
+        pass

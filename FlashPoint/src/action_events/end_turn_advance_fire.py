@@ -120,6 +120,9 @@ class EndTurnAdvanceFireEvent(TurnEvent):
         # Smoke -> Fire
         elif tile_status == SpaceStatusEnum.SMOKE:
             target_tile.space_status = SpaceStatusEnum.FIRE
+            # if there's a hazmat on target tile, explosion occurs
+            if target_tile.has_hazmat():
+                self.explosion(target_tile)
 
         # Fire -> Explosion
         else:
@@ -127,6 +130,11 @@ class EndTurnAdvanceFireEvent(TurnEvent):
 
     def explosion(self, origin_tile: TileModel):
         logger.info(f"Explosion occurred on {origin_tile}")
+
+        if origin_tile.has_hazmat():
+            logger.info(f"Failed to remove hazmat :'(")
+            origin_tile.remove_hazmat()
+
         for direction, obstacle in origin_tile.adjacent_edge_objects.items():
             # fire does not move to the neighbouring tile
             # damaging wall present along the tile
@@ -149,6 +157,9 @@ class EndTurnAdvanceFireEvent(TurnEvent):
                         self.shockwave(nb_tile, direction)
                     else:
                         nb_tile.space_status = SpaceStatusEnum.FIRE
+                        # if there's a hazmat on nearby tile, explosion occurs
+                        if nb_tile.has_hazmat():
+                            self.explosion(nb_tile)
 
     def shockwave(self, tile: TileModel, direction: str):
         """
@@ -169,6 +180,9 @@ class EndTurnAdvanceFireEvent(TurnEvent):
                 nb_tile: TileModel = tile.get_tile_in_direction(direction)
                 if nb_tile.space_status != SpaceStatusEnum.FIRE:
                     nb_tile.space_status = SpaceStatusEnum.FIRE
+                    # if tile has hazmat, explosion occurs
+                    if nb_tile.has_hazmat():
+                        self.explosion(nb_tile)
                     should_stop = True
 
                 else:
@@ -229,6 +243,9 @@ class EndTurnAdvanceFireEvent(TurnEvent):
                     if nb_tile.space_status == SpaceStatusEnum.FIRE:
                         logger.info(f"Flashover on tile {tile}")
                         tile.space_status = SpaceStatusEnum.FIRE
+                        # if tile has hazmat, explosion occurs
+                        if tile.has_hazmat():
+                            self.explosion(tile)
                         num_converted += 1
                         break
 

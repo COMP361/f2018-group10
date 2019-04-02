@@ -61,6 +61,10 @@ class TileModel(Model):
         for obs in self.observers:
             obs.tile_assoc_models_changed(self.associated_models)
 
+    def _notify_hotspot(self):
+        for obs in self.observers:
+            obs.tile_hotspot_changed(self.is_hotspot)
+
     @property
     def observers(self) -> List[TileObserver]:
         return self._observers
@@ -99,6 +103,7 @@ class TileModel(Model):
     def is_hotspot(self, hotspot_bool: bool):
         self._is_hotspot = hotspot_bool
         logger.info(self.__str__() + " hotspot: %s", str(hotspot_bool))
+        self._notify_hotspot()
 
     @property
     def adjacent_tiles(self):
@@ -254,3 +259,14 @@ class TileModel(Model):
             if isinstance(model, POIModel) or isinstance(model, VictimModel):
                 return True
         return False
+
+    def has_hazmat(self) -> bool:
+        for model in self.associated_models:
+            if isinstance(model, HazmatModel):
+                return True
+        return False
+
+    def remove_hazmat(self):
+        for model in self.associated_models:
+            if isinstance(model, HazmatModel):
+                self.remove_associated_model(model)

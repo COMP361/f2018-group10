@@ -126,9 +126,6 @@ class TileSprite(Interactable, TileObserver):
         self.dismount_vehicle_button.on_click(None)
         self.hazmat_button.on_click(None)
 
-    def tile_assoc_models_changed(self, assoc_models: List[Model]):
-        pass
-
     def is_clicked(self):
         if not self.hover():
             return False
@@ -265,3 +262,9 @@ class TileSprite(Interactable, TileObserver):
             new_surf.blit(image_file, (0, 0))
 
         self._non_highlight_image.blit(new_surf, (0, 0))
+
+    def tile_assoc_models_changed(self, assoc_models: List[Model]):
+        pass
+
+    def tile_hotspot_changed(self, is_hotspot: bool):
+        pass
