@@ -131,7 +131,7 @@ class EndTurnAdvanceFireEvent(TurnEvent):
         logger.info(f"Explosion occurred on {origin_tile}")
 
         if origin_tile.has_hazmat():
-            logger.info(f"Failed to remove hazmat :'(")
+            logger.info(f"Failed to remove hazmat :'( , it was exploded at {origin_tile.row}, {origin_tile.column}")
             origin_tile.remove_hazmat()
 
         for direction, obstacle in origin_tile.adjacent_edge_objects.items():

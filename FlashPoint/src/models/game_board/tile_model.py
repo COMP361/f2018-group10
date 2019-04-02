@@ -1,6 +1,7 @@
 import logging
 from typing import Optional, List
 
+from src.models.game_units.hazmat_model import HazmatModel
 from src.models.game_units.poi_model import POIModel
 from src.models.game_units.victim_model import VictimModel
 from src.models.game_board.door_model import DoorModel
