@@ -60,11 +60,11 @@ class PlaceHazmatEvent(ActionEvent):
             new_haz_column = self.game.roll_black_dice()
             tile = self.board.get_tile_at(new_haz_row, new_haz_column)
 
-            if tile.space_status is not SpaceStatusEnum.SAFE:
+            if tile.space_status is SpaceStatusEnum.FIRE:
                 continue
 
             for model in tile.associated_models:
-                if isinstance(model, HazmatModel) or isinstance(model, POIModel) or isinstance(model, VictimModel):
+                if isinstance(model, HazmatModel):
                     continue
 
             logger.info(f"Placed hazmat on location: {new_haz_row}, {new_haz_column}")
