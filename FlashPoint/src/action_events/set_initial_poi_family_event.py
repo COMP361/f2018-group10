@@ -13,7 +13,7 @@ class SetInitialPOIFamilyEvent(ActionEvent):
         super().__init__()
         self.game_state: GameStateModel = GameStateModel.instance()
         if seed == 0:
-            self.seed = random.randint(0, 6969)
+            self.seed = random.randint(1, 6969)
         else:
             self.seed = seed
 

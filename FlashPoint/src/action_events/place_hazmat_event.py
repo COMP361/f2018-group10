@@ -41,17 +41,16 @@ class PlaceHazmatEvent(ActionEvent):
         :param kwargs:
         :return:
         """
-        print()
-        logger.info("Executing HazMat Placement")
+        logger.info("Executing HazMat Placement Event")
         level = self.game.difficulty_level
 
-        if level is DifficultyLevelEnum.RECRUIT:
+        if level == DifficultyLevelEnum.RECRUIT:
             self.place_hazmat(PlaceHazmatEvent.RECRUIT)
 
-        elif level is DifficultyLevelEnum.VETERAN:
+        elif level == DifficultyLevelEnum.VETERAN:
             self.place_hazmat(PlaceHazmatEvent.VETERAN)
 
-        elif level is DifficultyLevelEnum.HEROIC:
+        elif level == DifficultyLevelEnum.HEROIC:
             self.place_hazmat(PlaceHazmatEvent.HEROIC)
 
     def place_hazmat(self, hazmat_to_place: int):
@@ -60,11 +59,14 @@ class PlaceHazmatEvent(ActionEvent):
             new_haz_column = self.game.roll_black_dice()
             tile = self.board.get_tile_at(new_haz_row, new_haz_column)
 
-            if tile.space_status is not SpaceStatusEnum.SAFE:
+            # Hazmat cannot be placed on tile
+            # that is on fire or has a hazmat
+            # on it already.
+            if tile.space_status == SpaceStatusEnum.FIRE:
                 continue
 
             for model in tile.associated_models:
-                if isinstance(model, HazmatModel) or isinstance(model, POIModel) or isinstance(model, VictimModel):
+                if isinstance(model, HazmatModel):
                     continue
 
             tile.add_associated_model(HazmatModel())
