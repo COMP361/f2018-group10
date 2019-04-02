@@ -25,7 +25,7 @@ class KnockDownEvent(ActionEvent):
 
     def execute(self):
         print()
-        logger.info(f"Exceuting KnockDownEvent for player at ({self.player.row},{self.player.column})")
+        logger.info(f"Executing KnockDownEvent for player at ({self.player.row},{self.player.column})")
         # if the player was carrying a victim,
         # that victim is lost. disassociate the
         # victim from the player and increment the

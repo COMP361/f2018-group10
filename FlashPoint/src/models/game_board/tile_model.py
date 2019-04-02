@@ -229,7 +229,7 @@ class TileModel(Model):
 
         self._associated_models.append(model)
         # TODO: Have to set the position of the model to that of the tile
-        # model.set_pos(self.row, self.column)
+        model.set_pos(self.row, self.column)
         self._notify_assoc_models()
 
     def remove_associated_model(self, model: Model):

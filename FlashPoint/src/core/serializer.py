@@ -4,7 +4,8 @@ import pygame
 from typing import Dict
 import logging
 
-from src.action_events.hazmat_event import HazmatEvent
+from src.action_events.fire_placement_event import FirePlacementEvent
+from src.action_events.remove_hazmat_event import RemoveHazmatEvent
 from src.action_events.identify_event import IdentifyEvent
 from src.action_events.place_hazmat_event import PlaceHazmatEvent
 from src.action_events.end_turn_advance_fire import EndTurnAdvanceFireEvent
@@ -229,11 +230,16 @@ class JSONSerializer(object):
         vehicle_type = payload['_vehicle_type']
         event = RideVehicleEvent(vehicle_type=vehicle_type, player_index=player_index)
         return event
+
     @staticmethod
-    def _deserialize_hazmat_event(payload: Dict) -> HazmatEvent:
-        event = HazmatEvent(payload['row'], payload['column'])
+    def _deserialize_remove_hazmat_event(payload: Dict) -> RemoveHazmatEvent:
+        event = RemoveHazmatEvent(payload['row'], payload['column'])
         return event
 
+    @staticmethod
+    def _deserialize_fire_placement_event(payload: Dict) -> FirePlacementEvent:
+        seed = payload['seed']
+        return FirePlacementEvent(seed)
 
     @staticmethod
     def _deserialize_dismount_vehicle_event(payload: Dict) -> DismountVehicleEvent:
@@ -305,8 +311,10 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_ride_vehicle_event(payload)
         elif object_type == DismountVehicleEvent.__name__:
             return JSONSerializer._deserialize_dismount_vehicle_event(payload)
-        elif object_type == HazmatEvent.__name__:
-            return JSONSerializer._deserialize_hazmat_event(payload)
+        elif object_type == RemoveHazmatEvent.__name__:
+            return JSONSerializer._deserialize_remove_hazmat_event(payload)
+        elif object_type == FirePlacementEvent.__name__:
+            return JSONSerializer._deserialize_fire_placement_event(payload)
 
         logger.warning(f"Could not deserialize object {object_type}, not of recognized type.")
 

@@ -67,7 +67,6 @@ class PlaceHazmatEvent(ActionEvent):
                 if isinstance(model, HazmatModel) or isinstance(model, POIModel) or isinstance(model, VictimModel):
                     continue
 
-            logger.info(f"Placed hazmat on location: {new_haz_row}, {new_haz_column}")
             tile.add_associated_model(HazmatModel())
             GameBoard.instance().add(HazmatSprite(tile))
             hazmat_to_place -= 1

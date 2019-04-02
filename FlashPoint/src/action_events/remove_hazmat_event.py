@@ -8,7 +8,7 @@ from src.models.game_units.hazmat_model import HazmatModel
 logger = logging.getLogger("FlashPoint")
 
 
-class HazmatEvent(ActionEvent):
+class RemoveHazmatEvent(ActionEvent):
 
     def __init__(self, row: int, column: int):
         super().__init__()
