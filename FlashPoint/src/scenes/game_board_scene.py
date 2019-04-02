@@ -3,6 +3,8 @@ from datetime import datetime
 from typing import List
 
 import pygame
+
+from src.action_events.set_initial_poi_experienced_event import SetInitialPOIExperiencedEvent
 from src.constants.state_enums import GameKindEnum
 from src.models.game_units.victim_model import VictimModel
 from src.sprites.victim_sprite import VictimSprite
@@ -58,7 +60,11 @@ class GameBoardScene(GameBoardObserver):
 
         self.active_sprites = pygame.sprite.Group()   # Maybe add separate groups for different things later
         self.game_board_sprite = GameBoard(current_player)
-        self.set_initial_poi_family()
+        # Setting the initial POI on the board
+        if self._game.rules == GameKindEnum.FAMILY:
+            self.set_initial_poi_family()
+        else:
+            self.set_initial_poi_experienced()
 
         # Place hazmat event
         if self._game.rules is GameKindEnum.EXPERIENCED:
@@ -202,6 +208,11 @@ class GameBoardScene(GameBoardObserver):
     def set_initial_poi_family(self):
         if Networking.get_instance().is_host:
             event = SetInitialPOIFamilyEvent()
+            Networking.get_instance().send_to_all_client(event)
+
+    def set_initial_poi_experienced(self):
+        if Networking.get_instance().is_host:
+            event = SetInitialPOIExperiencedEvent()
             Networking.get_instance().send_to_all_client(event)
 
     def place_hazmat(self):
