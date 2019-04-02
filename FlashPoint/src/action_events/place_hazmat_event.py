@@ -3,8 +3,6 @@ import logging
 
 from src.sprites.game_board import GameBoard
 from src.sprites.hazmat_sprite import HazmatSprite
-from src.models.game_units.victim_model import VictimModel
-from src.models.game_units.poi_model import POIModel
 from src.models.game_units.hazmat_model import HazmatModel
 from src.constants.state_enums import DifficultyLevelEnum, SpaceStatusEnum
 from src.models.game_state_model import GameStateModel
@@ -65,9 +63,14 @@ class PlaceHazmatEvent(ActionEvent):
             if tile.space_status == SpaceStatusEnum.FIRE:
                 continue
 
+            should_reroll = False
             for model in tile.associated_models:
                 if isinstance(model, HazmatModel):
-                    continue
+                    should_reroll = True
+                    break
+
+            if should_reroll:
+                continue
 
             tile.add_associated_model(HazmatModel())
             GameBoard.instance().add(HazmatSprite(tile))
