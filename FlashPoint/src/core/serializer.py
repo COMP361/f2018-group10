@@ -9,6 +9,8 @@ from src.action_events.remove_hazmat_event import RemoveHazmatEvent
 from src.action_events.identify_event import IdentifyEvent
 from src.action_events.place_hazmat_event import PlaceHazmatEvent
 from src.action_events.end_turn_advance_fire import EndTurnAdvanceFireEvent
+from src.action_events.set_initial_hotspot_event import SetInitialHotspotEvent
+from src.action_events.set_initial_poi_experienced_event import SetInitialPOIExperiencedEvent
 from src.action_events.set_initial_poi_family_event import SetInitialPOIFamilyEvent
 from src.action_events.turn_events.chop_event import ChopEvent
 from src.action_events.turn_events.close_door_event import CloseDoorEvent
@@ -242,6 +244,16 @@ class JSONSerializer(object):
         return FirePlacementEvent(seed)
 
     @staticmethod
+    def _deserialize_set_initial_hotspot_event(payload: Dict) -> SetInitialHotspotEvent:
+        seed = payload['seed']
+        return SetInitialHotspotEvent(seed)
+
+    @staticmethod
+    def _deserialize_set_initial_poi_experienced_event(payload: Dict) -> SetInitialPOIExperiencedEvent:
+        seed = payload['seed']
+        return SetInitialPOIExperiencedEvent(seed)
+
+    @staticmethod
     def _deserialize_dismount_vehicle_event(payload: Dict) -> DismountVehicleEvent:
         return DismountVehicleEvent(payload['_vehicle_type'], player_index=payload['_player_index'])
 
@@ -315,6 +327,10 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_remove_hazmat_event(payload)
         elif object_type == FirePlacementEvent.__name__:
             return JSONSerializer._deserialize_fire_placement_event(payload)
+        elif object_type == SetInitialHotspotEvent.__name__:
+            return JSONSerializer._deserialize_set_initial_hotspot_event(payload)
+        elif object_type == SetInitialPOIExperiencedEvent.__name__:
+            return JSONSerializer._deserialize_set_initial_poi_experienced_event(payload)
 
         logger.warning(f"Could not deserialize object {object_type}, not of recognized type.")
 

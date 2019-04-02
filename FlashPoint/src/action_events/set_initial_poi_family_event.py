@@ -26,8 +26,7 @@ class SetInitialPOIFamilyEvent(ActionEvent):
         Set all initial POIlocations for a family game.
         Returns the locations that were randomly chosen for reuse in the PlacePOIEvent
         """
-        print()
-        logging.info("Executing SetInitialPOIFamilyEvent")
+        logging.info("Executing Set Initial POI Family Event")
         locations = [[2, 4], [5, 1], [5, 8]]
         pois_to_remove = []
         for i, index in enumerate(self.rand_nums):
