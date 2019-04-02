@@ -28,7 +28,7 @@ class FirePlacementEvent(ActionEvent):
         self.board: GameBoardModel = self.game.game_board
 
     def execute(self):
-        logger.info("Executing FirePlacementEvent")
+        logger.info("Executing Fire Placement Event")
         if self.game.rules == GameKindEnum.FAMILY:
             self.board.set_fires_family()
         else:

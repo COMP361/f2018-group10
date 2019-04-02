@@ -4,11 +4,14 @@ import pygame
 from typing import Dict
 import logging
 
-from src.action_events.hazmat_event import HazmatEvent
+from src.action_events.remove_hazmat_event import RemoveHazmatEvent
+from src.action_events.fire_placement_event import FirePlacementEvent
 from src.action_events.choose_character_event import ChooseCharacterEvent
 from src.action_events.identify_event import IdentifyEvent
 from src.action_events.place_hazmat_event import PlaceHazmatEvent
 from src.action_events.end_turn_advance_fire import EndTurnAdvanceFireEvent
+from src.action_events.set_initial_hotspot_event import SetInitialHotspotEvent
+from src.action_events.set_initial_poi_experienced_event import SetInitialPOIExperiencedEvent
 from src.action_events.set_initial_poi_family_event import SetInitialPOIFamilyEvent
 from src.action_events.turn_events.chop_event import ChopEvent
 from src.action_events.turn_events.close_door_event import CloseDoorEvent
@@ -89,7 +92,7 @@ class JSONSerializer(object):
         player.special_ap = payload['_special_ap']
         player.wins = payload['_wins']
         player.losses = payload['_losses']
-        player.role = PlayerRoleEnum(payload['_role']['value'])
+        player.role = PlayerRoleEnum(payload["_role"]["value"])
 
         return player
 
@@ -230,11 +233,26 @@ class JSONSerializer(object):
         vehicle_type = payload['_vehicle_type']
         event = RideVehicleEvent(vehicle_type=vehicle_type, player_index=player_index)
         return event
+
     @staticmethod
-    def _deserialize_hazmat_event(payload: Dict) -> HazmatEvent:
-        event = HazmatEvent(payload['row'], payload['column'])
+    def _deserialize_remove_hazmat_event(payload: Dict) -> RemoveHazmatEvent:
+        event = RemoveHazmatEvent(payload['row'], payload['column'])
         return event
 
+    @staticmethod
+    def _deserialize_fire_placement_event(payload: Dict) -> FirePlacementEvent:
+        seed = payload['seed']
+        return FirePlacementEvent(seed)
+
+    @staticmethod
+    def _deserialize_set_initial_hotspot_event(payload: Dict) -> SetInitialHotspotEvent:
+        seed = payload['seed']
+        return SetInitialHotspotEvent(seed)
+
+    @staticmethod
+    def _deserialize_set_initial_poi_experienced_event(payload: Dict) -> SetInitialPOIExperiencedEvent:
+        seed = payload['seed']
+        return SetInitialPOIExperiencedEvent(seed)
 
     @staticmethod
     def _deserialize_dismount_vehicle_event(payload: Dict) -> DismountVehicleEvent:
@@ -312,8 +330,14 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_dismount_vehicle_event(payload)
         elif object_type == ChooseCharacterEvent.__name__:
             return JSONSerializer._deserialize_choose_character_event(payload)
-        elif object_type == HazmatEvent.__name__:
-            return JSONSerializer._deserialize_hazmat_event(payload)
+        elif object_type == RemoveHazmatEvent.__name__:
+            return JSONSerializer._deserialize_remove_hazmat_event(payload)
+        elif object_type == FirePlacementEvent.__name__:
+            return JSONSerializer._deserialize_fire_placement_event(payload)
+        elif object_type == SetInitialHotspotEvent.__name__:
+            return JSONSerializer._deserialize_set_initial_hotspot_event(payload)
+        elif object_type == SetInitialPOIExperiencedEvent.__name__:
+            return JSONSerializer._deserialize_set_initial_poi_experienced_event(payload)
 
         logger.warning(f"Could not deserialize object {object_type}, not of recognized type.")
 

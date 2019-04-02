@@ -3,8 +3,6 @@ import logging
 
 from src.sprites.game_board import GameBoard
 from src.sprites.hazmat_sprite import HazmatSprite
-from src.models.game_units.victim_model import VictimModel
-from src.models.game_units.poi_model import POIModel
 from src.models.game_units.hazmat_model import HazmatModel
 from src.constants.state_enums import DifficultyLevelEnum, SpaceStatusEnum
 from src.models.game_state_model import GameStateModel
@@ -41,16 +39,16 @@ class PlaceHazmatEvent(ActionEvent):
         :param kwargs:
         :return:
         """
-        logger.info("Executing HazMat Placement")
+        logger.info("Executing HazMat Placement Event")
         level = self.game.difficulty_level
 
-        if level is DifficultyLevelEnum.RECRUIT:
+        if level == DifficultyLevelEnum.RECRUIT:
             self.place_hazmat(PlaceHazmatEvent.RECRUIT)
 
-        elif level is DifficultyLevelEnum.VETERAN:
+        elif level == DifficultyLevelEnum.VETERAN:
             self.place_hazmat(PlaceHazmatEvent.VETERAN)
 
-        elif level is DifficultyLevelEnum.HEROIC:
+        elif level == DifficultyLevelEnum.HEROIC:
             self.place_hazmat(PlaceHazmatEvent.HEROIC)
 
     def place_hazmat(self, hazmat_to_place: int):
@@ -59,14 +57,21 @@ class PlaceHazmatEvent(ActionEvent):
             new_haz_column = self.game.roll_black_dice()
             tile = self.board.get_tile_at(new_haz_row, new_haz_column)
 
-            if tile.space_status is not SpaceStatusEnum.SAFE:
+            # Hazmat cannot be placed on tile
+            # that is on fire or has a hazmat
+            # on it already.
+            if tile.space_status == SpaceStatusEnum.FIRE:
                 continue
 
+            should_reroll = False
             for model in tile.associated_models:
-                if isinstance(model, HazmatModel) or isinstance(model, POIModel) or isinstance(model, VictimModel):
-                    continue
+                if isinstance(model, HazmatModel):
+                    should_reroll = True
+                    break
 
-            logger.info(f"Placed hazmat on location: {new_haz_row}, {new_haz_column}")
+            if should_reroll:
+                continue
+
             tile.add_associated_model(HazmatModel())
             GameBoard.instance().add(HazmatSprite(tile))
             hazmat_to_place -= 1
