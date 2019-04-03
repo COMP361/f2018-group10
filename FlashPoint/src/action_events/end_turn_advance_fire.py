@@ -286,10 +286,26 @@ class EndTurnAdvanceFireEvent(TurnEvent):
         """
         for tile in self.game_state.game_board.tiles:
             if tile.space_status == SpaceStatusEnum.FIRE:
+                # If the tile contains a Hazmat, trigger
+                # an explosion.
                 for assoc_model in tile.associated_models:
                     if isinstance(assoc_model, HazmatModel):
                         self.explosion(tile)
                         tile.remove_associated_model(assoc_model)
+                        if self.board.hotspot_bank > 0:
+                            tile.is_hotspot = True
+                            self.board.hotspot_bank = self.board.hotspot_bank - 1
+
+                # If there are any players on the tile and
+                # if they are carrying a Hazmat, knock down
+                # the player, trigger an explosion and disassociate
+                # the Hazmat from the player.
+                players_on_tile = self.game_state.get_players_on_tile(tile.row, tile.column)
+                for player in players_on_tile:
+                    if isinstance(player.carrying_hazmat, HazmatModel):
+                        KnockDownEvent(player.ip).execute()
+                        self.explosion(tile)
+                        player.carrying_hazmat = NullModel()
                         if self.board.hotspot_bank > 0:
                             tile.is_hotspot = True
                             self.board.hotspot_bank = self.board.hotspot_bank - 1

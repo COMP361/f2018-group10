@@ -3,6 +3,7 @@ from typing import Tuple, List, Union
 
 import src.constants.color as Color
 from src.models.game_board.null_model import NullModel
+from src.models.game_units.hazmat_model import HazmatModel
 from src.models.game_units.victim_model import VictimModel
 from src.observers.player_observer import PlayerObserver
 from src.constants.state_enums import PlayerStatusEnum, PlayerRoleEnum, GameKindEnum
@@ -25,6 +26,7 @@ class PlayerModel(Model):
         self._wins = 0
         self._losses = 0
         self._carrying_victim = NullModel()
+        self._carrying_hazmat = NullModel()
         self._role = PlayerRoleEnum.FAMILY
 
     def __eq__(self, other):
@@ -185,6 +187,17 @@ class PlayerModel(Model):
         self._carrying_victim = victim
         logger.info("Player {nickname} carrying victim: {cv}".format(nickname=self.nickname, cv=victim))
         self._notify_carry()
+
+    @property
+    def carrying_hazmat(self) -> Union[HazmatModel, NullModel]:
+        return self._carrying_hazmat
+
+    @carrying_hazmat.setter
+    def carrying_hazmat(self, hazmat: HazmatModel):
+        self._carrying_hazmat = hazmat
+        logger.info("Player {nickname} carrying hazmat: {h}".format(nickname=self.nickname, h=hazmat))
+        # TODO: Modify notify carry to account for carrying hazmats
+        # self._notify_carry()
 
     @property
     def role(self) -> PlayerRoleEnum:
