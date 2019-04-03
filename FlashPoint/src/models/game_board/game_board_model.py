@@ -1,4 +1,5 @@
 import json
+import logging
 import random
 from typing import List, Tuple, Dict
 
@@ -16,6 +17,7 @@ from src.models.game_board.wall_model import WallModel
 from src.models.game_board.door_model import DoorModel
 from src.models.game_units.victim_model import VictimModel
 
+logger = logging.getLogger("FlashPoint")
 
 class GameBoardModel(Model):
     """
@@ -40,6 +42,7 @@ class GameBoardModel(Model):
         self._active_pois = []
         self._ambulance = AmbulanceModel((8, 10))
         self._engine = EngineModel((8, 10))
+        self._hotspot_bank: int = 0
 
     def _notify_active_poi(self):
         for obs in self.observers:
@@ -63,6 +66,15 @@ class GameBoardModel(Model):
     @property
     def engine(self) -> EngineModel:
         return self._engine
+
+    @property
+    def hotspot_bank(self) -> int:
+        return self._hotspot_bank
+
+    @hotspot_bank.setter
+    def hotspot_bank(self, num_hotspots: int):
+        self._hotspot_bank = num_hotspots
+        logger.info("{nh} hotspots left in bank".format(nh=num_hotspots))
 
     @property
     def tiles(self) -> List[TileModel]:
