@@ -227,7 +227,6 @@ class TileModel(Model):
         # of redrawing the model in the new location
 
         self._associated_models.append(model)
-        # TODO: Have to set the position of the model to that of the tile
         model.set_pos(self.row, self.column)
         self._notify_assoc_models()
 

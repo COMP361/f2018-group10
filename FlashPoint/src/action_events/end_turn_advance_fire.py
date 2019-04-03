@@ -7,6 +7,7 @@ from src.action_events.replenish_poi_event import ReplenishPOIEvent
 from src.models.game_board.door_model import DoorModel
 from src.models.game_board.null_model import NullModel
 from src.models.game_board.wall_model import WallModel
+from src.models.game_units.hazmat_model import HazmatModel
 from src.models.game_units.poi_model import POIModel
 from src.models.game_units.victim_model import VictimModel
 from src.models.game_board.tile_model import TileModel
@@ -62,6 +63,7 @@ class EndTurnAdvanceFireEvent(TurnEvent):
         self.initial_tile = self.board.get_tile_at(self.red_dice, self.black_dice)
         self.advance_on_tile(self.initial_tile)
         self.flashover()
+        self.resolve_hazmat_explosions()
         self.affect_damages()
 
         # ------ ReplenishPOI ------ #
@@ -234,6 +236,24 @@ class EndTurnAdvanceFireEvent(TurnEvent):
 
             if num_converted == 0:
                 all_smokes_converted = True
+
+    def resolve_hazmat_explosions(self):
+        """
+        For all the fire tiles, if any of them
+        contain a hazmat, cause an explosion
+        in that space. After the explosion,
+        remove the hazmat from the tile and
+        put a hotspot marker on that tile.
+
+        :return:
+        """
+        for tile in self.game_state.game_board.tiles:
+            if tile.space_status == SpaceStatusEnum.FIRE:
+                for assoc_model in tile.associated_models:
+                    if isinstance(assoc_model, HazmatModel):
+                        self.explosion(tile)
+                        tile.remove_associated_model(assoc_model)
+                        tile.is_hotspot = True
 
     def affect_damages(self):
         """
