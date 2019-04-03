@@ -45,7 +45,6 @@ class EndTurnAdvanceFireEvent(TurnEvent):
         self.initial_tile: TileModel = None
 
         if seed == 0:
-
             self.seed = random.randint(1, 6969)
         else:
             self.seed = seed
@@ -60,11 +59,34 @@ class EndTurnAdvanceFireEvent(TurnEvent):
     def _main_phase_end_turn(self):
         # ------ AdvanceFire ------ #
         # Change state of tile depending on previous state
-        self.initial_tile = self.board.get_tile_at(self.red_dice, self.black_dice)
-        self.advance_on_tile(self.initial_tile)
-        self.flashover()
-        self.resolve_hazmat_explosions()
-        self.affect_damages()
+
+        # Assume that a Flare Up will occur so that we iterate
+        # through the loop at least once (like a do-while loop).
+        # Advance on tile will decide whether a flare up will
+        # occur or not and whether we should roll the dice once more.
+        flare_up_will_occur = True
+        x = 0
+        while flare_up_will_occur:
+            # Will log if a flare up was actually caused
+            # (skips the first default iteration)
+            if x > 0:
+                logger.info("Flare up triggered by {tile}".format(tile=self.initial_tile))
+            self.initial_tile = self.board.get_tile_at(self.red_dice, self.black_dice)
+            flare_up_will_occur = self.advance_on_tile(self.initial_tile)
+            self.flashover()
+            self.resolve_hazmat_explosions()
+            self.affect_damages()
+            # Preparing the dice for the next
+            # iteration if a flare up is going to occur
+            self.red_dice = self.game_state.roll_red_dice()
+            self.black_dice = self.game_state.roll_black_dice()
+            x += 1
+
+        # Add a hotspot marker to the last
+        # target space of the advance_on_tile()
+        if self.board.hotspot_bank > 0:
+            self.initial_tile.is_hotspot = True
+            self.board.hotspot_bank = self.board.hotspot_bank - 1
 
         # ------ ReplenishPOI ------ #
         rp_event = ReplenishPOIEvent(self.seed)
@@ -112,7 +134,20 @@ class EndTurnAdvanceFireEvent(TurnEvent):
         # call next player
         self.game_state.next_player()
 
-    def advance_on_tile(self, target_tile: TileModel):
+    def advance_on_tile(self, target_tile: TileModel) -> bool:
+        """
+        Advances the fire on the target tile.
+        Determines whether a flare up should
+        occur or not after this instance of
+        Advance Fire is done.
+
+        :param target_tile:
+        :return: boolean which tells us if a flare up will occur
+        """
+        flare_up_will_occur = False
+        if target_tile.is_hotspot:
+            flare_up_will_occur = True
+
         tile_status = target_tile.space_status
 
         # Safe -> Smoke
@@ -126,6 +161,8 @@ class EndTurnAdvanceFireEvent(TurnEvent):
         # Fire -> Explosion
         else:
             self.explosion(target_tile)
+
+        return flare_up_will_occur
 
     def explosion(self, origin_tile: TileModel):
         logger.info(f"Explosion occurred on {origin_tile}")
@@ -253,7 +290,9 @@ class EndTurnAdvanceFireEvent(TurnEvent):
                     if isinstance(assoc_model, HazmatModel):
                         self.explosion(tile)
                         tile.remove_associated_model(assoc_model)
-                        tile.is_hotspot = True
+                        if self.board.hotspot_bank > 0:
+                            tile.is_hotspot = True
+                            self.board.hotspot_bank = self.board.hotspot_bank - 1
 
     def affect_damages(self):
         """
@@ -307,4 +346,3 @@ class EndTurnAdvanceFireEvent(TurnEvent):
         for tile in self.board.tiles:
             if tile.space_kind != SpaceKindEnum.INDOOR and tile.space_status == SpaceStatusEnum.FIRE:
                 tile.space_status = SpaceStatusEnum.SAFE
-
