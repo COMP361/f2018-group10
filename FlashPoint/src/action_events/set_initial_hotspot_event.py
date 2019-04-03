@@ -57,3 +57,11 @@ class SetInitialHotspotEvent(ActionEvent):
 
             target_tile.is_hotspot = True
             num_placed += 1
+
+        # If the difficulty level is Heroic, put 12
+        # hotspots in the bank that will be used later,
+        # otherwise put 6 in the bank.
+        if self.game.difficulty_level == DifficultyLevelEnum.HEROIC:
+            self.game_board.hotspot_bank = 12
+        else:
+            self.game_board.hotspot_bank = 6
