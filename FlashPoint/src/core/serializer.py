@@ -3,7 +3,6 @@ import json
 from typing import Dict
 import logging
 
-from src.action_events.remove_hazmat_event import RemoveHazmatEvent
 from src.action_events.fire_placement_event import FirePlacementEvent
 from src.action_events.choose_character_event import ChooseCharacterEvent
 from src.action_events.turn_events.remove_hazmat_event import RemoveHazmatEvent
