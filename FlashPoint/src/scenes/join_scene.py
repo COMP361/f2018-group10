@@ -47,9 +47,10 @@ class JoinScene(object):
         try:
             self._current_player.status = PlayerStatusEnum.NOT_READY
             Networking.get_instance().join_host(ip_addr, player=self._current_player)
+            reply = Networking.wait_for_reply()
             # Connection error will be raised if no reply
-            if GameStateModel.instance():
-                # If instance is set, change to lobby
+            if reply:
+                # GameStateModel.set_game(JSONSerializer.deserialize(reply))
                 EventQueue.post(CustomEvent(ChangeSceneEnum.LOBBYSCENE))
         except ConnectionError:
             msg = "Unable to connect"
