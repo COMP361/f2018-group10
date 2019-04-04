@@ -1,3 +1,5 @@
+import time
+
 import pygame
 
 import src.constants.color as Color
@@ -48,6 +50,7 @@ class JoinScene(object):
             reply = Networking.wait_for_reply()
             # Connection error will be raised if no reply
             GameStateModel.set_game(JSONSerializer.deserialize(reply))
+            time.sleep(2)
             EventQueue.post(CustomEvent(ChangeSceneEnum.LOBBYSCENE))
         except ConnectionError:
             msg = "Unable to connect"
