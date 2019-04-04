@@ -204,12 +204,11 @@ class Networking:
                 # Stops accepting connection
                 self.host.accepting_disallow()
                 # Disconnects all clients
-                self.send_to_all_client(DisconnectEvent())
                 self.host.disconnect_clients()
                 self.host.disconnect()
                 self.host.__del__()
                 self.host = None
-            if self.client is not None:
+            elif self.client is not None:
                 logger.info("Disconnecting client")
                 self.client.disconnect()
                 self.client.__del__()
@@ -445,7 +444,6 @@ class Networking:
             self._pause_blk_signal.set()
             self._pause_receive.set()
             self._stop_receive.set()
-            time.sleep(0.5)
             return super(MastermindClientUDP, self).disconnect()
 
         @staticmethod

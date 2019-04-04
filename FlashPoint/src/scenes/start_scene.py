@@ -40,6 +40,7 @@ class StartScene(object):
                                 color.STANDARDBTN, color.BLACK)
         self.update_profiles()
 
+        # Reset everything
         if GameStateModel.instance():
             GameStateModel.__del__()
         if GameBoard.instance():

@@ -1,9 +1,10 @@
 import enum
 import json
-import pygame
+
 from typing import Dict
 import logging
 
+from src.action_events.disconnect_event import DisconnectEvent
 from src.action_events.remove_hazmat_event import RemoveHazmatEvent
 from src.action_events.fire_placement_event import FirePlacementEvent
 from src.action_events.choose_character_event import ChooseCharacterEvent
@@ -302,6 +303,8 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_move_event(payload)
         elif object_type == DummyEvent.__name__:
             return DummyEvent()
+        elif object_type == DisconnectEvent.__name__:
+            return DisconnectEvent()
         elif object_type == ExtinguishEvent.__name__:
             return JSONSerializer._deserialize_extinguish_event(payload)
         elif object_type == DropVictimEvent.__name__:

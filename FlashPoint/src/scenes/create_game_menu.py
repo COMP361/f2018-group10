@@ -20,9 +20,6 @@ class CreateGameMenu(Scene):
         Scene.__init__(self, screen)
         self._current_player = current_player
 
-        if GameStateModel.instance():
-            GameStateModel.__del__()
-
         self._init_background()
         self._init_text_box(344, 387, 200, 32, "Choose Game Mode:", Color.STANDARDBTN, Color.BLACK)
         self._init_btn_back(20, 20, "Back", Color.STANDARDBTN, Color.BLACK)
@@ -37,7 +34,8 @@ class CreateGameMenu(Scene):
         self.buttonFamily.on_click(self.create_new_game, GameKindEnum.FAMILY)
         self.buttonBack.on_click(self._disconnect_and_back)
 
-    def _disconnect_and_back(self):
+    @staticmethod
+    def _disconnect_and_back():
         Networking.get_instance().disconnect()
         EventQueue.post(CustomEvent(ChangeSceneEnum.HOSTMENUSCENE))
 
