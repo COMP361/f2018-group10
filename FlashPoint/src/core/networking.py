@@ -285,11 +285,12 @@ class Networking:
             """
             try:
                 conn_obj = self.client_list[ip_addr]
-                if conn_obj is not None:
-                    return conn_obj
-                else:
-                    raise Networking.Host.ClientNotFoundException
             except KeyError:
+                raise Networking.Host.ClientNotFoundException
+
+            if conn_obj is not None:
+                return conn_obj
+            else:
                 raise Networking.Host.ClientNotFoundException
 
         def client_exists(self, ip_addr: str):
