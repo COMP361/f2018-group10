@@ -252,6 +252,8 @@ class Networking:
                     self.host.callback_client_send(client_conn_obj, data, compress)
                 except MastermindErrorSocket as e:
                     raise MastermindErrorSocket(e)
+                except Networking.Host.ClientNotFoundException:
+                    logging.error(f"Client at {ip_addr} is not connected")
             else:
                 raise MastermindErrorServer("Server is not available")
 
