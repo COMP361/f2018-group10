@@ -302,6 +302,7 @@ class Networking:
                 return False
 
         def kick_client(self, ip_addr: str):
+            logger.info(f"Player at {ip_addr} was kicked.")
             self.client_list.pop(ip_addr)
 
         def callback_connect_client(self, connection_object):
@@ -354,6 +355,7 @@ class Networking:
             data = JSONSerializer.deserialize(data)
             # If it's a dummy event, don't do anything
             if isinstance(data, DummyEvent):
+                Networking.get_instance().send_to_client(connection_object.address[0], data)
                 return super(MastermindServerUDP, self).callback_client_handle(connection_object, data)
 
             logger.debug(f"Client at {connection_object.address} sent a message: "
