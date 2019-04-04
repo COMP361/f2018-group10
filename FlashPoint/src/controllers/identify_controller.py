@@ -1,7 +1,7 @@
 from src.UIComponents.interactable import Interactable
-from src.action_events.identify_event import IdentifyEvent
+from src.action_events.turn_events.identify_poi_event import IdentifyPOIEvent
 from src.action_events.turn_events.turn_event import TurnEvent
-from src.constants.state_enums import GameKindEnum
+from src.constants.state_enums import GameKindEnum, PlayerRoleEnum
 from src.controllers.controller import Controller
 from src.core.networking import Networking
 from src.models.game_board.game_board_model import GameBoardModel
@@ -35,6 +35,9 @@ class IdentifyController(Controller):
         if not self._current_player == self.game.players_turn:
             return False
 
+        if self._current_player.role != PlayerRoleEnum.IMAGING:
+            return False
+
         if not TurnEvent.has_required_AP(self._current_player.ap, 1):
             return False
 
@@ -47,7 +50,7 @@ class IdentifyController(Controller):
     def send_event_and_close_menu(self, tile_model: TileModel, menu_to_close: Interactable):
         if not self.run_checks(tile_model):
             return
-        event = IdentifyEvent(tile_model.row, tile_model.column)
+        event = IdentifyPOIEvent(tile_model.row, tile_model.column)
 
         if Networking.get_instance().is_host:
             Networking.get_instance().send_to_all_client(event)

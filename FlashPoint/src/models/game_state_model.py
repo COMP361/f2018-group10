@@ -12,7 +12,6 @@ from src.models.game_units.player_model import PlayerModel
 
 logger = logging.getLogger("FlashPoint")
 
-
 class GameStateModel(Model):
     """Singleton Class for maintaining the current Game state."""
     _instance = None
@@ -165,6 +164,7 @@ class GameStateModel(Model):
             if self._rules != GameKindEnum.EXPERIENCED or None:
                 raise InvalidGameKindException("set difficulty level", self._rules)
             self._difficulty_level = level
+            logger.info("Game difficulty level: {lvl}".format(lvl=level))
 
     @property
     def rules(self) -> GameKindEnum:
@@ -177,6 +177,7 @@ class GameStateModel(Model):
         """Set the rules for this game. one of GameKindEnum.FAMILY or GameKindEnum.EXPERIENCED"""
         with GameStateModel.lock:
             self._rules = rules
+            logger.info("Game rules: {r}".format(r=rules))
 
     def roll_black_dice(self) -> int:
         """Roll the black dice to get a random number between 1-8"""
@@ -197,6 +198,7 @@ class GameStateModel(Model):
     def victims_saved(self, victims_saved: int):
         with GameStateModel.lock:
             self._victims_saved = victims_saved
+            logger.info("Game victims saved: {vs}".format(vs=victims_saved))
             for obs in self.observers:
                 obs.saved_victims(victims_saved)
             if self._victims_saved >= 7:
@@ -211,6 +213,7 @@ class GameStateModel(Model):
     def victims_lost(self, victims_lost: int):
         with GameStateModel.lock:
             self._victims_lost = victims_lost
+            logger.info("Game victims lost: {vl}".format(vl=victims_lost))
             for obs in self.observers:
                 obs.dead_victims(victims_lost)
             if self._victims_lost >= 4:
@@ -225,6 +228,7 @@ class GameStateModel(Model):
     def damage(self, damage: int):
         with GameStateModel.lock:
             self._damage = damage
+            logger.info("Game damage: {d}".format(d=damage))
             for obs in self.observers:
                 obs.damage_changed(damage)
             if self._damage >= self.max_damage:
@@ -249,6 +253,7 @@ class GameStateModel(Model):
     def state(self, game_state: GameStateEnum):
         with GameStateModel.lock:
             self._state = game_state
+            logger.info("Game state: {s}".format(s=game_state))
             self._notify_state()
             if self._state == GameStateEnum.LOST:
                 # TODO: More stuff here for what is supposed to happen when the game is lost.

@@ -106,6 +106,8 @@ class GameBoardModel(Model):
         if poi_or_victim in self._active_pois:
             if isinstance(poi_or_victim, POIModel):
                 poi_or_victim.status = POIStatusEnum.LOST
+            # elif isinstance(poi_or_victim, VictimModel):
+            #     poi_or_victim.state = VictimStateEnum.LOST
             else:
                 pass
             self._active_pois.remove(poi_or_victim)

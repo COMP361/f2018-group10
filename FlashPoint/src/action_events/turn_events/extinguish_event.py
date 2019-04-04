@@ -23,11 +23,9 @@ class ExtinguishEvent(TurnEvent):
         extinguish_space = self.extinguish_space
 
         if extinguish_space.space_status == SpaceStatusEnum.SMOKE:
-            logger.info("SMOKE EXTINGUISHED")
             extinguish_space.space_status = SpaceStatusEnum.SAFE
 
         elif extinguish_space.space_status == SpaceStatusEnum.FIRE:
-            logger.info("FIRE TO SMOKE")
             extinguish_space.space_status = SpaceStatusEnum.SMOKE
 
         else:
