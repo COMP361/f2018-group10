@@ -51,7 +51,8 @@ class LobbyScene(GameStateObserver):
             self.buttonReady.on_click(self.set_ready)
         self.buttonBack.on_click(self.go_back)
 
-    def go_back(self):
+    @staticmethod
+    def go_back():
         Networking.get_instance().disconnect()
         EventQueue.post(CustomEvent(ChangeSceneEnum.STARTSCENE))
 

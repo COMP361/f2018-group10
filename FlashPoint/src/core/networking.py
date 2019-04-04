@@ -336,6 +336,9 @@ class Networking:
                 players = [x for x in game.players if x.ip == connection_object.address[0]]
                 if players:
                     self.kick_client(connection_object.address[0])
+                    player_model = GameStateModel.instance().get_player_by_ip(connection_object.address[0])
+                    GameStateModel.instance().remove_player(player_model)
+                    Networking.get_instance().send_to_all_client(GameStateModel.instance())
             return super(MastermindServerUDP, self).callback_disconnect()
 
         def callback_client_handle(self, connection_object, data):
@@ -475,7 +478,7 @@ class Networking:
             while not self._stop_receive.is_set():
                 if not self._pause_blk_signal.is_set():
                     self.send(DummyEvent())
-                    time.sleep(2)
+                    time.sleep(5)
 
         def toggle_block_signal(self, toggle: bool):
             if toggle:
