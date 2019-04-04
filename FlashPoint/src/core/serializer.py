@@ -1,11 +1,10 @@
 import enum
 import json
-import pygame
 from typing import Dict
 import logging
 
 from src.action_events.fire_placement_event import FirePlacementEvent
-from src.action_events.remove_hazmat_event import RemoveHazmatEvent
+from src.action_events.turn_events.remove_hazmat_event import RemoveHazmatEvent
 from src.action_events.identify_event import IdentifyEvent
 from src.action_events.place_hazmat_event import PlaceHazmatEvent
 from src.action_events.end_turn_advance_fire import EndTurnAdvanceFireEvent

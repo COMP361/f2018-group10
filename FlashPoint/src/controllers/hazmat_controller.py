@@ -1,13 +1,11 @@
 from src.UIComponents.interactable import Interactable
-from src.action_events.remove_hazmat_event import RemoveHazmatEvent
+from src.action_events.turn_events.remove_hazmat_event import RemoveHazmatEvent
 from src.action_events.turn_events.turn_event import TurnEvent
-from src.constants.state_enums import GameKindEnum, WallStatusEnum, DoorStatusEnum
+from src.constants.state_enums import GameKindEnum, PlayerRoleEnum
 from src.controllers.controller import Controller
 from src.core.networking import Networking
-from src.models.game_board.door_model import DoorModel
 from src.models.game_board.game_board_model import GameBoardModel
 from src.models.game_board.tile_model import TileModel
-from src.models.game_board.wall_model import WallModel
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.hazmat_model import HazmatModel
 from src.models.game_units.player_model import PlayerModel
@@ -36,58 +34,20 @@ class HazmatController(Controller):
         return cls._instance
 
     def run_checks(self, tile_model: TileModel) -> bool:
-        player_tile: TileModel = GameStateModel.instance().game_board.get_tile_at(self._current_player.row,
-                                                                                  self._current_player.column)
+        player_tile = self.board.get_tile_at(self._current_player.row, self._current_player.column)
 
         if not self._current_player == self.game.players_turn:
             return False
 
-        valid_to_identify = TurnEvent.has_required_AP(self._current_player.ap, 2)
-        if not valid_to_identify:
+        if self._current_player.role != PlayerRoleEnum.HAZMAT:
             return False
 
-        if player_tile not in tile_model.adjacent_tiles.values() and player_tile != tile_model:
+        valid_to_do_event = TurnEvent.has_required_AP(self._current_player.ap, 2)
+        if not valid_to_do_event:
             return False
 
-        if player_tile.south_tile == tile_model:
-            obs = player_tile.get_obstacle_in_direction('South')
-            if isinstance(obs, WallModel):
-                if not obs.wall_status == WallStatusEnum.DESTROYED:
-                    return False
-
-            elif isinstance(obs, DoorModel):
-                if obs.door_status == DoorStatusEnum.CLOSED:
-                    return False
-
-        elif player_tile.north_tile == tile_model:
-            obs = player_tile.get_obstacle_in_direction('North')
-            if isinstance(obs, WallModel):
-                if not obs.wall_status == WallStatusEnum.DESTROYED:
-                    return False
-
-            elif isinstance(obs, DoorModel):
-                if obs.door_status == DoorStatusEnum.CLOSED:
-                    return False
-
-        elif player_tile.east_tile == tile_model:
-            obs = player_tile.get_obstacle_in_direction('East')
-            if isinstance(obs, WallModel):
-                if not obs.wall_status == WallStatusEnum.DESTROYED:
-                    return False
-
-            elif isinstance(obs, DoorModel):
-                if obs.door_status == DoorStatusEnum.CLOSED:
-                    return False
-
-        elif player_tile.west_tile == tile_model:
-            obs = player_tile.get_obstacle_in_direction('West')
-            if isinstance(obs, WallModel):
-                if not obs.wall_status == WallStatusEnum.DESTROYED:
-                    return False
-
-            elif isinstance(obs, DoorModel):
-                if obs.door_status == DoorStatusEnum.CLOSED:
-                    return False
+        if player_tile.row != tile_model.row or player_tile.column != tile_model.column:
+            return False
 
         if not any([isinstance(model, HazmatModel) for model in tile_model.associated_models]):
             return False
@@ -105,6 +65,7 @@ class HazmatController(Controller):
             Networking.get_instance().send_to_all_client(event)
         else:
             Networking.get_instance().client.send(event)
+
         menu_to_close.disable()
         menu_to_close.on_click(None)
 
