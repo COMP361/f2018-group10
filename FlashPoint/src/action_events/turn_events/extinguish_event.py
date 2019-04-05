@@ -1,7 +1,7 @@
 import logging
 
 from src.action_events.turn_events.turn_event import TurnEvent
-from src.constants.state_enums import SpaceStatusEnum
+from src.constants.state_enums import SpaceStatusEnum, PlayerRoleEnum
 from src.models.game_board.tile_model import TileModel
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
@@ -31,6 +31,9 @@ class ExtinguishEvent(TurnEvent):
         else:
             return
 
-        fireman.ap = fireman.ap - 1
+        if fireman.role == PlayerRoleEnum.RESCUE:
+            fireman.ap = fireman.ap - 2
+        else:
+            fireman.ap = fireman.ap - 1
 
         return
