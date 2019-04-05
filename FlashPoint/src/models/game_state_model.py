@@ -6,7 +6,8 @@ from typing import List, Optional, Tuple
 
 from src.models.model import Model
 from src.models.game_board.game_board_model import GameBoardModel
-from src.constants.state_enums import GameKindEnum, DifficultyLevelEnum, GameStateEnum, VehicleOrientationEnum
+from src.constants.state_enums import GameKindEnum, DifficultyLevelEnum, GameStateEnum, VehicleOrientationEnum, \
+    GameBoardTypeEnum
 from src.core.flashpoint_exceptions import TooManyPlayersException, InvalidGameKindException, PlayerNotFoundException
 from src.models.game_units.player_model import PlayerModel
 
@@ -18,7 +19,13 @@ class GameStateModel(Model):
     _instance = None
     lock = RLock()
 
-    def __init__(self, host: PlayerModel, num_players: int, game_kind: GameKindEnum, difficulty: DifficultyLevelEnum = None):
+    def __init__(self,
+                 host: PlayerModel,
+                 num_players: int,
+                 game_kind: GameKindEnum,
+                 board_type: GameBoardTypeEnum,
+                 difficulty: DifficultyLevelEnum = None
+                 ):
         logger.info("Initializing game state...")
 
         if not GameStateModel._instance:
@@ -32,7 +39,8 @@ class GameStateModel(Model):
             self._red_dice = 0
             self._black_dice = 0
 
-            self._game_board = None
+            self._board_type = board_type
+            self._game_board = GameBoardModel(self._board_type)
 
             self._victims_saved = 0
             self._victims_lost = 0

@@ -19,6 +19,7 @@ from src.models.game_units.victim_model import VictimModel
 
 logger = logging.getLogger("FlashPoint")
 
+
 class GameBoardModel(Model):
     """
     Class for aggregating all objects related to the game board itself, this means TileModels, PlayerModels
@@ -36,7 +37,6 @@ class GameBoardModel(Model):
             self._tiles = self._init_all_tiles_original_board()
         else:
             self._tiles = self._init_all_tiles_alternative_board()
-
 
         self._poi_bank = GameBoardModel._init_pois()
         self._active_pois = []
