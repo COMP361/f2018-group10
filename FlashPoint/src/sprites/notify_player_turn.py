@@ -142,6 +142,6 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
 
     def player_added(self, player: PlayerModel):
         pass
-    
+
     def player_removed(self, player: PlayerModel):
         pass
