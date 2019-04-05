@@ -35,6 +35,7 @@ class DoorStatusEnum(Enum):
 class GameBoardTypeEnum(Enum):
     ORIGINAL = auto()
     ALTERNATIVE = auto()
+    RANDOM = auto()
 
 
 class GameKindEnum(Enum):

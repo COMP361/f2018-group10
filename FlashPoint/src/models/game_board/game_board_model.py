@@ -31,12 +31,7 @@ class GameBoardModel(Model):
         self._ambulance_spots = []
         self._engine_spots = []
         self._board_type = board_type
-
-        if self._board_type == GameBoardTypeEnum.ORIGINAL:
-            self._tiles = self._init_all_tiles_original_board()
-        else:
-            self._tiles = self._init_all_tiles_alternative_board()
-
+        self._tiles = self._determine_board_tiles()
 
         self._poi_bank = GameBoardModel._init_pois()
         self._active_pois = []
@@ -150,8 +145,44 @@ class GameBoardModel(Model):
         outdoor = any([row == 0, row == self._dimensions[0]-1, column == 0, column == self._dimensions[1]-1])
         return SpaceKindEnum.OUTDOOR if outdoor else SpaceKindEnum.INDOOR
 
-    def _init_all_tiles_original_board(self) -> List[List[TileModel]]:
-        """Create all tiles for the original board and set their adjacency."""
+    def _determine_board_tiles(self) -> List[List[TileModel]]:
+        """
+        Determines the tiles for the board depending
+        on the board type: Original, Alternative, Random
+
+        :return: A list of list of tile models that will act as the board
+        """
+        amb_engine_parking_fname = ""
+        outside_doors_fname = ""
+        inside_walls_doors_fname = ""
+        if self.board_type == GameBoardTypeEnum.ORIGINAL:
+            amb_engine_parking_fname = "media/board_layouts/original_engine_ambulance_locations.json"
+            outside_doors_fname = "media/board_layouts/original_outside_door_locations.json"
+            inside_walls_doors_fname = "media/board_layouts/original_inside_walls_doors.json"
+
+        elif self.board_type == GameBoardTypeEnum.ALTERNATIVE:
+            amb_engine_parking_fname = "media/board_layouts/alternative_engine_ambulance_locations.json"
+            outside_doors_fname = "media/board_layouts/alternative_outside_door_locations.json"
+            inside_walls_doors_fname = "media/board_layouts/alternative_inside_walls_doors.json"
+
+        # TODO: put in the names of the files for the random board details
+        # elif self.board_type == GameBoardTypeEnum.RANDOM:
+        #     amb_engine_parking_fname = ""
+        #     outside_doors_fname = ""
+        #     inside_walls_doors_fname = ""
+
+        return self._init_all_tiles_board(amb_engine_parking_fname, outside_doors_fname, inside_walls_doors_fname)
+
+    def _init_all_tiles_board(self, amb_engine_parking_fname: str, outside_doors_fname: str, inside_walls_doors_fname: str) -> List[List[TileModel]]:
+        """
+        Create all tiles for the board and set their adjacencies.
+
+        :param amb_engine_parking_fname: Name of file that contains details about the ambulance
+                                        and engine parking spaces
+        :param outside_doors_fname: Name of file that contains details about the outside doors
+        :param inside_walls_doors_fname: Name of file that contains details about the inside walls/doors
+        :return: A list of list of tile models that will act as the board
+        """
         tiles = []
 
         for i in range(self._dimensions[0]):
@@ -179,13 +210,13 @@ class GameBoardModel(Model):
                 tiles[i][right].set_adjacent_edge_obstacle("West", wall)
 
         # setting the ambulance and engine parking spaces
-        self.set_parking_spaces("media/board_layouts/original_engine_ambulance_locations.json", tiles)
+        self.set_parking_spaces(amb_engine_parking_fname, tiles)
 
         # setting the doors present on the outside of the house EXPLICITLY
-        self.set_outside_doors("media/board_layouts/original_outside_door_locations.json", tiles)
+        self.set_outside_doors(outside_doors_fname, tiles)
 
         # setting the walls and doors present inside the house
-        self.set_inside_walls_doors("media/board_layouts/original_inside_walls_doors.json", tiles)
+        self.set_inside_walls_doors(inside_walls_doors_fname, tiles)
 
         # setting the arrow directions given for the inside tiles
         self.set_all_tiles_arrows("media/board_layouts/tile_arrow_directions.json", tiles)
@@ -300,49 +331,6 @@ class GameBoardModel(Model):
         first_dirn, second_dirn = adjacency['first_dirn'], adjacency['second_dirn']
         for coord, direction in [(first_pair, first_dirn), (second_pair, second_dirn)]:
             tiles[coord[0]][coord[1]].set_adjacent_edge_obstacle(direction, obstacle)
-
-    def _init_all_tiles_alternative_board(self) -> List[List[TileModel]]:
-        """Create all tiles for the alternative board
-            and set their adjacencies."""
-        tiles = []
-
-        for i in range(self._dimensions[0]):
-            tiles.append([])
-            for j in range(self._dimensions[1]):
-                tile_kind = self._determine_tile_kind(i, j)
-                tile = TileModel(i, j, tile_kind)
-                tiles[i].append(tile)
-
-        # setting tile adjacencies
-        self.set_adjacencies(tiles)
-
-        # setting the top and bottom walls on the outside of the house
-        for top, bottom in [(0, 1), (6, 7)]:
-            for i in range(1, 9):
-                wall = WallModel(top, i, "South")
-                tiles[top][i].set_adjacent_edge_obstacle("South", wall)
-                tiles[bottom][i].set_adjacent_edge_obstacle("North", wall)
-
-        # setting the left and right walls on the outside of the house
-        for left, right in [(0, 1), (8, 9)]:
-            for i in range(1, 7):
-                wall = WallModel(i, left, "East")
-                tiles[i][left].set_adjacent_edge_obstacle("East", wall)
-                tiles[i][right].set_adjacent_edge_obstacle("West", wall)
-
-        # setting the ambulance and engine parking spaces
-        self.set_parking_spaces("media/board_layouts/alternative_engine_ambulance_locations.json", tiles)
-
-        # setting the doors present on the outside of the house EXPLICITLY
-        self.set_outside_doors("media/board_layouts/alternative_outside_door_locations.json", tiles)
-
-        # setting the walls and doors present inside the house
-        self.set_inside_walls_doors("media/board_layouts/alternative_inside_walls_doors.json", tiles)
-
-        # setting the arrow directions given for the inside tiles
-        self.set_all_tiles_arrows("media/board_layouts/tile_arrow_directions.json", tiles)
-
-        return tiles
 
     def get_tile_at(self, row: int, column: int) -> TileModel:
         """Grab the TileModel at a given position"""
