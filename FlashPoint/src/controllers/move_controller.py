@@ -3,7 +3,7 @@ from typing import List
 import src.constants.color as Color
 from src.UIComponents.interactable import Interactable
 from src.action_events.turn_events.move_event import DijkstraTile, PriorityQueue, MoveEvent
-from src.constants.state_enums import PlayerStatusEnum
+from src.constants.state_enums import PlayerStatusEnum, PlayerRoleEnum
 from src.controllers.controller import Controller
 from src.core.networking import Networking
 
@@ -32,8 +32,13 @@ class MoveController(PlayerObserver, Controller):
 
         self.game_board_sprite = GameBoard.instance()
         self.current_player = current_player
+        ap = self.current_player.ap
+        # Rescue specialist's special AP are used for moving
+        if self.current_player.role == PlayerRoleEnum.RESCUE:
+            ap = ap + self.current_player.special_ap
+
         self.moveable_tiles = self._determine_reachable_tiles(
-            self.current_player.row, self.current_player.column, self.current_player.ap)
+            self.current_player.row, self.current_player.column, ap)
         self.current_player.add_observer(self)
         GameStateModel.instance().game_board.reset_tiles_visit_count()
 
@@ -210,20 +215,35 @@ class MoveController(PlayerObserver, Controller):
 
     def player_ap_changed(self, updated_ap: int):
         GameStateModel.instance().game_board.reset_tiles_visit_count()
+        ap = self.current_player.ap
+        # Rescue specialist's special AP are used for moving
+        if self.current_player.role == PlayerRoleEnum.RESCUE:
+            ap = ap + self.current_player.special_ap
+
         self.moveable_tiles = self._determine_reachable_tiles(
-            self.current_player.row, self.current_player.column, self.current_player.ap)
+            self.current_player.row, self.current_player.column, ap)
         GameStateModel.instance().game_board.reset_tiles_visit_count()
 
     def player_position_changed(self, x_pos: int, y_pos: int):
         GameStateModel.instance().game_board.reset_tiles_visit_count()
+        ap = self.current_player.ap
+        # Rescue specialist's special AP are used for moving
+        if self.current_player.role == PlayerRoleEnum.RESCUE:
+            ap = ap + self.current_player.special_ap
+
         self.moveable_tiles = self._determine_reachable_tiles(
-            self.current_player.row, self.current_player.column, self.current_player.ap)
+            self.current_player.row, self.current_player.column, ap)
         GameStateModel.instance().game_board.reset_tiles_visit_count()
 
     def player_carry_changed(self, carry):
         GameStateModel.instance().game_board.reset_tiles_visit_count()
+        ap = self.current_player.ap
+        # Rescue specialist's special AP are used for moving
+        if self.current_player.role == PlayerRoleEnum.RESCUE:
+            ap = ap + self.current_player.special_ap
+
         self.moveable_tiles = self._determine_reachable_tiles(
-            self.current_player.row, self.current_player.column, self.current_player.ap)
+            self.current_player.row, self.current_player.column, ap)
         GameStateModel.instance().game_board.reset_tiles_visit_count()
 
     def player_wins_changed(self, wins: int):
@@ -233,7 +253,20 @@ class MoveController(PlayerObserver, Controller):
         pass
 
     def player_special_ap_changed(self, updated_ap: int):
-        pass
+        # If the player is not a Rescue Specialist, a change
+        # in the special AP will not affect the moveable tiles.
+        if self.current_player.role != PlayerRoleEnum.RESCUE:
+            return
+
+        GameStateModel.instance().game_board.reset_tiles_visit_count()
+        ap = self.current_player.ap
+        # Rescue specialist's special AP are used for moving
+        if self.current_player.role == PlayerRoleEnum.RESCUE:
+            ap = ap + self.current_player.special_ap
+
+        self.moveable_tiles = self._determine_reachable_tiles(
+            self.current_player.row, self.current_player.column, ap)
+        GameStateModel.instance().game_board.reset_tiles_visit_count()
 
     def player_status_changed(self, status: PlayerStatusEnum):
         pass
