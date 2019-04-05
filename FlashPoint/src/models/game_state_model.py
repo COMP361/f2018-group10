@@ -85,6 +85,17 @@ class GameStateModel(Model):
             self._game_board = board
 
     @property
+    def board_type(self) -> GameBoardTypeEnum:
+        with GameStateModel.lock:
+            return self._board_type
+
+    @board_type.setter
+    def board_type(self, board_type: GameBoardTypeEnum):
+        with GameStateModel.lock:
+            self._board_type = board_type
+            self.game_board = GameBoardModel(board_type)
+
+    @property
     def chat_history(self) -> List[Tuple[str, str]]:
         with GameStateModel.lock:
             return self._chat_history
