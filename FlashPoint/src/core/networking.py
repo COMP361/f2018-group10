@@ -341,8 +341,8 @@ class Networking:
                 if players:
                     self.kick_client(connection_object.address[0])
                     player_model = GameStateModel.instance().get_player_by_ip(connection_object.address[0])
-                    GameStateModel.instance().remove_player(player_model)
-                    Networking.get_instance().send_to_all_client(GameStateModel.instance())
+                    event = DisconnectEvent(player_model)
+                    Networking.get_instance().send_to_all_client(event)
             return super(MastermindServerUDP, self).callback_disconnect()
 
         def callback_client_handle(self, connection_object, data):

@@ -265,6 +265,11 @@ class JSONSerializer(object):
         return ChooseCharacterEvent(PlayerRoleEnum(payload['_role']['value']), payload['_player_index'])
 
     @staticmethod
+    def _deserialize_disconnect_event(payload: Dict) -> DisconnectEvent:
+        player: PlayerModel = JSONSerializer.deserialize(payload['_player'])
+        return DisconnectEvent(player)
+
+    @staticmethod
     def deserialize(payload: Dict) -> object:
         """
         Grab an object and deserialize it.
@@ -305,7 +310,7 @@ class JSONSerializer(object):
         elif object_type == DummyEvent.__name__:
             return DummyEvent()
         elif object_type == DisconnectEvent.__name__:
-            return DisconnectEvent()
+            return JSONSerializer._deserialize_disconnect_event(payload)
         elif object_type == ExtinguishEvent.__name__:
             return JSONSerializer._deserialize_extinguish_event(payload)
         elif object_type == DropVictimEvent.__name__:
