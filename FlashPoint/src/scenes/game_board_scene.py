@@ -43,6 +43,7 @@ class GameBoardScene(GameBoardObserver):
     """
     Scene for displaying the main game view
     """
+
     def __init__(self, screen: pygame.display, current_player: PlayerModel):
         """
         :param screen : The display passed from main on which to draw the Scene.
@@ -64,8 +65,6 @@ class GameBoardScene(GameBoardObserver):
 
         # Send initialization events.
         self._send_game_board_initialize()
-
-
 
     def _init_ui_elements(self):
         """Initialize all things to be drawn on this screen."""
@@ -93,7 +92,8 @@ class GameBoardScene(GameBoardObserver):
 
         # HUD stuff
         self._active_sprites.add(TimeBar(0, 0))
-        self._active_sprites.add(InGameStates(250, 650, self._game.damage, self._game.victims_saved, self._game.victims_lost))
+        self._active_sprites.add(
+            InGameStates(250, 650, self._game.damage, self._game.victims_saved, self._game.victims_lost))
         self._active_sprites.add(self._menu_btn)
 
     def _init_controllers(self):
@@ -111,17 +111,17 @@ class GameBoardScene(GameBoardObserver):
 
     def _send_game_board_initialize(self):
         """Send any game board initialization events."""
-        if self._game.rules is GameKindEnum.EXPERIENCED:
-            self.set_initial_poi_experienced()
-            self.place_hazmat()
-        else:
-            self.set_initial_poi_family()
+        if Networking.get_instance().is_host:
+            self._game._notify_player_index()
+
+            if self._game.rules == GameKindEnum.EXPERIENCED:
+                Networking.get_instance().send_to_all_client(SetInitialPOIExperiencedEvent())
+                Networking.get_instance().send_to_all_client(PlaceHazmatEvent())
+            else:
+                Networking.get_instance().send_to_all_client(SetInitialPOIFamilyEvent())
 
         for player in self._game.players:
             player.set_initial_ap(self._game.rules)
-
-        if Networking.get_instance().is_host:
-            self._game._notify_player_index()
 
     def notify_active_poi(self, active_pois: List[POIModel]):
         # Removes are already handled by the sprites themselves, therefore only need to deal with adds.
@@ -221,18 +221,3 @@ class GameBoardScene(GameBoardObserver):
                                 sprite.rect.y < mouse_pos[1] < sprite.rect.y + sprite.rect.height)
 
         return ignore
-
-    def set_initial_poi_family(self):
-        if Networking.get_instance().is_host:
-            event = SetInitialPOIFamilyEvent()
-            Networking.get_instance().send_to_all_client(event)
-
-    def set_initial_poi_experienced(self):
-        if Networking.get_instance().is_host:
-            event = SetInitialPOIExperiencedEvent()
-            Networking.get_instance().send_to_all_client(event)
-
-    def place_hazmat(self):
-        if Networking.get_instance().is_host:
-            event = PlaceHazmatEvent()
-            Networking.get_instance().send_to_all_client(event)
