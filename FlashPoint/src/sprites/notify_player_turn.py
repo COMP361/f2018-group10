@@ -44,7 +44,7 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
         self.text = self.font_name.render(self.msg, True, Color.GREEN2)
         self.rect = self.image.get_rect()
         self.rect.move_ip(880, 600)
-        self.not_your_turn = self._init_not_your_turn()
+        self.not_your_turn = self.init_not_your_turn()
         self._current_player = current_player
         self._current_sprite = current_sprite
         self._active_sprites = sprite_group
@@ -89,7 +89,7 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
         rct.add_frame('media/GameHud/frame.png')
         return rct
 
-    def _init_not_your_turn(self):
+    def init_not_your_turn(self):
         rct = RectLabel(880, 600, 250, 50, background=Color.ORANGE,
                         txt_obj=Text(pygame.font.SysFont('Agency FB', 30), "NOT YOUR TURN", Color.GREEN2))
         rct.change_bg_image('media/GameHud/wood2.png')
