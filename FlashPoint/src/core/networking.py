@@ -168,7 +168,7 @@ class Networking:
             Returns True if the local machine is a host
             :return:
             """
-            return self.host is not None
+            return self.host
 
         @staticmethod
         def get_ip():
@@ -196,7 +196,7 @@ class Networking:
             Disconnects the current machine. If the current machine is a host, it ends the game as well.
             :return:
             """
-            if self.host:
+            if self.is_host:
                 logger.info("Disconnecting host")
                 # Kill the broadcast
                 self.stop_broadcast.set()
@@ -481,7 +481,7 @@ class Networking:
             while not self._stop_receive.is_set():
                 if not self._pause_blk_signal.is_set():
                     self.send(DummyEvent())
-                    time.sleep(5)
+                    time.sleep(3)
 
         def toggle_block_signal(self, toggle: bool):
             if toggle:
