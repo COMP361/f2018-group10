@@ -1,16 +1,18 @@
+import itertools
 import json
-import random
 from datetime import datetime
 from typing import List
 
 import pygame
 
 from src.action_events.set_initial_poi_experienced_event import SetInitialPOIExperiencedEvent
-from src.constants.state_enums import GameKindEnum
+from src.constants.state_enums import GameKindEnum, GameStateEnum
 from src.models.game_units.victim_model import VictimModel
 from src.sprites.victim_sprite import VictimSprite
 from src.models.game_units.poi_model import POIModel
+from src.models.game_board.null_model import NullModel
 from src.observers.GameBoardObserver import GameBoardObserver
+from src.observers.game_state_observer import GameStateObserver
 
 from src.action_events.place_hazmat_event import PlaceHazmatEvent
 from src.action_events.set_initial_poi_family_event import SetInitialPOIFamilyEvent
@@ -33,13 +35,14 @@ from src.sprites.hud.player_state import PlayerState
 from src.sprites.hud.current_player_state import CurrentPlayerState
 from src.sprites.hud.time_bar import TimeBar
 from src.sprites.hud.ingame_states import InGameStates
+from src.sprites.player_sprite import PlayerSprite
 import src.constants.color as Color
 from src.UIComponents.rect_button import RectButton
 from src.UIComponents.text import Text
 from src.sprites.notify_player_turn import NotifyPlayerTurn
 
 
-class GameBoardScene(GameBoardObserver):
+class GameBoardScene(GameBoardObserver, GameStateObserver):
     """
     Scene for displaying the main game view
     """
@@ -60,6 +63,7 @@ class GameBoardScene(GameBoardObserver):
                                    Text(pygame.font.SysFont('Arial', 20), "Quit", Color.BLACK))
 
         self.active_sprites = pygame.sprite.Group()   # Maybe add separate groups for different things later
+        self.player_hud_sprites = pygame.sprite.Group()
         self.game_board_sprite = GameBoard(current_player)
 
         # Set initial POI and place hazmat event
@@ -102,7 +106,7 @@ class GameBoardScene(GameBoardObserver):
 
     def _init_sprites(self):
         for i, player in enumerate(self._game.players):
-            self.active_sprites.add(PlayerState(0, 30 + 64*i, player.nickname, player.color,player))
+            self.player_hud_sprites.add(PlayerState(0, 30 + 64*i, player.nickname, player.color,player))
         self._current_sprite = CurrentPlayerState(1130, 550, self._current_player.nickname,self._current_player.color,self._current_player)
         self.active_sprites.add(self._current_sprite)
         self.notify_turn_popup = NotifyPlayerTurn(self._current_player, self._current_sprite, self.active_sprites)
@@ -127,7 +131,8 @@ class GameBoardScene(GameBoardObserver):
 
         self.menu.close()
 
-    def _quit_btn_on_click(self):
+    @staticmethod
+    def _quit_btn_on_click():
         Networking.get_instance().disconnect()
         TileInputController.__del__()
         ChopController._instance = None
@@ -169,6 +174,7 @@ class GameBoardScene(GameBoardObserver):
         """Draw all currently active sprites."""
         self.game_board_sprite.draw(screen)
         self.chat_box.draw(screen)
+        self.player_hud_sprites.draw(screen)
         self.active_sprites.draw(screen)
 
         if self.menu and not self.menu.is_closed:
@@ -176,6 +182,7 @@ class GameBoardScene(GameBoardObserver):
 
     def update(self, event_queue: EventQueue):
         """Call the update() function of everything in this class."""
+        self.player_hud_sprites.update(event_queue)
         self.active_sprites.update(event_queue)
         self.chat_box.update(event_queue)
 
@@ -198,23 +205,58 @@ class GameBoardScene(GameBoardObserver):
         ignore = ignore or (self.chat_box.box.x < mouse_pos[0] < self.chat_box.box.x + self.chat_box.box.width and
                             self.chat_box.box.y < mouse_pos[1] < self.chat_box.box.y + self.chat_box.box.height)
 
-        for sprite in self.active_sprites:
+        for sprite in itertools.chain(self.player_hud_sprites, self.active_sprites):
             ignore = ignore or (sprite.rect.x < mouse_pos[0] < sprite.rect.x + sprite.rect.width and
                                 sprite.rect.y < mouse_pos[1] < sprite.rect.y + sprite.rect.height)
 
         return ignore
 
-    def set_initial_poi_family(self):
+    @staticmethod
+    def set_initial_poi_family():
         if Networking.get_instance().is_host:
             event = SetInitialPOIFamilyEvent()
             Networking.get_instance().send_to_all_client(event)
 
-    def set_initial_poi_experienced(self):
+    @staticmethod
+    def set_initial_poi_experienced():
         if Networking.get_instance().is_host:
             event = SetInitialPOIExperiencedEvent()
             Networking.get_instance().send_to_all_client(event)
 
-    def place_hazmat(self):
+    @staticmethod
+    def place_hazmat():
         if Networking.get_instance().is_host:
             event = PlaceHazmatEvent()
             Networking.get_instance().send_to_all_client(event)
+
+    def notify_player_index(self, player_index: int):
+        pass
+
+    def notify_game_state(self, game_state: GameStateEnum):
+        pass
+
+    def damage_changed(self, new_damage: int):
+        pass
+
+    def saved_victims(self, victims_saved: int):
+        pass
+
+    def dead_victims(self, victims_dead: int):
+        pass
+
+    def player_added(self, player: PlayerModel):
+        pass
+
+    def player_removed(self, player: PlayerModel):
+        self.player_list_changed()
+        # Remove player sprite from game board
+        for sprite in GameBoard.instance():
+            if isinstance(sprite, PlayerSprite):
+                if sprite.associated_player is player:
+                    GameBoard.instance().remove(sprite)
+
+    def player_list_changed(self):
+        # Refresh the list of players in HUD
+        self.player_hud_sprites.empty()
+        for i, player in enumerate(self._game.players):
+            self.player_hud_sprites.add(PlayerState(0, 30 + 64 * i, player.nickname, player.color, player))

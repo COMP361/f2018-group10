@@ -13,6 +13,7 @@ from src.models.game_units.player_model import PlayerModel
 
 logger = logging.getLogger("FlashPoint")
 
+
 class GameStateModel(Model):
     """Singleton Class for maintaining the current Game state."""
     _instance = None
@@ -52,12 +53,20 @@ class GameStateModel(Model):
         else:
             raise Exception("GameStateModel is a Singleton")
 
+    def _notify_player_added(self, player: PlayerModel):
+        for obs in self._observers:
+            obs.player_added(player)
+
+    def _notify_player_removed(self, player: PlayerModel):
+        for obs in self._observers:
+            obs.player_removed(player)
+
     def _notify_player_index(self):
         for obs in self._observers:
             obs.notify_player_index(self._players_turn_index)
 
     def _notify_state(self):
-        for obs in self.observers:
+        for obs in self._observers:
             obs.notify_game_state(self._state)
 
     @staticmethod
@@ -131,6 +140,7 @@ class GameStateModel(Model):
             if len(self._players) == self._max_desired_players:
                 raise TooManyPlayersException(player)
             self._players.append(player)
+            self._notify_player_added(player)
 
     def get_player_by_ip(self, ip: str) -> PlayerModel:
         with GameStateModel.lock:
@@ -143,6 +153,7 @@ class GameStateModel(Model):
         """Remove a player from the current game."""
         with GameStateModel.lock:
             self._players.remove(player)
+            self._notify_player_removed(player)
 
     @property
     def players_turn_index(self) -> int:
@@ -218,7 +229,7 @@ class GameStateModel(Model):
         with GameStateModel.lock:
             self._victims_saved = victims_saved
             logger.info("Game victims saved: {vs}".format(vs=victims_saved))
-            for obs in self.observers:
+            for obs in self._observers:
                 obs.saved_victims(victims_saved)
             if self._victims_saved >= 7:
                 self.state = GameStateEnum.WON
@@ -233,7 +244,7 @@ class GameStateModel(Model):
         with GameStateModel.lock:
             self._victims_lost = victims_lost
             logger.info("Game victims lost: {vl}".format(vl=victims_lost))
-            for obs in self.observers:
+            for obs in self._observers:
                 obs.dead_victims(victims_lost)
             if self._victims_lost >= 4:
                 self.state = GameStateEnum.LOST
@@ -248,7 +259,7 @@ class GameStateModel(Model):
         with GameStateModel.lock:
             self._damage = damage
             logger.info("Game damage: {d}".format(d=damage))
-            for obs in self.observers:
+            for obs in self._observers:
                 obs.damage_changed(damage)
             if self._damage >= self.max_damage:
                 self.state = GameStateEnum.LOST
