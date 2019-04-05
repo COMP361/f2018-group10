@@ -56,9 +56,12 @@ class JSONSerializer(object):
         num_players = payload['_max_desired_players']
         rules = GameKindEnum(payload['_rules']["value"])
         board_type = GameBoardTypeEnum(payload['_board_type']["value"])
+        difficulty_level = None
+        if rules == GameKindEnum.EXPERIENCED:
+            difficulty_level = DifficultyLevelEnum(payload['_difficulty_level']['value'])
 
         if not GameStateModel.instance():
-            game = GameStateModel(host, num_players, rules, board_type)
+            game = GameStateModel(host, num_players, rules, board_type, difficulty_level)
         else:
             game = GameStateModel.instance()
 
@@ -67,9 +70,6 @@ class JSONSerializer(object):
             player_obj: PlayerModel = JSONSerializer.deserialize(player)
             if player_obj not in game.players:
                 game.add_player(player_obj)
-
-        if rules == GameKindEnum.EXPERIENCED:
-            game.difficulty_level = DifficultyLevelEnum(payload['_difficulty_level']['value'])
 
         game.players_turn = payload['_players_turn_index']
         game.damage = payload['_damage']
