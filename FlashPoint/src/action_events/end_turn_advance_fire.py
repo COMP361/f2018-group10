@@ -13,7 +13,7 @@ from src.models.game_units.victim_model import VictimModel
 from src.models.game_board.tile_model import TileModel
 from src.models.game_board.game_board_model import GameBoardModel
 from src.constants.state_enums import GameStateEnum, SpaceStatusEnum, WallStatusEnum, DoorStatusEnum, VictimStateEnum, \
-    SpaceKindEnum, POIIdentityEnum, GameKindEnum
+    SpaceKindEnum, POIIdentityEnum, GameKindEnum, PlayerRoleEnum
 from src.action_events.turn_events.turn_event import TurnEvent
 from src.models.game_state_model import GameStateModel
 
@@ -39,8 +39,8 @@ class EndTurnAdvanceFireEvent(TurnEvent):
     """
     def __init__(self, seed: int = 0):
         super().__init__()
-        self.player = GameStateModel.instance().players_turn
         self.game_state: GameStateModel = GameStateModel.instance()
+        self.player = self.game_state.players_turn
         self.board: GameBoardModel = self.game_state.game_board
         self.initial_tile: TileModel = None
 
@@ -92,13 +92,37 @@ class EndTurnAdvanceFireEvent(TurnEvent):
         rp_event = ReplenishPOIEvent(self.seed)
         rp_event.execute()
 
+        # ------ Replenish Player's points ----- #
+        self._replenish_player_points()
+
+    def _replenish_player_points(self):
+        """
+        Replenishes a player's AP, special AP
+        according to the rules for the different roles.
+
+        :return:
+        """
         # retain up to a maximum of 4 AP
         # as the turn is ending and
-        # replenish player's AP by 4
+        # replenish player's AP, irrespective
+        # of role, by 4 (add/subtract points after)
         if self.player.ap > 4:
             self.player.ap = 4
 
-        self.player.ap += 4
+        self.player.ap = self.player.ap + 4
+
+        if self.player.role == PlayerRoleEnum.CAPTAIN:
+            self.player.special_ap = 2
+
+        elif self.player.role == PlayerRoleEnum.CAFS:
+            self.player.ap = self.player.ap - 1
+            self.player.special_ap = 3
+
+        elif self.player.role == PlayerRoleEnum.GENERALIST:
+            self.player.ap = self.player.ap + 1
+
+        elif self.player.role == PlayerRoleEnum.RESCUE:
+            self.player.special_ap = 3
 
     def _placing_players_end_turn(self):
         # If the last player has chosen a location, move the game into the next phase.
@@ -157,9 +181,6 @@ class EndTurnAdvanceFireEvent(TurnEvent):
         # Smoke -> Fire
         elif tile_status == SpaceStatusEnum.SMOKE:
             target_tile.space_status = SpaceStatusEnum.FIRE
-            # if there's a hazmat on target tile, explosion occurs
-            if target_tile.has_hazmat():
-                self.explosion(target_tile)
 
         # Fire -> Explosion
         else:
@@ -169,11 +190,6 @@ class EndTurnAdvanceFireEvent(TurnEvent):
 
     def explosion(self, origin_tile: TileModel):
         logger.info(f"Explosion occurred on {origin_tile}")
-
-        if origin_tile.has_hazmat():
-            logger.info(f"Failed to remove hazmat :'( , it was exploded at {origin_tile.row}, {origin_tile.column}")
-            origin_tile.remove_hazmat()
-
         for direction, obstacle in origin_tile.adjacent_edge_objects.items():
             # fire does not move to the neighbouring tile
             # damaging wall present along the tile
@@ -196,9 +212,6 @@ class EndTurnAdvanceFireEvent(TurnEvent):
                         self.shockwave(nb_tile, direction)
                     else:
                         nb_tile.space_status = SpaceStatusEnum.FIRE
-                        # if there's a hazmat on nearby tile, explosion occurs
-                        if nb_tile.has_hazmat():
-                            self.explosion(nb_tile)
 
     def shockwave(self, tile: TileModel, direction: str):
         """
@@ -219,9 +232,6 @@ class EndTurnAdvanceFireEvent(TurnEvent):
                 nb_tile: TileModel = tile.get_tile_in_direction(direction)
                 if nb_tile.space_status != SpaceStatusEnum.FIRE:
                     nb_tile.space_status = SpaceStatusEnum.FIRE
-                    # if tile has hazmat, explosion occurs
-                    if nb_tile.has_hazmat():
-                        self.explosion(nb_tile)
                     should_stop = True
 
                 else:
@@ -280,11 +290,7 @@ class EndTurnAdvanceFireEvent(TurnEvent):
                         pass
 
                     if nb_tile.space_status == SpaceStatusEnum.FIRE:
-                        logger.info(f"Flashover on tile {tile}")
                         tile.space_status = SpaceStatusEnum.FIRE
-                        # if tile has hazmat, explosion occurs
-                        if tile.has_hazmat():
-                            self.explosion(tile)
                         num_converted += 1
                         break
 

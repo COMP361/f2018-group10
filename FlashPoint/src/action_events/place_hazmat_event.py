@@ -60,10 +60,16 @@ class PlaceHazmatEvent(ActionEvent):
             # Hazmat cannot be placed on tile
             # that is on fire or has a hazmat
             # on it already.
-            if tile.space_status is SpaceStatusEnum.FIRE:
+            if tile.space_status == SpaceStatusEnum.FIRE:
                 continue
 
-            if tile.has_hazmat():
+            should_reroll = False
+            for model in tile.associated_models:
+                if isinstance(model, HazmatModel):
+                    should_reroll = True
+                    break
+
+            if should_reroll:
                 continue
 
             tile.add_associated_model(HazmatModel())
