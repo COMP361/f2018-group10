@@ -1,4 +1,5 @@
 import json
+import os
 import random
 from datetime import datetime
 from typing import List
@@ -51,7 +52,7 @@ class GameBoardScene(GameBoardObserver):
         """
 
         self._screen = screen
-        self._save_games_file = "media/save_games.json"
+        self._save_games_file = "media/saved_games.json"
         self._game: GameStateModel = GameStateModel.instance()
         self._game.game_board.add_observer(self)
         self._init_current_player(current_player)
@@ -139,6 +140,10 @@ class GameBoardScene(GameBoardObserver):
 
     def _save(self):
         """Save the current game state to the hosts machine"""
+        if not os.path.exists(self._save_games_file):
+            with open(self._save_games_file, mode="w+", encoding='utf-8') as myFile:
+                myFile.write("[]")
+
         with open(self._save_games_file, mode='r+', encoding='utf-8') as myFile:
             temp = json.load(myFile)
             game_data = JSONSerializer.serialize(self._game)
