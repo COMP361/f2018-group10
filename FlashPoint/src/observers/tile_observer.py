@@ -10,7 +10,7 @@ class TileObserver(Observer):
     """ABC for classes concerned with getting tile state."""
 
     @abstractmethod
-    def tile_status_changed(self, status: SpaceStatusEnum):
+    def tile_status_changed(self, status: SpaceStatusEnum, is_hotspot: bool):
         pass
 
     @abstractmethod

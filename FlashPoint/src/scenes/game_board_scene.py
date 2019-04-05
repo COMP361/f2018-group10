@@ -1,4 +1,5 @@
 import json
+import random
 from datetime import datetime
 from typing import List
 
@@ -60,15 +61,13 @@ class GameBoardScene(GameBoardObserver):
 
         self.active_sprites = pygame.sprite.Group()   # Maybe add separate groups for different things later
         self.game_board_sprite = GameBoard(current_player)
-        # Setting the initial POI on the board
-        if self._game.rules == GameKindEnum.FAMILY:
-            self.set_initial_poi_family()
-        else:
-            self.set_initial_poi_experienced()
 
-        # Place hazmat event
+        # Set initial POI and place hazmat event
         if self._game.rules is GameKindEnum.EXPERIENCED:
+            self.set_initial_poi_experienced()
             self.place_hazmat()
+        else:
+            self.set_initial_poi_family()
 
         self.chat_box = ChatBox(self._current_player)
         self.menu = None
