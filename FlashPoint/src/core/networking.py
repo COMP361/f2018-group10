@@ -28,7 +28,7 @@ class Networking:
     __instance = None
 
     @staticmethod
-    def wait_for_reply(timeout=5):
+    def wait_for_reply(timeout=3):
         """
         Wait for a reply from the host before continuing with a timeout (in seconds).
         Returns false for failed attempt, true for success.
@@ -40,7 +40,7 @@ class Networking:
             time.sleep(1)
             i += 1
             if i > timeout:
-                raise ConnectionError
+                raise TimeoutError
         return reply
 
     @staticmethod
@@ -133,10 +133,10 @@ class Networking:
                 self.client.connect(ip, port)
                 self.client.send(JoinEvent(player))
                 return True
-            except MastermindErrorClient as e:
+            except MastermindErrorSocket:
                 self.client.disconnect()
                 logger.error(f"Error connecting to server at: {ip}:{port}")
-                raise MastermindErrorClient(e)
+                raise Networking.Client.SocketError
             except OSError as e:
                 self.client.disconnect()
                 raise OSError(e)
@@ -196,7 +196,7 @@ class Networking:
             Disconnects the current machine. If the current machine is a host, it ends the game as well.
             :return:
             """
-            if self.host is not None:
+            if self.host:
                 logger.info("Disconnecting host")
                 # Kill the broadcast
                 self.stop_broadcast.set()
@@ -208,7 +208,7 @@ class Networking:
                 self.host.disconnect()
                 self.host.__del__()
                 self.host = None
-            elif self.client is not None:
+            elif self.client:
                 logger.info("Disconnecting client")
                 self.client.disconnect()
                 self.client.__del__()
@@ -497,5 +497,7 @@ class Networking:
             """
             logger.warning("It seems that client is not connected...")
             Networking.get_instance().disconnect()
-            EventQueue.post(CustomEvent(ChangeSceneEnum.STARTSCENE))
+            EventQueue.post(CustomEvent(ChangeSceneEnum.DISCONNECT))
 
+        class SocketError(Exception):
+            pass

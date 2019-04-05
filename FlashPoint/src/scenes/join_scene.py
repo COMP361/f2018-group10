@@ -52,8 +52,12 @@ class JoinScene(object):
             if reply:
                 # GameStateModel.set_game(JSONSerializer.deserialize(reply))
                 EventQueue.post(CustomEvent(ChangeSceneEnum.LOBBYSCENE))
-        except ConnectionError:
-            msg = "Unable to connect"
+        except TimeoutError:
+            msg = "Host not found."
+            print(msg)
+            self.init_error_message(msg)
+        except Networking.Client.SocketError:
+            msg = "Failed to establish connection."
             print(msg)
             self.init_error_message(msg)
         except OSError:

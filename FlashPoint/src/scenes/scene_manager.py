@@ -108,6 +108,10 @@ class SceneManager(object):
                     self.next(LoadGame, self._current_player)
                 elif event.type == ChangeSceneEnum.LOBBYSCENE:
                     self.next(LobbyScene, self._current_player)
+                elif event.type == ChangeSceneEnum.DISCONNECT:
+                    # player won't be redirected if they are not in game or trying to enter a game when disconnected
+                    if self._active_scene is not (StartScene or HostJoinScene):
+                        self.next(StartScene)
                 elif event.type == ChangeSceneEnum.GAMEBOARDSCENE:
                     EventQueue.unblock()
                     self.next(GameBoardScene, self._current_player)
