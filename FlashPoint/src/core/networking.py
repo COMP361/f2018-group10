@@ -210,7 +210,8 @@ class Networking:
                 self.host = None
             elif self.client:
                 logger.info("Disconnecting client")
-                self.send_to_server(DisconnectEvent())
+                player_model = GameStateModel.instance().get_player_by_ip(self.get_ip())
+                self.send_to_server(DisconnectEvent(player_model))
                 self.client.disconnect()
                 self.client.__del__()
                 self.client = None
