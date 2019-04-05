@@ -33,7 +33,9 @@ class GameBoardModel(Model):
         self._engine_spots = []
         self._board_type = board_type
 
-        self._tiles = self._determine_board_tiles()
+        self._tiles = None
+        if self._board_type:
+            self._tiles = self._determine_board_tiles()
 
         self._poi_bank = GameBoardModel._init_pois()
         self._active_pois = []
