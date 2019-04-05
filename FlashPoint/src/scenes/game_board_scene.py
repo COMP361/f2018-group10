@@ -254,7 +254,7 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
             if isinstance(sprite, PlayerSprite):
                 if sprite.associated_player is player:
                     GameBoard.instance().remove(sprite)
-                    return
+                    break
 
     def player_list_changed(self):
         # Refresh the list of players in HUD
