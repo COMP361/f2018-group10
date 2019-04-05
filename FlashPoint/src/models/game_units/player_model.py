@@ -101,12 +101,22 @@ class PlayerModel(Model):
         self._notify_position()
 
     def set_initial_ap(self, game_kind: GameKindEnum):
-        """Set the initial AP for this player"""
+        """Set the initial AP and special AP for this player"""
         self.ap = 4
 
         if game_kind == GameKindEnum.EXPERIENCED:
-            # TODO: Set AP based on role.
-            pass
+            if self.role == PlayerRoleEnum.CAPTAIN:
+                self.special_ap = 2
+
+            elif self.role == PlayerRoleEnum.CAFS:
+                self.ap = self.ap - 1
+                self.special_ap = 3
+
+            elif self.role == PlayerRoleEnum.GENERALIST:
+                self.ap = self.ap + 1
+
+            elif self.role == PlayerRoleEnum.RESCUE:
+                self.special_ap = 3
 
     @property
     def column(self) -> int:

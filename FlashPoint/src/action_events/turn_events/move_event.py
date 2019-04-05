@@ -4,7 +4,7 @@ import logging
 
 from src.action_events.turn_events.turn_event import TurnEvent
 from src.constants.state_enums import SpaceStatusEnum, SpaceKindEnum, DoorStatusEnum, VictimStateEnum, \
-    GameKindEnum
+    GameKindEnum, PlayerRoleEnum
 from src.models.game_board.door_model import DoorModel
 from src.models.game_board.null_model import NullModel
 from src.models.game_board.tile_model import TileModel
@@ -280,23 +280,23 @@ class MoveEvent(TurnEvent):
             if isinstance(self.fireman.carrying_victim, VictimModel):
                 carrying_something = True
                 if d_tile.tile_model.space_status != SpaceStatusEnum.FIRE:
-                    self.fireman.ap = self.fireman.ap - 2
+                    self._deduct_player_points(2)
                     if d_tile.tile_model.space_kind != SpaceKindEnum.INDOOR:
                         self.resolve_victim_while_traveling(d_tile.tile_model)
 
             if isinstance(self.fireman.carrying_hazmat, HazmatModel):
                 carrying_something = True
                 if d_tile.tile_model.space_status != SpaceStatusEnum.FIRE:
-                    self.fireman.ap = self.fireman.ap - 2
+                    self._deduct_player_points(2)
                     if d_tile.tile_model.space_kind != SpaceKindEnum.INDOOR:
                         self.fireman.carrying_hazmat = NullModel()
 
             # fireman is not carrying a victim/hazmat
             if not carrying_something:
                 if d_tile.tile_model.space_status != SpaceStatusEnum.FIRE:
-                    self.fireman.ap = self.fireman.ap - 1
+                    self._deduct_player_points(1)
                 else:
-                    self.fireman.ap = self.fireman.ap - 2
+                    self._deduct_player_points(2)
 
             # Check the associated models of the tile.
             # If it contains any POIs, flip them over.
@@ -354,3 +354,23 @@ class MoveEvent(TurnEvent):
         # and disassociate the victim from the player
         self.game.game_board.remove_poi_or_victim(self.fireman.carrying_victim)
         self.fireman.carrying_victim = NullModel()
+
+    def _deduct_player_points(self, pts_to_deduct: int):
+        """
+        If the fireman is a Rescue Specialist, subtract
+        from the special AP first and then from AP.
+        If any other type of fireman, just subtract from AP.
+
+        :param pts_to_deduct: number of points to deduct
+        :return:
+        """
+        if self.fireman.role == PlayerRoleEnum.RESCUE:
+            while self.fireman.special_ap > 0 and pts_to_deduct > 0:
+                self.fireman.special_ap = self.fireman.special_ap - 1
+                pts_to_deduct = pts_to_deduct - 1
+
+            if pts_to_deduct > 0:
+                self.fireman.ap = self.fireman.ap - pts_to_deduct
+
+        else:
+            self.fireman.ap = self.fireman.ap - pts_to_deduct
