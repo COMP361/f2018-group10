@@ -10,7 +10,6 @@ from src.constants.state_enums import GameKindEnum, GameStateEnum
 from src.models.game_units.victim_model import VictimModel
 from src.sprites.victim_sprite import VictimSprite
 from src.models.game_units.poi_model import POIModel
-from src.models.game_board.null_model import NullModel
 from src.observers.GameBoardObserver import GameBoardObserver
 from src.observers.game_state_observer import GameStateObserver
 
@@ -89,6 +88,8 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
 
         for player in self._game.players:
             player.set_initial_ap(self._game.rules)
+
+        GameStateModel.instance().add_observer(self)
 
     def notify_active_poi(self, active_pois: List[POIModel]):
         # Removes are already handled by the sprites themselves, therefore only need to deal with adds.

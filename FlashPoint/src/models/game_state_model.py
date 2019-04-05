@@ -153,6 +153,7 @@ class GameStateModel(Model):
         """Remove a player from the current game."""
         with GameStateModel.lock:
             self._players.remove(player)
+            self._notify_player_index()
             self._notify_player_removed(player)
 
     @property
