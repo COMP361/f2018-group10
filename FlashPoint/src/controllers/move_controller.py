@@ -214,37 +214,13 @@ class MoveController(PlayerObserver, Controller):
         self._apply_highlight()
 
     def player_ap_changed(self, updated_ap: int):
-        GameStateModel.instance().game_board.reset_tiles_visit_count()
-        ap = self.current_player.ap
-        # Rescue specialist's special AP are used for moving
-        if self.current_player.role == PlayerRoleEnum.RESCUE:
-            ap = ap + self.current_player.special_ap
-
-        self.moveable_tiles = self._determine_reachable_tiles(
-            self.current_player.row, self.current_player.column, ap)
-        GameStateModel.instance().game_board.reset_tiles_visit_count()
+        self._update_moveable_tiles()
 
     def player_position_changed(self, x_pos: int, y_pos: int):
-        GameStateModel.instance().game_board.reset_tiles_visit_count()
-        ap = self.current_player.ap
-        # Rescue specialist's special AP are used for moving
-        if self.current_player.role == PlayerRoleEnum.RESCUE:
-            ap = ap + self.current_player.special_ap
-
-        self.moveable_tiles = self._determine_reachable_tiles(
-            self.current_player.row, self.current_player.column, ap)
-        GameStateModel.instance().game_board.reset_tiles_visit_count()
+        self._update_moveable_tiles()
 
     def player_carry_changed(self, carry):
-        GameStateModel.instance().game_board.reset_tiles_visit_count()
-        ap = self.current_player.ap
-        # Rescue specialist's special AP are used for moving
-        if self.current_player.role == PlayerRoleEnum.RESCUE:
-            ap = ap + self.current_player.special_ap
-
-        self.moveable_tiles = self._determine_reachable_tiles(
-            self.current_player.row, self.current_player.column, ap)
-        GameStateModel.instance().game_board.reset_tiles_visit_count()
+        self._update_moveable_tiles()
 
     def player_wins_changed(self, wins: int):
         pass
@@ -258,6 +234,9 @@ class MoveController(PlayerObserver, Controller):
         if self.current_player.role != PlayerRoleEnum.RESCUE:
             return
 
+        self._update_moveable_tiles()
+
+    def _update_moveable_tiles(self):
         GameStateModel.instance().game_board.reset_tiles_visit_count()
         ap = self.current_player.ap
         # Rescue specialist's special AP are used for moving
