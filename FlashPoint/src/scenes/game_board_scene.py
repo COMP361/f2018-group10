@@ -205,7 +205,7 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
         ignore = ignore or (self.chat_box.box.x < mouse_pos[0] < self.chat_box.box.x + self.chat_box.box.width and
                             self.chat_box.box.y < mouse_pos[1] < self.chat_box.box.y + self.chat_box.box.height)
 
-        for sprite in itertools.chain(self.player_hud_sprites, self.active_sprites):
+        for sprite in itertools.chain(self.player_hud_sprites.sprites(), self.active_sprites.sprites()):
             ignore = ignore or (sprite.rect.x < mouse_pos[0] < sprite.rect.x + sprite.rect.width and
                                 sprite.rect.y < mouse_pos[1] < sprite.rect.y + sprite.rect.height)
 
@@ -250,10 +250,11 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
     def player_removed(self, player: PlayerModel):
         self.player_list_changed()
         # Remove player sprite from game board
-        for sprite in GameBoard.instance():
+        for sprite in GameBoard.instance().sprites():
             if isinstance(sprite, PlayerSprite):
                 if sprite.associated_player is player:
                     GameBoard.instance().remove(sprite)
+                    return
 
     def player_list_changed(self):
         # Refresh the list of players in HUD
