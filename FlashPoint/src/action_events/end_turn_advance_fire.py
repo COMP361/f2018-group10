@@ -266,7 +266,6 @@ class EndTurnAdvanceFireEvent(TurnEvent):
                         pass
 
                     if nb_tile.space_status == SpaceStatusEnum.FIRE:
-                        logger.info(f"Flashover on tile {tile}")
                         tile.space_status = SpaceStatusEnum.FIRE
                         num_converted += 1
                         break
