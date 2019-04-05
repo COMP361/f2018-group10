@@ -463,8 +463,6 @@ class Networking:
                 return
             if isinstance(data, TurnEvent) or isinstance(data, ActionEvent):
                 data.execute()
-                if isinstance(data, DisconnectEvent):
-                    Networking.get_instance().disconnect()
 
         def get_server_reply(self):
             """
