@@ -2,7 +2,6 @@ from typing import List
 
 import pygame
 
-from src.action_events.end_turn_advance_fire import EndTurnAdvanceFireEvent
 from src.constants.state_enums import SpaceStatusEnum
 from src.models.model import Model
 from src.models.game_units.hazmat_model import HazmatModel
@@ -31,11 +30,5 @@ class HazmatSprite(TileObserver, pygame.sprite.Sprite):
         # If HazmatModel no longer exists in the associated models, remove it
         self.kill()
 
-    def tile_status_changed(self, status: SpaceStatusEnum):
-        if status is SpaceStatusEnum.FIRE:
-            advance_fire = EndTurnAdvanceFireEvent()
-            advance_fire.explosion(self.tile_model)
-
-            for model in self.tile_model.associated_models:
-                if isinstance(model, HazmatModel):
-                    self.tile_model.remove_associated_model(model)
+    def tile_status_changed(self, status: SpaceStatusEnum, is_hotspot: bool):
+        pass

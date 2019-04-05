@@ -83,6 +83,13 @@ class WallAlreadyDestroyedException(FlashPointBaseException):
         super().__init__(message)
 
 
+class NoAvailableTileException(FlashPointBaseException):
+    """Called when no valid tiles can be found when following the arrow path."""
+
+    def __init__(self):
+        message = "No available tile can be found."
+
+
 class FlippingDiceProblemException(FlashPointBaseException):
     """Class to indicate that there is an issue when the dice are being flipped."""
 

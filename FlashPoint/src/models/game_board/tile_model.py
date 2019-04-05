@@ -1,6 +1,7 @@
 import logging
 from typing import Optional, List
 
+from src.models.game_units.hazmat_model import HazmatModel
 from src.models.game_units.poi_model import POIModel
 from src.models.game_units.victim_model import VictimModel
 from src.models.game_board.door_model import DoorModel
@@ -54,7 +55,7 @@ class TileModel(Model):
 
     def _notify_status(self):
         for obs in self.observers:
-            obs.tile_status_changed(self.space_status)
+            obs.tile_status_changed(self.space_status, self.is_hotspot)
 
     def _notify_assoc_models(self):
         for obs in self.observers:
@@ -98,6 +99,7 @@ class TileModel(Model):
     def is_hotspot(self, hotspot_bool: bool):
         self._is_hotspot = hotspot_bool
         logger.info(self.__str__() + " hotspot: %s", str(hotspot_bool))
+        self._notify_status()
 
     @property
     def adjacent_tiles(self):
@@ -252,3 +254,14 @@ class TileModel(Model):
             if isinstance(model, POIModel) or isinstance(model, VictimModel):
                 return True
         return False
+
+    def has_hazmat(self) -> bool:
+        for model in self.associated_models:
+            if isinstance(model, HazmatModel):
+                return True
+        return False
+
+    def remove_hazmat(self):
+        for model in self.associated_models:
+            if isinstance(model, HazmatModel):
+                self.remove_associated_model(model)
