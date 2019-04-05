@@ -9,6 +9,7 @@ from src.models.game_units.poi_model import POIModel
 
 logger = logging.getLogger("FlashPoint")
 
+
 class SetInitialPOIExperiencedEvent(ActionEvent):
 
     def __init__(self, seed: int = 0):
@@ -40,13 +41,12 @@ class SetInitialPOIExperiencedEvent(ActionEvent):
             poi = self.game_board.get_poi_from_bank_by_index(index)
             row = locations[i][0]
             column = locations[i][1]
-            self.game_board.active_pois.append(poi)
+            self.game_board.add_poi_or_victim(poi)
             self.game_board.get_tile_at(row, column).add_associated_model(poi)
             pois_to_remove.append(poi)
 
         for poi in pois_to_remove:
             self.game_board.remove_from_poi_bank(poi)
-
 
     def _determine_locations(self) -> List[List[int]]:
         """
