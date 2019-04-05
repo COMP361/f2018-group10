@@ -210,6 +210,7 @@ class Networking:
                 self.host = None
             elif self.client:
                 logger.info("Disconnecting client")
+                self.send_to_server(DisconnectEvent())
                 self.client.disconnect()
                 self.client.__del__()
                 self.client = None
@@ -368,8 +369,7 @@ class Networking:
             if isinstance(data, TurnEvent) or isinstance(data, ActionEvent):
                 if isinstance(data, DisconnectEvent):
                     # Kick the player that send the DC event and notify all other players.
-                    # Need to have similar polling mechanics like in lobby
-                    self.kick_client(connection_object.address[0])
+                    self.callback_disconnect_client(connection_object)
                     return super(MastermindServerUDP, self).callback_client_handle(connection_object, data)
 
                 if isinstance(data, JoinEvent):
