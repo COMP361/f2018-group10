@@ -21,7 +21,6 @@ class ChooseStartingPositionEvent(ActionEvent):
         self.player: PlayerModel = game.players_turn
 
     def execute(self):
-        print()
         logger.info("Executing ChooseStartingPositionEvent")
         game: GameStateModel = GameStateModel.instance()
         tile = game.game_board.get_tile_at(self._row, self._column)

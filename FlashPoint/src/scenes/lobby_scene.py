@@ -61,7 +61,8 @@ class LobbyScene(GameStateObserver):
             self.buttonReady.on_click(self.set_ready)
         self.buttonBack.on_click(self.go_back)
 
-    def go_back(self):
+    @staticmethod
+    def go_back():
         Networking.get_instance().disconnect()
         EventQueue.post(CustomEvent(ChangeSceneEnum.STARTSCENE))
 
@@ -148,6 +149,42 @@ class LobbyScene(GameStateObserver):
         self.this_img = RectButton(x, y, box_size[0], box_size[1], path)
 
         self.sprite_grp.add(self.this_img)
+
+    def _init_background_player(self, rect):
+
+        if not self._game.rules == GameKindEnum.FAMILY and self._current_player.role:
+            role_path = self.get_path_from_character_enum(self._current_player.role)
+            user_box = RectLabel(rect[0], rect[1], rect[2], rect[3], role_path)
+        else:
+            user_box = RectLabel(rect[0], rect[1], rect[2], rect[3], "media/specialist_cards/family.png")
+        return user_box
+
+    def get_path_from_character_enum(self, enum: PlayerRoleEnum):
+        if enum == PlayerRoleEnum.CAFS:
+            return "media/specialist_cards/cafs_firefighter.png"
+        elif enum == PlayerRoleEnum.CAPTAIN:
+            return "media/specialist_cards/fire_captain.png"
+        elif enum == PlayerRoleEnum.GENERALIST:
+            return "media/specialist_cards/generalist.png"
+        elif enum == PlayerRoleEnum.DRIVER:
+            return "media/specialist_cards/driver_operator.png"
+        elif enum == PlayerRoleEnum.HAZMAT:
+            return "media/specialist_cards/hazmat_technician.png"
+        elif enum == PlayerRoleEnum.IMAGING:
+            return "media/specialist_cards/imaging_technician.png"
+        elif enum == PlayerRoleEnum.PARAMEDIC:
+            return "media/specialist_cards/paramedic.png"
+        elif enum == PlayerRoleEnum.RESCUE:
+            return "media/specialist_cards/rescue_specialist.png"
+        elif enum == PlayerRoleEnum.FAMILY:
+            return "media/specialist_cards/family.png"
+
+    def _init_text_box(self, position, text, color):
+        box_size = (position[2], position[3])
+
+        user_box = RectLabel(position[0], position[1], box_size[0], box_size[1], color, 0,
+                             Text(pygame.font.SysFont('Arial', 20), text, (0, 255, 0, 0)))
+        return user_box
 
     def _init_selec_char(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
         box_size = (130, 48)
@@ -256,5 +293,8 @@ class LobbyScene(GameStateObserver):
     def dead_victims(self, victims_dead: int):
         pass
 
-    def player_list_changed(self):
+    def player_added(self, player: PlayerModel):
+        pass
+
+    def player_removed(self, player: PlayerModel):
         pass

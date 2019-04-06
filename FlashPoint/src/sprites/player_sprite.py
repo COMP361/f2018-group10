@@ -13,6 +13,9 @@ import src.constants.color as Color
 class PlayerSprite(pygame.sprite.Sprite, PlayerObserver):
     """Visual representation of a Player and/or his fireman."""
 
+    def player_role_changed(self, role: PlayerRoleEnum):
+        pass
+
     def player_carry_changed(self, carry):
         pass
 

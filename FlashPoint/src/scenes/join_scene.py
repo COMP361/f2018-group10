@@ -1,3 +1,5 @@
+import time
+
 import pygame
 
 import src.constants.color as Color
@@ -46,13 +48,16 @@ class JoinScene(object):
             self._current_player.status = PlayerStatusEnum.NOT_READY
             Networking.get_instance().join_host(ip_addr, player=self._current_player)
             reply = Networking.wait_for_reply()
+            # Connection error will be raised if no reply
             if reply:
-                GameStateModel.set_game(JSONSerializer.deserialize(reply))
+                # GameStateModel.set_game(JSONSerializer.deserialize(reply))
                 EventQueue.post(CustomEvent(ChangeSceneEnum.LOBBYSCENE))
-            else:
-                raise ConnectionError
-        except ConnectionError:
-            msg = "Unable to connect"
+        except TimeoutError:
+            msg = "Host not found."
+            print(msg)
+            self.init_error_message(msg)
+        except Networking.Client.SocketError:
+            msg = "Failed to establish connection."
             print(msg)
             self.init_error_message(msg)
         except OSError:

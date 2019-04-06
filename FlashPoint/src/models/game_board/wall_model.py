@@ -7,6 +7,7 @@ from src.observers.wall_observer import WallObserver
 
 logger = logging.getLogger("FlashPoint")
 
+
 class WallModel(EdgeObstacleModel):
     """Logical state of a Wall object."""
     def __init__(self, row: int, column: int, direction: str):
@@ -32,6 +33,8 @@ class WallModel(EdgeObstacleModel):
     @wall_status.setter
     def wall_status(self, status: WallStatusEnum):
         self._wall_status = status
+        for obs in self.observers:
+            obs.wall_status_changed(self._wall_status)
 
     @property
     def id(self):

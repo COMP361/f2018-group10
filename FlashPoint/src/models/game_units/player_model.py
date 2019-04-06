@@ -3,6 +3,7 @@ from typing import Tuple, List, Union
 
 import src.constants.color as Color
 from src.models.game_board.null_model import NullModel
+from src.models.game_units.hazmat_model import HazmatModel
 from src.models.game_units.victim_model import VictimModel
 from src.observers.player_observer import PlayerObserver
 from src.constants.state_enums import PlayerStatusEnum, PlayerRoleEnum, GameKindEnum
@@ -25,7 +26,8 @@ class PlayerModel(Model,object):
         self._wins = 0
         self._losses = 0
         self._carrying_victim = NullModel()
-        self._role: PlayerRoleEnum = PlayerRoleEnum.FAMILY
+        self._carrying_hazmat = NullModel()
+        self._role = PlayerRoleEnum.FAMILY
 
     def __eq__(self, other):
         x = [other.ip == self.ip, other.nickname == self.nickname]
@@ -106,13 +108,21 @@ class PlayerModel(Model,object):
         self._notify_position()
 
     def set_initial_ap(self, game_kind: GameKindEnum):
-        """Set the initial AP for this player"""
+        """Set the initial AP and special AP for this player"""
         self.ap = 4
         if game_kind == GameKindEnum.EXPERIENCED:
-            # TODO: Set AP based on role.
-            self.special_ap = 1
+            if self.role == PlayerRoleEnum.CAPTAIN:
+                self.special_ap = 2
 
+            elif self.role == PlayerRoleEnum.CAFS:
+                self.ap = self.ap - 1
+                self.special_ap = 3
 
+            elif self.role == PlayerRoleEnum.GENERALIST:
+                self.ap = self.ap + 1
+
+            elif self.role == PlayerRoleEnum.RESCUE:
+                self.special_ap = 3
 
     @property
     def column(self) -> int:
@@ -194,7 +204,7 @@ class PlayerModel(Model,object):
     @status.setter
     def status(self, status: PlayerStatusEnum):
         self._status = status
-        logger.info("Player {nickname} status: {status}".format(nickname=self.nickname, status=self.status))
+        logger.info("Player {nickname} status: {status}".format(nickname=self.nickname, status=self.status.name))
         self._notify_status()
 
     @property
@@ -206,3 +216,23 @@ class PlayerModel(Model,object):
         self._carrying_victim = victim
         logger.info("Player {nickname} carrying victim: {cv}".format(nickname=self.nickname, cv=victim))
         self._notify_carry()
+
+    @property
+    def carrying_hazmat(self) -> Union[HazmatModel, NullModel]:
+        return self._carrying_hazmat
+
+    @carrying_hazmat.setter
+    def carrying_hazmat(self, hazmat: HazmatModel):
+        self._carrying_hazmat = hazmat
+        logger.info("Player {nickname} carrying hazmat: {h}".format(nickname=self.nickname, h=hazmat))
+        # TODO: Modify notify carry to account for carrying hazmats
+        # self._notify_carry()
+
+    @property
+    def role(self) -> PlayerRoleEnum:
+        return self._role
+
+    @role.setter
+    def role(self, player_role: PlayerRoleEnum):
+        self._role = player_role
+        logger.info("Player {nickname} role: {r}".format(nickname=self.nickname, r=player_role.name))

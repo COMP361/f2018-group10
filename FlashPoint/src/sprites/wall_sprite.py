@@ -98,8 +98,11 @@ class WallSprite(pygame.sprite.Sprite, WallObserver):
             marker = RectLabel(self.button.rect.x + x_offset1, self.button.rect.y + y_offset1, 28, 28,
                                "media/Threat_Markers/damageMarker.png")
             marker.draw(screen)
-        if self.destroyed:
+        elif self.destroyed:
             marker = RectLabel(self.button.rect.x + x_offset2, self.button.rect.y + y_offset2, 28, 28,
+                               "media/Threat_Markers/damageMarker.png")
+            marker.draw(screen)
+            marker = RectLabel(self.button.rect.x + x_offset1, self.button.rect.y + y_offset1, 28, 28,
                                "media/Threat_Markers/damageMarker.png")
             marker.draw(screen)
 

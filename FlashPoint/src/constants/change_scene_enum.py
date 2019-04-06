@@ -16,3 +16,4 @@ class ChangeSceneEnum(Enum):
     LOSESCENE = auto()
     WINSCENE = auto()
     CHOOSEBOARDSCENE = auto()
+    DISCONNECT = auto()
