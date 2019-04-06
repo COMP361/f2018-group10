@@ -105,7 +105,8 @@ class EndTurnAdvanceFireEvent(TurnEvent):
         # retain up to a maximum of 4 AP
         # as the turn is ending and
         # replenish player's AP, irrespective
-        # of role, by 4 (add/subtract points after)
+        # of role, by 4 (add/subtract points after).
+        # special AP are not retained for the next turn.
         if self.player.ap > 4:
             self.player.ap = 4
 
