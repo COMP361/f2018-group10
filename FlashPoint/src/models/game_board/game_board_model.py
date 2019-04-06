@@ -500,8 +500,9 @@ class GameBoardModel(Model):
         else:
             return VehicleOrientationEnum.HORIZONTAL
 
-    def get_distance_to_parking_spot(self, destination: Tuple[TileModel, TileModel]):
-        origin_first_tile = self.get_tile_at(self.ambulance.row, self.ambulance.column)
+    def get_distance_to_parking_spot(self, vehicle_type: str, destination: Tuple[TileModel, TileModel]):
+        vehicle = self.ambulance if vehicle_type == "AMBULANCE" else self.engine
+        origin_first_tile = self.get_tile_at(vehicle.row, vehicle.column)
         origin_second_tile = self.get_other_parking_tile(origin_first_tile)
         origin_spot = (origin_first_tile, origin_second_tile)
 

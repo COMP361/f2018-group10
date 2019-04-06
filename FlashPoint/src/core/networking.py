@@ -1,3 +1,4 @@
+import traceback
 from typing import Union
 
 import ipaddress
@@ -236,6 +237,7 @@ class Networking:
                 except MastermindErrorClient:
                     # retry
                     self.send_to_server(data, compress, count+1)
+                    time.sleep(0.5)
                 self.client.toggle_block_signal(False)
             else:
                 raise MastermindErrorClient("Client is not available")
@@ -443,8 +445,14 @@ class Networking:
                             self._reply_queue.append(_server_reply)
                             self.callback_client_receive(_server_reply)
                     except MastermindErrorClient:
+                        logger.error("Mastermind Error:")
+                        info = sys.exc_info()
+                        traceback.print_exception(*info)
                         self.callback_disconnect()
                     except OSError:
+                        logger.error("OS ERROR, disconnecting client.")
+                        info = sys.exc_info()
+                        traceback.print_exception(*info)
                         self.callback_disconnect()
 
         def disconnect(self):

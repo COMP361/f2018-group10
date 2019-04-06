@@ -39,9 +39,7 @@ class EndTurnAdvanceFireEvent(TurnEvent):
     """
     def __init__(self, seed: int = 0):
         super().__init__()
-        self.game_state: GameStateModel = GameStateModel.instance()
-        self.player = self.game_state.players_turn
-        self.board: GameBoardModel = self.game_state.game_board
+        self.player = GameStateModel.instance().players_turn
         self.initial_tile: TileModel = None
 
         if seed == 0:
@@ -52,8 +50,8 @@ class EndTurnAdvanceFireEvent(TurnEvent):
         # Pick random location: roll dice
         random.seed(self.seed)
 
-        self.red_dice = self.game_state.roll_red_dice()
-        self.black_dice = self.game_state.roll_black_dice()
+        self.red_dice = GameStateModel.instance().roll_red_dice()
+        self.black_dice = GameStateModel.instance().roll_black_dice()
         self.directions = ["North", "South", "East", "West"]
 
     def _main_phase_end_turn(self):
@@ -145,6 +143,8 @@ class EndTurnAdvanceFireEvent(TurnEvent):
     def execute(self):
         logger.info("Executing EndTurnAdvanceFireEvent")
 
+        self.game_state: GameStateModel = GameStateModel.instance()
+        self.board: GameBoardModel = self.game_state.game_board
         if self.game_state.state == GameStateEnum.MAIN_GAME:
             self._main_phase_end_turn()
 
@@ -191,12 +191,13 @@ class EndTurnAdvanceFireEvent(TurnEvent):
 
     def explosion(self, origin_tile: TileModel):
         logger.info(f"Explosion occurred on {origin_tile}")
+        game_state = GameStateModel.instance()
         for direction, obstacle in origin_tile.adjacent_edge_objects.items():
             # fire does not move to the neighbouring tile
             # damaging wall present along the tile
             if isinstance(obstacle, WallModel) and obstacle.wall_status != WallStatusEnum.DESTROYED:
                 obstacle.inflict_damage()
-                self.game_state.damage = self.game_state.damage + 1
+                game_state.damage = game_state.damage + 1
 
             # fire does not move to the neighbouring tile
             # removing door that borders the tile
@@ -222,6 +223,7 @@ class EndTurnAdvanceFireEvent(TurnEvent):
         :param direction: direction in which shockwave continues
         :return:
         """
+        game_state = GameStateModel.instance()
         should_stop = False
         while not should_stop:
             # if there is no obstacle in the given direction -
@@ -249,7 +251,7 @@ class EndTurnAdvanceFireEvent(TurnEvent):
                 obstacle = tile.get_obstacle_in_direction(direction)
                 if isinstance(obstacle, WallModel):
                     obstacle.inflict_damage()
-                    self.game_state.damage = self.game_state.damage + 1
+                    game_state.damage = game_state.damage + 1
                     should_stop = True
 
                 elif isinstance(obstacle, DoorModel):
