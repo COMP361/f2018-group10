@@ -4,6 +4,7 @@ import pygame
 
 import src.constants.color as Color
 import src.constants.fonts as Font
+from src.core.serializer import JSONSerializer
 from src.core.networking import Networking
 from src.core.custom_event import CustomEvent
 from src.core.event_queue import EventQueue
@@ -50,6 +51,7 @@ class JoinScene(object):
             reply = Networking.wait_for_reply()
             # Connection error will be raised if no reply
             if reply:
+                reply = JSONSerializer.deserialize(reply)
                 if isinstance(reply, TooManyPlayersEvent):
                     raise TooManyPlayersException
                 # GameStateModel.set_game(JSONSerializer.deserialize(reply))

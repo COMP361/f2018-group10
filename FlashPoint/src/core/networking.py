@@ -381,7 +381,7 @@ class Networking:
                         Networking.get_instance().send_to_all_client(GameStateModel.instance())
                     except TooManyPlayersException:
                         # Informs the client that the lobby is full
-                        Networking.get_instance().send_to_client(connection_object.address[0], TooManyPlayersEvent)
+                        Networking.get_instance().send_to_client(connection_object.address[0], TooManyPlayersEvent())
                     return super(MastermindServerUDP, self).callback_client_handle(connection_object, data)
 
                 # send everything back to the clients to process
