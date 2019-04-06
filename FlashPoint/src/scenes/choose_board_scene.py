@@ -5,7 +5,6 @@ from src.constants.change_scene_enum import ChangeSceneEnum
 from src.constants.state_enums import GameBoardTypeEnum
 from src.core.custom_event import CustomEvent
 from src.core.event_queue import EventQueue
-from src.models.game_board.game_board_model import GameBoardModel
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 from src.UIComponents.rect_button import RectButton
@@ -13,7 +12,7 @@ from src.UIComponents.rect_label import RectLabel
 from src.UIComponents.text import Text
 
 
-class ChooseBoard(object):
+class ChooseBoardScene(object):
     def __init__(self, screen, current_player: PlayerModel):
         self.game_kind = GameStateModel.instance().rules
         self.sprite_grp = pygame.sprite.Group()
@@ -63,12 +62,17 @@ class ChooseBoard(object):
         box_size = (130, 48)
         self.buttonBack = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
                                      Text(pygame.font.SysFont('Arial', 20), text, color_text))
-        self.buttonBack.on_click(EventQueue.post, CustomEvent(ChangeSceneEnum.CREATEGAMEMENU))
+        self.buttonBack.on_click(self.destroy_game_and_back)
         self.sprite_grp.add(self.buttonBack)
 
     @staticmethod
-    def set_and_continue(board_type : GameBoardTypeEnum):
-        GameStateModel.instance().game_board = GameBoardModel(board_type)
+    def destroy_game_and_back():
+        GameStateModel.instance().__del__()
+        EventQueue.post(CustomEvent(ChangeSceneEnum.CREATEGAMEMENU))
+
+    @staticmethod
+    def set_and_continue(board_type: GameBoardTypeEnum):
+        GameStateModel.instance().board_type = board_type
         EventQueue.post(CustomEvent(ChangeSceneEnum.SETMAXPLAYERSCENE))
 
     def draw(self, screen):

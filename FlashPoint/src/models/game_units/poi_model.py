@@ -20,7 +20,7 @@ class POIModel(Model):
         self._column = -7
 
     def __str__(self):
-        return f"PoiModel: {self._identity} at: ({self._row}, {self._column})"
+        return f"POIModel: {self._identity} at: ({self._row}, {self._column})"
 
     def __eq__(self, other):
         if not isinstance(other, POIModel):
@@ -56,6 +56,7 @@ class POIModel(Model):
     def set_pos(self, row: int, column: int):
         self._row = row
         self._column = column
+        logger.info("POIModel position: ({row}, {column})".format(row=self.row, column=self.column))
         self._notify_position()
 
     @property
@@ -65,6 +66,7 @@ class POIModel(Model):
     @status.setter
     def status(self, status: POIStatusEnum):
         self._status = status
+        logger.info("POIModel status: {status}".format(status=self.status))
 
     @property
     def identity(self) -> POIIdentityEnum:  # GOTTA CHECK IF IT IS REVEALED YET

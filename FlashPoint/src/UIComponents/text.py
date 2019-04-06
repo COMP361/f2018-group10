@@ -22,8 +22,8 @@ class Text(pygame.sprite.Sprite):
     def __init__(self,
                  font: pygame.font.Font,
                  text: str,
-                 color: Tuple[int, ...]=(0, 0, 0),
-                 anti_alias: bool=True):
+                 color: Tuple[int, ...] = (0, 0, 0),
+                 anti_alias: bool = True):
         """
         Constructor.
         :param font: Defines font style. MUST BE an instance of pygame.font.Font()

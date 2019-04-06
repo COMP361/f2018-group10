@@ -1,7 +1,7 @@
 import pygame
 
 from src.action_events.turn_events.turn_event import TurnEvent
-from src.constants.state_enums import WallStatusEnum, GameStateEnum
+from src.constants.state_enums import WallStatusEnum, GameStateEnum, PlayerRoleEnum
 from src.core.event_queue import EventQueue
 from src.core.networking import Networking
 from src.action_events.turn_events.chop_event import ChopEvent
@@ -33,7 +33,11 @@ class ChopController(object):
         if not self.current_player == self.game.players_turn:
             return False
 
-        valid_to_chop = TurnEvent.has_required_AP(self.current_player.ap, 2)
+        if self.current_player.role == PlayerRoleEnum.RESCUE:
+            valid_to_chop = TurnEvent.has_required_AP(self.current_player.ap, 1)
+        else:
+            valid_to_chop = TurnEvent.has_required_AP(self.current_player.ap, 2)
+
         if not valid_to_chop:
             return False
 

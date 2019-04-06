@@ -34,6 +34,8 @@ class EngineSprite(pygame.sprite.Sprite, VehicleObserver):
         elif self.orientation == VehicleOrientationEnum.HORIZONTAL and orientation == VehicleOrientationEnum.VERTICAL:
             self.image = pygame.transform.rotate(self.image, 90)
 
+        self.orientation = orientation
+
     def update(self, event_queue: EventQueue):
         new_x = self.tile_sprite.rect.x
         new_y = self.tile_sprite.rect.y

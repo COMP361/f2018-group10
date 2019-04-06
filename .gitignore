@@ -28,3 +28,5 @@
 #ignore profiles.json
 FlashPoint/src/media/profiles.json
 FlashPoint/src/media/save_games.json
+
+FlashPoint/src/media/saved_games\.json

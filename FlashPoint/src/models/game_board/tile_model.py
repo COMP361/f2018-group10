@@ -1,10 +1,11 @@
+import logging
 from typing import Optional, List
 
+from src.models.game_units.hazmat_model import HazmatModel
 from src.models.game_units.poi_model import POIModel
 from src.models.game_units.victim_model import VictimModel
 from src.models.game_board.door_model import DoorModel
 from src.models.game_board.wall_model import WallModel
-from src.models.game_units.hazmat_model import HazmatModel
 from src.models.model import Model
 from src.core.flashpoint_exceptions import TilePositionOutOfBoundsException
 from src.models.game_board.edge_obstacle_model import EdgeObstacleModel
@@ -12,6 +13,8 @@ from src.models.game_board.null_model import NullModel
 from src.constants.state_enums import SpaceKindEnum, DoorStatusEnum, WallStatusEnum, ArrowDirectionEnum
 from src.constants.state_enums import SpaceStatusEnum
 from src.observers.tile_observer import TileObserver
+
+logger = logging.getLogger("FlashPoint")
 
 
 class TileModel(Model):
@@ -53,7 +56,7 @@ class TileModel(Model):
 
     def _notify_status(self):
         for obs in self.observers:
-            obs.tile_status_changed(self.space_status)
+            obs.tile_status_changed(self.space_status, self.is_hotspot)
 
     def _notify_assoc_models(self):
         for obs in self.observers:
@@ -86,11 +89,18 @@ class TileModel(Model):
     @space_status.setter
     def space_status(self, space_status: SpaceStatusEnum):
         self._space_status = space_status
+        logger.info(self.__str__() + " status: %s", space_status.name)
         self._notify_status()
 
     @property
     def is_hotspot(self):
         return self._is_hotspot
+
+    @is_hotspot.setter
+    def is_hotspot(self, hotspot_bool: bool):
+        self._is_hotspot = hotspot_bool
+        logger.info(self.__str__() + " hotspot: %s", str(hotspot_bool))
+        self._notify_status()
 
     @property
     def adjacent_tiles(self):
@@ -220,6 +230,7 @@ class TileModel(Model):
         # of redrawing the model in the new location
 
         self._associated_models.append(model)
+        model.set_pos(self.row, self.column)
         self._notify_assoc_models()
 
     def remove_associated_model(self, model: Model):

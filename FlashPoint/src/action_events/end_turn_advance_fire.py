@@ -7,12 +7,13 @@ from src.action_events.replenish_poi_event import ReplenishPOIEvent
 from src.models.game_board.door_model import DoorModel
 from src.models.game_board.null_model import NullModel
 from src.models.game_board.wall_model import WallModel
+from src.models.game_units.hazmat_model import HazmatModel
 from src.models.game_units.poi_model import POIModel
 from src.models.game_units.victim_model import VictimModel
 from src.models.game_board.tile_model import TileModel
 from src.models.game_board.game_board_model import GameBoardModel
 from src.constants.state_enums import GameStateEnum, SpaceStatusEnum, WallStatusEnum, DoorStatusEnum, VictimStateEnum, \
-    SpaceKindEnum, POIIdentityEnum, GameKindEnum
+    SpaceKindEnum, POIIdentityEnum, GameKindEnum, PlayerRoleEnum
 from src.action_events.turn_events.turn_event import TurnEvent
 from src.models.game_state_model import GameStateModel
 
@@ -39,12 +40,9 @@ class EndTurnAdvanceFireEvent(TurnEvent):
     def __init__(self, seed: int = 0):
         super().__init__()
         self.player = GameStateModel.instance().players_turn
-        self.game_state: GameStateModel = GameStateModel.instance()
-        self.board: GameBoardModel = self.game_state.game_board
         self.initial_tile: TileModel = None
 
         if seed == 0:
-
             self.seed = random.randint(1, 6969)
         else:
             self.seed = seed
@@ -52,30 +50,78 @@ class EndTurnAdvanceFireEvent(TurnEvent):
         # Pick random location: roll dice
         random.seed(self.seed)
 
-        self.red_dice = self.game_state.roll_red_dice()
-        self.black_dice = self.game_state.roll_black_dice()
+        self.red_dice = GameStateModel.instance().roll_red_dice()
+        self.black_dice = GameStateModel.instance().roll_black_dice()
         self.directions = ["North", "South", "East", "West"]
 
     def _main_phase_end_turn(self):
         # ------ AdvanceFire ------ #
         # Change state of tile depending on previous state
-        self.initial_tile = self.board.get_tile_at(self.red_dice, self.black_dice)
-        logger.info(f"Smoke placed: {self.initial_tile.row}, {self.initial_tile.column}")
-        self.advance_on_tile(self.initial_tile)
-        self.flashover()
-        self.affect_damages()
+
+        # Assume that a Flare Up will occur so that we iterate
+        # through the loop at least once (like a do-while loop).
+        # Advance on tile will decide whether a flare up will
+        # occur or not and whether we should roll the dice once more.
+        flare_up_will_occur = True
+        x = 0
+        while flare_up_will_occur:
+            # Will log if a flare up was actually caused
+            # (skips the first default iteration)
+            if x > 0:
+                logger.info("Flare up triggered by {tile}".format(tile=self.initial_tile))
+            self.initial_tile = self.board.get_tile_at(self.red_dice, self.black_dice)
+            flare_up_will_occur = self.advance_on_tile(self.initial_tile)
+            self.flashover()
+            self.resolve_hazmat_explosions()
+            self.affect_damages()
+            # Preparing the dice for the next
+            # iteration if a flare up is going to occur
+            self.red_dice = self.game_state.roll_red_dice()
+            self.black_dice = self.game_state.roll_black_dice()
+            x += 1
+
+        # Add a hotspot marker to the last
+        # target space of the advance_on_tile()
+        if self.board.hotspot_bank > 0:
+            self.initial_tile.is_hotspot = True
+            self.board.hotspot_bank = self.board.hotspot_bank - 1
 
         # ------ ReplenishPOI ------ #
         rp_event = ReplenishPOIEvent(self.seed)
         rp_event.execute()
 
+        # ------ Replenish Player's points ----- #
+        self._replenish_player_points()
+
+    def _replenish_player_points(self):
+        """
+        Replenishes a player's AP, special AP
+        according to the rules for the different roles.
+
+        :return:
+        """
         # retain up to a maximum of 4 AP
         # as the turn is ending and
-        # replenish player's AP by 4
+        # replenish player's AP, irrespective
+        # of role, by 4 (add/subtract points after).
+        # special AP are not retained for the next turn.
         if self.player.ap > 4:
             self.player.ap = 4
 
-        self.player.ap += 4
+        self.player.ap = self.player.ap + 4
+
+        if self.player.role == PlayerRoleEnum.CAPTAIN:
+            self.player.special_ap = 2
+
+        elif self.player.role == PlayerRoleEnum.CAFS:
+            self.player.ap = self.player.ap - 1
+            self.player.special_ap = 3
+
+        elif self.player.role == PlayerRoleEnum.GENERALIST:
+            self.player.ap = self.player.ap + 1
+
+        elif self.player.role == PlayerRoleEnum.RESCUE:
+            self.player.special_ap = 3
 
     def _placing_players_end_turn(self):
         # If the last player has chosen a location, move the game into the next phase.
@@ -97,6 +143,8 @@ class EndTurnAdvanceFireEvent(TurnEvent):
     def execute(self):
         logger.info("Executing EndTurnAdvanceFireEvent")
 
+        self.game_state: GameStateModel = GameStateModel.instance()
+        self.board: GameBoardModel = self.game_state.game_board
         if self.game_state.state == GameStateEnum.MAIN_GAME:
             self._main_phase_end_turn()
 
@@ -105,13 +153,30 @@ class EndTurnAdvanceFireEvent(TurnEvent):
             self._placing_players_end_turn()
         elif not self.game_state.all_players_have_chosen_location():
             logger.info("Not all players have chosen starting location, not moving to next game phase.")
+            if not self.game_state.players_turn.has_pos:
+                logger.info("The player did not choose a location, not moving to next player.")
+                self.game_state._notify_player_index()
+                return
         elif self.game_state.state == GameStateEnum.PLACING_VEHICLES:
             self._placing_vehicles_end_turn()
 
         # call next player
         self.game_state.next_player()
 
-    def advance_on_tile(self, target_tile: TileModel):
+    def advance_on_tile(self, target_tile: TileModel) -> bool:
+        """
+        Advances the fire on the target tile.
+        Determines whether a flare up should
+        occur or not after this instance of
+        Advance Fire is done.
+
+        :param target_tile:
+        :return: boolean which tells us if a flare up will occur
+        """
+        flare_up_will_occur = False
+        if target_tile.is_hotspot:
+            flare_up_will_occur = True
+
         tile_status = target_tile.space_status
 
         # Safe -> Smoke
@@ -126,14 +191,17 @@ class EndTurnAdvanceFireEvent(TurnEvent):
         else:
             self.explosion(target_tile)
 
+        return flare_up_will_occur
+
     def explosion(self, origin_tile: TileModel):
         logger.info(f"Explosion occurred on {origin_tile}")
+        game_state = GameStateModel.instance()
         for direction, obstacle in origin_tile.adjacent_edge_objects.items():
             # fire does not move to the neighbouring tile
             # damaging wall present along the tile
             if isinstance(obstacle, WallModel) and obstacle.wall_status != WallStatusEnum.DESTROYED:
                 obstacle.inflict_damage()
-                self.game_state.damage = self.game_state.damage + 1
+                game_state.damage = game_state.damage + 1
 
             # fire does not move to the neighbouring tile
             # removing door that borders the tile
@@ -159,6 +227,7 @@ class EndTurnAdvanceFireEvent(TurnEvent):
         :param direction: direction in which shockwave continues
         :return:
         """
+        game_state = GameStateModel.instance()
         should_stop = False
         while not should_stop:
             # if there is no obstacle in the given direction -
@@ -186,7 +255,7 @@ class EndTurnAdvanceFireEvent(TurnEvent):
                 obstacle = tile.get_obstacle_in_direction(direction)
                 if isinstance(obstacle, WallModel):
                     obstacle.inflict_damage()
-                    self.game_state.damage = self.game_state.damage + 1
+                    game_state.damage = game_state.damage + 1
                     should_stop = True
 
                 elif isinstance(obstacle, DoorModel):
@@ -228,13 +297,48 @@ class EndTurnAdvanceFireEvent(TurnEvent):
                         pass
 
                     if nb_tile.space_status == SpaceStatusEnum.FIRE:
-                        logger.info(f"Flashover on tile {tile}")
                         tile.space_status = SpaceStatusEnum.FIRE
                         num_converted += 1
                         break
 
             if num_converted == 0:
                 all_smokes_converted = True
+
+    def resolve_hazmat_explosions(self):
+        """
+        For all the fire tiles, if any of them
+        contain a hazmat, cause an explosion
+        in that space. After the explosion,
+        remove the hazmat from the tile and
+        put a hotspot marker on that tile.
+
+        :return:
+        """
+        for tile in self.game_state.game_board.tiles:
+            if tile.space_status == SpaceStatusEnum.FIRE:
+                # If the tile contains a Hazmat, trigger
+                # an explosion.
+                for assoc_model in tile.associated_models:
+                    if isinstance(assoc_model, HazmatModel):
+                        self.explosion(tile)
+                        tile.remove_associated_model(assoc_model)
+                        if self.board.hotspot_bank > 0:
+                            tile.is_hotspot = True
+                            self.board.hotspot_bank = self.board.hotspot_bank - 1
+
+                # If there are any players on the tile and
+                # if they are carrying a Hazmat, knock down
+                # the player, trigger an explosion and disassociate
+                # the Hazmat from the player.
+                players_on_tile = self.game_state.get_players_on_tile(tile.row, tile.column)
+                for player in players_on_tile:
+                    if isinstance(player.carrying_hazmat, HazmatModel):
+                        KnockDownEvent(player.ip).execute()
+                        self.explosion(tile)
+                        player.carrying_hazmat = NullModel()
+                        if self.board.hotspot_bank > 0:
+                            tile.is_hotspot = True
+                            self.board.hotspot_bank = self.board.hotspot_bank - 1
 
     def affect_damages(self):
         """
@@ -288,4 +392,3 @@ class EndTurnAdvanceFireEvent(TurnEvent):
         for tile in self.board.tiles:
             if tile.space_kind != SpaceKindEnum.INDOOR and tile.space_status == SpaceStatusEnum.FIRE:
                 tile.space_status = SpaceStatusEnum.SAFE
-

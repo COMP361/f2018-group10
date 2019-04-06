@@ -1,9 +1,6 @@
 from src.UIComponents.interactable import Interactable
 from src.controllers.controller import Controller
 from src.controllers.drive_vehicles_controller import DriveVehiclesController
-from src.action_events.hazmat_event import HazmatEvent
-from src.action_events.identify_event import IdentifyEvent
-from src.action_events.turn_events.drive_ambulance_event import DriveAmbulanceEvent
 from src.controllers.hazmat_controller import HazmatController
 from src.controllers.identify_controller import IdentifyController
 from src.controllers.vehicle_placement_controller import VehiclePlacementController
@@ -119,6 +116,12 @@ class TileInputController(GameStateObserver, Controller):
         pass
 
     def dead_victims(self, victims_dead: int):
+        pass
+
+    def player_added(self, player: PlayerModel):
+        pass
+
+    def player_removed(self, player: PlayerModel):
         pass
 
     @staticmethod
