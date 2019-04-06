@@ -21,8 +21,6 @@ from src.sprites.player_box import PlayerBox
 
 class LobbyScene(GameStateObserver):
 
-
-
     def __init__(self, screen, current_player: PlayerModel):
         super().__init__()
         self._current_player = current_player
@@ -296,5 +294,6 @@ class LobbyScene(GameStateObserver):
 
     def player_added(self, player: PlayerModel):
         pass
+
     def player_removed(self, player: PlayerModel):
         pass
