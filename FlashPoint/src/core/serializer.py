@@ -141,7 +141,7 @@ class JSONSerializer(object):
                     south_obj.wall_status = WallStatusEnum(wall_dict['_wall_status']['value'])
                 elif isinstance(south_obj, DoorModel):
                     door_dict = tile_dict['_adjacent_edge_objects']["South"]
-                    south_obj.wall_status = WallStatusEnum(door_dict['_door_status']['value'])
+                    south_obj.door_status = DoorStatusEnum(door_dict['_door_status']['value'])
 
     @staticmethod
     def _restore_parking_spots(game: GameStateModel, payload: Dict):
