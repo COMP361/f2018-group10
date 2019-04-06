@@ -75,11 +75,12 @@ class FireDeckGunController(Controller):
 
                 return False
 
-        engine_quadrant = self._determine_quadrant(tile_model.row, tile_model.column)
+        engine_quadrant = self._determine_quadrant(self.engine.row, self.engine.column)
+        tile_input_quadrant = self._determine_quadrant(tile_model.row, tile_model.column)
         # If there are players present in the
         # quadrant, the deck gun cannot be fired.
-        if self._are_players_in_quadrant(engine_quadrant):
-
+        # tile input gotta be on quadrant adjacent to engine
+        if self._are_players_in_quadrant(engine_quadrant) or tile_input_quadrant != engine_quadrant:
             return False
 
         return True
@@ -104,6 +105,26 @@ class FireDeckGunController(Controller):
         else:
             return QuadrantEnum.BOTTOM_RIGHT
 
+    @staticmethod
+    def _determine_quadrant_player(row, column) -> QuadrantEnum:
+        """
+        Determines the quadrant to which
+        the row and column belong to.
+
+        :param row:
+        :param column:
+        :return: Quadrant in which the row and
+                column are located.
+        """
+        if 4 > row > 0 and 5 > column > 0:
+            return QuadrantEnum.TOP_LEFT
+        elif 4 > row > 0 and 5 <= column < 9:
+            return QuadrantEnum.TOP_RIGHT
+        elif 4 <= row < 7 and 5 > column > 0:
+            return QuadrantEnum.BOTTOM_LEFT
+        elif 4 <= row < 7 and 5 <= column < 9:
+            return QuadrantEnum.BOTTOM_RIGHT
+
     def _are_players_in_quadrant(self, quadrant: QuadrantEnum) -> bool:
         """
         Determines whether there are any players
@@ -115,10 +136,10 @@ class FireDeckGunController(Controller):
         """
 
         for player in self._game.players:
-            logger.info(f"Player assoc_quadrant: {self._determine_quadrant(player.row, player.column)}")
+            logger.info(f"Player assoc_quadrant: {self._determine_quadrant_player(player.row, player.column)}")
             logger.info(f"Player row: {player.row}, Player column: {player.column}")
             logger.info(f"Quadrant to compare: {quadrant}")
-            if quadrant == self._determine_quadrant(player.row, player.column):
+            if quadrant == self._determine_quadrant_player(player.row, player.column):
                 return True
 
         return False
