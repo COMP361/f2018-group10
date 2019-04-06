@@ -45,7 +45,7 @@ class TileSprite(Interactable, TileObserver):
 
         # ------- POP-UP MENU -------- #
         self.identify_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
-                                       Text(pygame.font.SysFont('Arial', 20), "Identify", Color.ORANGE))
+                                          Text(pygame.font.SysFont('Arial', 20), "Identify", Color.ORANGE))
 
         self.move_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
                                       Text(pygame.font.SysFont('Arial', 15), "Move Here", Color.ORANGE))
@@ -57,18 +57,23 @@ class TileSprite(Interactable, TileObserver):
                                              Text(pygame.font.SysFont('Arial', 15), "Drop Victim", Color.ORANGE))
 
         self.drive_ambulance_here_button = RectButton(self.rect.x, self.rect.y, 120, 25, Color.BLACK, 0,
-                                             Text(pygame.font.SysFont('Arial', 15), "Drive Ambulance Here", Color.ORANGE))
+                                                      Text(pygame.font.SysFont('Arial', 15), "Drive Ambulance Here",
+                                                           Color.ORANGE))
 
         self.drive_engine_here_button = RectButton(self.rect.x, self.rect.y, 120, 25, Color.BLACK, 0,
-                                                      Text(pygame.font.SysFont('Arial', 15), "Drive Engine Here",
-                                                           Color.ORANGE))
+                                                   Text(pygame.font.SysFont('Arial', 15), "Drive Engine Here",
+                                                        Color.ORANGE))
         self.ride_vehicle_button = RectButton(self.rect.x, self.rect.y, 120, 25, Color.BLACK, 0,
                                               Text(pygame.font.SysFont('Arial', 15), "Ride Vehicle", Color.ORANGE))
         self.hazmat_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
                                         Text(pygame.font.SysFont('Arial', 20), "Remove Hazmat", Color.ORANGE))
 
         self.dismount_vehicle_button = RectButton(self.rect.x, self.rect.y, 120, 25, Color.BLACK, 0,
-                                              Text(pygame.font.SysFont('Arial', 15), "Dismount Vehicle", Color.ORANGE))
+                                                  Text(pygame.font.SysFont('Arial', 15), "Dismount Vehicle",
+                                                       Color.ORANGE))
+
+        self.fire_deck_gun_button = RectButton(self.rect.x, self.rect.y, 120, 25, Color.BLACK, 0,
+                                               Text(pygame.font.SysFont('Arial', 15), "Fire Deckgun", Color.ORANGE))
 
         self.disable_all()
 
@@ -116,6 +121,7 @@ class TileSprite(Interactable, TileObserver):
         self.ride_vehicle_button.disable()
         self.dismount_vehicle_button.disable()
         self.hazmat_button.disable()
+        self.fire_deck_gun_button.disable()
 
         # Important! Reset the on_clicks
         self.identify_button.on_click(None)
@@ -128,6 +134,7 @@ class TileSprite(Interactable, TileObserver):
         self.ride_vehicle_button.on_click(None)
         self.dismount_vehicle_button.on_click(None)
         self.hazmat_button.on_click(None)
+        self.fire_deck_gun_button.on_click(None)
 
     def is_clicked(self):
         if not self.hover():
@@ -232,6 +239,12 @@ class TileSprite(Interactable, TileObserver):
             self.hazmat_button.rect.y = self.rect.y + offset
             offset += 20
 
+        if self.fire_deck_gun_button.enabled:
+            screen.blit(self.fire_deck_gun_button.image, self.fire_deck_gun_button.rect)
+            self.fire_deck_gun_button.rect.x = self.rect.x
+            self.fire_deck_gun_button.rect.y = self.rect.y + offset
+            offset += 20
+
     def update(self, event_queue: EventQueue):
         self.sprite_grp.update(event_queue)
 
@@ -245,6 +258,7 @@ class TileSprite(Interactable, TileObserver):
         self.dismount_vehicle_button.update(event_queue)
         self.drive_engine_here_button.update(event_queue)
         self.hazmat_button.update(event_queue)
+        self.fire_deck_gun_button.update(event_queue)
 
         self._scroll()
         if self.is_clicked():

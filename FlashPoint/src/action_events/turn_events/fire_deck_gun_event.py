@@ -23,46 +23,13 @@ class FireDeckGunEvent(TurnEvent):
 
         # Pick random location: roll dice
         random.seed(self.seed)
-        self.game: GameStateModel = GameStateModel.instance()
-        self.player = self.game.players_turn
-        self.engine = self.game.game_board.engine
+        self.player = GameStateModel.instance().players_turn
+        self.engine = GameStateModel.instance().game_board.engine
         self.target_tile: TileModel = NullModel()
 
     # TODO: Move this code to the controller for this event.
     def check(self) -> bool:
-        """
-        Determines whether or not it is
-        possible to perform this event.
-
-        :return: True if it possible to perform
-                this event. False otherwise.
-        """
-        if not TurnEvent.has_required_AP(self.player.ap, 4):
-            return False
-
-        # If the player is not located in the
-        # same space as the engine, they cannot
-        # fire the deck gun.
-        engine_orient = self.engine.orientation
-        if engine_orient == VehicleOrientationEnum.HORIZONTAL:
-            on_first_spot = self.player.row == self.engine.row and self.player.column == self.engine.column
-            on_second_spot = self.player.row == self.engine.row and self.player.column == self.engine.column + 1
-            if not on_first_spot and not on_second_spot:
-                return False
-
-        elif engine_orient == VehicleOrientationEnum.VERTICAL:
-            on_first_spot = self.player.row == self.engine.row and self.player.column == self.engine.column
-            on_second_spot = self.player.row == self.engine.row + 1 and self.player.column == self.engine.column
-            if not on_first_spot and not on_second_spot:
-                return False
-
-        engine_quadrant = self._determine_quadrant(self.engine.row, self.engine.column)
-        # If there are players present in the
-        # quadrant, the deck gun cannot be fired.
-        if self._are_players_in_quadrant(engine_quadrant):
-            return False
-
-        return True
+        pass
 
     def execute(self, *args, **kwargs):
         logger.info("Executing Fire Deck Gun Event")
@@ -88,13 +55,13 @@ class FireDeckGunEvent(TurnEvent):
         :return:
         """
         engine_quadrant = self._determine_quadrant(self.engine.row, self.engine.column)
-        target_row = self.game.roll_red_dice()
-        target_column = self.game.roll_black_dice()
+        target_row = GameStateModel.instance().roll_red_dice()
+        target_column = GameStateModel.instance().roll_black_dice()
         target_quadrant = self._determine_quadrant(target_row, target_column)
         # If the roll gives a tile in the engine's
         # quadrant, that will become the target tile.
         if target_quadrant == engine_quadrant:
-            self.target_tile = self.game.game_board.get_tile_at(target_row, target_column)
+            self.target_tile = GameStateModel.instance().game_board.get_tile_at(target_row, target_column)
             return
 
         else:
@@ -109,18 +76,18 @@ class FireDeckGunEvent(TurnEvent):
             # 3. flipping the row, flipping the column
             new_target_quadrant = self._determine_quadrant(flipped_row, target_column)
             if new_target_quadrant == engine_quadrant:
-                self.target_tile = self.game.game_board.get_tile_at(flipped_row, target_column)
+                self.target_tile = GameStateModel.instance().game_board.get_tile_at(flipped_row, target_column)
                 return
 
-            flipped_column = self.game.determine_black_dice_opposite_face(target_column)
+            flipped_column = GameStateModel.instance().determine_black_dice_opposite_face(target_column)
             new_target_quadrant = self._determine_quadrant(target_row, flipped_column)
             if new_target_quadrant == engine_quadrant:
-                self.target_tile = self.game.game_board.get_tile_at(target_row, flipped_column)
+                self.target_tile = GameStateModel.instance().game_board.get_tile_at(target_row, flipped_column)
                 return
 
             new_target_quadrant = self._determine_quadrant(flipped_row, flipped_column)
             if new_target_quadrant == engine_quadrant:
-                self.target_tile = self.game.game_board.get_tile_at(flipped_row, flipped_column)
+                self.target_tile = GameStateModel.instance().game_board.get_tile_at(flipped_row, flipped_column)
                 return
 
         # $$$$$$$$$$$$$$$$$
@@ -158,7 +125,7 @@ class FireDeckGunEvent(TurnEvent):
         :return: True if there are players in the quadrant,
                 False otherwise.
         """
-        for player in self.game.players:
+        for player in GameStateModel.instance().players:
             if quadrant == self._determine_quadrant(player.row, player.column):
                 return True
 
