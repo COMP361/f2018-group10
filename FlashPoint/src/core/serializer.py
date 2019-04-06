@@ -8,6 +8,7 @@ import logging
 from src.action_events.disconnect_event import DisconnectEvent
 from src.action_events.fire_placement_event import FirePlacementEvent
 from src.action_events.choose_character_event import ChooseCharacterEvent
+from src.action_events.turn_events.fire_deck_gun_event import FireDeckGunEvent
 from src.action_events.turn_events.remove_hazmat_event import RemoveHazmatEvent
 from src.action_events.turn_events.identify_poi_event import IdentifyPOIEvent
 from src.action_events.place_hazmat_event import PlaceHazmatEvent
@@ -398,6 +399,10 @@ class JSONSerializer(object):
         return DisconnectEvent(player)
 
     @staticmethod
+    def _deserialize_fire_deck_gun_event(payload: Dict) -> FireDeckGunEvent:
+        return FireDeckGunEvent(payload['seed'])
+
+    @staticmethod
     def deserialize(payload: Dict) -> object:
         """
         Grab an object and deserialize it.
@@ -481,6 +486,8 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_set_initial_poi_experienced_event(payload)
         elif object_type == NullModel.__name__:
             return NullModel()
+        elif object_type == FireDeckGunEvent.__name__:
+            return JSONSerializer._deserialize_fire_deck_gun_event(payload)
 
         logger.warning(f"Could not deserialize object {object_type}, not of recognized type.")
 
