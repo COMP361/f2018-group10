@@ -69,7 +69,6 @@ class LobbyScene(GameStateObserver):
         if Networking.get_instance().is_host:
             # Kill the broadcast
             Networking.get_instance().stop_broadcast.set()
-            print("Broadcast killed")
             Networking.get_instance().send_to_all_client(StartGameEvent())
 
     def set_ready(self):
