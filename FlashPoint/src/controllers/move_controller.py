@@ -6,6 +6,7 @@ from src.action_events.turn_events.move_event import DijkstraTile, PriorityQueue
 from src.constants.state_enums import PlayerStatusEnum, PlayerRoleEnum
 from src.controllers.controller import Controller
 from src.core.networking import Networking
+from src.models.game_units.hazmat_model import HazmatModel
 
 from src.models.game_units.victim_model import VictimModel
 from src.observers.player_observer import PlayerObserver
@@ -69,8 +70,14 @@ class MoveController(PlayerObserver, Controller):
         moveable_tiles = []
         pq = PriorityQueue()
         is_carrying_victim = False
+        is_carrying_hazmat = False
         if isinstance(self.current_player.carrying_victim, VictimModel):
             is_carrying_victim = True
+
+        if isinstance(self.current_player.carrying_hazmat, HazmatModel):
+            is_carrying_hazmat = True
+
+        is_carrying_something = is_carrying_victim or is_carrying_hazmat
 
         # Get the tiles of the board. Remove the source tile
         # from the list since it has to be initialised as a
@@ -102,7 +109,7 @@ class MoveController(PlayerObserver, Controller):
                 if isinstance(tile, NullModel):
                     continue
                 d_tile = dijkstra_tiles.get(str(tile.row) + ", " + str(tile.column))
-                can_travel_to = self._check_and_relax(direction, current_d_tile, d_tile, is_carrying_victim, ap-current_d_tile.least_cost)
+                can_travel_to = self._check_and_relax(direction, current_d_tile, d_tile, is_carrying_something, ap-current_d_tile.least_cost)
                 # If it is possible to travel to the second tile,
                 # add it to the moveable tiles and insert it into
                 # the Priority Queue
@@ -114,11 +121,11 @@ class MoveController(PlayerObserver, Controller):
 
         return moveable_tiles
 
-    def _check_and_relax(self, direction: str, first_tile: DijkstraTile, second_tile: DijkstraTile, is_carrying_victim: bool, ap: int) -> bool:
+    def _check_and_relax(self, direction: str, first_tile: DijkstraTile, second_tile: DijkstraTile, is_carrying_something: bool, ap: int) -> bool:
         """
         Check if the player can move from the first tile
         to the second depending on whether they are carrying
-        a victim or not and the AP they have. Update the least
+        something or not and the AP they have. Update the least
         cost to get to the second tile accordingly.
 
         :param first_tile:
@@ -135,17 +142,17 @@ class MoveController(PlayerObserver, Controller):
         # If the path from the first tile to the second is not hindered by anything
         # (i.e. there is a destroyed door or a destroyed wall or an open door or no obstacle)
         # then there exists the **possibility** of moving to the second tile.
-        # Two cases then depending on whether the player is carrying a victim or not.
+        # Two cases then depending on whether the player is carrying a victim/hazmat or not.
         if not has_obstacle or (isinstance(obstacle, DoorModel) and obstacle.door_status == DoorStatusEnum.OPEN):
             second_tile_status = second_tile.tile_model.space_status
-            # carrying a victim
-            if is_carrying_victim:
+            # carrying a victim/hazmat
+            if is_carrying_something:
                 if second_tile_status != SpaceStatusEnum.FIRE and ap - 2 >= 0:
                     if second_tile.least_cost > first_tile.least_cost + 2:
                         second_tile.least_cost = first_tile.least_cost + 2
                         return True
 
-            # not carrying a victim
+            # not carrying a victim/hazmat
             else:
                 if second_tile_status != SpaceStatusEnum.FIRE and ap - 1 >= 0:
                     if second_tile.least_cost > first_tile.least_cost + 1:
@@ -231,9 +238,9 @@ class MoveController(PlayerObserver, Controller):
     def player_role_changed(self, role):
         pass
     def player_special_ap_changed(self, updated_ap: int):
-        # If the player is not a Rescue Specialist, a change
+        # If the player is not a Rescue Specialist/CAFS, a change
         # in the special AP will not affect the moveable tiles.
-        if self.current_player.role != PlayerRoleEnum.RESCUE:
+        if self.current_player.role not in [PlayerRoleEnum.RESCUE, PlayerRoleEnum.CAFS]:
             return
 
         self._update_moveable_tiles()

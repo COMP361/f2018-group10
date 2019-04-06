@@ -41,8 +41,16 @@ class ExtinguishController(Controller):
         if tile_model not in player_tile.adjacent_tiles.values() and tile_model != player_tile:
             return False
 
-        if self.current_player.role == PlayerRoleEnum.RESCUE:
+        # It costs the Rescue Specialist and Paramedic
+        # twice as much AP to extinguish fire/smoke.
+        if self.current_player.role in [PlayerRoleEnum.RESCUE, PlayerRoleEnum.PARAMEDIC]:
             valid_to_extinguish = TurnEvent.has_required_AP(self.current_player.ap, 2)
+
+        # CAFS firefighter's special AP are
+        # used for extinguishing fire/smoke.
+        elif self.current_player.role == PlayerRoleEnum.CAFS:
+            valid_to_extinguish = TurnEvent.has_required_AP(self.current_player.ap + self.current_player.special_ap, 1)
+
         else:
             valid_to_extinguish = TurnEvent.has_required_AP(self.current_player.ap, 1)
 
