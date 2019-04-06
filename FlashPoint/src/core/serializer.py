@@ -6,6 +6,7 @@ import logging
 
 
 from src.action_events.disconnect_event import DisconnectEvent
+from src.action_events.dodge_reply_event import DodgeReplyEvent
 from src.action_events.fire_placement_event import FirePlacementEvent
 from src.action_events.choose_character_event import ChooseCharacterEvent
 from src.action_events.turn_events.remove_hazmat_event import RemoveHazmatEvent
@@ -259,8 +260,8 @@ class JSONSerializer(object):
     def _deserialize_move_event(payload: Dict):
         game_board = GameStateModel.instance().game_board
         destination = payload['destination']
-        # dest_model = game_board.get_tile_at(destination['_row'], destination['_column'])
         tile_list = payload['moveable_tiles']
+
         moveable_tiles = []
         for tile in tile_list:
             tile_model: TileModel = game_board.get_tile_at(tile['_row'], tile['_column'])
@@ -295,10 +296,8 @@ class JSONSerializer(object):
 
     @staticmethod
     def _deserialize_extinguish_event(payload: Dict) -> ExtinguishEvent:
-
         tile_dict = payload['extinguish_space']
         tile: TileModel = GameStateModel.instance().game_board.get_tile_at(tile_dict['_row'], tile_dict['_column'])
-        # GameStateModel.instance().game_board.set_single_tile_adjacencies(tile)
         return ExtinguishEvent(tile)
 
     @staticmethod
@@ -398,6 +397,10 @@ class JSONSerializer(object):
         return DisconnectEvent(player)
 
     @staticmethod
+    def _deserialize_dodge_reply(payload: Dict) -> DodgeReplyEvent:
+        return DodgeReplyEvent(payload['_reply'])
+
+    @staticmethod
     def deserialize(payload: Dict) -> object:
         """
         Grab an object and deserialize it.
@@ -479,6 +482,8 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_set_initial_hotspot_event(payload)
         elif object_type == SetInitialPOIExperiencedEvent.__name__:
             return JSONSerializer._deserialize_set_initial_poi_experienced_event(payload)
+        elif object_type == DodgeReplyEvent.__name__:
+            return JSONSerializer._deserialize_dodge_reply(payload)
         elif object_type == NullModel.__name__:
             return NullModel()
 
