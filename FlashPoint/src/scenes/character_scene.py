@@ -57,7 +57,7 @@ class CharacterScene(Scene):
 
         self._init_btn_back(20, 20, "Back", Color.STANDARDBTN, Color.BLACK)
 
-        self._init_btn_confirm(1050, 575, "Confirm", Color.STANDARDBTN, Color.BLACK)
+        self._init_btn_confirm(1100, 575, "Confirm", Color.STANDARDBTN, Color.BLACK)
 
         self._init_title_text()
         self.character_enum: PlayerRoleEnum = None
