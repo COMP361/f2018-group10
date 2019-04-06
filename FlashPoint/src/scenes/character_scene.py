@@ -25,29 +25,35 @@ class CharacterScene(Scene):
         self._game = GameStateModel.instance()
 
         self.create_label(0, 0, 100, 150, 1)
-        self.create_butn_img(250, 150, 99, 150,
+        self.create_butn_img(150, 150, 99, 150,
                              "media/specialist_cards/cafs_firefighter.png", 1)
 
-        self.create_butn_img(450, 150, 100, 150,
+        self.create_butn_img(350, 150, 100, 150,
                              "media/specialist_cards/driver_operator.png", 2)
 
-        self.create_butn_img(650, 150, 100, 150,
+        self.create_butn_img(550, 150, 100, 150,
                              "media/specialist_cards/fire_captain.png", 3)
 
-        self.create_butn_img(850, 150, 99, 150,
+        self.create_butn_img(750, 150, 99, 150,
                              "media/specialist_cards/generalist.png", 4)
 
-        self.create_butn_img(250, 450, 100, 150,
+        self.create_butn_img(150, 450, 100, 150,
                              "media/specialist_cards/hazmat_technician.png", 5)
 
-        self.create_butn_img(450, 450, 99, 150,
+        self.create_butn_img(350, 450, 99, 150,
                              "media/specialist_cards/imaging_technician.png", 6)
 
-        self.create_butn_img(650, 450, 99, 150,
+        self.create_butn_img(550, 450, 99, 150,
                              "media/specialist_cards/paramedic.png", 7)
 
-        self.create_butn_img(850, 450, 98, 150,
+        self.create_butn_img(750, 450, 98, 150,
                              "media/specialist_cards/rescue_specialist.png", 8)
+
+        self.create_butn_img(950, 150, 98, 150,
+                             "media/specialist_cards/doge.png", 9)
+
+        self.create_butn_img(950, 450, 99, 150,
+                             "media/specialist_cards/veteran.png", 10)
 
         self._init_btn_back(20, 20, "Back", Color.STANDARDBTN, Color.BLACK)
 
@@ -118,8 +124,14 @@ class CharacterScene(Scene):
         elif count == 7:
             return PlayerRoleEnum.PARAMEDIC
 
-        else:
+        elif count == 8:
             return PlayerRoleEnum.RESCUE
+
+        elif count == 9:
+            return PlayerRoleEnum.DOGE
+
+        elif count == 10:
+            return PlayerRoleEnum.VETERAN
 
     def _init_btn_back(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
         box_size = (130, 48)
