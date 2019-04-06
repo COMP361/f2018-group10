@@ -1,17 +1,18 @@
+import itertools
 import json
 import os
-import random
 from datetime import datetime
 from typing import List
 
 import pygame
 
 from src.action_events.set_initial_poi_experienced_event import SetInitialPOIExperiencedEvent
-from src.constants.state_enums import GameKindEnum
+from src.constants.state_enums import GameKindEnum, GameStateEnum
 from src.models.game_units.victim_model import VictimModel
 from src.sprites.victim_sprite import VictimSprite
 from src.models.game_units.poi_model import POIModel
 from src.observers.GameBoardObserver import GameBoardObserver
+from src.observers.game_state_observer import GameStateObserver
 
 from src.action_events.place_hazmat_event import PlaceHazmatEvent
 from src.action_events.set_initial_poi_family_event import SetInitialPOIFamilyEvent
@@ -34,13 +35,14 @@ from src.sprites.hud.player_state import PlayerState
 from src.sprites.hud.current_player_state import CurrentPlayerState
 from src.sprites.hud.time_bar import TimeBar
 from src.sprites.hud.ingame_states import InGameStates
+from src.sprites.player_sprite import PlayerSprite
 import src.constants.color as Color
 from src.UIComponents.rect_button import RectButton
 from src.UIComponents.text import Text
 from src.sprites.notify_player_turn import NotifyPlayerTurn
 
 
-class GameBoardScene(GameBoardObserver):
+class GameBoardScene(GameBoardObserver, GameStateObserver):
     """
     Scene for displaying the main game view
     """
@@ -57,12 +59,14 @@ class GameBoardScene(GameBoardObserver):
         self._game.game_board.add_observer(self)
         self._init_current_player(current_player)
         self._active_sprites = pygame.sprite.Group()  # Maybe add separate groups for different things later
+        self._player_hud_sprites = pygame.sprite.Group()
 
         # Initialize UI elements
         self._init_ui_elements()
 
         # Initialize controllers
         self._init_controllers()
+
 
         # Send initialization events.
         self._send_game_board_initialize()
@@ -79,8 +83,9 @@ class GameBoardScene(GameBoardObserver):
 
     def _init_active_sprites(self):
         """Set all the initial Sprites and add them to the sprite Group."""
+
         for i, player in enumerate(self._game.players):
-            self._active_sprites.add(PlayerState(0, 30 + 64 * i, player.nickname, player.color, player))
+            self._player_hud_sprites.add(PlayerState(0, 30 + 64 * i, player.nickname, player.color, player))
 
         # Notify player turn stuff
         current_player_info_sprite = CurrentPlayerState(1130, 550, self._current_player.nickname,
@@ -124,6 +129,8 @@ class GameBoardScene(GameBoardObserver):
         for player in self._game.players:
             player.set_initial_ap(self._game.rules)
 
+        GameStateModel.instance().add_observer(self)
+
     def notify_active_poi(self, active_pois: List[POIModel]):
         # Removes are already handled by the sprites themselves, therefore only need to deal with adds.
         for sprite in self._game_board_sprite:
@@ -155,7 +162,8 @@ class GameBoardScene(GameBoardObserver):
 
         self._menu.close()
 
-    def _quit_btn_on_click(self):
+    @staticmethod
+    def _quit_btn_on_click():
         Networking.get_instance().disconnect()
         TileInputController.__del__()
         ChopController._instance = None
@@ -195,6 +203,7 @@ class GameBoardScene(GameBoardObserver):
         self._game_board_sprite.draw(screen)
         self._chat_box.draw(screen)
         self._active_sprites.draw(screen)
+        self._player_hud_sprites.draw(screen)
 
         if self._menu and not self._menu.is_closed:
             self._menu.draw(screen)
@@ -203,6 +212,8 @@ class GameBoardScene(GameBoardObserver):
         """Call the update() function of everything in this class."""
         self._active_sprites.update(event_queue)
         self._chat_box.update(event_queue)
+        self._player_hud_sprites.update(event_queue)
+
 
         if not self.ignore_area():
             self._game_board_sprite.update(event_queue)
@@ -221,8 +232,42 @@ class GameBoardScene(GameBoardObserver):
         ignore = ignore or (self._chat_box.box.x < mouse_pos[0] < self._chat_box.box.x + self._chat_box.box.width and
                             self._chat_box.box.y < mouse_pos[1] < self._chat_box.box.y + self._chat_box.box.height)
 
-        for sprite in self._active_sprites:
+        for sprite in itertools.chain(self._player_hud_sprites.sprites(), self._active_sprites.sprites()):
             ignore = ignore or (sprite.rect.x < mouse_pos[0] < sprite.rect.x + sprite.rect.width and
                                 sprite.rect.y < mouse_pos[1] < sprite.rect.y + sprite.rect.height)
 
         return ignore
+
+    def notify_player_index(self, player_index: int):
+        pass
+
+    def notify_game_state(self, game_state: GameStateEnum):
+        pass
+
+    def damage_changed(self, new_damage: int):
+        pass
+
+    def saved_victims(self, victims_saved: int):
+        pass
+
+    def dead_victims(self, victims_dead: int):
+        pass
+
+    def player_added(self, player: PlayerModel):
+        pass
+
+    def player_removed(self, player: PlayerModel):
+        self.player_list_changed()
+        # Remove player sprite from game board
+        for sprite in GameBoard.instance().sprites():
+            if isinstance(sprite, PlayerSprite):
+                if sprite.associated_player is player:
+                    GameBoard.instance().remove(sprite)
+                    break
+
+    def player_list_changed(self):
+        # Refresh the list of players in HUD
+        self._player_hud_sprites.empty()
+        for i, player in enumerate(self._game.players):
+            self._player_hud_sprites.add(PlayerState(0, 30 + 64 * i, player.nickname, player.color, player))
+

@@ -3,7 +3,7 @@ import logging
 
 from src.models.game_units.player_model import PlayerModel
 from src.UIComponents.file_importer import FileImporter
-from src.scenes.choose_board_scene import ChooseBoard
+from src.scenes.choose_board_scene import ChooseBoardScene
 from src.scenes.game_board_scene import GameBoardScene
 from src.scenes.host_join_scene import HostJoinScene
 from src.scenes.host_menu_scene import HostMenuScene
@@ -11,7 +11,7 @@ from src.scenes.join_scene import JoinScene
 from src.scenes.load_game_scene import LoadGameScene
 from src.scenes.start_scene import StartScene
 from src.scenes.set_max_players_scene import SetMaxPlayers
-from src.scenes.create_game_menu import CreateGameMenu
+from src.scenes.create_game_menu import CreateGameMenuScene
 from src.core.event_queue import EventQueue
 from src.scenes.character_scene import CharacterScene
 from src.scenes.lobby_scene import LobbyScene
@@ -92,11 +92,11 @@ class SceneManager(object):
                 elif event.type == ChangeSceneEnum.SETMAXPLAYERSCENE:
                     self.next(SetMaxPlayers, self._current_player)
                 elif event.type == ChangeSceneEnum.CHOOSEBOARDSCENE:
-                    self.next(ChooseBoard, self._current_player)
+                    self.next(ChooseBoardScene, self._current_player)
                 elif event.type == ChangeSceneEnum.CHARACTERSCENE:
                     self.next(CharacterScene, self._current_player)
                 elif event.type == ChangeSceneEnum.CREATEGAMEMENU:
-                    self.next(CreateGameMenu, self._current_player)
+                    self.next(CreateGameMenuScene, self._current_player)
                 elif event.type == ChangeSceneEnum.HOSTJOINSCENE:
                     self._current_player = event.player
                     self.next(HostJoinScene, self._current_player)
@@ -108,6 +108,10 @@ class SceneManager(object):
                     self.next(LoadGameScene, self._current_player)
                 elif event.type == ChangeSceneEnum.LOBBYSCENE:
                     self.next(LobbyScene, self._current_player)
+                elif event.type == ChangeSceneEnum.DISCONNECT:
+                    # player won't be redirected if they are not in game or trying to enter a game when disconnected
+                    if self._active_scene is not (StartScene or HostJoinScene):
+                        self.next(StartScene)
                 elif event.type == ChangeSceneEnum.GAMEBOARDSCENE:
                     EventQueue.unblock()
                     self.next(GameBoardScene, self._current_player)

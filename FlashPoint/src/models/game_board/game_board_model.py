@@ -11,13 +11,14 @@ from src.models.game_board.edge_obstacle_model import EdgeObstacleModel
 from src.models.game_board.null_model import NullModel
 from src.models.game_units.poi_model import POIModel
 from src.models.game_board.tile_model import TileModel
-from src.constants.state_enums import GameKindEnum, SpaceKindEnum, SpaceStatusEnum, POIIdentityEnum, \
+from src.constants.state_enums import SpaceKindEnum, SpaceStatusEnum, POIIdentityEnum, \
     DoorStatusEnum, POIStatusEnum, VictimStateEnum, ArrowDirectionEnum, VehicleOrientationEnum, GameBoardTypeEnum
 from src.models.game_board.wall_model import WallModel
 from src.models.game_board.door_model import DoorModel
 from src.models.game_units.victim_model import VictimModel
 
 logger = logging.getLogger("FlashPoint")
+
 
 class GameBoardModel(Model):
     """
@@ -31,7 +32,10 @@ class GameBoardModel(Model):
         self._ambulance_spots = []
         self._engine_spots = []
         self._board_type = board_type
-        self._tiles = self._determine_board_tiles()
+
+        self._tiles = None
+        if self._board_type:
+            self._tiles = self._determine_board_tiles()
 
         self._poi_bank = GameBoardModel._init_pois()
         self._active_pois = []
@@ -40,7 +44,7 @@ class GameBoardModel(Model):
         self._hotspot_bank: int = 0
 
     def _notify_active_poi(self):
-        for obs in self.observers:
+        for obs in self._observers:
             obs.notify_active_poi(self._active_pois)
 
     def get_tiles(self) -> List[List[TileModel]]:

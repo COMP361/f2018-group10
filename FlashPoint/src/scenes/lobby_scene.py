@@ -51,7 +51,8 @@ class LobbyScene(GameStateObserver):
             self.buttonReady.on_click(self.set_ready)
         self.buttonBack.on_click(self.go_back)
 
-    def go_back(self):
+    @staticmethod
+    def go_back():
         Networking.get_instance().disconnect()
         EventQueue.post(CustomEvent(ChangeSceneEnum.STARTSCENE))
 
@@ -282,5 +283,8 @@ class LobbyScene(GameStateObserver):
     def dead_victims(self, victims_dead: int):
         pass
 
-    def player_list_changed(self):
+    def player_added(self, player: PlayerModel):
+        pass
+
+    def player_removed(self, player: PlayerModel):
         pass

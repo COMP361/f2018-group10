@@ -6,18 +6,26 @@ from typing import List, Optional, Tuple
 
 from src.models.model import Model
 from src.models.game_board.game_board_model import GameBoardModel
-from src.constants.state_enums import GameKindEnum, DifficultyLevelEnum, GameStateEnum, VehicleOrientationEnum
+from src.constants.state_enums import GameKindEnum, DifficultyLevelEnum, GameStateEnum, VehicleOrientationEnum, \
+    GameBoardTypeEnum
 from src.core.flashpoint_exceptions import TooManyPlayersException, InvalidGameKindException, PlayerNotFoundException
 from src.models.game_units.player_model import PlayerModel
 
 logger = logging.getLogger("FlashPoint")
+
 
 class GameStateModel(Model):
     """Singleton Class for maintaining the current Game state."""
     _instance = None
     lock = RLock()
 
-    def __init__(self, host: PlayerModel, num_players: int, game_kind: GameKindEnum, difficulty: DifficultyLevelEnum = None):
+    def __init__(self,
+                 host: PlayerModel,
+                 num_players: int,
+                 game_kind: GameKindEnum,
+                 board_type: GameBoardTypeEnum,
+                 difficulty: DifficultyLevelEnum = None
+                 ):
         logger.info("Initializing game state...")
 
         if not GameStateModel._instance:
@@ -28,10 +36,9 @@ class GameStateModel(Model):
             self._players_turn_index = 0
             self._difficulty_level = difficulty
             self._rules = game_kind
-            self._red_dice = 0
-            self._black_dice = 0
 
-            self._game_board = None
+            self._board_type = board_type
+            self._game_board = GameBoardModel(self._board_type)
 
             self._victims_saved = 0
             self._victims_lost = 0
@@ -44,12 +51,20 @@ class GameStateModel(Model):
         else:
             raise Exception("GameStateModel is a Singleton")
 
+    def _notify_player_added(self, player: PlayerModel):
+        for obs in self._observers:
+            obs.player_added(player)
+
+    def _notify_player_removed(self, player: PlayerModel):
+        for obs in self._observers:
+            obs.player_removed(player)
+
     def _notify_player_index(self):
         for obs in self._observers:
             obs.notify_player_index(self._players_turn_index)
 
     def _notify_state(self):
-        for obs in self.observers:
+        for obs in self._observers:
             obs.notify_game_state(self._state)
 
     @staticmethod
@@ -76,6 +91,17 @@ class GameStateModel(Model):
             self._game_board = board
 
     @property
+    def board_type(self) -> GameBoardTypeEnum:
+        with GameStateModel.lock:
+            return self._board_type
+
+    @board_type.setter
+    def board_type(self, board_type: GameBoardTypeEnum):
+        with GameStateModel.lock:
+            self._board_type = board_type
+            self._game_board = GameBoardModel(board_type)
+
+    @property
     def chat_history(self) -> List[Tuple[str, str]]:
         with GameStateModel.lock:
             return self._chat_history
@@ -90,6 +116,11 @@ class GameStateModel(Model):
         """Get the PlayerModel assigned to the host of the current game."""
         with GameStateModel.lock:
             return self._host
+
+    @host.setter
+    def host(self, host: PlayerModel):
+        with GameStateModel.lock:
+            self._host = host
 
     @property
     def max_players(self) -> int:
@@ -106,12 +137,18 @@ class GameStateModel(Model):
         with GameStateModel.lock:
             return self._players
 
+    @players.setter
+    def players(self, players: List[PlayerModel]):
+        with GameStateModel.lock:
+            self._players = players
+
     def add_player(self, player: PlayerModel):
         """Add a player to the current game."""
         with GameStateModel.lock:
             if len(self._players) == self._max_desired_players:
                 raise TooManyPlayersException(player)
             self._players.append(player)
+            self._notify_player_added(player)
 
     def get_player_by_ip(self, ip: str) -> PlayerModel:
         with GameStateModel.lock:
@@ -124,6 +161,8 @@ class GameStateModel(Model):
         """Remove a player from the current game."""
         with GameStateModel.lock:
             self._players.remove(player)
+            self._notify_player_index()
+            self._notify_player_removed(player)
 
     @property
     def players_turn_index(self) -> int:
@@ -199,7 +238,7 @@ class GameStateModel(Model):
         with GameStateModel.lock:
             self._victims_saved = victims_saved
             logger.info("Game victims saved: {vs}".format(vs=victims_saved))
-            for obs in self.observers:
+            for obs in self._observers:
                 obs.saved_victims(victims_saved)
             if self._victims_saved >= 7:
                 self.state = GameStateEnum.WON
@@ -214,7 +253,7 @@ class GameStateModel(Model):
         with GameStateModel.lock:
             self._victims_lost = victims_lost
             logger.info("Game victims lost: {vl}".format(vl=victims_lost))
-            for obs in self.observers:
+            for obs in self._observers:
                 obs.dead_victims(victims_lost)
             if self._victims_lost >= 4:
                 self.state = GameStateEnum.LOST
@@ -229,7 +268,7 @@ class GameStateModel(Model):
         with GameStateModel.lock:
             self._damage = damage
             logger.info("Game damage: {d}".format(d=damage))
-            for obs in self.observers:
+            for obs in self._observers:
                 obs.damage_changed(damage)
             if self._damage >= self.max_damage:
                 self.state = GameStateEnum.LOST

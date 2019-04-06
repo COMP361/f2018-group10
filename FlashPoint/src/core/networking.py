@@ -28,7 +28,7 @@ class Networking:
     __instance = None
 
     @staticmethod
-    def wait_for_reply(timeout=5):
+    def wait_for_reply(timeout=3):
         """
         Wait for a reply from the host before continuing with a timeout (in seconds).
         Returns false for failed attempt, true for success.
@@ -40,7 +40,7 @@ class Networking:
             time.sleep(1)
             i += 1
             if i > timeout:
-                raise ConnectionError
+                raise TimeoutError
         return reply
 
     @staticmethod
@@ -133,10 +133,10 @@ class Networking:
                 self.client.connect(ip, port)
                 self.client.send(JoinEvent(player))
                 return True
-            except MastermindErrorClient as e:
+            except MastermindErrorSocket:
                 self.client.disconnect()
                 logger.error(f"Error connecting to server at: {ip}:{port}")
-                raise MastermindErrorClient(e)
+                raise Networking.Client.SocketError
             except OSError as e:
                 self.client.disconnect()
                 raise OSError(e)
@@ -168,7 +168,7 @@ class Networking:
             Returns True if the local machine is a host
             :return:
             """
-            return self.host is not None
+            return self.host
 
         @staticmethod
         def get_ip():
@@ -196,7 +196,7 @@ class Networking:
             Disconnects the current machine. If the current machine is a host, it ends the game as well.
             :return:
             """
-            if self.host is not None:
+            if self.is_host:
                 logger.info("Disconnecting host")
                 # Kill the broadcast
                 self.stop_broadcast.set()
@@ -204,13 +204,14 @@ class Networking:
                 # Stops accepting connection
                 self.host.accepting_disallow()
                 # Disconnects all clients
-                self.send_to_all_client(DisconnectEvent())
                 self.host.disconnect_clients()
                 self.host.disconnect()
                 self.host.__del__()
                 self.host = None
-            if self.client is not None:
+            elif self.client:
                 logger.info("Disconnecting client")
+                #player_model = GameStateModel.instance().get_player_by_ip(self.get_ip())
+                #self.send_to_server(DisconnectEvent(player_model))
                 self.client.disconnect()
                 self.client.__del__()
                 self.client = None
@@ -253,6 +254,8 @@ class Networking:
                     self.host.callback_client_send(client_conn_obj, data, compress)
                 except MastermindErrorSocket as e:
                     raise MastermindErrorSocket(e)
+                except Networking.Host.ClientNotFoundException:
+                    logging.error(f"Client at {ip_addr} is not connected")
             else:
                 raise MastermindErrorServer("Server is not available")
 
@@ -286,11 +289,12 @@ class Networking:
             """
             try:
                 conn_obj = self.client_list[ip_addr]
-                if conn_obj is not None:
-                    return conn_obj
-                else:
-                    raise Networking.Host.ClientNotFoundException
             except KeyError:
+                raise Networking.Host.ClientNotFoundException
+
+            if conn_obj is not None:
+                return conn_obj
+            else:
                 raise Networking.Host.ClientNotFoundException
 
         def client_exists(self, ip_addr: str):
@@ -302,6 +306,7 @@ class Networking:
                 return False
 
         def kick_client(self, ip_addr: str):
+            logger.info(f"Player at {ip_addr} was kicked.")
             self.client_list.pop(ip_addr)
 
         def callback_connect_client(self, connection_object):
@@ -336,6 +341,9 @@ class Networking:
                 players = [x for x in game.players if x.ip == connection_object.address[0]]
                 if players:
                     self.kick_client(connection_object.address[0])
+                    player_model = GameStateModel.instance().get_player_by_ip(connection_object.address[0])
+                    event = DisconnectEvent(player_model)
+                    Networking.get_instance().send_to_all_client(event)
             return super(MastermindServerUDP, self).callback_disconnect()
 
         def callback_client_handle(self, connection_object, data):
@@ -354,6 +362,7 @@ class Networking:
             data = JSONSerializer.deserialize(data)
             # If it's a dummy event, don't do anything
             if isinstance(data, DummyEvent):
+                Networking.get_instance().send_to_client(connection_object.address[0], data)
                 return super(MastermindServerUDP, self).callback_client_handle(connection_object, data)
 
             logger.debug(f"Client at {connection_object.address} sent a message: "
@@ -361,8 +370,7 @@ class Networking:
             if isinstance(data, TurnEvent) or isinstance(data, ActionEvent):
                 if isinstance(data, DisconnectEvent):
                     # Kick the player that send the DC event and notify all other players.
-                    # Need to have similar polling mechanics like in lobby
-                    self.kick_client(connection_object.address[0])
+                    self.callback_disconnect_client(connection_object)
                     return super(MastermindServerUDP, self).callback_client_handle(connection_object, data)
 
                 if isinstance(data, JoinEvent):
@@ -443,7 +451,6 @@ class Networking:
             self._pause_blk_signal.set()
             self._pause_receive.set()
             self._stop_receive.set()
-            time.sleep(0.5)
             return super(MastermindClientUDP, self).disconnect()
 
         @staticmethod
@@ -456,8 +463,6 @@ class Networking:
                 return
             if isinstance(data, TurnEvent) or isinstance(data, ActionEvent):
                 data.execute()
-                if isinstance(data, DisconnectEvent):
-                    Networking.get_instance().disconnect()
 
         def get_server_reply(self):
             """
@@ -475,7 +480,7 @@ class Networking:
             while not self._stop_receive.is_set():
                 if not self._pause_blk_signal.is_set():
                     self.send(DummyEvent())
-                    time.sleep(2)
+                    time.sleep(3)
 
         def toggle_block_signal(self, toggle: bool):
             if toggle:
@@ -491,5 +496,7 @@ class Networking:
             """
             logger.warning("It seems that client is not connected...")
             Networking.get_instance().disconnect()
-            EventQueue.post(CustomEvent(ChangeSceneEnum.STARTSCENE))
+            EventQueue.post(CustomEvent(ChangeSceneEnum.DISCONNECT))
 
+        class SocketError(Exception):
+            pass
