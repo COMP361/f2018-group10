@@ -6,6 +6,7 @@ import logging
 
 
 from src.action_events.disconnect_event import DisconnectEvent
+from src.action_events.end_game_event import EndGameEvent
 from src.action_events.fire_placement_event import FirePlacementEvent
 from src.action_events.choose_character_event import ChooseCharacterEvent
 from src.action_events.turn_events.remove_hazmat_event import RemoveHazmatEvent
@@ -27,6 +28,7 @@ from src.action_events.turn_events.open_door_event import OpenDoorEvent
 from src.action_events.turn_events.ride_vehicle_event import RideVehicleEvent
 from src.action_events.vehicle_placed_event import VehiclePlacedEvent
 from src.models.game_board.door_model import DoorModel
+from src.models.game_board.game_board_model import GameBoardModel
 from src.models.game_board.null_model import NullModel
 from src.models.game_board.wall_model import WallModel
 from src.models.game_units.hazmat_model import HazmatModel
@@ -43,7 +45,7 @@ from src.action_events.dummy_event import DummyEvent
 from src.action_events.join_event import JoinEvent
 from src.constants.state_enums import DifficultyLevelEnum, GameKindEnum, PlayerStatusEnum, WallStatusEnum, \
     DoorStatusEnum, SpaceKindEnum, SpaceStatusEnum, ArrowDirectionEnum, PlayerRoleEnum, GameBoardTypeEnum, \
-    POIIdentityEnum, POIStatusEnum
+    POIIdentityEnum, POIStatusEnum, GameStateEnum
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 from src.sprites.game_board import GameBoard
@@ -213,8 +215,8 @@ class JSONSerializer(object):
         player.wins = payload['_wins']
         player.losses = payload['_losses']
         player.role = PlayerRoleEnum(payload["_role"]["value"])
-        if payload['_carrying_hazmat']:
-            player.carrying_hazmat = JSONSerializer.deserialize(payload['_carrying_hazmat'])
+        # if payload['_carrying_hazmat']:
+        #     player.carrying_hazmat = JSONSerializer.deserialize(payload['_carrying_hazmat'])
         if payload['_carrying_victim']:
             player.carrying_victim = JSONSerializer.deserialize(payload['_carrying_victim'])
         return player

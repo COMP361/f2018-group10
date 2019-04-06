@@ -52,9 +52,9 @@ class GameStateModel(Model):
         else:
             raise Exception("GameStateModel is a Singleton")
 
-    def notify_all_observers(self):
-        self._notify_state()
-        self._game_board.notify_all_observers()
+    # def notify_all_observers(self):
+    #     self._notify_state()
+    #     self._game_board.notify_all_observers()
 
 
     def _notify_player_added(self, player: PlayerModel):

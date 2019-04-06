@@ -70,7 +70,9 @@ class CurrentPlayerState(pygame.sprite.Sprite, PlayerObserver):
         self.image.blit(self.frame, self.image.get_rect())
         self.image.blit(self.text, self.P_rect)
         self.image.blit(self.text_AP, self.AP_rect)
-        self.image.blit(self.text_SAP,self.SAP_rect)
+
+        if self.rules is GameKindEnum.EXPERIENCED:
+            self.image.blit(self.text_SAP, self.SAP_rect)
 
         if self.turn:
             self.time_left_rect = self.text_time_left.get_rect()

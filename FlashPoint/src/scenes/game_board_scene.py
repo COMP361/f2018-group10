@@ -94,11 +94,11 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
         """Set all the initial Sprites and add them to the sprite Group."""
 
         for i, player in enumerate(self._game.players):
-            self._player_hud_sprites.add(PlayerState(0, 30 + 64 * i, player.nickname, player.color, player))
+            self._player_hud_sprites.add(PlayerState(0, 30 + 64 * i, player.nickname, player.color, player,self._game.rules))
 
         # Notify player turn stuff
         current_player_info_sprite = CurrentPlayerState(1130, 550, self._current_player.nickname,
-                                                        self._current_player.color, self._current_player)
+                                                        self._current_player.color, self._current_player,self._game.rules)
         self._active_sprites.add(current_player_info_sprite)
         notify_player_turn = NotifyPlayerTurn(self._current_player, current_player_info_sprite,
                                               self._active_sprites)
