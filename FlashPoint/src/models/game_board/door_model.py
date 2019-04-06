@@ -7,6 +7,7 @@ from src.observers.door_observer import DoorObserver
 
 logger = logging.getLogger("FlashPoint")
 
+
 class DoorModel(EdgeObstacleModel):
 
     def __init__(self, row: int, column: int, direction: str, door_status: DoorStatusEnum = DoorStatusEnum.CLOSED):
@@ -26,6 +27,13 @@ class DoorModel(EdgeObstacleModel):
     @property
     def door_status(self):
         return self._door_status
+
+    @door_status.setter
+    def door_status(self, door_status: DoorStatusEnum):
+        self._door_status = door_status
+        self.log_info()
+        for obs in self.observers:
+            obs.door_status_changed(self._door_status)
 
     @property
     def id(self):

@@ -480,7 +480,7 @@ class Networking:
             while not self._stop_receive.is_set():
                 if not self._pause_blk_signal.is_set():
                     self.send(DummyEvent())
-                    time.sleep(3)
+                    time.sleep(1)
 
         def toggle_block_signal(self, toggle: bool):
             if toggle:

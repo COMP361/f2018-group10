@@ -99,7 +99,8 @@ class GameStateModel(Model):
     def board_type(self, board_type: GameBoardTypeEnum):
         with GameStateModel.lock:
             self._board_type = board_type
-            self._game_board = GameBoardModel(board_type)
+            if board_type != GameBoardTypeEnum.LOADED:
+                self._game_board = GameBoardModel(board_type)
 
     @property
     def chat_history(self) -> List[Tuple[str, str]]:
