@@ -78,15 +78,6 @@ class PlayerModel(Model):
         return self._observers
 
     @property
-    def role(self):
-        return self._role
-
-    @role.setter
-    def role(self, new_role: PlayerRoleEnum):
-        self._role = new_role
-        self._notify_role()
-
-    @property
     def row(self) -> int:
         return self._row
 
@@ -230,3 +221,4 @@ class PlayerModel(Model):
     def role(self, player_role: PlayerRoleEnum):
         self._role = player_role
         logger.info("Player {nickname} role: {r}".format(nickname=self.nickname, r=player_role.name))
+        self._notify_role()

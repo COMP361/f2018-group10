@@ -1,5 +1,5 @@
 import pygame
-
+import logging as logger
 from src.UIComponents.rect_label import RectLabel
 from src.UIComponents.text import Text
 from src.constants.state_enums import PlayerRoleEnum, PlayerStatusEnum
@@ -80,6 +80,7 @@ class PlayerBox(PlayerObserver):
         pass
 
     def player_role_changed(self, role: PlayerRoleEnum):
+        logger.info(f"new role: {role}")
         role_path = self.get_path_from_character_enum(role)
         self.background = (RectLabel(self.background_position[0], self.background_position[1], self.background_position[2],
                                      self.background_position[3], role_path))
