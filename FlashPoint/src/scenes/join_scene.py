@@ -53,7 +53,7 @@ class JoinScene(object):
             if reply:
                 reply = JSONSerializer.deserialize(reply)
                 if isinstance(reply, TooManyPlayersEvent):
-                    raise TooManyPlayersException
+                    raise TooManyPlayersException(self._current_player)
                 # GameStateModel.set_game(JSONSerializer.deserialize(reply))
                 EventQueue.post(CustomEvent(ChangeSceneEnum.LOBBYSCENE))
         except TimeoutError:
@@ -66,7 +66,7 @@ class JoinScene(object):
             self.init_error_message(msg)
             # Disconnect client that's trying to connect
             if not Networking.get_instance().is_host:
-                Networking.get_instance().disconnect()
+                Networking.get_instance().client.disconnect()
         except Networking.Client.SocketError:
             msg = "Failed to establish connection."
             print(msg)
