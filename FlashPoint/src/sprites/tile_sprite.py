@@ -31,8 +31,10 @@ class TileSprite(Interactable, TileObserver):
         self._blank_image = image.copy()
 
         # Initialize if place is Fire, Smoke or Safe
-        status = GameStateModel.instance().game_board.get_tile_at(row, column).space_status
-        self.tile_status_changed(status)
+        tile = GameStateModel.instance().game_board.get_tile_at(row, column)
+        status = tile.space_status
+        is_hotspot = tile.is_hotspot
+        self.tile_status_changed(status, is_hotspot)
 
         Interactable.__init__(self, self.image.get_rect())
         self.rect = self.image.get_rect().move(x_offset, y_offset)
@@ -61,6 +63,8 @@ class TileSprite(Interactable, TileObserver):
                                                            Color.ORANGE))
         self.ride_vehicle_button = RectButton(self.rect.x, self.rect.y, 120, 25, Color.BLACK, 0,
                                               Text(pygame.font.SysFont('Arial', 15), "Ride Vehicle", Color.ORANGE))
+        self.hazmat_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
+                                        Text(pygame.font.SysFont('Arial', 20), "Remove Hazmat", Color.ORANGE))
 
         self.dismount_vehicle_button = RectButton(self.rect.x, self.rect.y, 120, 25, Color.BLACK, 0,
                                               Text(pygame.font.SysFont('Arial', 15), "Dismount Vehicle", Color.ORANGE))
@@ -110,6 +114,7 @@ class TileSprite(Interactable, TileObserver):
         self.drive_engine_here_button.disable()
         self.ride_vehicle_button.disable()
         self.dismount_vehicle_button.disable()
+        self.hazmat_button.disable()
 
         # Important! Reset the on_clicks
         self.identify_button.on_click(None)
@@ -121,9 +126,7 @@ class TileSprite(Interactable, TileObserver):
         self.drive_engine_here_button.on_click(None)
         self.ride_vehicle_button.on_click(None)
         self.dismount_vehicle_button.on_click(None)
-
-    def tile_assoc_models_changed(self, assoc_models: List[Model]):
-        pass
+        self.hazmat_button.on_click(None)
 
     def is_clicked(self):
         if not self.hover():
@@ -222,6 +225,12 @@ class TileSprite(Interactable, TileObserver):
             self.dismount_vehicle_button.rect.y = self.rect.y + offset
             offset += 20
 
+        if self.hazmat_button.enabled:
+            screen.blit(self.hazmat_button.image, self.hazmat_button.rect)
+            self.hazmat_button.rect.x = self.rect.x
+            self.hazmat_button.rect.y = self.rect.y + offset
+            offset += 20
+
     def update(self, event_queue: EventQueue):
         self.sprite_grp.update(event_queue)
 
@@ -234,12 +243,13 @@ class TileSprite(Interactable, TileObserver):
         self.ride_vehicle_button.update(event_queue)
         self.dismount_vehicle_button.update(event_queue)
         self.drive_engine_here_button.update(event_queue)
+        self.hazmat_button.update(event_queue)
 
         self._scroll()
         if self.is_clicked():
             self.click()
 
-    def tile_status_changed(self, status: SpaceStatusEnum):
+    def tile_status_changed(self, status: SpaceStatusEnum, is_hotspot: bool):
         new_surf = pygame.Surface([self._non_highlight_image.get_width(), self._non_highlight_image.get_height()])
         self._non_highlight_image = self._blank_image.copy()
 
@@ -253,4 +263,11 @@ class TileSprite(Interactable, TileObserver):
             image_file = FileImporter.import_image("media/All Markers/smoke.png")
             new_surf.blit(image_file, (0, 0))
 
+        if is_hotspot:
+            hs_img = FileImporter.import_image("media/all_markers/hot_spot.png")
+            new_surf.blit(hs_img, (0, 0))
+
         self._non_highlight_image.blit(new_surf, (0, 0))
+
+    def tile_assoc_models_changed(self, assoc_models: List[Model]):
+        pass

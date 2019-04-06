@@ -3,11 +3,13 @@ import time
 import logging
 
 from src.action_events.turn_events.turn_event import TurnEvent
-from src.constants.state_enums import SpaceStatusEnum, POIIdentityEnum, SpaceKindEnum, DoorStatusEnum, VictimStateEnum
+from src.constants.state_enums import SpaceStatusEnum, SpaceKindEnum, DoorStatusEnum, VictimStateEnum, \
+    GameKindEnum, PlayerRoleEnum
 from src.models.game_board.door_model import DoorModel
 from src.models.game_board.null_model import NullModel
 from src.models.game_board.tile_model import TileModel
 from src.models.game_state_model import GameStateModel
+from src.models.game_units.hazmat_model import HazmatModel
 from src.models.game_units.player_model import PlayerModel
 from src.models.game_units.poi_model import POIModel
 from src.models.game_units.victim_model import VictimModel
@@ -178,14 +180,14 @@ class MoveEvent(TurnEvent):
 
         cost_to_travel = 0
         # Two separate cases depending on whether
-        # fireman is carrying a victim or not.
+        # fireman is carrying a victim/hazmat or not.
 
-        # fireman is carrying a victim
-        if isinstance(self.fireman.carrying_victim, VictimModel):
+        # fireman is carrying a victim/hazmat
+        if isinstance(self.fireman.carrying_victim, VictimModel) or isinstance(self.fireman.carrying_hazmat, HazmatModel):
             if second_tile.tile_model.space_status != SpaceStatusEnum.FIRE:
                 cost_to_travel = 2
 
-        # fireman is not carrying a victim
+        # fireman is not carrying a victim/hazmat
         else:
             if second_tile.tile_model.space_status != SpaceStatusEnum.FIRE:
                 cost_to_travel = 1
@@ -253,43 +255,48 @@ class MoveEvent(TurnEvent):
         """
         Make the fireman traverse the shortest
         path found - subtracting AP along the way,
-        flipping POIs and saving victims if we have
-        reached the outside of the building.
+        flipping POIs, saving victims and disposing
+        hazmats (if we get out of the building).
 
         :param shortest_path:
         :return:
         """
         shortest_path.pop(0)
         for d_tile in shortest_path:
-            # Two separate cases depending on whether
-            # fireman is carrying a victim or not
-
-            # Fireman is carrying a victim
-            # 2 AP to carry victim through Safe or
-            # Smoke space. If victim carried outside
-            # of building, victim has been saved.
-            # Increment number of victims saved in game
-            # state and dissociate victim from player.
-            if isinstance(self.fireman.carrying_victim, VictimModel):
-                if d_tile.tile_model.space_status != SpaceStatusEnum.FIRE:
-                    self.fireman.ap = self.fireman.ap - 2
-                    if d_tile.tile_model.space_kind != SpaceKindEnum.INDOOR:
-                        self.fireman.carrying_victim.state = VictimStateEnum.RESCUED
-                        self.game.victims_saved = self.game.victims_saved + 1
-                        # remove the victim from the list of active POIs on the board
-                        # and disassociate the victim from the player
-                        self.game.game_board.remove_poi_or_victim(self.fireman.carrying_victim)
-                        self.fireman.carrying_victim = NullModel()
-
-            # fireman is not carrying a victim
-            else:
-                if d_tile.tile_model.space_status != SpaceStatusEnum.FIRE:
-                    self.fireman.ap = self.fireman.ap - 1
-                else:
-                    self.fireman.ap = self.fireman.ap - 2
-
             # update the position of the fireman
             self.fireman.set_pos(d_tile.tile_model.row, d_tile.tile_model.column)
+
+            # Two separate cases depending on whether
+            # fireman is carrying a victim/hazmat or not
+
+            # Fireman is carrying a victim/hazmat -
+            # 2 AP to carry victim/hazmat through Safe or
+            # Smoke space. Handle the case for when
+            # victim is carried outside of the building
+            # depending on the game mode. If the hazmat
+            # is carried outside of the building, it is disposed.
+            carrying_something = False
+
+            if isinstance(self.fireman.carrying_victim, VictimModel):
+                carrying_something = True
+                if d_tile.tile_model.space_status != SpaceStatusEnum.FIRE:
+                    self._deduct_player_points(2)
+                    if d_tile.tile_model.space_kind != SpaceKindEnum.INDOOR:
+                        self.resolve_victim_while_traveling(d_tile.tile_model)
+
+            if isinstance(self.fireman.carrying_hazmat, HazmatModel):
+                carrying_something = True
+                if d_tile.tile_model.space_status != SpaceStatusEnum.FIRE:
+                    self._deduct_player_points(2)
+                    if d_tile.tile_model.space_kind != SpaceKindEnum.INDOOR:
+                        self.fireman.carrying_hazmat = NullModel()
+
+            # fireman is not carrying a victim/hazmat
+            if not carrying_something:
+                if d_tile.tile_model.space_status != SpaceStatusEnum.FIRE:
+                    self._deduct_player_points(1)
+                else:
+                    self._deduct_player_points(2)
 
             # Check the associated models of the tile.
             # If it contains any POIs, flip them over.
@@ -304,3 +311,66 @@ class MoveEvent(TurnEvent):
             # Put to sleep so that we can see the
             # player move through the individual tiles
             time.sleep(0.75)
+
+    def resolve_victim_while_traveling(self, target_tile: TileModel):
+        """
+        Family mode:
+        If victim carried outside of building, victim has been saved.
+        Experienced mode:
+        If victim carried to ambulance, victim has been saved.
+
+        Both cases:
+        Increment number of victims saved in game state and
+        dissociate victim from player.
+
+        :param target_tile: Tile to which player travels with the victim
+        :return:
+        """
+        if self.game.rules == GameKindEnum.EXPERIENCED:
+            if target_tile.space_kind != SpaceKindEnum.AMBULANCE_PARKING:
+                return
+
+            # Target space is an Ambulance Parking spot.
+            # If the target space does not match either
+            # of the ambulance's current location tiles,
+            # then the victim has not been brought to the
+            # ambulance.
+            game_board = self.game.game_board
+            amb_first_tile = game_board.get_tile_at(game_board.ambulance.row, game_board.ambulance.column)
+            amb_second_tile = game_board.get_other_parking_tile(amb_first_tile)
+            eq_to_first = target_tile.row == amb_first_tile.row and target_tile.column == amb_first_tile.column
+            eq_to_second = target_tile.row == amb_second_tile.row and target_tile.column == amb_second_tile.column
+            if not eq_to_first and not eq_to_second:
+                return
+
+        # For Family mode, can directly come here
+        # without the above checks.
+        # For Experienced mode, we only reach here
+        # if the target space is equal to one of
+        # the ambulance's current location tiles.
+        self.fireman.carrying_victim.state = VictimStateEnum.RESCUED
+        self.game.victims_saved = self.game.victims_saved + 1
+        # remove the victim from the list of active POIs on the board
+        # and disassociate the victim from the player
+        self.game.game_board.remove_poi_or_victim(self.fireman.carrying_victim)
+        self.fireman.carrying_victim = NullModel()
+
+    def _deduct_player_points(self, pts_to_deduct: int):
+        """
+        If the fireman is a Rescue Specialist, subtract
+        from the special AP first and then from AP.
+        If any other type of fireman, just subtract from AP.
+
+        :param pts_to_deduct: number of points to deduct
+        :return:
+        """
+        if self.fireman.role == PlayerRoleEnum.RESCUE:
+            while self.fireman.special_ap > 0 and pts_to_deduct > 0:
+                self.fireman.special_ap = self.fireman.special_ap - 1
+                pts_to_deduct = pts_to_deduct - 1
+
+            if pts_to_deduct > 0:
+                self.fireman.ap = self.fireman.ap - pts_to_deduct
+
+        else:
+            self.fireman.ap = self.fireman.ap - pts_to_deduct

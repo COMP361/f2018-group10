@@ -15,13 +15,10 @@ from src.constants.change_scene_enum import ChangeSceneEnum
 from src.core.networking import Networking
 
 
-class CreateGameMenu(Scene):
+class CreateGameMenuScene(Scene):
     def __init__(self, screen: pygame.Surface, current_player: PlayerModel):
         Scene.__init__(self, screen)
         self._current_player = current_player
-
-        if GameStateModel.instance():
-            GameStateModel.__del__()
 
         self._init_background()
         self._init_text_box(344, 387, 200, 32, "Choose Game Mode:", Color.STANDARDBTN, Color.BLACK)
@@ -37,15 +34,16 @@ class CreateGameMenu(Scene):
         self.buttonFamily.on_click(self.create_new_game, GameKindEnum.FAMILY)
         self.buttonBack.on_click(self._disconnect_and_back)
 
-    def _disconnect_and_back(self):
+    @staticmethod
+    def _disconnect_and_back():
         Networking.get_instance().disconnect()
         EventQueue.post(CustomEvent(ChangeSceneEnum.HOSTMENUSCENE))
 
     # ------------- GAME CREATE/LOAD STUFF ---------- #
 
-    def create_new_game(self, game_kind: GameKindEnum, diff: DifficultyLevelEnum = None):
+    def create_new_game(self, game_kind: GameKindEnum, difficulty_level: DifficultyLevelEnum = None):
         """Instantiate a new family game and move to the lobby scene."""
-        GameStateModel(self._current_player, 6, game_kind, diff)
+        GameStateModel(self._current_player, 6, game_kind, None, difficulty_level)
         if game_kind == GameKindEnum.FAMILY:
             EventQueue.post(CustomEvent(ChangeSceneEnum.CHOOSEBOARDSCENE))
         elif game_kind == GameKindEnum.EXPERIENCED:

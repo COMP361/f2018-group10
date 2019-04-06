@@ -1,5 +1,6 @@
 import pygame
 import src.constants.color as Color
+from src.models.game_units.player_model import PlayerModel
 from src.constants.state_enums import GameStateEnum
 from src.core.event_queue import EventQueue
 from src.models.game_state_model import GameStateModel
@@ -58,4 +59,10 @@ class InGameStates(pygame.sprite.Sprite, GameStateObserver):
         self.victims_dead = self.font.render(self.victims_dead_str, True, Color.WHITE)
 
     def notify_player_index(self, player_index: int):
+        pass
+
+    def player_added(self, player: PlayerModel):
+        pass
+
+    def player_removed(self, player: PlayerModel):
         pass

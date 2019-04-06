@@ -3,10 +3,7 @@ import logging
 from src.action_events.action_event import ActionEvent
 from src.models.game_board.game_board_model import GameBoardModel
 from src.models.game_state_model import GameStateModel
-from src.models.game_units.ambulance_model import AmbulanceModel
-from src.models.game_units.engine_model import EngineModel
 from src.models.game_units.player_model import PlayerModel
-from src.models.game_units.vehicle_model import VehicleModel
 
 logger = logging.getLogger("FlashPoint")
 

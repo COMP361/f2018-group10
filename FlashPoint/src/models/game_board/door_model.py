@@ -1,8 +1,11 @@
+import logging
 from typing import List
 
 from src.constants.state_enums import DoorStatusEnum
 from src.models.game_board.edge_obstacle_model import EdgeObstacleModel
 from src.observers.door_observer import DoorObserver
+
+logger = logging.getLogger("FlashPoint")
 
 
 class DoorModel(EdgeObstacleModel):
@@ -25,6 +28,13 @@ class DoorModel(EdgeObstacleModel):
     def door_status(self):
         return self._door_status
 
+    @door_status.setter
+    def door_status(self, door_status: DoorStatusEnum):
+        self._door_status = door_status
+        self.log_info()
+        for obs in self.observers:
+            obs.door_status_changed(self._door_status)
+
     @property
     def id(self):
         return self._id
@@ -32,20 +42,26 @@ class DoorModel(EdgeObstacleModel):
     def open_door(self):
         """Set the door status of this door to DoorStatusEnum.OPEN"""
         self._door_status = DoorStatusEnum.OPEN
+        self.log_info()
         for obs in self.observers:
             obs.door_status_changed(self._door_status)
 
     def close_door(self):
         """Set the door status of this door to DoorStatusEnum.CLOSED"""
         self._door_status = DoorStatusEnum.CLOSED
+        self.log_info()
         for obs in self.observers:
             obs.door_status_changed(self._door_status)
 
     def destroy_door(self):
         """Set the door status of this door to DoorStatusEnum.DESTROYED"""
         self._door_status = DoorStatusEnum.DESTROYED
+        self.log_info()
         for obs in self.observers:
             obs.door_status_changed(self._door_status)
+
+    def log_info(self):
+        logger.info(self.__str__())
 
     @property
     def observers(self) -> List[DoorObserver]:

@@ -35,6 +35,8 @@ class DoorStatusEnum(Enum):
 class GameBoardTypeEnum(Enum):
     ORIGINAL = auto()
     ALTERNATIVE = auto()
+    RANDOM = auto()
+    LOADED = auto()
 
 
 class GameKindEnum(Enum):
@@ -117,3 +119,10 @@ class VehicleOrientationEnum(Enum):
     VERTICAL = auto()
     HORIZONTAL = auto()
     UNSET = auto()
+
+
+class QuadrantEnum(Enum):
+    TOP_LEFT = auto()
+    TOP_RIGHT = auto()
+    BOTTOM_LEFT = auto()
+    BOTTOM_RIGHT = auto()

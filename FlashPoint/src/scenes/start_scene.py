@@ -40,6 +40,7 @@ class StartScene(object):
                                 color.STANDARDBTN, color.BLACK)
         self.update_profiles()
 
+        # Reset everything
         if GameStateModel.instance():
             GameStateModel.__del__()
         if GameBoard.instance():
@@ -118,6 +119,7 @@ class StartScene(object):
             temp = json.load(myFile)
             for i, user in enumerate(temp):
                 player: PlayerModel = JSONSerializer.deserialize(user)
+                player.ip = Networking.get_instance().get_ip()
                 player.set_pos(-1, -1)
                 player.ap = 0
                 player.special_ap = 0

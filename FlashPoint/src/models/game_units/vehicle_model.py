@@ -1,9 +1,11 @@
+import logging
 from typing import List, Tuple
 
 from src.constants.state_enums import VehicleOrientationEnum
 from src.models.game_units.player_model import PlayerModel
 from src.models.model import Model
 
+logger = logging.getLogger("FlashPoint")
 
 class VehicleModel(Model):
     """Base class for Ambulance and Engine.
@@ -46,8 +48,10 @@ class VehicleModel(Model):
         """Moving the Vehicle moves driver and passengers as well."""
         self._row = parking_spot[0]
         self._column = parking_spot[1]
+        logger.info("Vehicle position: ({row}, {column})".format(row=self.row, column=self.column))
 
         if self.passengers:
+            logger.info("Passengers moving")
             for passenger in self._passengers:
                 passenger.set_pos(self.row, self.column)
 
