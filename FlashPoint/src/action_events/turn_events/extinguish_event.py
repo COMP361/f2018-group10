@@ -31,8 +31,21 @@ class ExtinguishEvent(TurnEvent):
         else:
             return
 
-        if fireman.role == PlayerRoleEnum.RESCUE:
+        # It costs the Rescue Specialist and Paramedic
+        # twice as much AP to extinguish fire/smoke.
+        if fireman.role in [PlayerRoleEnum.RESCUE, PlayerRoleEnum.PARAMEDIC]:
             fireman.ap = fireman.ap - 2
+
+        # CAFS firefighter's special AP are
+        # used for extinguishing fire/smoke.
+        # First try to subtract from special
+        # AP and then from AP.
+        elif fireman.role == PlayerRoleEnum.CAFS:
+            if fireman.special_ap > 0:
+                fireman.special_ap = fireman.special_ap - 1
+            else:
+                fireman.ap = fireman.ap - 1
+
         else:
             fireman.ap = fireman.ap - 1
 
