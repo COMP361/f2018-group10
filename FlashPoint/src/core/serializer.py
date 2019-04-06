@@ -1,7 +1,7 @@
 import enum
 import json
 
-from typing import Dict
+from typing import Dict, List
 import logging
 
 from src.action_events.too_many_players_event import TooManyPlayersEvent
@@ -18,7 +18,7 @@ from src.action_events.set_initial_poi_family_event import SetInitialPOIFamilyEv
 from src.action_events.turn_events.chop_event import ChopEvent
 from src.action_events.turn_events.close_door_event import CloseDoorEvent
 from src.action_events.turn_events.dismount_vehicle_event import DismountVehicleEvent
-from src.action_events.turn_events.drive_ambulance_event import DriveAmbulanceEvent
+from src.action_events.turn_events.drive_vehicle_event import DriveVehicleEvent
 from src.action_events.turn_events.drop_victim_event import DropVictimEvent
 from src.action_events.turn_events.extinguish_event import ExtinguishEvent
 from src.action_events.turn_events.move_event import MoveEvent
@@ -27,8 +27,12 @@ from src.action_events.turn_events.open_door_event import OpenDoorEvent
 from src.action_events.turn_events.ride_vehicle_event import RideVehicleEvent
 from src.action_events.vehicle_placed_event import VehiclePlacedEvent
 from src.models.game_board.door_model import DoorModel
+from src.models.game_board.null_model import NullModel
 from src.models.game_board.wall_model import WallModel
+from src.models.game_units.hazmat_model import HazmatModel
+from src.models.game_units.poi_model import POIModel
 from src.models.game_units.victim_model import VictimModel
+from src.models.model import Model
 from src.observers.observer import Observer
 from src.models.game_board.tile_model import TileModel
 from src.action_events.turn_events.choose_starting_position_event import ChooseStartingPositionEvent
@@ -38,10 +42,13 @@ from src.action_events.chat_event import ChatEvent
 from src.action_events.dummy_event import DummyEvent
 from src.action_events.join_event import JoinEvent
 from src.constants.state_enums import DifficultyLevelEnum, GameKindEnum, PlayerStatusEnum, WallStatusEnum, \
-    DoorStatusEnum, SpaceKindEnum, SpaceStatusEnum, ArrowDirectionEnum, PlayerRoleEnum, GameBoardTypeEnum
+    DoorStatusEnum, SpaceKindEnum, SpaceStatusEnum, ArrowDirectionEnum, PlayerRoleEnum, GameBoardTypeEnum, \
+    POIIdentityEnum, POIStatusEnum
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
+from src.sprites.game_board import GameBoard
 from src.sprites.hazmat_sprite import HazmatSprite
+from src.sprites.poi_sprite import POISprite
 
 logger = logging.getLogger("FlashPoint")
 
@@ -52,7 +59,6 @@ class JSONSerializer(object):
     @staticmethod
     def _deserialize_game_state(payload: Dict) -> GameStateModel:
         """Deserialize a game state"""
-        GameStateModel.lock.acquire()
         host: PlayerModel = JSONSerializer.deserialize(payload['_host'])
         num_players = payload['_max_desired_players']
         rules = GameKindEnum(payload['_rules']["value"])
@@ -66,20 +72,126 @@ class JSONSerializer(object):
         else:
             game = GameStateModel.instance()
 
-        # game.game_board.set_adjacencies(game.game_board.get_tiles())
         for player in [x for x in payload['_players'] if x['_ip'] != host.ip]:
             player_obj: PlayerModel = JSONSerializer.deserialize(player)
             if player_obj not in game.players:
                 game.add_player(player_obj)
 
+        JSONSerializer.restore_game_board(game, payload['_game_board'])
         game.players_turn = payload['_players_turn_index']
         game.damage = payload['_damage']
         game.max_damage = payload['_max_damage']
         game.victims_lost = payload['_victims_lost']
         game.victims_saved = payload['_victims_saved']
 
-        GameStateModel.lock.release()
         return game
+
+    @staticmethod
+    def _restore_carried_hazmats(game: GameStateModel):
+        """Helper for restoring GameBoardModel"""
+        picked_up_hazmats = [player.carrying_hazmat for player in game.players
+                             if not isinstance(player.carrying_hazmat, NullModel)]
+
+        for hazmat in picked_up_hazmats:
+            tile = game.game_board.get_tile_at(hazmat.row, hazmat.column)
+            tile.add_associated_model(hazmat)
+            GameBoard.instance().add(HazmatSprite(tile))
+
+    @staticmethod
+    def _restore_carried_victims(game: GameStateModel):
+        """Helper for restoring GameBoardModel"""
+        picked_up_victims = [player.carrying_victim for player in game.players
+                             if not isinstance(player.carrying_victim, NullModel)]
+
+    @staticmethod
+    def _restore_tile_state(game: GameStateModel, payload: Dict):
+        """Restore the full state of all tiles, including associated models and sprites."""
+        for row in range(len(payload['_tiles'])):
+            for column in range(len(payload['_tiles'][row])):
+                tile_dict = payload['_tiles'][row][column]
+                tile = game.game_board.get_tile_at(row, column)
+                tile.space_status = SpaceStatusEnum(tile_dict['_space_status']['value'])
+                tile.space_kind = SpaceKindEnum(tile_dict['_space_kind']['value'])
+                tile.is_hotspot = tile_dict['_is_hotspot']
+
+                for assoc_model_dict in tile_dict['_associated_models']:
+                    model: Model = JSONSerializer.deserialize(assoc_model_dict)
+                    tile.add_associated_model(model)
+
+    @staticmethod
+    def _restore_wall_and_door_states(game: GameStateModel, payload: Dict):
+        """Restore all the states of all the walls. Must be called """
+        for row in range(len(payload['_tiles'])):
+            for column in range(len(payload['_tiles'][row])):
+                tile_dict = payload['_tiles'][row][column]
+                tile = game.game_board.get_tile_at(row, column)
+
+                east_obj = tile.adjacent_edge_objects["East"]
+                south_obj = tile.adjacent_edge_objects["South"]
+
+                if isinstance(east_obj, WallModel):
+                    wall_dict = tile_dict['_adjacent_edge_objects']["East"]
+                    east_obj.wall_status = WallStatusEnum(wall_dict['_wall_status']['value'])
+                elif isinstance(east_obj, DoorModel):
+                    door_dict = tile_dict['_adjacent_edge_objects']["East"]
+                    east_obj.door_status = DoorStatusEnum(door_dict['_door_status']['value'])
+
+                if isinstance(south_obj, WallModel):
+                    wall_dict = tile_dict['_adjacent_edge_objects']["South"]
+                    south_obj.wall_status = WallStatusEnum(wall_dict['_wall_status']['value'])
+                elif isinstance(south_obj, DoorModel):
+                    door_dict = tile_dict['_adjacent_edge_objects']["South"]
+                    south_obj.door_status = DoorStatusEnum(door_dict['_door_status']['value'])
+
+    @staticmethod
+    def _restore_parking_spots(game: GameStateModel, payload: Dict):
+        a_spots_dict = payload['_ambulance_spots']
+        e_spots_dict = payload['_engine_spots']
+        a_spots = []
+        e_spots = []
+
+        def fill_spots_list(spots_dict, spots_list):
+            for spot in spots_dict:
+                first_tile = game.game_board.get_tile_at(spot[0]['_row'], spot[0]['_column'])
+                second_tile = game.game_board.get_tile_at(spot[1]['_row'], spot[1]['_column'])
+                spots_list.append([first_tile, second_tile])
+
+        fill_spots_list(a_spots_dict, a_spots)
+        fill_spots_list(e_spots_dict, e_spots)
+
+        game.game_board.ambulance_spots = a_spots
+        game.game_board.engine_spots = e_spots
+
+    @staticmethod
+    def _restore_active_pois(game: GameStateModel, payload: Dict):
+        active_poi_dict = payload['_active_pois']
+        active = []
+        for poi_dict in active_poi_dict:
+            active.append(JSONSerializer.deserialize(poi_dict))
+        game.game_board.active_pois = active
+
+    @staticmethod
+    def _restore_poi_bank(game: GameStateModel, payload: Dict):
+        poi_bank_dict = payload['_poi_bank']
+
+        bank = []
+        for poi_dict in poi_bank_dict:
+            bank.append(JSONSerializer.deserialize(poi_dict))
+
+        game.game_board.poi_bank = bank
+
+    @staticmethod
+    def restore_game_board(game: GameStateModel, payload: Dict):
+        """Special deserialize called from the GameStateModel deserializer."""
+        JSONSerializer._restore_carried_hazmats(game)
+        JSONSerializer._restore_carried_victims(game)
+        JSONSerializer._restore_tile_state(game, payload)
+        JSONSerializer._restore_parking_spots(game, payload) # Might not be necessary but oh well.
+        JSONSerializer._restore_wall_and_door_states(game, payload)
+        JSONSerializer._restore_active_pois(game, payload)
+        JSONSerializer._restore_poi_bank(game, payload)
+        game.game_board.hotspot_bank = payload['_hotspot_bank']
+        game.board_type = GameBoardTypeEnum.LOADED
 
     @staticmethod
     def _deserialize_player(payload: Dict) -> PlayerModel:
@@ -95,7 +207,10 @@ class JSONSerializer(object):
         player.wins = payload['_wins']
         player.losses = payload['_losses']
         player.role = PlayerRoleEnum(payload["_role"]["value"])
-
+        if payload['_carrying_hazmat']:
+            player.carrying_hazmat = JSONSerializer.deserialize(payload['_carrying_hazmat'])
+        if payload['_carrying_victim']:
+            player.carrying_victim = JSONSerializer.deserialize(payload['_carrying_victim'])
         return player
 
     @staticmethod
@@ -105,6 +220,19 @@ class JSONSerializer(object):
         serialized_victim.set_pos(payload['_row'], payload['_column'])
 
         return serialized_victim
+
+    @staticmethod
+    def _deserialize_hazmat(payload: Dict) -> HazmatModel:
+        hazmat = HazmatModel()
+        hazmat.set_pos(payload['_row'], payload['_column'])
+        return hazmat
+
+    @staticmethod
+    def _deserialize_poi_model(payload: Dict) -> POIModel:
+        poi = POIModel(POIIdentityEnum(payload['_identity']['value']))
+        poi.set_pos(payload['_row'], payload['_column'])
+        poi.status = POIStatusEnum(payload['_status']['value'])
+        return poi
 
     @staticmethod
     def _deserialize_chat_event(payload: Dict) -> ChatEvent:
@@ -139,7 +267,6 @@ class JSONSerializer(object):
             moveable_tiles.append(tile_model)
 
         destination_model: TileModel = game_board.get_tile_at(destination['_row'], destination['_column'])
-        # game_board.set_adjacencies(game_board.get_tiles())
         event = MoveEvent(destination_model, moveable_tiles)
         return event
 
@@ -219,8 +346,8 @@ class JSONSerializer(object):
         return event
 
     @staticmethod
-    def _deserialize_drive_ambulance_event(payload: Dict) -> DriveAmbulanceEvent:
-        event = DriveAmbulanceEvent()
+    def _deserialize_drive_vehicle_event(payload: Dict) -> DriveVehicleEvent:
+        event = DriveVehicleEvent(payload['_vehicle_type'])
         event._row = payload['_row']
         event._column = payload['_column']
         return event
@@ -293,6 +420,10 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_wall(payload)
         elif object_type == VictimModel.__name__:
             return JSONSerializer._deserialize_victim(payload)
+        elif object_type == HazmatModel.__name__:
+            return JSONSerializer._deserialize_hazmat(payload)
+        elif object_type == POIModel.__name__:
+            return JSONSerializer._deserialize_poi_model(payload)
         # --------------EVENTS------------------
         elif object_type == JoinEvent.__name__:
             return JSONSerializer._deserialize_join_event(payload)
@@ -330,8 +461,8 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_place_hazmat_event(payload)
         elif object_type == VehiclePlacedEvent.__name__:
             return JSONSerializer._deserialize_vehicle_placed_event(payload)
-        elif object_type == DriveAmbulanceEvent.__name__:
-            return JSONSerializer._deserialize_drive_ambulance_event(payload)
+        elif object_type == DriveVehicleEvent.__name__:
+            return JSONSerializer._deserialize_drive_vehicle_event(payload)
         elif object_type == IdentifyPOIEvent.__name__:
             return JSONSerializer._deserialize_identify_poi_event(payload)
         elif object_type == RideVehicleEvent.__name__:
@@ -350,6 +481,8 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_set_initial_poi_experienced_event(payload)
         elif object_type == TooManyPlayersEvent.__name__:
             return TooManyPlayersEvent()
+        elif object_type == NullModel.__name__:
+            return NullModel()
 
         logger.warning(f"Could not deserialize object {object_type}, not of recognized type.")
 
@@ -387,4 +520,3 @@ class JSONSerializer(object):
     def serialize(input_obj: object) -> dict:
         """Perform a deep serialize to a dict, then can be dumped into json file."""
         return json.loads(json.dumps(input_obj, default=lambda x: JSONSerializer._safe_dict(x)))
-

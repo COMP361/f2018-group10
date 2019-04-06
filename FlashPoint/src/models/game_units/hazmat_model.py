@@ -4,6 +4,7 @@ from src.models.model import Model
 
 logger = logging.getLogger("FlashPoint")
 
+
 class HazmatModel(Model):
 
     def __init__(self):

@@ -87,13 +87,25 @@ class GameBoardModel(Model):
     def ambulance_spots(self) -> List[Tuple[TileModel]]:
         return self._ambulance_spots
 
+    @ambulance_spots.setter
+    def ambulance_spots(self, ambulance_spots: List[Tuple[TileModel]]):
+        self._ambulance_spots = ambulance_spots
+
     @property
     def engine_spots(self) -> List[Tuple[TileModel]]:
         return self._engine_spots
 
+    @engine_spots.setter
+    def engine_spots(self, engine_spots: List[Tuple[TileModel]]):
+        self._engine_spots = engine_spots
+
     @property
     def active_pois(self):
         return self._active_pois
+
+    @active_pois.setter
+    def active_pois(self, pois: List[POIModel]):
+        self._active_pois = pois
 
     def add_poi_or_victim(self, poi_or_victim):
         self._active_pois.append(poi_or_victim)
@@ -120,6 +132,10 @@ class GameBoardModel(Model):
     @property
     def poi_bank(self) -> List[POIModel]:
         return self._poi_bank
+
+    @poi_bank.setter
+    def poi_bank(self, bank: List[POIModel]):
+        self._poi_bank = bank
 
     def remove_from_poi_bank(self, poi: POIModel):
         self._poi_bank.remove(poi)
@@ -484,8 +500,9 @@ class GameBoardModel(Model):
         else:
             return VehicleOrientationEnum.HORIZONTAL
 
-    def get_distance_to_parking_spot(self, destination: Tuple[TileModel, TileModel]):
-        origin_first_tile = self.get_tile_at(self.ambulance.row, self.ambulance.column)
+    def get_distance_to_parking_spot(self, vehicle_type: str, destination: Tuple[TileModel, TileModel]):
+        vehicle = self.ambulance if vehicle_type == "AMBULANCE" else self.engine
+        origin_first_tile = self.get_tile_at(vehicle.row, vehicle.column)
         origin_second_tile = self.get_other_parking_tile(origin_first_tile)
         origin_spot = (origin_first_tile, origin_second_tile)
 

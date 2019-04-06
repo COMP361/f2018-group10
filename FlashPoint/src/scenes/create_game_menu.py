@@ -15,7 +15,7 @@ from src.constants.change_scene_enum import ChangeSceneEnum
 from src.core.networking import Networking
 
 
-class CreateGameMenu(Scene):
+class CreateGameMenuScene(Scene):
     def __init__(self, screen: pygame.Surface, current_player: PlayerModel):
         Scene.__init__(self, screen)
         self._current_player = current_player
@@ -41,9 +41,9 @@ class CreateGameMenu(Scene):
 
     # ------------- GAME CREATE/LOAD STUFF ---------- #
 
-    def create_new_game(self, game_kind: GameKindEnum, diff: DifficultyLevelEnum = None):
+    def create_new_game(self, game_kind: GameKindEnum, difficulty_level: DifficultyLevelEnum = None):
         """Instantiate a new family game and move to the lobby scene."""
-        GameStateModel(self._current_player, 6, game_kind, GameBoardTypeEnum.ORIGINAL, diff)
+        GameStateModel(self._current_player, 6, game_kind, GameBoardTypeEnum.ORIGINAL, difficulty_level)
         EventQueue.post(CustomEvent(ChangeSceneEnum.CHOOSEBOARDSCENE))
 
     # ----------------------------------------------- #

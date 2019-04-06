@@ -1,5 +1,6 @@
 from src.UIComponents.interactable import Interactable
 from src.action_events.turn_events.extinguish_event import ExtinguishEvent
+from src.action_events.turn_events.turn_event import TurnEvent
 from src.controllers.controller import Controller
 from src.core.event_queue import EventQueue
 from src.core.networking import Networking
@@ -7,7 +8,7 @@ from src.models.game_board.door_model import DoorModel
 from src.models.game_board.wall_model import WallModel
 from src.sprites.tile_sprite import TileSprite
 from src.models.game_units.player_model import PlayerModel
-from src.constants.state_enums import SpaceStatusEnum, GameStateEnum, WallStatusEnum, DoorStatusEnum
+from src.constants.state_enums import SpaceStatusEnum, GameStateEnum, WallStatusEnum, DoorStatusEnum, PlayerRoleEnum
 from src.models.game_board.tile_model import TileModel
 from src.models.game_state_model import GameStateModel
 from src.sprites.game_board import GameBoard
@@ -40,7 +41,20 @@ class ExtinguishController(Controller):
         if tile_model not in player_tile.adjacent_tiles.values() and tile_model != player_tile:
             return False
 
-        if self.current_player.ap < 1:
+        # It costs the Rescue Specialist and Paramedic
+        # twice as much AP to extinguish fire/smoke.
+        if self.current_player.role in [PlayerRoleEnum.RESCUE, PlayerRoleEnum.PARAMEDIC]:
+            valid_to_extinguish = TurnEvent.has_required_AP(self.current_player.ap, 2)
+
+        # CAFS firefighter's special AP are
+        # used for extinguishing fire/smoke.
+        elif self.current_player.role == PlayerRoleEnum.CAFS:
+            valid_to_extinguish = TurnEvent.has_required_AP(self.current_player.ap + self.current_player.special_ap, 1)
+
+        else:
+            valid_to_extinguish = TurnEvent.has_required_AP(self.current_player.ap, 1)
+
+        if not valid_to_extinguish:
             return False
 
         if tile_model.space_status == SpaceStatusEnum.SAFE:

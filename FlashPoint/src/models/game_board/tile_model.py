@@ -16,6 +16,7 @@ from src.observers.tile_observer import TileObserver
 
 logger = logging.getLogger("FlashPoint")
 
+
 class TileModel(Model):
     """Logical state of a Tile object."""
 

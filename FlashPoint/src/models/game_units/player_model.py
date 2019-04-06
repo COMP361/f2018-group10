@@ -78,15 +78,6 @@ class PlayerModel(Model):
         return self._observers
 
     @property
-    def role(self):
-        return self._role
-
-    @role.setter
-    def role(self, new_role: PlayerRoleEnum):
-        self._role = new_role
-        self._notify_role()
-
-    @property
     def row(self) -> int:
         return self._row
 
@@ -101,12 +92,22 @@ class PlayerModel(Model):
         self._notify_position()
 
     def set_initial_ap(self, game_kind: GameKindEnum):
-        """Set the initial AP for this player"""
+        """Set the initial AP and special AP for this player"""
         self.ap = 4
 
         if game_kind == GameKindEnum.EXPERIENCED:
-            # TODO: Set AP based on role.
-            pass
+            if self.role == PlayerRoleEnum.CAPTAIN:
+                self.special_ap = 2
+
+            elif self.role == PlayerRoleEnum.CAFS:
+                self.ap = self.ap - 1
+                self.special_ap = 3
+
+            elif self.role == PlayerRoleEnum.GENERALIST:
+                self.ap = self.ap + 1
+
+            elif self.role == PlayerRoleEnum.RESCUE:
+                self.special_ap = 3
 
     @property
     def column(self) -> int:
@@ -220,3 +221,4 @@ class PlayerModel(Model):
     def role(self, player_role: PlayerRoleEnum):
         self._role = player_role
         logger.info("Player {nickname} role: {r}".format(nickname=self.nickname, r=player_role.name))
+        self._notify_role()

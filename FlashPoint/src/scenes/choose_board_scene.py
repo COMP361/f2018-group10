@@ -5,7 +5,6 @@ from src.constants.change_scene_enum import ChangeSceneEnum
 from src.constants.state_enums import GameBoardTypeEnum
 from src.core.custom_event import CustomEvent
 from src.core.event_queue import EventQueue
-from src.models.game_board.game_board_model import GameBoardModel
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 from src.UIComponents.rect_button import RectButton
@@ -13,7 +12,7 @@ from src.UIComponents.rect_label import RectLabel
 from src.UIComponents.text import Text
 
 
-class ChooseBoard(object):
+class ChooseBoardScene(object):
     def __init__(self, screen, current_player: PlayerModel):
         self.game_kind = GameStateModel.instance().rules
         self.sprite_grp = pygame.sprite.Group()

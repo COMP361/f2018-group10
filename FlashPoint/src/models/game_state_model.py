@@ -36,8 +36,6 @@ class GameStateModel(Model):
             self._players_turn_index = 0
             self._difficulty_level = difficulty
             self._rules = game_kind
-            self._red_dice = 0
-            self._black_dice = 0
 
             self._board_type = board_type
             self._game_board = GameBoardModel(self._board_type)
@@ -101,7 +99,8 @@ class GameStateModel(Model):
     def board_type(self, board_type: GameBoardTypeEnum):
         with GameStateModel.lock:
             self._board_type = board_type
-            self.game_board = GameBoardModel(board_type)
+            if board_type != GameBoardTypeEnum.LOADED:
+                self._game_board = GameBoardModel(board_type)
 
     @property
     def chat_history(self) -> List[Tuple[str, str]]:
@@ -119,6 +118,11 @@ class GameStateModel(Model):
         with GameStateModel.lock:
             return self._host
 
+    @host.setter
+    def host(self, host: PlayerModel):
+        with GameStateModel.lock:
+            self._host = host
+
     @property
     def max_players(self) -> int:
         with GameStateModel.lock:
@@ -133,6 +137,11 @@ class GameStateModel(Model):
     def players(self)-> List[PlayerModel]:
         with GameStateModel.lock:
             return self._players
+
+    @players.setter
+    def players(self, players: List[PlayerModel]):
+        with GameStateModel.lock:
+            self._players = players
 
     def add_player(self, player: PlayerModel):
         """Add a player to the current game."""

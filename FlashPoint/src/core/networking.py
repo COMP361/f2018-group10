@@ -1,3 +1,4 @@
+import traceback
 from typing import Union
 
 import ipaddress
@@ -212,8 +213,8 @@ class Networking:
                 self.host = None
             if self.client:
                 logger.info("Disconnecting client")
-                player_model = GameStateModel.instance().get_player_by_ip(self.get_ip())
-                self.send_to_server(DisconnectEvent(player_model))
+                #player_model = GameStateModel.instance().get_player_by_ip(self.get_ip())
+                #self.send_to_server(DisconnectEvent(player_model))
                 self.client.disconnect()
                 self.client.__del__()
                 self.client = None
@@ -238,6 +239,7 @@ class Networking:
                 except MastermindErrorClient:
                     # retry
                     self.send_to_server(data, compress, count+1)
+                    time.sleep(0.5)
                 self.client.toggle_block_signal(False)
             else:
                 raise MastermindErrorClient("Client is not available")
@@ -449,8 +451,14 @@ class Networking:
                             self._reply_queue.append(_server_reply)
                             self.callback_client_receive(_server_reply)
                     except MastermindErrorClient:
+                        logger.error("Mastermind Error:")
+                        info = sys.exc_info()
+                        traceback.print_exception(*info)
                         self.callback_disconnect()
                     except OSError:
+                        logger.error("OS ERROR, disconnecting client.")
+                        info = sys.exc_info()
+                        traceback.print_exception(*info)
                         self.callback_disconnect()
 
         def disconnect(self):
@@ -486,7 +494,7 @@ class Networking:
             while not self._stop_receive.is_set():
                 if not self._pause_blk_signal.is_set():
                     self.send(DummyEvent())
-                    time.sleep(3)
+                    time.sleep(1)
 
         def toggle_block_signal(self, toggle: bool):
             if toggle:

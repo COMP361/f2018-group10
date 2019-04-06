@@ -33,7 +33,7 @@ class SetInitialPOIFamilyEvent(ActionEvent):
             poi = self.game_state.game_board.get_poi_from_bank_by_index(index)
             row = locations[i][0]
             column = locations[i][1]
-            self.game_state.game_board.active_pois.append(poi)
+            self.game_state.game_board.add_poi_or_victim(poi)
             self.game_state.game_board.get_tile_at(row, column).add_associated_model(poi)
             pois_to_remove.append(poi)
 

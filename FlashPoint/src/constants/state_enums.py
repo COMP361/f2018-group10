@@ -36,6 +36,7 @@ class GameBoardTypeEnum(Enum):
     ORIGINAL = auto()
     ALTERNATIVE = auto()
     RANDOM = auto()
+    LOADED = auto()
 
 
 class GameKindEnum(Enum):
