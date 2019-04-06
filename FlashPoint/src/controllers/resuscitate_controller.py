@@ -1,7 +1,6 @@
 from src.UIComponents.interactable import Interactable
-from src.action_events.hazmat_event import HazmatEvent
 from src.action_events.turn_events.turn_event import TurnEvent
-from src.constants.state_enums import GameKindEnum, WallStatusEnum, DoorStatusEnum
+from src.constants.state_enums import GameKindEnum, WallStatusEnum, DoorStatusEnum, PlayerRoleEnum
 from src.controllers.controller import Controller
 from src.core.networking import Networking
 from src.models.game_board.door_model import DoorModel
@@ -12,6 +11,7 @@ from src.models.game_state_model import GameStateModel
 from src.models.game_units.hazmat_model import HazmatModel
 from src.models.game_units.player_model import PlayerModel
 from src.models.game_units.poi_model import POIModel
+from src.models.game_units.victim_model import VictimModel
 from src.sprites.tile_sprite import TileSprite
 
 
@@ -37,60 +37,23 @@ class ResuscitateController(Controller):
         return cls._instance
 
     def run_checks(self, tile_model: TileModel) -> bool:
-        player_tile: TileModel = GameStateModel.instance().game_board.get_tile_at(self._current_player.row,
-                                                                                  self._current_player.column)
+       
+        player_tile = self.board.get_tile_at(self._current_player.row, self._current_player.column)
 
         if not self._current_player == self.game.players_turn:
             return False
 
-        valid_to_identify = TurnEvent.has_required_AP(self._current_player.ap, 2)
-        if not valid_to_identify:
+        if self._current_player.role != PlayerRoleEnum.PARAMEDIC:
             return False
 
-        if player_tile not in tile_model.adjacent_tiles.values() and player_tile != tile_model:
+        valid_to_do_event = TurnEvent.has_required_AP(self._current_player.ap, 1)
+        if not valid_to_do_event:
             return False
 
-        if player_tile.south_tile == tile_model:
-            obs = player_tile.get_obstacle_in_direction('South')
-            if isinstance(obs, WallModel):
-                if not obs.wall_status == WallStatusEnum.DESTROYED:
-                    return False
+        if player_tile.row != tile_model.row or player_tile.column != tile_model.column:
+            return False
 
-            elif isinstance(obs, DoorModel):
-                if obs.door_status == DoorStatusEnum.CLOSED:
-                    return False
-
-        elif player_tile.north_tile == tile_model:
-            obs = player_tile.get_obstacle_in_direction('North')
-            if isinstance(obs, WallModel):
-                if not obs.wall_status == WallStatusEnum.DESTROYED:
-                    return False
-
-            elif isinstance(obs, DoorModel):
-                if obs.door_status == DoorStatusEnum.CLOSED:
-                    return False
-
-        elif player_tile.east_tile == tile_model:
-            obs = player_tile.get_obstacle_in_direction('East')
-            if isinstance(obs, WallModel):
-                if not obs.wall_status == WallStatusEnum.DESTROYED:
-                    return False
-
-            elif isinstance(obs, DoorModel):
-                if obs.door_status == DoorStatusEnum.CLOSED:
-                    return False
-
-        elif player_tile.west_tile == tile_model:
-            obs = player_tile.get_obstacle_in_direction('West')
-            if isinstance(obs, WallModel):
-                if not obs.wall_status == WallStatusEnum.DESTROYED:
-                    return False
-
-            elif isinstance(obs, DoorModel):
-                if obs.door_status == DoorStatusEnum.CLOSED:
-                    return False
-
-        if not any([isinstance(model, POIModel) for model in tile_model.associated_models]):
+        if not any([isinstance(model, VictimModel) for model in tile_model.associated_models]):
             return False
 
         return True
@@ -100,7 +63,8 @@ class ResuscitateController(Controller):
             menu_to_close.disable()
             return
 
-        event = HazmatEvent(tile_model.row, tile_model.column)
+       ## event = Resucistate(tile_model.row, tile_model.column)
+       ## event = HazmatEvent(tile_model.row, tile_model.column)
 
         if Networking.get_instance().is_host:
             Networking.get_instance().send_to_all_client(event)
@@ -112,8 +76,8 @@ class ResuscitateController(Controller):
     def process_input(self, tile_sprite: TileSprite):
         tile = self.board.get_tile_at(tile_sprite.row, tile_sprite.column)
         if self.run_checks(tile):
-            tile_sprite.hazmat_button.enable()
-            tile_sprite.on_click(self.send_event_and_close_menu, tile, tile_sprite.hazmat_button)
+            tile_sprite.resuscitate_button.enable()
+            tile_sprite.on_click(self.send_event_and_close_menu, tile, tile_sprite.resuscitate_button)
         else:
-            tile_sprite.hazmat_button.disable()
+            tile_sprite.resuscitate_button.disable()
 

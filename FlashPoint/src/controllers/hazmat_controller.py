@@ -34,6 +34,7 @@ class HazmatController(Controller):
         return cls._instance
 
     def run_checks(self, tile_model: TileModel) -> bool:
+
         player_tile = self.board.get_tile_at(self._current_player.row, self._current_player.column)
 
         if not self._current_player == self.game.players_turn:
@@ -45,46 +46,6 @@ class HazmatController(Controller):
         valid_to_do_event = TurnEvent.has_required_AP(self._current_player.ap, 2)
         if not valid_to_do_event:
             return False
-        #
-        # if player_tile.south_tile == tile_model:
-        #     obs = player_tile.get_obstacle_in_direction('South')
-        #     if isinstance(obs, WallModel):
-        #         if not obs.wall_status == WallStatusEnum.DESTROYED:
-        #             return False
-        #
-        #     elif isinstance(obs, DoorModel):
-        #         if obs.door_status == DoorStatusEnum.CLOSED:
-        #             return False
-        #
-        # elif player_tile.north_tile == tile_model:
-        #     obs = player_tile.get_obstacle_in_direction('North')
-        #     if isinstance(obs, WallModel):
-        #         if not obs.wall_status == WallStatusEnum.DESTROYED:
-        #             return False
-        #
-        #     elif isinstance(obs, DoorModel):
-        #         if obs.door_status == DoorStatusEnum.CLOSED:
-        #             return False
-        #
-        # elif player_tile.east_tile == tile_model:
-        #     obs = player_tile.get_obstacle_in_direction('East')
-        #     if isinstance(obs, WallModel):
-        #         if not obs.wall_status == WallStatusEnum.DESTROYED:
-        #             return False
-        #
-        #     elif isinstance(obs, DoorModel):
-        #         if obs.door_status == DoorStatusEnum.CLOSED:
-        #             return False
-        #
-        # elif player_tile.west_tile == tile_model:
-        #     obs = player_tile.get_obstacle_in_direction('West')
-        #     if isinstance(obs, WallModel):
-        #         if not obs.wall_status == WallStatusEnum.DESTROYED:
-        #             return False
-        #
-        #     elif isinstance(obs, DoorModel):
-        #         if obs.door_status == DoorStatusEnum.CLOSED:
-        #             return False
 
         if player_tile.row != tile_model.row or player_tile.column != tile_model.column:
             return False
