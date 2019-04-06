@@ -153,6 +153,10 @@ class EndTurnAdvanceFireEvent(TurnEvent):
             self._placing_players_end_turn()
         elif not self.game_state.all_players_have_chosen_location():
             logger.info("Not all players have chosen starting location, not moving to next game phase.")
+            if not self.game_state.players_turn.has_pos:
+                logger.info("The player did not choose a location, not moving to next player.")
+                self.game_state._notify_player_index()
+                return
         elif self.game_state.state == GameStateEnum.PLACING_VEHICLES:
             self._placing_vehicles_end_turn()
 
