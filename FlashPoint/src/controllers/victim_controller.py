@@ -31,7 +31,7 @@ class VictimController(Controller):
         victim_tile = game.game_board.get_tile_at(tile.row, tile.column)
         player = game.players_turn
 
-        if not game.game_board.get_tile_at(player.row, player.column) == victim_tile:
+        if game.game_board.get_tile_at(player.row, player.column) != victim_tile:
             return False
 
         for assoc_model in victim_tile.associated_models:
@@ -51,7 +51,12 @@ class VictimController(Controller):
         return False
 
     def send_event_and_close_menu(self, tile_model: TileModel, menu_to_close: Interactable):
-        victim = [model for model in tile_model.associated_models if isinstance(model, VictimModel)][0]
+        victims = [model for model in tile_model.associated_models if isinstance(model, VictimModel)]
+        if victims:
+            victim = victims[0]
+        else:
+            return
+
         is_carrying = isinstance(self._current_player.carrying_victim, VictimModel)
 
         check_func = self.check_drop if is_carrying else self.check_pickup
@@ -83,7 +88,7 @@ class VictimController(Controller):
 
         if button:
             button.enable()
-            button.on_click(self.send_event_and_close_menu(tile_model, button))
+            button.on_click(self.send_event_and_close_menu, tile_model, button)
         else:
             tile_sprite.pickup_victim_button.disable()
             tile_sprite.drop_victim_button.disable()
