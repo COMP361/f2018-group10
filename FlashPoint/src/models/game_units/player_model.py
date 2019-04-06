@@ -10,7 +10,7 @@ from src.models.model import Model
 
 logger = logging.getLogger("FlashPoint")
 
-class PlayerModel(Model):
+class PlayerModel(Model,object):
 
     def __init__(self, ip: str, nickname: str):
         super().__init__()
@@ -108,10 +108,11 @@ class PlayerModel(Model):
     def set_initial_ap(self, game_kind: GameKindEnum):
         """Set the initial AP for this player"""
         self.ap = 4
-
         if game_kind == GameKindEnum.EXPERIENCED:
             # TODO: Set AP based on role.
-            pass
+            self.special_ap = 1
+
+
 
     @property
     def column(self) -> int:

@@ -30,8 +30,8 @@ class PlayerState(Interactable, PlayerObserver):
         self.ap = current.ap
         self.sap = current.special_ap
         self.rules = rules
-        self.AP = f'Action Points: {self.ap}'
-        self.SAP = f'Special Action Points: {self.sap}'
+        self.AP = f'Action Points: {current.ap}'
+        self.SAP = f'Special Action Points: {current.special_ap}'
 
         self.text = self.font_name.render(self.name, True, current.color)
         self.text_AP = self.font_other.render(self.AP, True, Color.GREEN2)
@@ -98,14 +98,12 @@ class PlayerState(Interactable, PlayerObserver):
         pass
 
     def player_ap_changed(self, updated_ap: int):
-        self.ap = updated_ap
-        self.AP = f'AP: {self.ap}'
+        self.AP = f'Action Points: {updated_ap}'
         self.text_AP = self.font_other.render(self.AP, True, Color.GREEN2)
 
     def player_special_ap_changed(self, updated_sap: int):
-        self.sap = updated_sap
-        self.AP = f'SAP: {self.sap}'
-        self.text_AP = self.font_other.render(self.SAP, True, Color.GREEN2)
+        self.SAP = f'Special Action Points: {updated_sap}'
+        self.text_SAP = self.font_other.render(self.SAP, True, Color.GREEN2)
 
     def player_position_changed(self, x_pos: int, y_pos: int):
         pass

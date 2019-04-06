@@ -38,8 +38,8 @@ class CurrentPlayerState(pygame.sprite.Sprite, PlayerObserver):
         self.SAP = f'Special AP:{self.sap}'
 
         self.text = self.font_name.render(self.name, True, Color.GREEN2)
-        self.text_AP = self.font_other.render(self.AP, True, Color.WHITE)
-        self.text_SAP = self.font_other.render(self.SAP, True, Color.WHITE)
+        self.text_AP = self.font_other.render(self.AP, True, Color.GREEN2)
+        self.text_SAP = self.font_other.render(self.SAP, True, Color.GREEN2)
         self.turn = False
         self.start = datetime.now()
         self.time_str = f"TOTAL TIME:"
@@ -51,7 +51,7 @@ class CurrentPlayerState(pygame.sprite.Sprite, PlayerObserver):
         self.AP_rect = self.text_AP.get_rect()
         self.AP_rect.move_ip(15, 50)
         self.SAP_rect = self.text_SAP.get_rect()
-        self.SAP_rect.move_ip(15, 70)
+        self.SAP_rect.move_ip(15, 72)
 
     def color_picker(self, color: Color):
         return {
@@ -70,6 +70,7 @@ class CurrentPlayerState(pygame.sprite.Sprite, PlayerObserver):
         self.image.blit(self.frame, self.image.get_rect())
         self.image.blit(self.text, self.P_rect)
         self.image.blit(self.text_AP, self.AP_rect)
+        self.image.blit(self.text_SAP,self.SAP_rect)
 
         if self.turn:
             self.time_left_rect = self.text_time_left.get_rect()
@@ -80,14 +81,13 @@ class CurrentPlayerState(pygame.sprite.Sprite, PlayerObserver):
         pass
 
     def player_ap_changed(self, updated_ap: int):
-        self.ap = updated_ap
-        self.AP = f'AP: {self.ap}'
+        self.AP = f'AP: {updated_ap}'
         self.text_AP = self.font_other.render(self.AP, True, Color.GREEN2)
 
     def player_special_ap_changed(self, updated_sap: int):
-        self.sap = updated_sap
-        self.SAP = f'AP: {self.sap}'
+        self.SAP = f'Special AP:{updated_sap}'
         self.text_SAP = self.font_other.render(self.SAP, True, Color.GREEN2)
+
     def player_position_changed(self, x_pos: int, y_pos: int):
         pass
 
