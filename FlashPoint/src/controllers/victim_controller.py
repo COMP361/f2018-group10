@@ -54,17 +54,16 @@ class VictimController(Controller):
         victims = [model for model in tile_model.associated_models if isinstance(model, VictimModel)]
         if victims:
             victim = victims[0]
-        else:
-            return
 
         is_carrying = isinstance(self._current_player.carrying_victim, VictimModel)
 
         check_func = self.check_drop if is_carrying else self.check_pickup
+
         if not check_func(tile_model):
             menu_to_close.disable()
             return
 
-        event = DropVictimEvent(victim) if is_carrying else PickupVictimEvent(victim)
+        event = DropVictimEvent(self._current_player.carrying_victim) if is_carrying else PickupVictimEvent(victim)
 
         if Networking.get_instance().is_host:
             Networking.get_instance().send_to_all_client(event)
