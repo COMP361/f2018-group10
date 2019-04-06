@@ -52,6 +52,10 @@ class PlayerBox(PlayerObserver):
             return "media/specialist_cards/rescue_specialist.png"
         elif enum == PlayerRoleEnum.FAMILY:
             return "media/specialist_cards/family.png"
+        elif enum == PlayerRoleEnum.DOGE:
+            return "media/specialist_cards/doge.png"
+        elif enum == PlayerRoleEnum.VETERAN:
+            return "media/specialist_cards/veteran.png"
 
     def draw(self, screen):
         self.text_box.draw(screen)
