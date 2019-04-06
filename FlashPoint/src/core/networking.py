@@ -208,7 +208,7 @@ class Networking:
                 self.host.disconnect()
                 self.host.__del__()
                 self.host = None
-            elif self.client:
+            if self.client:
                 logger.info("Disconnecting client")
                 player_model = GameStateModel.instance().get_player_by_ip(self.get_ip())
                 self.send_to_server(DisconnectEvent(player_model))
@@ -494,9 +494,10 @@ class Networking:
             Define callback here when client's connection to host is interrupted.
             :return:
             """
-            logger.warning("It seems that client is not connected...")
-            Networking.get_instance().disconnect()
-            EventQueue.post(CustomEvent(ChangeSceneEnum.DISCONNECT))
+            if Networking.get_instance().is_host:
+                logger.warning("It seems that client is not connected...")
+                Networking.get_instance().disconnect()
+                EventQueue.post(CustomEvent(ChangeSceneEnum.DISCONNECT))
 
         class SocketError(Exception):
             pass
