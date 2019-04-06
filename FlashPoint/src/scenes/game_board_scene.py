@@ -6,8 +6,9 @@ from typing import List
 
 import pygame
 
+from src.action_events.fire_placement_event import FirePlacementEvent
 from src.action_events.set_initial_poi_experienced_event import SetInitialPOIExperiencedEvent
-from src.constants.state_enums import GameKindEnum, GameStateEnum
+from src.constants.state_enums import GameKindEnum, GameStateEnum, GameBoardTypeEnum
 from src.models.game_units.victim_model import VictimModel
 from src.sprites.victim_sprite import VictimSprite
 from src.models.game_units.poi_model import POIModel
@@ -67,9 +68,12 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
         # Initialize controllers
         self._init_controllers()
 
-
-        # Send initialization events.
-        self._send_game_board_initialize()
+        # Send initialization events
+        if self._game.board_type != GameBoardTypeEnum.LOADED:
+            self._send_game_board_initialize()
+        else:
+            self._init_loaded_sprites()
+        self._game._notify_player_index()
 
     def _init_ui_elements(self):
         """Initialize all things to be drawn on this screen."""
@@ -102,6 +106,9 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
             InGameStates(250, 650, self._game.damage, self._game.victims_saved, self._game.victims_lost))
         self._active_sprites.add(self._menu_btn)
 
+    def _init_loaded_sprites(self):
+        """Find all models that were loaded but don't have corresponding observers/sprites."""
+        
     def _init_controllers(self):
         """Instantiate all controllers."""
         ChopController(self._current_player)
@@ -118,7 +125,7 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
     def _send_game_board_initialize(self):
         """Send any game board initialization events."""
         if Networking.get_instance().is_host:
-            self._game._notify_player_index()
+            Networking.get_instance().send_to_all_client(FirePlacementEvent())
 
             if self._game.rules == GameKindEnum.EXPERIENCED:
                 Networking.get_instance().send_to_all_client(SetInitialPOIExperiencedEvent())
@@ -213,7 +220,6 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
         self._active_sprites.update(event_queue)
         self._chat_box.update(event_queue)
         self._player_hud_sprites.update(event_queue)
-
 
         if not self.ignore_area():
             self._game_board_sprite.update(event_queue)
