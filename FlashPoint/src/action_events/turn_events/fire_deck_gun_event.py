@@ -2,11 +2,13 @@ import logging
 import random
 
 from src.action_events.turn_events.turn_event import TurnEvent
-from src.constants.state_enums import VehicleOrientationEnum, QuadrantEnum, SpaceStatusEnum, DoorStatusEnum
+from src.constants.state_enums import VehicleOrientationEnum, QuadrantEnum, SpaceStatusEnum, DoorStatusEnum, \
+    WallStatusEnum
 from src.core.flashpoint_exceptions import FlippingDiceProblemException
 from src.models.game_board.door_model import DoorModel
 from src.models.game_board.null_model import NullModel
 from src.models.game_board.tile_model import TileModel
+from src.models.game_board.wall_model import WallModel
 from src.models.game_state_model import GameStateModel
 
 logger = logging.getLogger("FlashPoint")
@@ -41,7 +43,8 @@ class FireDeckGunEvent(TurnEvent):
             obstacle = self.target_tile.get_obstacle_in_direction(dirn)
             # If there is no obstacle in the given direction or there is an
             # open door, set the status of the space in that direction to Safe.
-            if not has_obstacle or (isinstance(obstacle, DoorModel) and obstacle.door_status == DoorStatusEnum.OPEN):
+            if not has_obstacle or (isinstance(obstacle, DoorModel) and obstacle.door_status == DoorStatusEnum.OPEN)\
+                    or (isinstance(obstacle, WallModel) and obstacle.wall_status == WallStatusEnum.DESTROYED):
                 nb_tile: TileModel = self.target_tile.get_tile_in_direction(dirn)
                 nb_tile.space_status = SpaceStatusEnum.SAFE
 
@@ -86,6 +89,7 @@ class FireDeckGunEvent(TurnEvent):
                 return
 
             new_target_quadrant = self._determine_quadrant(flipped_row, flipped_column)
+
             if new_target_quadrant == engine_quadrant:
                 self.target_tile = GameStateModel.instance().game_board.get_tile_at(flipped_row, flipped_column)
                 return
@@ -96,6 +100,25 @@ class FireDeckGunEvent(TurnEvent):
         # $$$$$$$$$$$$$$$$$
         logger.error("Possible issue with dice flipping! Stop!!")
         raise FlippingDiceProblemException()
+
+    def _determine_quadrant_player(self, row, column) -> QuadrantEnum:
+        """
+        Determines the quadrant to which
+        the row and column belong to.
+
+        :param row:
+        :param column:
+        :return: Quadrant in which the row and
+                column are located.
+        """
+        if 4 > row > 0 and 5 > column > 0:
+            return QuadrantEnum.TOP_LEFT
+        elif 4 > row > 0 and 5 <= column < 9:
+            return QuadrantEnum.TOP_RIGHT
+        elif 4 <= row < 7 and 5 > column > 0:
+            return QuadrantEnum.BOTTOM_LEFT
+        elif 4 <= row < 7 and 5 <= column < 9:
+            return QuadrantEnum.BOTTOM_RIGHT
 
     def _determine_quadrant(self, row, column) -> QuadrantEnum:
         """
@@ -125,8 +148,10 @@ class FireDeckGunEvent(TurnEvent):
         :return: True if there are players in the quadrant,
                 False otherwise.
         """
+
         for player in GameStateModel.instance().players:
-            if quadrant == self._determine_quadrant(player.row, player.column):
+
+            if quadrant == self._determine_quadrant_player(self.player.row, self.player.column):
                 return True
 
         return False
