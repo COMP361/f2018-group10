@@ -64,6 +64,9 @@ class JoinScene(object):
             msg = "Lobby is full. Cannot join the game."
             print(msg)
             self.init_error_message(msg)
+            # Disconnect client that's trying to connect
+            if not Networking.get_instance().is_host:
+                Networking.get_instance().disconnect()
         except Networking.Client.SocketError:
             msg = "Failed to establish connection."
             print(msg)
