@@ -26,11 +26,11 @@ class DriveVehiclesController(Controller):
     def instance(cls):
         return cls._instance
 
-    def _player_has_enough_ap(self, tile_model: TileModel) -> bool:
+    def _player_has_enough_ap(self, vehicle_type: str, tile_model: TileModel) -> bool:
         game_board: GameBoardModel = GameStateModel.instance().game_board
         destination_second_tile = game_board.get_other_parking_tile(tile_model)
 
-        ap_multiplier = game_board.get_distance_to_parking_spot((tile_model, destination_second_tile))
+        ap_multiplier = game_board.get_distance_to_parking_spot(vehicle_type, (tile_model, destination_second_tile))
         return self._current_player.ap >= 2 * ap_multiplier
 
     def _player_is_in_vehicle_space(self, vehicle_type: str, first_tile: TileModel) -> bool:
@@ -52,7 +52,7 @@ class DriveVehiclesController(Controller):
             return False
 
         row_match = player.row == vehicle_row or player.row == vehicle_row + 1
-        column_match = player.column == vehicle_column or player.row == vehicle_column + 1
+        column_match = player.column == vehicle_column or player.column == vehicle_column + 1
         return row_match and column_match
 
     def _run_checks_drive_ambulance(self, tile_model: TileModel):
@@ -62,7 +62,7 @@ class DriveVehiclesController(Controller):
         if tile_model.space_kind != SpaceKindEnum.AMBULANCE_PARKING:
             return False
 
-        if not self._player_has_enough_ap(tile_model):
+        if not self._player_has_enough_ap("AMBULANCE", tile_model):
             return False
         return True
 
@@ -76,7 +76,7 @@ class DriveVehiclesController(Controller):
         if self._current_player not in GameStateModel.instance().game_board.engine.passengers:
             return False
 
-        if not self._player_has_enough_ap(tile_model):
+        if not self._player_has_enough_ap("ENGINE", tile_model):
             return False
 
         return True

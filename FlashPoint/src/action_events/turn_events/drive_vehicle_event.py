@@ -26,7 +26,7 @@ class DriveVehicleEvent(TurnEvent):
         destination_first_tile = self._board_model.get_tile_at(self._row, self._column)
         destination_second_tile = self._board_model.get_other_parking_tile(destination_first_tile)
 
-        ap_multiplier = self._board_model.get_distance_to_parking_spot(
+        ap_multiplier = self._board_model.get_distance_to_parking_spot(self._vehicle_type,
             (destination_first_tile, destination_second_tile))
         self._player.ap = self._player.ap - 2*ap_multiplier
 
