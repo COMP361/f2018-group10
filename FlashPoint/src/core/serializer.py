@@ -4,7 +4,7 @@ import json
 from typing import Dict
 import logging
 
-
+from src.action_events.too_many_players_event import TooManyPlayersEvent
 from src.action_events.disconnect_event import DisconnectEvent
 from src.action_events.fire_placement_event import FirePlacementEvent
 from src.action_events.choose_character_event import ChooseCharacterEvent
@@ -217,6 +217,7 @@ class JSONSerializer(object):
         event._row = payload['_row']
         event._column = payload['_column']
         return event
+
     @staticmethod
     def _deserialize_drive_ambulance_event(payload: Dict) -> DriveAmbulanceEvent:
         event = DriveAmbulanceEvent()
@@ -347,6 +348,8 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_set_initial_hotspot_event(payload)
         elif object_type == SetInitialPOIExperiencedEvent.__name__:
             return JSONSerializer._deserialize_set_initial_poi_experienced_event(payload)
+        elif object_type == TooManyPlayersEvent.__name__:
+            return TooManyPlayersEvent()
 
         logger.warning(f"Could not deserialize object {object_type}, not of recognized type.")
 

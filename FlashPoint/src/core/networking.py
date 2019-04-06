@@ -6,6 +6,7 @@ import threading
 import logging
 import time
 
+from src.core.flashpoint_exceptions import TooManyPlayersException
 from src.core.custom_event import CustomEvent
 from src.core.serializer import JSONSerializer
 from src.core.event_queue import EventQueue
@@ -16,6 +17,7 @@ from src.action_events.turn_events.turn_event import TurnEvent
 from src.action_events.join_event import JoinEvent
 from src.action_events.dummy_event import DummyEvent
 from src.action_events.disconnect_event import DisconnectEvent
+from src.action_events.too_many_players_event import TooManyPlayersEvent
 from src.external.Mastermind import *
 
 logger = logging.getLogger("FlashPoint")
@@ -374,8 +376,12 @@ class Networking:
                     return super(MastermindServerUDP, self).callback_client_handle(connection_object, data)
 
                 if isinstance(data, JoinEvent):
-                    data.execute()
-                    Networking.get_instance().send_to_all_client(GameStateModel.instance())
+                    try:
+                        data.execute()
+                        Networking.get_instance().send_to_all_client(GameStateModel.instance())
+                    except TooManyPlayersException:
+                        # Informs the client that the lobby is full
+                        Networking.get_instance().send_to_client(connection_object.address[0], TooManyPlayersEvent)
                     return super(MastermindServerUDP, self).callback_client_handle(connection_object, data)
 
                 # send everything back to the clients to process
