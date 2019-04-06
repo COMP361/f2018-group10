@@ -18,7 +18,7 @@ from src.action_events.set_initial_poi_family_event import SetInitialPOIFamilyEv
 from src.action_events.turn_events.chop_event import ChopEvent
 from src.action_events.turn_events.close_door_event import CloseDoorEvent
 from src.action_events.turn_events.dismount_vehicle_event import DismountVehicleEvent
-from src.action_events.turn_events.drive_ambulance_event import DriveAmbulanceEvent
+from src.action_events.turn_events.drive_vehicle_event import DriveVehicleEvent
 from src.action_events.turn_events.drop_victim_event import DropVictimEvent
 from src.action_events.turn_events.extinguish_event import ExtinguishEvent
 from src.action_events.turn_events.move_event import MoveEvent
@@ -344,9 +344,10 @@ class JSONSerializer(object):
         event._row = payload['_row']
         event._column = payload['_column']
         return event
+
     @staticmethod
-    def _deserialize_drive_ambulance_event(payload: Dict) -> DriveAmbulanceEvent:
-        event = DriveAmbulanceEvent()
+    def _deserialize_drive_vehicle_event(payload: Dict) -> DriveVehicleEvent:
+        event = DriveVehicleEvent(payload['_vehicle_type'])
         event._row = payload['_row']
         event._column = payload['_column']
         return event
@@ -460,8 +461,8 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_place_hazmat_event(payload)
         elif object_type == VehiclePlacedEvent.__name__:
             return JSONSerializer._deserialize_vehicle_placed_event(payload)
-        elif object_type == DriveAmbulanceEvent.__name__:
-            return JSONSerializer._deserialize_drive_ambulance_event(payload)
+        elif object_type == DriveVehicleEvent.__name__:
+            return JSONSerializer._deserialize_drive_vehicle_event(payload)
         elif object_type == IdentifyPOIEvent.__name__:
             return JSONSerializer._deserialize_identify_poi_event(payload)
         elif object_type == RideVehicleEvent.__name__:
