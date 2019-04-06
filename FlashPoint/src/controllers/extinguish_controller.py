@@ -45,6 +45,12 @@ class ExtinguishController(Controller):
         # twice as much AP to extinguish fire/smoke.
         if self.current_player.role in [PlayerRoleEnum.RESCUE, PlayerRoleEnum.PARAMEDIC]:
             valid_to_extinguish = TurnEvent.has_required_AP(self.current_player.ap, 2)
+
+        # CAFS firefighter's special AP are
+        # used for extinguishing fire/smoke.
+        elif self.current_player.role == PlayerRoleEnum.CAFS:
+            valid_to_extinguish = TurnEvent.has_required_AP(self.current_player.ap + self.current_player.special_ap, 1)
+
         else:
             valid_to_extinguish = TurnEvent.has_required_AP(self.current_player.ap, 1)
 

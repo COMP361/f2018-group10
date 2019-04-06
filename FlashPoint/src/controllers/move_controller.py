@@ -236,9 +236,9 @@ class MoveController(PlayerObserver, Controller):
         pass
 
     def player_special_ap_changed(self, updated_ap: int):
-        # If the player is not a Rescue Specialist, a change
+        # If the player is not a Rescue Specialist/CAFS, a change
         # in the special AP will not affect the moveable tiles.
-        if self.current_player.role != PlayerRoleEnum.RESCUE:
+        if self.current_player.role not in [PlayerRoleEnum.RESCUE, PlayerRoleEnum.CAFS]:
             return
 
         self._update_moveable_tiles()
