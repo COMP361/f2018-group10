@@ -87,7 +87,7 @@ class SetMaxPlayers(object):
         box_size = (130, 48)
         self.buttonBack = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
                                      Text(pygame.font.SysFont('Arial', 20), text, color_text))
-        self.buttonBack.on_click(EventQueue.post, CustomEvent(ChangeSceneEnum.CREATEGAMEMENU))
+        self.buttonBack.on_click(EventQueue.post, CustomEvent(ChangeSceneEnum.CHOOSEBOARDSCENE))
         self.sprite_grp.add(self.buttonBack)
 
     @staticmethod

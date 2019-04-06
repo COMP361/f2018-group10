@@ -118,6 +118,12 @@ class TileInputController(GameStateObserver, Controller):
     def dead_victims(self, victims_dead: int):
         pass
 
+    def player_added(self, player: PlayerModel):
+        pass
+
+    def player_removed(self, player: PlayerModel):
+        pass
+
     @staticmethod
     def update(event_queue: EventQueue):
         MoveController.instance().update(event_queue)
