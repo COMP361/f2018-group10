@@ -9,7 +9,9 @@ import pygame
 from src.action_events.fire_placement_event import FirePlacementEvent
 from src.action_events.set_initial_poi_experienced_event import SetInitialPOIExperiencedEvent
 from src.constants.state_enums import GameKindEnum, GameStateEnum, GameBoardTypeEnum
+from src.models.game_units.hazmat_model import HazmatModel
 from src.models.game_units.victim_model import VictimModel
+from src.sprites.hazmat_sprite import HazmatSprite
 from src.sprites.victim_sprite import VictimSprite
 from src.models.game_units.poi_model import POIModel
 from src.observers.GameBoardObserver import GameBoardObserver
@@ -108,7 +110,12 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
 
     def _init_loaded_sprites(self):
         """Find all models that were loaded but don't have corresponding observers/sprites."""
-        
+        self.notify_active_poi(self._game.game_board.active_pois)
+        for tile in self._game.game_board.tiles:
+            for obj in tile.associated_models:
+                if isinstance(obj, HazmatModel):
+                    self._game_board_sprite.add(HazmatSprite(tile))
+
     def _init_controllers(self):
         """Instantiate all controllers."""
         ChopController(self._current_player)
@@ -137,20 +144,6 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
             player.set_initial_ap(self._game.rules)
 
         GameStateModel.instance().add_observer(self)
-
-    def notify_active_poi(self, active_pois: List[POIModel]):
-        # Removes are already handled by the sprites themselves, therefore only need to deal with adds.
-        for sprite in self._game_board_sprite:
-            if isinstance(sprite, POISprite) or isinstance(sprite, VictimSprite):
-                sprite.kill()
-
-        for poi in active_pois:
-            if isinstance(poi, POIModel):
-                self._game_board_sprite.add(POISprite(poi))
-            elif isinstance(poi, VictimModel):
-                victim_sprite = VictimSprite(poi.row, poi.column)
-                poi.add_observer(victim_sprite)
-                self._game_board_sprite.add(victim_sprite)
 
     def _save(self):
         """Save the current game state to the hosts machine"""
@@ -244,6 +237,20 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
 
         return ignore
 
+    def notify_active_poi(self, active_pois: List[POIModel]):
+        # Removes are already handled by the sprites themselves, therefore only need to deal with adds.
+        for sprite in self._game_board_sprite:
+            if isinstance(sprite, POISprite) or isinstance(sprite, VictimSprite):
+                sprite.kill()
+
+        for poi in active_pois:
+            if isinstance(poi, POIModel):
+                self._game_board_sprite.add(POISprite(poi))
+            elif isinstance(poi, VictimModel):
+                victim_sprite = VictimSprite(poi.row, poi.column)
+                poi.add_observer(victim_sprite)
+                self._game_board_sprite.add(victim_sprite)
+
     def notify_player_index(self, player_index: int):
         pass
 
@@ -276,4 +283,3 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
         self._player_hud_sprites.empty()
         for i, player in enumerate(self._game.players):
             self._player_hud_sprites.add(PlayerState(0, 30 + 64 * i, player.nickname, player.color, player))
-
