@@ -192,7 +192,6 @@ class JSONSerializer(object):
         JSONSerializer._restore_active_pois(game, payload)
         JSONSerializer._restore_poi_bank(game, payload)
         game.game_board.hotspot_bank = payload['_hotspot_bank']
-        game.board_type = GameBoardTypeEnum.LOADED
 
     @staticmethod
     def _deserialize_player(payload: Dict) -> PlayerModel:
