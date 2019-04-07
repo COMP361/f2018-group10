@@ -49,6 +49,14 @@ class MoveController(PlayerObserver, Controller):
     def instance(cls):
         return cls._instance
 
+    @property
+    def target(self):
+        game: GameStateModel = GameStateModel.instance()
+        source: PlayerModel = game.command[0]
+        if source and self.current_player == source:
+            return [player for player in game.players if player == game.command[1]]
+        return self.current_player
+
     def _determine_reachable_tiles(self, row: int, column: int, ap: int) -> List[TileModel]:
         """
         Determines the list of tiles the player can
@@ -71,10 +79,10 @@ class MoveController(PlayerObserver, Controller):
         pq = PriorityQueue()
         is_carrying_victim = False
         is_carrying_hazmat = False
-        if isinstance(self.current_player.carrying_victim, VictimModel):
+        if isinstance(self.target.carrying_victim, VictimModel):
             is_carrying_victim = True
 
-        if isinstance(self.current_player.carrying_hazmat, HazmatModel):
+        if isinstance(self.target.carrying_hazmat, HazmatModel):
             is_carrying_hazmat = True
 
         is_carrying_something = is_carrying_victim or is_carrying_hazmat
@@ -137,7 +145,7 @@ class MoveController(PlayerObserver, Controller):
         if ap < 1:
             return False
 
-        is_leading_victim = isinstance(self.current_player.leading_victim, VictimModel)
+        is_leading_victim = isinstance(self.target.leading_victim, VictimModel)
 
         has_obstacle = first_tile.tile_model.has_obstacle_in_direction(direction)
         obstacle = first_tile.tile_model.get_obstacle_in_direction(direction)
@@ -243,6 +251,7 @@ class MoveController(PlayerObserver, Controller):
 
     def player_role_changed(self, role):
         pass
+
     def player_special_ap_changed(self, updated_ap: int):
         # If the player is not a Rescue Specialist/CAFS, a change
         # in the special AP will not affect the moveable tiles.
@@ -259,7 +268,7 @@ class MoveController(PlayerObserver, Controller):
             ap = ap + self.current_player.special_ap
 
         self.moveable_tiles = self._determine_reachable_tiles(
-            self.current_player.row, self.current_player.column, ap)
+            self.target.row, self.target.column, ap)
         GameStateModel.instance().game_board.reset_tiles_visit_count()
 
     def player_status_changed(self, status: PlayerStatusEnum):

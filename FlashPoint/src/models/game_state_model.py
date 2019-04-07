@@ -106,9 +106,11 @@ class GameStateModel(Model):
 
     @property
     def command(self) -> Tuple[PlayerModel, PlayerModel]:
-        source = [player for player in self.players if player == self._command[0]][0]
-        target = [player for player in self.players if player == self._command[1]][0]
-        return source, target
+        if self._command[0] and self._command[1]:
+            source = [player for player in self.players if player == self._command[0]][0]
+            target = [player for player in self.players if player == self._command[1]][0]
+            return source, target
+        return None, None
 
     @command.setter
     def command(self, command: Tuple[PlayerModel, PlayerModel]):
