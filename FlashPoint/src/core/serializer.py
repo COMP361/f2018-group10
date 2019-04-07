@@ -201,13 +201,13 @@ class JSONSerializer(object):
 
     @staticmethod
     def _deserialize_drop_hazmat_event(payload: Dict) -> DropHazmatEvent:
-        hazmat: HazmatModel = JSONSerializer.deserialize(payload['hazmat_tile'])
-        return DropHazmatEvent(hazmat)
+        hazmat_tile: TileModel = JSONSerializer.deserialize(payload['hazmat_tile'])
+        return DropHazmatEvent(hazmat_tile.row, hazmat_tile.column)
 
     @staticmethod
     def _deserialize_pickup_hazmat_event(payload: Dict) -> PickupHazmatEvent:
-        hazmat: HazmatModel = JSONSerializer.deserialize(payload['hazmat_tile'])
-        return PickupHazmatEvent(hazmat)
+        hazmat_tile: TileModel = JSONSerializer.deserialize(payload['hazmat_tile'])
+        return PickupHazmatEvent(hazmat_tile.row, hazmat_tile.column)
 
     @staticmethod
     def _deserialize_set_initial_poi_family_event(payload: Dict) -> SetInitialPOIFamilyEvent:
