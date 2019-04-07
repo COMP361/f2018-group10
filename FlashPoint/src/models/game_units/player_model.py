@@ -213,7 +213,7 @@ class PlayerModel(Model):
 
     @leading_victim.setter
     def leading_victim(self, victim: VictimModel):
-        if victim.state != VictimStateEnum.TREATED:
+        if isinstance(victim, VictimModel) and victim.state != VictimStateEnum.TREATED:
             logger.error("Player cannot lead a victim that has not been treated! Abort!")
             return
 
