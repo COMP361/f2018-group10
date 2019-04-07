@@ -215,6 +215,8 @@ class JSONSerializer(object):
             player.carrying_hazmat = JSONSerializer.deserialize(payload['_carrying_hazmat'])
         if payload['_carrying_victim']:
             player.carrying_victim = JSONSerializer.deserialize(payload['_carrying_victim'])
+        if payload['_leading_victim']:
+            player.leading_victim = JSONSerializer.deserialize(payload['_leading_victim'])
         return player
 
     @staticmethod

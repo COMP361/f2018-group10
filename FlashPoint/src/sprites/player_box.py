@@ -83,6 +83,9 @@ class PlayerBox(PlayerObserver):
     def player_carry_changed(self, carry):
         pass
 
+    def player_leading_victim_changed(self, leading_victim):
+        pass
+
     def player_role_changed(self, role: PlayerRoleEnum):
         logger.info(f"new role: {role}")
         role_path = self.get_path_from_character_enum(role)
