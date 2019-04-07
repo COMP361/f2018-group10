@@ -5,6 +5,7 @@ import logging
 
 from src.action_events.fire_placement_event import FirePlacementEvent
 from src.action_events.turn_events.drop_hazmat_event import DropHazmatEvent
+from src.action_events.turn_events.lead_victim_event import LeadVictimEvent
 from src.action_events.turn_events.pick_up_hazmat_event import PickupHazmatEvent
 from src.action_events.turn_events.remove_hazmat_event import RemoveHazmatEvent
 from src.action_events.turn_events.identify_poi_event import IdentifyPOIEvent
@@ -23,6 +24,7 @@ from src.action_events.turn_events.move_event import MoveEvent
 from src.action_events.turn_events.pick_up_victim_event import PickupVictimEvent
 from src.action_events.turn_events.open_door_event import OpenDoorEvent
 from src.action_events.turn_events.ride_vehicle_event import RideVehicleEvent
+from src.action_events.turn_events.stop_leading_victim_event import StopLeadingVictimEvent
 from src.action_events.vehicle_placed_event import VehiclePlacedEvent
 from src.models.game_board.door_model import DoorModel
 from src.models.game_board.wall_model import WallModel
@@ -198,6 +200,16 @@ class JSONSerializer(object):
     def _deserialize_pickup_victim_event(payload: Dict) -> PickupVictimEvent:
         victim_tile: TileModel = JSONSerializer.deserialize(payload['victim_tile'])
         return PickupVictimEvent(victim_tile.row, victim_tile.column)
+
+    @staticmethod
+    def _deserialize_lead_victim_event(payload: Dict) -> LeadVictimEvent:
+        victim_tile: TileModel = JSONSerializer.deserialize(payload['victim_tile'])
+        return LeadVictimEvent(victim_tile.row, victim_tile.column)
+
+    @staticmethod
+    def _deserialize_stop_leading_victim_event(payload: Dict) -> StopLeadingVictimEvent:
+        victim_tile: TileModel = JSONSerializer.deserialize(payload['victim_tile'])
+        return StopLeadingVictimEvent(victim_tile.row, victim_tile.column)
 
     @staticmethod
     def _deserialize_drop_hazmat_event(payload: Dict) -> DropHazmatEvent:
