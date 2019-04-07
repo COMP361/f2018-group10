@@ -299,6 +299,10 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
                     GameBoard.instance().remove(sprite)
                     break
 
+    def player_command(self, source: PlayerModel, target: PlayerModel):
+        if source == self._current_player:
+            pass
+
     def player_list_changed(self):
         # Refresh the list of players in HUD
         self._player_hud_sprites.empty()

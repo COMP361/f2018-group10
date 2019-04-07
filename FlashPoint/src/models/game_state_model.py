@@ -69,6 +69,10 @@ class GameStateModel(Model):
         for obs in self._observers:
             obs.notify_game_state(self._state)
 
+    def _notify_command(self):
+        for obs in self._observers:
+            obs.player_command(self.command[0], self.command[1])
+
     @staticmethod
     def __del__():
         GameStateModel._instance = None
@@ -109,6 +113,7 @@ class GameStateModel(Model):
     @command.setter
     def command(self, command: Tuple[PlayerModel, PlayerModel]):
         self._command = command
+        self._notify_command()
 
     @property
     def board_type(self) -> GameBoardTypeEnum:

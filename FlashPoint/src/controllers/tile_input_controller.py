@@ -124,6 +124,9 @@ class TileInputController(GameStateObserver, Controller):
     def player_removed(self, player: PlayerModel):
         pass
 
+    def player_command(self, source: PlayerModel, target: PlayerModel):
+        pass
+
     @staticmethod
     def update(event_queue: EventQueue):
         MoveController.instance().update(event_queue)

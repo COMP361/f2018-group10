@@ -12,6 +12,9 @@ class InGameStates(pygame.sprite.Sprite, GameStateObserver):
     def notify_game_state(self, game_state: GameStateEnum):
         pass
 
+    def player_command(self, source: PlayerModel, target: PlayerModel):
+        pass
+
     def __init__(self, x: int, y: int, current_damage: int, victims_dead: int, victims_saved: int):
         super().__init__()
         GameStateModel.instance().add_observer(self)

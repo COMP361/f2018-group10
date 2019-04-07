@@ -296,3 +296,6 @@ class LobbyScene(GameStateObserver):
 
     def player_removed(self, player: PlayerModel):
         pass
+
+    def player_command(self, source: PlayerModel, target: PlayerModel):
+        pass
