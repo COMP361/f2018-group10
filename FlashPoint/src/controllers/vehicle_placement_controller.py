@@ -130,7 +130,7 @@ class VehiclePlacementController(Controller):
         if self.ambulance_placed:
             self.choose_ambulance_prompt.kill()
 
-        if self._current_player == GameStateModel.instance().players_turn:
+        if self.ambulance_placed and self.engine_placed or self._current_player == GameStateModel.instance().players_turn:
             self.wait_prompt.kill()
 
         vehicle_type = "ENGINE" if self.ambulance_placed else "AMBULANCE"
