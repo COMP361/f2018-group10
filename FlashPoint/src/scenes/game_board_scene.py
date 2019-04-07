@@ -13,6 +13,7 @@ from src.constants.custom_event_enums import CustomEventEnum
 from src.constants.state_enums import GameKindEnum, GameStateEnum, GameBoardTypeEnum
 from src.models.game_units.hazmat_model import HazmatModel
 from src.models.game_units.victim_model import VictimModel
+from src.sprites.permission_prompt import PermissionPrompt
 from src.sprites.dodge_prompt import DodgePrompt
 from src.sprites.hazmat_sprite import HazmatSprite
 from src.sprites.victim_sprite import VictimSprite
@@ -84,6 +85,7 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
         """Initialize all things to be drawn on this screen."""
         self._menu = None
         self._dodge_prompt = DodgePrompt()
+        self._permission_prompt = PermissionPrompt()
         self._game_board_sprite = GameBoard(self._current_player)
         self._menu_btn = self._init_menu_button()
         self._chat_box = ChatBox(self._current_player)
@@ -203,13 +205,20 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
 
         self._menu = menu
 
+    def display_permission_prompt(self, source: PlayerModel, target: PlayerModel):
+        self._permission_prompt.command = (source, target)
+        self._permission_prompt.enabled = True
+
     def draw(self, screen: pygame.display):
         """Draw all currently active sprites."""
         self._game_board_sprite.draw(screen)
         self._chat_box.draw(screen)
         self._active_sprites.draw(screen)
         self._player_hud_sprites.draw(screen)
+
+        self._permission_prompt.draw(screen)
         self._dodge_prompt.draw(screen)
+
         if self._menu and not self._menu.is_closed:
             self._menu.draw(screen)
 
@@ -218,6 +227,8 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
         self._active_sprites.update(event_queue)
         self._chat_box.update(event_queue)
         self._player_hud_sprites.update(event_queue)
+
+        self._permission_prompt.update(event_queue)
         self._dodge_prompt.update(event_queue)
 
         if not self.ignore_area():

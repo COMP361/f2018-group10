@@ -46,6 +46,7 @@ class GameStateModel(Model):
             self._max_damage = 24
             self._chat_history = []
             self._dodge_reply = False
+            self._command = (None, None)
             self._state = GameStateEnum.READY_TO_JOIN
 
             GameStateModel._instance = self
@@ -98,6 +99,16 @@ class GameStateModel(Model):
     @dodge_reply.setter
     def dodge_reply(self, reply: bool):
         self._dodge_reply = reply
+
+    @property
+    def command(self) -> Tuple[PlayerModel, PlayerModel]:
+        source = [player for player in self.players if player == self._command[0]][0]
+        target = [player for player in self.players if player == self._command[1]][0]
+        return source, target
+
+    @command.setter
+    def command(self, command: Tuple[PlayerModel, PlayerModel]):
+        self._command = command
 
     @property
     def board_type(self) -> GameBoardTypeEnum:

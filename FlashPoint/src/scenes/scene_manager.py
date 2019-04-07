@@ -15,6 +15,7 @@ from src.scenes.create_game_menu import CreateGameMenuScene
 from src.core.event_queue import EventQueue
 from src.scenes.character_scene import CharacterScene
 from src.scenes.lobby_scene import LobbyScene
+from src.constants.custom_event_enums import CustomEventEnum
 from src.constants.change_scene_enum import ChangeSceneEnum
 import src.constants.main_constants as MainConst
 
@@ -115,3 +116,9 @@ class SceneManager(object):
                 elif event.type == ChangeSceneEnum.GAMEBOARDSCENE:
                     EventQueue.unblock()
                     self.next(GameBoardScene, self._current_player)
+
+            if isinstance(self._active_scene, GameBoardScene):
+                for event in event_queue:
+                    if event.type == CustomEventEnum.PERMISSION_PROMPT:
+                        if event.target == self._current_player:
+                            self._active_scene.display_permission_prompt(event.source, event.target)
