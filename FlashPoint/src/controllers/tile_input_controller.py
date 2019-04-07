@@ -1,4 +1,4 @@
-from src.UIComponents.interactable import Interactable
+from src.controllers.command_player_controller import CommandPlayerController
 from src.controllers.controller import Controller
 from src.controllers.drive_vehicles_controller import DriveVehiclesController
 from src.controllers.hazmat_controller import HazmatController
@@ -16,6 +16,7 @@ from src.controllers.choose_starting_position_controller import ChooseStartingPo
 from src.controllers.extinguish_controller import ExtinguishController
 from src.controllers.move_controller import MoveController
 from src.models.game_state_model import GameStateModel
+from src.UIComponents.interactable import Interactable
 
 
 class TileInputController(GameStateObserver, Controller):
@@ -39,6 +40,7 @@ class TileInputController(GameStateObserver, Controller):
             DriveVehiclesController(current_player)
             IdentifyController(current_player)
             HazmatController(current_player)
+            CommandPlayerController(current_player)
 
         GameStateModel.instance().add_observer(self)
         # Force notify observers
@@ -61,6 +63,7 @@ class TileInputController(GameStateObserver, Controller):
         DriveVehiclesController._instance = None
         IdentifyController._instance = None
         HazmatController._instance = None
+        CommandPlayerController._instance = None
 
     def _disable_all_menus(self):
         grid = self.game_board_sprite.grid.grid
@@ -87,6 +90,7 @@ class TileInputController(GameStateObserver, Controller):
             IdentifyController.instance().process_input(tile_sprite)
             DriveVehiclesController.instance().process_input(tile_sprite)
             HazmatController.instance().process_input(tile_sprite)
+            CommandPlayerController.instance().process_input(tile_sprite)
 
     def notify_player_index(self, player_index: int):
         pass

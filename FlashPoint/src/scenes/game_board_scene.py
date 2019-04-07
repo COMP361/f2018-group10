@@ -13,6 +13,7 @@ from src.constants.custom_event_enums import CustomEventEnum
 from src.constants.state_enums import GameKindEnum, GameStateEnum, GameBoardTypeEnum
 from src.models.game_units.hazmat_model import HazmatModel
 from src.models.game_units.victim_model import VictimModel
+from src.sprites.hud.command_notification import CommandNotification
 from src.sprites.permission_prompt import PermissionPrompt
 from src.sprites.dodge_prompt import DodgePrompt
 from src.sprites.hazmat_sprite import HazmatSprite
@@ -86,6 +87,7 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
         self._menu = None
         self._dodge_prompt = DodgePrompt()
         self._permission_prompt = PermissionPrompt()
+        self._command_notification = CommandNotification()
         self._game_board_sprite = GameBoard(self._current_player)
         self._menu_btn = self._init_menu_button()
         self._chat_box = ChatBox(self._current_player)
@@ -216,6 +218,8 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
         self._active_sprites.draw(screen)
         self._player_hud_sprites.draw(screen)
 
+        self._command_notification.draw(screen)
+
         self._permission_prompt.draw(screen)
         self._dodge_prompt.draw(screen)
 
@@ -227,6 +231,8 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
         self._active_sprites.update(event_queue)
         self._chat_box.update(event_queue)
         self._player_hud_sprites.update(event_queue)
+
+        self._command_notification.update(event_queue)
 
         self._permission_prompt.update(event_queue)
         self._dodge_prompt.update(event_queue)
@@ -300,8 +306,16 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
                     break
 
     def player_command(self, source: PlayerModel, target: PlayerModel):
+        self._command_notification.command = (source, target)
+        self._command_notification.is_source = False
+        self._command_notification.is_target = False
+        self._notify_player_turn.end_btn_enabled = True
+
         if source == self._current_player:
-            pass
+            self._command_notification.is_source = True
+            self._notify_player_turn.end_btn_enabled = False
+        elif target == self._current_player:
+            self._command_notification.is_target = True
 
     def player_list_changed(self):
         # Refresh the list of players in HUD
