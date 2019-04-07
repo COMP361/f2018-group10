@@ -173,7 +173,7 @@ class GameBoardModel(Model):
 
         :return: A list of list of tile models that will act as the board
         """
-        self._board_type = GameBoardTypeEnum.RANDOM
+        # self._board_type = GameBoardTypeEnum.RANDOM
         amb_engine_parking_fname = ""
         outside_doors_fname = ""
         inside_walls_doors_fname = ""

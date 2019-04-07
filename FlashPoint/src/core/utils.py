@@ -308,7 +308,7 @@ class BoardGenerator(object):
             })
 
         for spot in bottom_row:
-            if leaf.room.bottom == self.board_height-1:
+            if leaf.room.bottom == self.board_height:
                 break
 
             walls_and_doors.append({
@@ -331,7 +331,7 @@ class BoardGenerator(object):
             })
 
         for spot in right_column:
-            if leaf.room.right == self.board_width-1:
+            if leaf.room.right == self.board_width:
                 break
             walls_and_doors.append({
                 "first_pair": [spot[0], spot[1]],
@@ -341,24 +341,25 @@ class BoardGenerator(object):
                 "second_dirn": "West"
             })
 
-        #  Choose a random wall and turn it into a door
-        random_index = random.randint(0, len(walls_and_doors) - 1)
-        walls_and_doors[random_index]['obstacle_type'] = "door"
+        for i in random.sample(range(0, len(walls_and_doors)), 1):
+            #  Choose a random wall and turn it into a door
+            walls_and_doors[i]['obstacle_type'] = "door"
         return walls_and_doors
 
     def dict_equals(self, o1: Dict, o2: Dict):
         """Determine whether this door is in the same place as this wall"""
-        return o1["first_pair"] == o2["first_pair"] and o1["second_pair"] == o2["second_pair"] and o1["obstacle_type"] == o2["obstacle_type"]
+        return o1["first_pair"] == o2["first_pair"] and o1["second_pair"] == o2["second_pair"]
 
     def remove_dups(self, walls):
         seen_walls = []
         for wall in walls:
-            seen = False
+            has_been_seen = False
             for seen in seen_walls:
                 if self.dict_equals(wall, seen):
-                    seen = True
+                    has_been_seen = True
                     break
-            if not seen:
+
+            if not has_been_seen:
                 seen_walls.append(wall)
         return seen_walls
 
@@ -373,7 +374,7 @@ class BoardGenerator(object):
         for leaf in self.tree.leaves:
             walls += self.create_walls_and_dumb_doors(leaf)
 
-        self.remove_dups(walls)
+        walls = self.remove_dups(walls)
 
         with open("media/board_layouts/random_inside_walls_doors.json", mode="w", encoding='utf-8') as f:
             json.dump(walls, f)
