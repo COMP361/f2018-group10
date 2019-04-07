@@ -98,10 +98,10 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
         current_player_info_sprite = CurrentPlayerState(1130, 550, self._current_player.nickname,
                                                         self._current_player.color, self._current_player)
         self._active_sprites.add(current_player_info_sprite)
-        notify_player_turn = NotifyPlayerTurn(self._current_player, current_player_info_sprite,
-                                              self._active_sprites)
-        self._active_sprites.add(notify_player_turn)
-        self._active_sprites.add(notify_player_turn.init_not_your_turn())
+        self._notify_player_turn = NotifyPlayerTurn(self._current_player, current_player_info_sprite,
+                                                    self._active_sprites)
+        self._active_sprites.add(self._notify_player_turn)
+        self._active_sprites.add(self._notify_player_turn.init_not_your_turn())
 
         # HUD stuff
         self._active_sprites.add(TimeBar(0, 0))

@@ -157,6 +157,10 @@ class Interactable(pygame.sprite.Sprite):
     def enabled(self):
         return self._is_enabled
 
+    @enabled.setter
+    def enabled(self, enable: bool):
+        self._is_enabled = enable
+
     # why is this so hard
     @property
     def click_action(self):
