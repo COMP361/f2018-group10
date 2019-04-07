@@ -64,8 +64,14 @@ class TileSprite(Interactable, TileObserver):
                                                            Color.ORANGE))
         self.ride_vehicle_button = RectButton(self.rect.x, self.rect.y, 120, 25, Color.BLACK, 0,
                                               Text(pygame.font.SysFont('Arial', 15), "Ride Vehicle", Color.ORANGE))
-        self.hazmat_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
-                                        Text(pygame.font.SysFont('Arial', 20), "Remove Hazmat", Color.ORANGE))
+        self.remove_hazmat_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
+                                               Text(pygame.font.SysFont('Arial', 20), "Remove Hazmat", Color.ORANGE))
+
+        self.pickup_hazmat_button = RectButton(self.rect.x, self.rect.y, 100,25,Color.BLACK, 0,
+                                               Text(pygame.font.SysFont('Arial', 20), "Pickup Hazmat", Color.ORANGE))
+
+        self.drop_hazmat_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
+                                               Text(pygame.font.SysFont('Arial', 20), "Drop Hazmat", Color.ORANGE))
 
         self.dismount_vehicle_button = RectButton(self.rect.x, self.rect.y, 120, 25, Color.BLACK, 0,
                                               Text(pygame.font.SysFont('Arial', 15), "Dismount Vehicle", Color.ORANGE))
@@ -115,7 +121,9 @@ class TileSprite(Interactable, TileObserver):
         self.drive_engine_here_button.disable()
         self.ride_vehicle_button.disable()
         self.dismount_vehicle_button.disable()
-        self.hazmat_button.disable()
+        self.remove_hazmat_button.disable()
+        self.pickup_hazmat_button.disable()
+        self.drop_hazmat_button.disable()
 
         # Important! Reset the on_clicks
         self.identify_button.on_click(None)
@@ -127,7 +135,9 @@ class TileSprite(Interactable, TileObserver):
         self.drive_engine_here_button.on_click(None)
         self.ride_vehicle_button.on_click(None)
         self.dismount_vehicle_button.on_click(None)
-        self.hazmat_button.on_click(None)
+        self.remove_hazmat_button.on_click(None)
+        self.pickup_hazmat_button.on_click(None)
+        self.drop_hazmat_button.on_click(None)
 
     def is_clicked(self):
         if not self.hover():
@@ -226,10 +236,22 @@ class TileSprite(Interactable, TileObserver):
             self.dismount_vehicle_button.rect.y = self.rect.y + offset
             offset += 20
 
-        if self.hazmat_button.enabled:
-            screen.blit(self.hazmat_button.image, self.hazmat_button.rect)
-            self.hazmat_button.rect.x = self.rect.x
-            self.hazmat_button.rect.y = self.rect.y + offset
+        if self.remove_hazmat_button.enabled:
+            screen.blit(self.remove_hazmat_button.image, self.remove_hazmat_button.rect)
+            self.remove_hazmat_button.rect.x = self.rect.x
+            self.remove_hazmat_button.rect.y = self.rect.y + offset
+            offset += 20
+
+        if self.pickup_hazmat_button.enabled:
+            screen.blit(self.pickup_hazmat_button.image, self.pickup_hazmat_button.rect)
+            self.pickup_hazmat_button.rect.x = self.rect.x
+            self.pickup_hazmat_button.rect.y = self.rect.y + offset
+            offset += 20
+
+        elif self.drop_hazmat_button.enabled:
+            screen.blit(self.drop_hazmat_button.image, self.drop_hazmat_button.rect)
+            self.drop_hazmat_button.rect.x = self.rect.x
+            self.drop_hazmat_button.rect.y = self.rect.y + offset
             offset += 20
 
     def update(self, event_queue: EventQueue):
@@ -244,7 +266,9 @@ class TileSprite(Interactable, TileObserver):
         self.ride_vehicle_button.update(event_queue)
         self.dismount_vehicle_button.update(event_queue)
         self.drive_engine_here_button.update(event_queue)
-        self.hazmat_button.update(event_queue)
+        self.remove_hazmat_button.update(event_queue)
+        self.drop_hazmat_button.update(event_queue)
+        self.pickup_hazmat_button.update(event_queue)
 
         self._scroll()
         if self.is_clicked():

@@ -255,3 +255,10 @@ class TileModel(Model):
             if isinstance(model, POIModel) or isinstance(model, VictimModel):
                 return True
         return False
+
+    def has_hazmat(self) -> bool:
+        for model in self.associated_models:
+            if isinstance(model, HazmatModel):
+                return True
+
+        return False
