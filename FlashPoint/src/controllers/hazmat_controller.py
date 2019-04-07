@@ -74,7 +74,7 @@ class HazmatController(Controller):
         tile = self.board.get_tile_at(tile_sprite.row, tile_sprite.column)
         if self.run_checks(tile):
             tile_sprite.hazmat_button.enable()
-            tile_sprite.on_click(self.send_event_and_close_menu, tile, tile_sprite.hazmat_button)
+            tile_sprite.hazmat_button.on_click(self.send_event_and_close_menu, tile, tile_sprite.hazmat_button)
         else:
             tile_sprite.hazmat_button.disable()
 

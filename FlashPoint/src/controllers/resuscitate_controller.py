@@ -1,6 +1,7 @@
 from src.UIComponents.interactable import Interactable
+from src.action_events.turn_events.resuscitate_victim_event import ResuscitateEvent
 from src.action_events.turn_events.turn_event import TurnEvent
-from src.constants.state_enums import GameKindEnum, WallStatusEnum, DoorStatusEnum, PlayerRoleEnum
+from src.constants.state_enums import GameKindEnum, WallStatusEnum, DoorStatusEnum, PlayerRoleEnum, VictimStateEnum
 from src.controllers.controller import Controller
 from src.core.networking import Networking
 from src.models.game_board.door_model import DoorModel
@@ -37,7 +38,11 @@ class ResuscitateController(Controller):
         return cls._instance
 
     def run_checks(self, tile_model: TileModel) -> bool:
-       
+        for model in tile_model.associated_models:
+            if isinstance(model, VictimModel):
+                if model.state == VictimStateEnum.TREATED:
+                    return False
+
         player_tile = self.board.get_tile_at(self._current_player.row, self._current_player.column)
 
         if not self._current_player == self.game.players_turn:
@@ -63,7 +68,7 @@ class ResuscitateController(Controller):
             menu_to_close.disable()
             return
 
-       ## event = Resucistate(tile_model.row, tile_model.column)
+        event = ResuscitateEvent(tile_model.row, tile_model.column)
        ## event = HazmatEvent(tile_model.row, tile_model.column)
 
         if Networking.get_instance().is_host:
@@ -74,10 +79,13 @@ class ResuscitateController(Controller):
         menu_to_close.on_click(None)
 
     def process_input(self, tile_sprite: TileSprite):
+
         tile = self.board.get_tile_at(tile_sprite.row, tile_sprite.column)
+
         if self.run_checks(tile):
             tile_sprite.resuscitate_button.enable()
-            tile_sprite.on_click(self.send_event_and_close_menu, tile, tile_sprite.resuscitate_button)
+            tile_sprite.resuscitate_button.on_click(self.send_event_and_close_menu, tile, tile_sprite.resuscitate_button)
         else:
             tile_sprite.resuscitate_button.disable()
+            tile_sprite.resuscitate_button.on_click(None)
 
