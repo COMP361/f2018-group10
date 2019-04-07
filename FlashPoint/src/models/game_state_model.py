@@ -45,6 +45,7 @@ class GameStateModel(Model):
             self._damage = 0
             self._max_damage = 24
             self._chat_history = []
+            self._dodge_reply = False
             self._state = GameStateEnum.READY_TO_JOIN
 
             GameStateModel._instance = self
@@ -89,6 +90,14 @@ class GameStateModel(Model):
     def game_board(self, board: GameBoardModel):
         with GameStateModel.lock:
             self._game_board = board
+
+    @property
+    def dodge_reply(self) -> bool:
+        return self._dodge_reply
+
+    @dodge_reply.setter
+    def dodge_reply(self, reply: bool):
+        self._dodge_reply = reply
 
     @property
     def board_type(self) -> GameBoardTypeEnum:
