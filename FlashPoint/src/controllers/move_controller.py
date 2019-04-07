@@ -137,6 +137,8 @@ class MoveController(PlayerObserver, Controller):
         if ap < 1:
             return False
 
+        is_leading_victim = isinstance(self.current_player.leading_victim, VictimModel)
+
         has_obstacle = first_tile.tile_model.has_obstacle_in_direction(direction)
         obstacle = first_tile.tile_model.get_obstacle_in_direction(direction)
         # If the path from the first tile to the second is not hindered by anything
@@ -164,7 +166,8 @@ class MoveController(PlayerObserver, Controller):
                 # the moveable tiles list, if the length of the list < 2, then
                 # we cannot go anywhere from this fire tile and therefore it
                 # would not be valid to add it to the list. Return False.
-                if second_tile_status == SpaceStatusEnum.FIRE and ap - 2 >= 0:
+                # (Also, cannot go to fire tile if leading a victim)
+                if second_tile_status == SpaceStatusEnum.FIRE and not is_leading_victim and ap - 2 >= 0:
                     moveable_tiles_from_fire = self._determine_reachable_tiles(second_tile.tile_model.row, second_tile.tile_model.column, ap-2)
                     if len(moveable_tiles_from_fire) < 2:
                         return False
@@ -227,6 +230,9 @@ class MoveController(PlayerObserver, Controller):
         self._update_moveable_tiles()
 
     def player_carry_changed(self, carry):
+        self._update_moveable_tiles()
+
+    def player_leading_victim_changed(self, leading_victim):
         self._update_moveable_tiles()
 
     def player_wins_changed(self, wins: int):

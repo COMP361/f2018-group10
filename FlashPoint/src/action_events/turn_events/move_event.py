@@ -191,7 +191,8 @@ class MoveEvent(TurnEvent):
         else:
             if second_tile.tile_model.space_status != SpaceStatusEnum.FIRE:
                 cost_to_travel = 1
-            else:
+            # fireman heading into fire and not leading a victim
+            elif second_tile.tile_model.space_status == SpaceStatusEnum.FIRE and not isinstance(self.fireman.leading_victim, VictimModel):
                 cost_to_travel = 2
 
         # If it is cheaper to take this new way from
@@ -291,11 +292,15 @@ class MoveEvent(TurnEvent):
                     if d_tile.tile_model.space_kind != SpaceKindEnum.INDOOR:
                         self.fireman.carrying_hazmat = NullModel()
 
+            if isinstance(self.fireman.leading_victim, VictimModel):
+                self.resolve_victim_while_traveling(d_tile.tile_model)
+
             # fireman is not carrying a victim/hazmat
             if not carrying_something:
                 if d_tile.tile_model.space_status != SpaceStatusEnum.FIRE:
                     self._deduct_player_points(1)
-                else:
+                # fireman is heading into fire and is not leading a victim
+                elif d_tile.tile_model.space_status == SpaceStatusEnum.FIRE and not isinstance(self.fireman.leading_victim, VictimModel):
                     self._deduct_player_points(2)
 
             # Check the associated models of the tile.
@@ -317,7 +322,7 @@ class MoveEvent(TurnEvent):
         Family mode:
         If victim carried outside of building, victim has been saved.
         Experienced mode:
-        If victim carried to ambulance, victim has been saved.
+        If victim carried/led to ambulance, victim has been saved.
 
         Both cases:
         Increment number of victims saved in game state and
@@ -348,12 +353,19 @@ class MoveEvent(TurnEvent):
         # For Experienced mode, we only reach here
         # if the target space is equal to one of
         # the ambulance's current location tiles.
-        self.fireman.carrying_victim.state = VictimStateEnum.RESCUED
-        self.game.victims_saved = self.game.victims_saved + 1
-        # remove the victim from the list of active POIs on the board
-        # and disassociate the victim from the player
-        self.game.game_board.remove_poi_or_victim(self.fireman.carrying_victim)
-        self.fireman.carrying_victim = NullModel()
+        if isinstance(self.fireman.carrying_victim, VictimModel):
+            self.fireman.carrying_victim.state = VictimStateEnum.RESCUED
+            self.game.victims_saved = self.game.victims_saved + 1
+            # remove the victim from the list of active POIs on the board
+            # and disassociate the victim from the player
+            self.game.game_board.remove_poi_or_victim(self.fireman.carrying_victim)
+            self.fireman.carrying_victim = NullModel()
+
+        if isinstance(self.fireman.leading_victim, VictimModel):
+            self.fireman.leading_victim.state = VictimStateEnum.RESCUED
+            self.game.victims_saved = self.game.victims_saved + 1
+            self.game.game_board.remove_poi_or_victim(self.fireman.leading_victim)
+            self.fireman.leading_victim = NullModel()
 
     def _deduct_player_points(self, pts_to_deduct: int):
         """

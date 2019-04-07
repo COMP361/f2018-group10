@@ -25,18 +25,25 @@ class KnockDownEvent(ActionEvent):
 
     def execute(self):
         logger.info(f"Executing KnockDownEvent for player at ({self.player.row},{self.player.column})")
-        # if the player was carrying a victim,
+        # if the player was carrying/leading a victim,
         # that victim is lost. disassociate the
         # victim from the player and increment the
         # number of victims lost.
         if isinstance(self.player.carrying_victim, VictimModel):
             self.player.carrying_victim.state = VictimStateEnum.LOST
 
-            logger.info(f"{self.player.carrying_victim} was lost.")
+            logger.info(f"{self.player.carrying_victim} being carried was lost.")
 
             self.game.game_board.remove_poi_or_victim(self.player.carrying_victim)
             self.player.carrying_victim = NullModel()
 
+            self.game.victims_lost = self.game.victims_lost + 1
+
+        if isinstance(self.player.leading_victim, VictimModel):
+            self.player.leading_victim.state = VictimStateEnum.LOST
+            logger.info(f"{self.player.leading_victim} being led was lost.")
+            self.game.game_board.remove_poi_or_victim(self.player.leading_victim)
+            self.player.leading_victim = NullModel()
             self.game.victims_lost = self.game.victims_lost + 1
 
         # Family mode:

@@ -7,7 +7,7 @@ from src.models.game_units.victim_model import VictimModel
 
 logger = logging.getLogger("FlashPoint")
 
-class DropVictimEvent(TurnEvent):
+class StopLeadingVictimEvent(TurnEvent):
 
     def __init__(self, victim_row: int, victim_column: int):
         super().__init__()
@@ -18,18 +18,18 @@ class DropVictimEvent(TurnEvent):
     # TODO: Move this code to the controller.
     def check(self):
         """
-        If the player is not carrying a
-        victim, then they cannot drop it.
+        If the player is not leading a
+        victim, then they cannot stop leading it.
 
-        :return: True if player is carrying a
+        :return: True if player is leading a
                 victim, False otherwise.
         """
-        if isinstance(self.player.carrying_victim, VictimModel):
+        if isinstance(self.player.leading_victim, VictimModel):
             return True
 
         return False
 
     def execute(self):
-        logger.info("Executing Drop Victim Event")
-        self.victim_tile.add_associated_model(self.player.carrying_victim)
-        self.player.carrying_victim = NullModel()
+        logger.info("Executing Stop Leading Victim Event")
+        self.victim_tile.add_associated_model(self.player.leading_victim)
+        self.player.leading_victim = NullModel()
