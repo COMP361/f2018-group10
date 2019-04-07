@@ -7,6 +7,7 @@ from typing import List
 import pygame
 
 from src.action_events.fire_placement_event import FirePlacementEvent
+from src.action_events.set_initial_hotspot_event import SetInitialHotspotEvent
 from src.action_events.set_initial_poi_experienced_event import SetInitialPOIExperiencedEvent
 from src.constants.state_enums import GameKindEnum, GameStateEnum, GameBoardTypeEnum
 from src.models.game_units.hazmat_model import HazmatModel
@@ -137,6 +138,7 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
             if self._game.rules == GameKindEnum.EXPERIENCED:
                 Networking.get_instance().send_to_all_client(SetInitialPOIExperiencedEvent())
                 Networking.get_instance().send_to_all_client(PlaceHazmatEvent())
+                Networking.get_instance().send_to_all_client(SetInitialHotspotEvent())
             else:
                 Networking.get_instance().send_to_all_client(SetInitialPOIFamilyEvent())
 

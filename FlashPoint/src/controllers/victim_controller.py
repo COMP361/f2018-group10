@@ -63,7 +63,7 @@ class VictimController(Controller):
             menu_to_close.disable()
             return
 
-        event = DropVictimEvent(self._current_player.carrying_victim) if is_carrying else PickupVictimEvent(victim)
+        event = DropVictimEvent(victim.row, victim.column) if is_carrying else PickupVictimEvent(victim.row, victim.column)
 
         if Networking.get_instance().is_host:
             Networking.get_instance().send_to_all_client(event)
