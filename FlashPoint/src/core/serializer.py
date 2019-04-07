@@ -1,10 +1,12 @@
 import enum
 import json
 
-from typing import Dict, List
+from typing import Dict
 import logging
 
-
+from src.action_events.stop_command_event import StopCommandEvent
+from src.action_events.permission_reply_event import PermissionReplyEvent
+from src.action_events.turn_events.command_permission_event import CommandPermissionEvent
 from src.action_events.disconnect_event import DisconnectEvent
 from src.action_events.dodge_reply_event import DodgeReplyEvent
 from src.action_events.fire_placement_event import FirePlacementEvent
@@ -419,12 +421,30 @@ class JSONSerializer(object):
 
     @staticmethod
     def _deserialize_disconnect_event(payload: Dict) -> DisconnectEvent:
-        player: PlayerModel = JSONSerializer.deserialize(payload['_player'])
+        player: PlayerModel = JSONSerializer._deserialize_player(payload['_player'])
         return DisconnectEvent(player)
 
     @staticmethod
     def _deserialize_dodge_reply(payload: Dict) -> DodgeReplyEvent:
         return DodgeReplyEvent(payload['_reply'])
+
+    @staticmethod
+    def _deserialize_command_permission_event(payload: Dict) -> CommandPermissionEvent:
+        source: PlayerModel = JSONSerializer._deserialize_player(payload['_source'])
+        target: PlayerModel = JSONSerializer._deserialize_player(payload['_target'])
+        return CommandPermissionEvent(source, target)
+
+    @staticmethod
+    def _deserialize_permission_reply(payload: Dict) -> PermissionReplyEvent:
+        reply: bool = payload['_reply']
+        source: PlayerModel = JSONSerializer._deserialize_player(payload['_source'])
+        target: PlayerModel = JSONSerializer._deserialize_player(payload['_target'])
+        return PermissionReplyEvent(reply, source, target)
+
+    @staticmethod
+    def _deserialize_stop_command_event(payload: Dict) -> StopCommandEvent:
+        source: PlayerModel = JSONSerializer._deserialize_player(payload['_source'])
+        return StopCommandEvent(source)
 
     @staticmethod
     def deserialize(payload: Dict) -> object:
@@ -520,6 +540,12 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_dodge_reply(payload)
         elif object_type == NullModel.__name__:
             return NullModel()
+        elif object_type == CommandPermissionEvent.__name__:
+            return JSONSerializer._deserialize_command_permission_event(payload)
+        elif object_type == PermissionReplyEvent.__name__:
+            return JSONSerializer._deserialize_permission_reply(payload)
+        elif object_type == StopCommandEvent.__name__:
+            return JSONSerializer._deserialize_stop_command_event(payload)
 
         logger.warning(f"Could not deserialize object {object_type}, not of recognized type.")
 
