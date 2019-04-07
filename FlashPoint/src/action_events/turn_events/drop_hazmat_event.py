@@ -28,5 +28,6 @@ class DropHazmatEvent(TurnEvent):
 
     def execute(self):
         logger.info("Executing Drop Hazmat Event")
+
         self.hazmat_tile.add_associated_model(self.player.carrying_hazmat)
         self.player.carrying_hazmat = NullModel()

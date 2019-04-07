@@ -231,6 +231,7 @@ class TileModel(Model):
 
         self._associated_models.append(model)
         model.set_pos(self.row, self.column)
+        logger.info(f"Hazmat was successfully dropped: {model}")
         self._notify_assoc_models()
 
     def remove_associated_model(self, model: Model):

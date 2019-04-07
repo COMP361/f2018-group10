@@ -8,7 +8,9 @@ from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 from src.models.game_units.victim_model import VictimModel
 from src.sprites.tile_sprite import TileSprite
+import logging
 
+logger = logging.getLogger("FlashPoint")
 
 class VictimController(Controller):
 
@@ -55,6 +57,7 @@ class VictimController(Controller):
         if victims:
             victim = victims[0]
 
+        logger.info(f"Victim is : {victim}")
         is_carrying = isinstance(self._current_player.carrying_victim, VictimModel)
 
         check_func = self.check_drop if is_carrying else self.check_pickup
