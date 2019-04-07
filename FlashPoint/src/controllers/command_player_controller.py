@@ -54,7 +54,12 @@ class CommandPlayerController(Controller):
                   if (player.row, player.column) == (tile_model.row, tile_model.column)][0]
         event = CommandPermissionEvent(self._current_player, target)
 
-        Networking.get_instance().send_to_server(event)
+        if Networking.get_instance().is_host:
+            Networking.get_instance().send_to_all_client(event)
+        else:
+            Networking.get_instance().send_to_server(event)
+
+        menu_to_close.disable()
 
     def process_input(self, tile_sprite: TileSprite):
         tile_model = self.board.get_tile_at(tile_sprite.row, tile_sprite.column)

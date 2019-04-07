@@ -53,7 +53,7 @@ class VehiclePlacementController(Controller):
         if game.state != GameStateEnum.PLACING_VEHICLES:
             return False
 
-        if self._current_player != game.players_turn:
+        if not Networking.get_instance().is_host:
             return False
 
         if tile_model.space_kind == SpaceKindEnum.INDOOR:
@@ -112,7 +112,6 @@ class VehiclePlacementController(Controller):
         if not self.run_checks(tile_model):
             return
 
-
         self.send_event_and_close_menu(tile_model, None)
 
     def enable_prompts(self):
@@ -121,7 +120,8 @@ class VehiclePlacementController(Controller):
         self.game_board_sprite.add(self.wait_prompt)
 
     def update(self, event_queue: EventQueue):
-        if not GameStateModel.instance().state == GameStateEnum.PLACING_VEHICLES:
+        game: GameStateModel = GameStateModel.instance()
+        if not game.state == GameStateEnum.PLACING_VEHICLES:
             return
 
         if self.engine_placed:
@@ -130,7 +130,7 @@ class VehiclePlacementController(Controller):
         if self.ambulance_placed:
             self.choose_ambulance_prompt.kill()
 
-        if self._current_player == GameStateModel.instance().players_turn:
+        if not Networking.get_instance().is_host:
             self.wait_prompt.kill()
 
         vehicle_type = "ENGINE" if self.ambulance_placed else "AMBULANCE"

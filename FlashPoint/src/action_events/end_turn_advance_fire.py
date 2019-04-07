@@ -39,6 +39,8 @@ class EndTurnAdvanceFireEvent(TurnEvent):
     """
     def __init__(self, seed: int = 0):
         super().__init__()
+        self.game_state: GameStateModel = GameStateModel.instance()
+        self.board: GameBoardModel = self.game_state.game_board
         self.player = GameStateModel.instance().players_turn
         self.initial_tile: TileModel = None
 
@@ -91,9 +93,10 @@ class EndTurnAdvanceFireEvent(TurnEvent):
         rp_event.execute()
 
         # ------ Replenish Player's points ----- #
-        self._replenish_player_points()
+        self._replenish_player_points(self.player)
 
-    def _replenish_player_points(self):
+    @staticmethod
+    def _replenish_player_points(player):
         """
         Replenishes a player's AP, special AP
         according to the rules for the different roles.
@@ -105,23 +108,23 @@ class EndTurnAdvanceFireEvent(TurnEvent):
         # replenish player's AP, irrespective
         # of role, by 4 (add/subtract points after).
         # special AP are not retained for the next turn.
-        if self.player.ap > 4:
-            self.player.ap = 4
+        if player.ap > 4:
+            player.ap = 4
 
-        self.player.ap = self.player.ap + 4
+        player.ap = player.ap + 4
 
-        if self.player.role == PlayerRoleEnum.CAPTAIN:
-            self.player.special_ap = 2
+        if player.role == PlayerRoleEnum.CAPTAIN:
+            player.special_ap = 2
 
-        elif self.player.role == PlayerRoleEnum.CAFS:
-            self.player.ap = self.player.ap - 1
-            self.player.special_ap = 3
+        elif player.role == PlayerRoleEnum.CAFS:
+            player.ap = player.ap - 1
+            player.special_ap = 3
 
-        elif self.player.role == PlayerRoleEnum.GENERALIST:
-            self.player.ap = self.player.ap + 1
+        elif player.role == PlayerRoleEnum.GENERALIST:
+            player.ap = player.ap + 1
 
-        elif self.player.role == PlayerRoleEnum.RESCUE:
-            self.player.special_ap = 3
+        elif player.role == PlayerRoleEnum.RESCUE:
+            player.special_ap = 3
 
     def _placing_players_end_turn(self):
         # If the last player has chosen a location, move the game into the next phase.
@@ -143,8 +146,6 @@ class EndTurnAdvanceFireEvent(TurnEvent):
     def execute(self):
         logger.info("Executing EndTurnAdvanceFireEvent")
 
-        self.game_state: GameStateModel = GameStateModel.instance()
-        self.board: GameBoardModel = self.game_state.game_board
         if self.game_state.state == GameStateEnum.MAIN_GAME:
             self._main_phase_end_turn()
 
