@@ -191,13 +191,13 @@ class JSONSerializer(object):
 
     @staticmethod
     def _deserialize_drop_victim_event(payload: Dict) -> DropVictimEvent:
-        victim: VictimModel = JSONSerializer.deserialize(payload['victim_tile'])
-        return DropVictimEvent(victim)
+        victim_tile: TileModel = JSONSerializer.deserialize(payload['victim_tile'])
+        return DropVictimEvent(victim_tile.row, victim_tile.column)
 
     @staticmethod
     def _deserialize_pickup_victim_event(payload: Dict) -> PickupVictimEvent:
-        victim: VictimModel = JSONSerializer.deserialize(payload['victim_tile'])
-        return PickupVictimEvent(victim)
+        victim_tile: TileModel = JSONSerializer.deserialize(payload['victim_tile'])
+        return PickupVictimEvent(victim_tile.row, victim_tile.column)
 
     @staticmethod
     def _deserialize_drop_hazmat_event(payload: Dict) -> DropHazmatEvent:

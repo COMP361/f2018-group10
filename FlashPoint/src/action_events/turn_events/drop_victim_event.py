@@ -9,10 +9,10 @@ logger = logging.getLogger("FlashPoint")
 
 class DropVictimEvent(TurnEvent):
 
-    def __init__(self, victim: VictimModel):
+    def __init__(self, victim_row: int, victim_column: int):
         super().__init__()
         game: GameStateModel = GameStateModel.instance()
-        self.victim_tile = game.game_board.get_tile_at(victim.row, victim.column)
+        self.victim_tile = game.game_board.get_tile_at(victim_row, victim_column)
         self.player = game.players_turn
 
     # TODO: Move this code to the controller.
