@@ -1,12 +1,11 @@
 import os
-from typing import List
 
 import pygame
 
 import src.constants.color as color
 import json
 
-from src.constants.state_enums import GameKindEnum
+from src.constants.state_enums import GameKindEnum, GameBoardTypeEnum
 from src.core.custom_event import CustomEvent
 from src.UIComponents.rect_button import RectButton
 from src.UIComponents.rect_label import RectLabel
@@ -69,6 +68,7 @@ class LoadGameScene(object):
         game.host = self._current_player
         game.players = [self._current_player]
 
+        game.board_type = GameBoardTypeEnum.LOADED
         # Restore GameBoard
         GameStateModel.set_game(game)
         EventQueue.post(CustomEvent(ChangeSceneEnum.LOBBYSCENE))
