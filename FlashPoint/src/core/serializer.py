@@ -328,6 +328,10 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_drop_victim_event(payload)
         elif object_type == PickupVictimEvent.__name__:
             return JSONSerializer._deserialize_pickup_victim_event(payload)
+        elif object_type == LeadVictimEvent.__name__:
+            return JSONSerializer._deserialize_lead_victim_event(payload)
+        elif object_type == StopLeadingVictimEvent.__name__:
+            return JSONSerializer._deserialize_stop_leading_victim_event(payload)
         elif object_type == DropHazmatEvent.__name__:
             return JSONSerializer._deserialize_drop_hazmat_event(payload)
         elif object_type == PickupHazmatEvent.__name__:
