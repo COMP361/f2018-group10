@@ -21,13 +21,12 @@ class FirePlacementEvent(ActionEvent):
             self.seed = random.randint(1, 6969)
         else:
             self.seed = seed
-
         # Pick random location: roll dice
         random.seed(self.seed)
-        self.game: GameStateModel = GameStateModel.instance()
-        self.board: GameBoardModel = self.game.game_board
 
     def execute(self):
+        self.game: GameStateModel = GameStateModel.instance()
+        self.board: GameBoardModel = self.game.game_board
         logger.info("Executing Fire Placement Event")
         if self.game.rules == GameKindEnum.FAMILY:
             self.board.set_fires_family()
@@ -35,7 +34,7 @@ class FirePlacementEvent(ActionEvent):
             self._set_fires_heroic_veteran_recruit(self.game.difficulty_level)
 
     def _set_fires_heroic_veteran_recruit(self, difficulty_lvl: DifficultyLevelEnum):
-        advance_event = EndTurnAdvanceFireEvent()
+        advance_event = EndTurnAdvanceFireEvent(self.seed)
         # First explosion:
         # Roll the black dice to determine where the
         # first explosion will take place. Set the tile on fire, turn
