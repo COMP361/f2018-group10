@@ -537,7 +537,7 @@ class JSONSerializer(object):
     def _safe_dict(obj):
 
         if isinstance(obj, HazmatSprite):
-            print("fuck")
+            return {"class": type(obj).__name__}
 
         if isinstance(obj, Observer):
             return {"class": type(obj).__name__}

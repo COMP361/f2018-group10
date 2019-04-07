@@ -115,7 +115,9 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
         for tile in self._game.game_board.tiles:
             for obj in tile.associated_models:
                 if isinstance(obj, HazmatModel):
-                    self._game_board_sprite.add(HazmatSprite(tile))
+                    hazmat_sprite = HazmatSprite(tile)
+                    obj.add_observer(hazmat_sprite)
+                    self._game_board_sprite.add(hazmat_sprite)
 
     def _init_controllers(self):
         """Instantiate all controllers."""

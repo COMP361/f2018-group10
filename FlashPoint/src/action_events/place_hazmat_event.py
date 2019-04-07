@@ -72,6 +72,9 @@ class PlaceHazmatEvent(ActionEvent):
             if should_reroll:
                 continue
 
-            tile.add_associated_model(HazmatModel())
-            GameBoard.instance().add(HazmatSprite(tile))
+            model = HazmatModel()
+            sprite = HazmatSprite(tile)
+            tile.add_associated_model(model)
+            GameBoard.instance().add(sprite)
+            model.add_observer(sprite)
             hazmat_to_place -= 1

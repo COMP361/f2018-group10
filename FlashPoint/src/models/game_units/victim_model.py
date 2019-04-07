@@ -7,6 +7,7 @@ from src.observers.victim_observer import VictimObserver
 
 logger = logging.getLogger("FlashPoint")
 
+
 class VictimModel(Model):
 
     def __init__(self, victim_state: VictimStateEnum):
