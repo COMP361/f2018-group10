@@ -33,5 +33,4 @@ class VictimLostPrompt(object):
             self.image.blit(self.bg, self.image.get_rect())
             self.image.blit(self.text, self.text.get_rect().move((72,28)))
             self.image.blit(self.frame, self.image.get_rect())
-
             screen.blit(self.image,self.rect)

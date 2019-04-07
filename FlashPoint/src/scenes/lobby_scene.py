@@ -84,9 +84,15 @@ class LobbyScene(GameStateObserver):
 
     def set_ready(self):
         """Set the status of the current player to ready."""
+        box_size = (130,48)
         if not self.isReady:
             self.isReady = True
-            self.buttonReady.change_color(Color.STANDARDBTN)
+            self.sprite_grp.remove(self.start_button)
+            self.start_button = RectButton(1050, 575, box_size[0], box_size[1], Color.GREY, 0,
+                                           Text(pygame.font.SysFont('Agency FB', 20), "Start", Color.GREEN))
+            self.start_button.change_bg_image('media/GameHud/wood2.png')
+            self.start_button.add_frame('media/GameHud/frame.png')
+            self.sprite_grp.add(self.start_button)
             self._current_player.status = PlayerStatusEnum.READY
             event = ReadyEvent(self._current_player, True)
 
@@ -97,7 +103,12 @@ class LobbyScene(GameStateObserver):
                 Networking.get_instance().send_to_server(event)
         else:
             self.isReady = False
-            self.buttonReady.change_color(Color.GREY)
+            self.sprite_grp.remove(self.start_button)
+            self.start_button = RectButton(1050, 575, box_size[0], box_size[1], Color.GREY, 0,
+                                           Text(pygame.font.SysFont('Agency FB', 20), "Start", Color.GREEN))
+            self.start_button.change_bg_image('media/GameHud/wood2.png')
+            self.start_button.add_frame('media/GameHud/frame.png')
+            self.sprite_grp.add(self.start_button)
             self._current_player.status = PlayerStatusEnum.NOT_READY
             event = ReadyEvent(self._current_player, False)
             if self._current_player.ip == GameStateModel.instance().host.ip:
@@ -112,7 +123,7 @@ class LobbyScene(GameStateObserver):
         self.chat_box = ChatBox(self._current_player)
 
         if not reuse:
-            self._init_btn_back(20, 20, "Exit", Color.STANDARDBTN, Color.BLACK)
+            self._init_btn_back(20, 20, "Exit", Color.STANDARDBTN, Color.GREEN2)
 
             if self._current_player.ip == GameStateModel.instance().host.ip:
                 self._init_start_game_button()
@@ -121,7 +132,7 @@ class LobbyScene(GameStateObserver):
                 self._init_ready(1050, 575, "Ready", Color.GREY, Color.BLACK)
 
             if not self._game.rules == GameKindEnum.FAMILY :
-                self._init_selec_char(1050, 475, "Select Character", Color.STANDARDBTN, Color.BLACK)
+                self._init_selec_char(1050, 475, "Select Character", Color.STANDARDBTN, Color.GREEN2)
         else:
             if not self._game.rules == GameKindEnum.FAMILY:
                 self.sprite_grp.add(self.buttonSelChar)
@@ -136,7 +147,9 @@ class LobbyScene(GameStateObserver):
         """Button for starting the game once all players have clicked ready."""
         box_size = (130, 48)
         self.start_button = RectButton(1050, 575, box_size[0], box_size[1], Color.GREY, 0,
-                                       Text(pygame.font.SysFont('Agency FB', 20), "Start", Color.BLACK))
+                                       Text(pygame.font.SysFont('Agency FB', 20), "Start", Color.GREY))
+        self.start_button.change_bg_image('media/GameHud/wood2.png')
+        self.start_button.add_frame('media/GameHud/frame.png')
         self.sprite_grp.add(self.start_button)
 
     def _init_background(self):
@@ -187,9 +200,11 @@ class LobbyScene(GameStateObserver):
         return user_box
 
     def _init_selec_char(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
-        box_size = (130, 48)
+        box_size = (170, 48)
         self.buttonSelChar = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
-                                        Text(pygame.font.SysFont('Arial', 20), text, color_text))
+                                        Text(pygame.font.SysFont('Arial', 25), text, color_text))
+        self.buttonSelChar.change_bg_image('media/GameHud/wood2.png')
+        self.buttonSelChar.add_frame('media/GameHud/frame.png')
         self.sprite_grp.add(self.buttonSelChar)
 
     def _init_ready(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
@@ -197,13 +212,17 @@ class LobbyScene(GameStateObserver):
 
         self.isReady = False
         self.buttonReady = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
-                                      Text(pygame.font.SysFont('Arial', 20), text, color_text))
+                                      Text(pygame.font.SysFont('Arial', 25), text, color_text))
+        self.buttonReady.change_bg_image('media/GameHud/wood2.png')
+        self.buttonReady.add_frame('media/GameHud/frame.png')
         self.sprite_grp.add(self.buttonReady)
 
     def _init_btn_back(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
         box_size = (130, 48)
         self.buttonBack = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
-                                     Text(pygame.font.SysFont('Arial', 20), text, color_text))
+                                     Text(pygame.font.SysFont('Arial', 25), text, color_text))
+        self.buttonBack.change_bg_image('media/GameHud/wood2.png')
+        self.buttonBack.add_frame('media/GameHud/frame.png')
         self.sprite_grp.add(self.buttonBack)
 
     def _init_ip_addr(self):
