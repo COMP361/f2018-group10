@@ -173,7 +173,7 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
         DoorController._instance = None
         EventQueue.post(CustomEvent(ChangeSceneEnum.STARTSCENE))
 
-    # Example of how to use the MenuClass YOU NEED TO MAKE ALL YOUR BUTTONS EXTEND INTERACTABLE!!!!!!!!!!!!!!!!!
+    # Example of how to use the MenuClass YOU NEED TO MAKE ALL YOUR BUTTONS EXTEND INTERACTABLE!
     def _init_menu_button(self):
         btn = RectButton(0, 0, 30, 30, background=Color.GREEN, txt_obj=Text(pygame.font.SysFont('Arial', 23), ""))
         btn.on_click(self._open_menu)

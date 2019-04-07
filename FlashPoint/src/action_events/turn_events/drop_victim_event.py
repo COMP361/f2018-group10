@@ -7,6 +7,7 @@ from src.models.game_units.victim_model import VictimModel
 
 logger = logging.getLogger("FlashPoint")
 
+
 class DropVictimEvent(TurnEvent):
 
     def __init__(self, victim: VictimModel):
@@ -15,7 +16,6 @@ class DropVictimEvent(TurnEvent):
         self.victim_tile = game.game_board.get_tile_at(victim.row, victim.column)
         self.player = game.players_turn
 
-    # TODO: Move this code to the controller.
     def check(self):
         """
         If the player is not carrying a
