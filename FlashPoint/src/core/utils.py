@@ -1,5 +1,6 @@
+import json
 import random
-from typing import List, Tuple, Optional, Dict
+from typing import List, Tuple, Dict
 
 
 class Room(object):
@@ -29,6 +30,7 @@ class Room(object):
     def bottom(self):
         return self.row + self.height - 1
 
+
 class Path(object):
 
     def __init__(self, direction: str, points: List[Tuple]):
@@ -38,8 +40,9 @@ class Path(object):
 class Node(object):
     """Representing a leaf of th Binary Space Partition Tree"""
 
-    def __init__(self, row: int, column: int, width: int, height: int, min_size: int):
+    def __init__(self, row: int, column: int, width: int, height: int, min_size: int, max_size: int):
         self._min_size = min_size
+        self._max_size = max_size
         self.row = row
         self.column = column
         self.width = width
@@ -49,6 +52,9 @@ class Node(object):
         self.room = None
         self.left_child = None
         self.right_child = None
+
+    def __str__(self):
+        return f"Node: ({self.row}, {self.column}), {self.width}x{self.height}"
 
     def split(self) -> bool:
         """Split this leaf into two children"""
@@ -60,26 +66,24 @@ class Node(object):
         # Otherwise split horizontally
         # If neither condition is true, randomly choose
         split_horizontal = random.random() > 0.5
+
         if self.width > self.height and self.width/self.height >= 1.25:
             split_horizontal = False
         elif self.height > self.width and self.height / self.width >= 1.25:
             split_horizontal = True
 
-        max_v = self.height - self._min_size if split_horizontal else self.width - self._min_size
-        if max_v <= self._min_size:
-            return False  # Area is too small to split anymore
+        max_split = self.height - self._min_size if split_horizontal else self.width - self._min_size
+        if max_split <= self._min_size:
+            return False
 
-        split: int = random.randint(self._min_size, max_v)
-
-        #  create left and right children
+        split = random.randint(self._min_size, max_split)
         if split_horizontal:
-            self.left_child = Node(self.row, self.column, self.width, split, self._min_size)
-            self.right_child = Node(self.row + split, self.column, self.width, self.height - split, self._min_size)
+            self.left_child = Node(self.row, self.column, self.width, split, self._min_size, self._max_size)
+            self.right_child = Node(self.row + split, self.column, self.width, self.height - split, self._min_size, self._max_size)
         else:
-            self.left_child = Node(self.row, self.column, self.width, split, self._min_size)
-            self.right_child = Node(self.row, self.column + split, self.width - split, self.height, self._min_size)
-
-        return True  # Split successful!
+            self.left_child = Node(self.row, self.column, split, self.height, self._min_size, self._max_size)
+            self.right_child = Node(self.row, self.column + split, self.width - split, self.height, self._min_size, self._max_size)
+        return True
 
     def get_room(self):
         if self.room:
@@ -190,21 +194,37 @@ class BinarySpacePartition(object):
         self.min_room_size = min_room_size
         self.max_room_size = max_room_size
 
-        self.root = Node(0, 0, board_width, board_height, min_room_size)
-        self.leaves = []
+        self.root = Node(1, 1, board_width, board_height, min_room_size, max_room_size)
+        self.nodes = []
+        self.leaves: List[Node] = []
+
+        self._init_bsp()
+        self._find_leaf_rooms(self.root)
+
+    def _find_leaf_rooms(self, node: Node):
+        """Initialize the list of all leaf nodes for convienience"""
+        if node.left_child:
+            self._find_leaf_rooms(node.left_child)
+        if node.right_child:
+            self._find_leaf_rooms(node.right_child)
+        if not node.left_child and not node.right_child:
+            #  We are at a leaf!
+            self.leaves.append(node)
 
     def _init_bsp(self):
-        self.leaves.append(self.root)
+        self.nodes.append(self.root)
         did_split = True
 
         while did_split:
-            for l in self.leaves:
-                if not l.left_child and not l.right_child:
-                    if l.width > self.max_room_size or l.height > self.max_room_size:
-                        if l.split():
-                            self.leaves.append(l.left_child)
-                            self.leaves.append(l.right_child)
+            did_split = False
+            for node in self.nodes:
+                if not node.left_child and not node.right_child:
+                    if node.height > self.max_room_size or node.width > self.max_room_size:
+                        if node.split():
+                            self.nodes.append(node.left_child)
+                            self.nodes.append(node.right_child)
                             did_split = True
+        self.root.create_rooms()
 
 
 class BoardGenerator(object):
@@ -212,28 +232,148 @@ class BoardGenerator(object):
 
     def __init__(self, board_width: int, board_height: int, min_room_size: int, max_room_size:int):
         self.tree = BinarySpacePartition(board_width, board_height, min_room_size, max_room_size)
-        self.json = []
+        self.board_width = board_width
+        self.board_height = board_height
 
-    def intersect_path(self, room: Room, direction: str, line: List[Tuple]) -> Optional[Dict]:
-        """Find out where along the straight path the doors should be placed."""
+    def extract_all_paths(self) -> List[Path]:
+        paths = []
+        for leaf in self.tree.leaves:
+            for path in leaf.door_paths:
+                paths.append(path)
+        return paths
+
+    def intersect_path(self, leaves: List[Node], direction: str, line: List[Tuple]) -> List[Dict]:
+        """Find out where along the straight path the doors should be placed. (Anywhere they intersect a room."""
+        doors = []
+
         for spot in line:
-            if direction == "North":
-                if spot == room.top:
-                    return {
-                        
-                    }
-            elif direction == "East":
-                pass
-            elif direction == "West":
-                pass
-            elif direction == "South":
-                pass
+            for leaf in leaves:
+                room = leaf.room
+                if direction == "North":
+                    if spot[1] == room.top and room.left <= spot[0] <= room.right:
+                        doors.append({
+                            "first_pair": [spot[0], spot[1]-1],
+                            "first_dirn": "South",
+                            "obstacle_type": "door",
+                            "second_pair": [spot[0], spot[1]],
+                            "second_dirn": "North"
+                        })
+                elif direction == "East":
+                    if spot[0] == room.right and room.top <= spot[1] <= room.bottom:
+                        doors.append({
+                            "first_pair": [spot[0], spot[1]],
+                            "first_dirn": "East",
+                            "obstacle_type": "door",
+                            "second_pair": [spot[0]+1, spot[1]],
+                            "second_dirn": "West"
+                        })
+                elif direction == "West":
+                    if spot[0] == room.left and room.top <= spot[1] <= room.bottom:
+                        doors.append({
+                            "first_pair": [spot[0], spot[1]],
+                            "first_dirn": "East",
+                            "obstacle_type": "door",
+                            "second_pair": [spot[0]-1, spot[1]],
+                            "second_dirn": "West"
+                        })
+                elif direction == "South":
+                    if spot[1] == room.bottom and room.left <= spot[0] <= room.right:
+                        doors.append({
+                            "first_pair": [spot[0], spot[1]],
+                            "first_dirn": "South",
+                            "obstacle_type": "door",
+                            "second_pair": [spot[0], spot[1]+1],
+                            "second_dirn": "North"
+                        })
+        return doors
 
-    def generate(self):
+    def create_walls_and_dumb_doors(self, leaf: Node) -> List[Dict]:
+        """Create a rectangle of walls around this leaf node room."""
+        walls_and_doors = []
+        top_row = [(leaf.room.top, leaf.room.left + i) for i in range(leaf.room.width)]
+        bottom_row = [(leaf.room.bottom, leaf.room.left + i) for i in range(leaf.room.width)]
+        right_column = [(leaf.room.top + i, leaf.room.right) for i in range(leaf.room.height)]
+        left_column = [(leaf.room.top + i, leaf.room.left) for i in range(leaf.room.height)]
+
+        for spot in top_row:
+            if leaf.room.top == 1:
+                break
+
+            walls_and_doors.append({
+                "first_pair": [spot[0]-1, spot[1]],
+                "first_dirn": "South",
+                "obstacle_type": "wall",
+                "second_pair": [spot[0], spot[1]],
+                "second_dirn": "North"
+            })
+
+        for spot in bottom_row:
+            if leaf.room.bottom == self.board_height-1:
+                break
+
+            walls_and_doors.append({
+                "first_pair": [spot[0], spot[1]],
+                "first_dirn": "South",
+                "obstacle_type": "wall",
+                "second_pair": [spot[0]+1, spot[1]],
+                "second_dirn": "North"
+            })
+
+        for spot in left_column:
+            if leaf.room.left == 1:
+                break
+            walls_and_doors.append({
+                "first_pair": [spot[0], spot[1]-1],
+                "first_dirn": "East",
+                "obstacle_type": "wall",
+                "second_pair": [spot[0], spot[1]],
+                "second_dirn": "West"
+            })
+
+        for spot in right_column:
+            if leaf.room.right == self.board_width-1:
+                break
+            walls_and_doors.append({
+                "first_pair": [spot[0], spot[1]],
+                "first_dirn": "East",
+                "obstacle_type": "wall",
+                "second_pair": [spot[0], spot[1]+1],
+                "second_dirn": "West"
+            })
+
+        #  Choose a random wall and turn it into a door
+        random_index = random.randint(0, len(walls_and_doors) - 1)
+        walls_and_doors[random_index]['obstacle_type'] = "door"
+        return walls_and_doors
+
+    def dict_equals(self, o1: Dict, o2: Dict):
+        """Determine whether this door is in the same place as this wall"""
+        return o1["first_pair"] == o2["first_pair"] and o1["second_pair"] == o2["second_pair"] and o1["obstacle_type"] == o2["obstacle_type"]
+
+    def remove_dups(self, walls):
+        seen_walls = []
+        for wall in walls:
+            seen = False
+            for seen in seen_walls:
+                if self.dict_equals(wall, seen):
+                    seen = True
+                    break
+            if not seen:
+                seen_walls.append(wall)
+        return seen_walls
+
+    def generate_inside_walls_doors(self):
         """
         Function for generating json files which contain information bout
         a randomly generated game board. These JSON can be used by the GameBoardModel to load
         the random board.
         """
 
+        walls = []
+        for leaf in self.tree.leaves:
+            walls += self.create_walls_and_dumb_doors(leaf)
 
+        self.remove_dups(walls)
+
+        with open("media/board_layouts/random_inside_walls_doors.json", mode="w", encoding='utf-8') as f:
+            json.dump(walls, f)

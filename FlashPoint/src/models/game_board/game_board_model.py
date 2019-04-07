@@ -3,6 +3,7 @@ import logging
 import random
 from typing import List, Tuple, Dict
 
+from src.core.utils import BoardGenerator
 from src.models.game_units.engine_model import EngineModel
 from src.models.game_units.ambulance_model import AmbulanceModel
 from src.models.model import Model
@@ -172,6 +173,7 @@ class GameBoardModel(Model):
 
         :return: A list of list of tile models that will act as the board
         """
+        self._board_type = GameBoardTypeEnum.RANDOM
         amb_engine_parking_fname = ""
         outside_doors_fname = ""
         inside_walls_doors_fname = ""
@@ -185,11 +187,11 @@ class GameBoardModel(Model):
             outside_doors_fname = "media/board_layouts/alternative_outside_door_locations.json"
             inside_walls_doors_fname = "media/board_layouts/alternative_inside_walls_doors.json"
 
-        # TODO: put in the names of the files for the random board details
-        # elif self.board_type == GameBoardTypeEnum.RANDOM:
-        #     amb_engine_parking_fname = ""
-        #     outside_doors_fname = ""
-        #     inside_walls_doors_fname = ""
+        elif self.board_type == GameBoardTypeEnum.RANDOM:
+            BoardGenerator(8, 6, 1, 3).generate_inside_walls_doors()
+            amb_engine_parking_fname = "media/board_layouts/alternative_engine_ambulance_locations.json"
+            outside_doors_fname = "media/board_layouts/alternative_outside_door_locations.json"
+            inside_walls_doors_fname = "media/board_layouts/random_inside_walls_doors.json"
 
         return self._init_all_tiles_board(amb_engine_parking_fname, outside_doors_fname, inside_walls_doors_fname)
 
