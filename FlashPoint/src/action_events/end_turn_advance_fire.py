@@ -1,9 +1,12 @@
 import random
 import logging
-
-
+import time
+from threading import Thread
 from src.action_events.knock_down_event import KnockDownEvent
 from src.action_events.replenish_poi_event import ReplenishPOIEvent
+from src.constants.enums.custom_event_enums import CustomEventEnum
+from src.core.custom_event import CustomEvent
+from src.core.event_queue import EventQueue
 from src.models.game_board.door_model import DoorModel
 from src.models.game_board.null_model import NullModel
 from src.models.game_board.wall_model import WallModel
@@ -340,6 +343,12 @@ class EndTurnAdvanceFireEvent(TurnEvent):
                             tile.is_hotspot = True
                             self.board.hotspot_bank = self.board.hotspot_bank - 1
 
+
+    def countdown(self):
+        EventQueue.post(CustomEvent(CustomEventEnum.ENABLE_VICTIM_LOST_PROMPT))
+        time.sleep(5)
+        EventQueue.post(CustomEvent(CustomEventEnum.DISABLE_VICTIM_LOST_PROMPT))
+
     def affect_damages(self):
         """
         Affect any valid damages to firemen,
@@ -354,6 +363,9 @@ class EndTurnAdvanceFireEvent(TurnEvent):
             for model in assoc_models:
                 if isinstance(model, VictimModel):
                     logger.info(f"{model} was lost.")
+
+                    thread = Thread(target=self.countdown)
+                    thread.start()
                     self.game_state.victims_lost = self.game_state.victims_lost + 1
                     model: VictimModel = model
                     model.state = VictimStateEnum.LOST

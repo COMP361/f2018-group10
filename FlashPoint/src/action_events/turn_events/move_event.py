@@ -1,10 +1,15 @@
 from typing import List
 import time
 import logging
+from threading import Thread
+
 
 from src.action_events.turn_events.turn_event import TurnEvent
+from src.constants.enums.custom_event_enums import CustomEventEnum
 from src.constants.state_enums import SpaceStatusEnum, SpaceKindEnum, DoorStatusEnum, VictimStateEnum, \
     GameKindEnum, PlayerRoleEnum
+from src.core.custom_event import CustomEvent
+from src.core.event_queue import EventQueue
 from src.models.game_board.door_model import DoorModel
 from src.models.game_board.null_model import NullModel
 from src.models.game_board.tile_model import TileModel
@@ -127,6 +132,7 @@ class MoveEvent(TurnEvent):
                 self.source_tile.least_cost = 0
             if d_tile.tile_model.row == dest.row and d_tile.tile_model.column == dest.column:
                 self.destination = d_tile
+
 
     def execute(self):
         logger.info(f"Executing MoveEvent from ({self.fireman.row}, "
@@ -349,11 +355,19 @@ class MoveEvent(TurnEvent):
         # if the target space is equal to one of
         # the ambulance's current location tiles.
         self.fireman.carrying_victim.state = VictimStateEnum.RESCUED
+        thread = Thread(target=self.countdown)
+        thread.start()
         self.game.victims_saved = self.game.victims_saved + 1
         # remove the victim from the list of active POIs on the board
         # and disassociate the victim from the player
         self.game.game_board.remove_poi_or_victim(self.fireman.carrying_victim)
         self.fireman.carrying_victim = NullModel()
+
+    def countdown(self):
+        EventQueue.post(CustomEvent(CustomEventEnum.ENABLE_VICTIM_SAVED_PROMPT))
+        time.sleep(5)
+        EventQueue.post(CustomEvent(CustomEventEnum.DISABLE_VICTIM_SAVED_PROMPT))
+
 
     def _deduct_player_points(self, pts_to_deduct: int):
         """

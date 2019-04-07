@@ -1,12 +1,21 @@
 import logging
 import random
+import threading
+import time
+from threading import Thread
+import pygame
+import src.constants.color as Color
 from src.action_events.action_event import ActionEvent
+from src.constants.enums.custom_event_enums import CustomEventEnum
 from src.constants.state_enums import VictimStateEnum, GameKindEnum
+from src.core.custom_event import CustomEvent
+from src.core.event_queue import EventQueue
 from src.models.game_board.null_model import NullModel
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.victim_model import VictimModel
 
 logger = logging.getLogger("FlashPoint")
+
 
 
 class KnockDownEvent(ActionEvent):
@@ -23,7 +32,19 @@ class KnockDownEvent(ActionEvent):
         self.game: GameStateModel = GameStateModel.instance()
         self.player = self.game.get_player_by_ip(player_ip)
 
+    def countdown(self):
+        EventQueue.post(CustomEvent(CustomEventEnum.ENABLE_KNOCKDOWN_PROMPT, self.player.nickname))
+        time.sleep(5)
+        EventQueue.post(CustomEvent(CustomEventEnum.DISABLE_KNOCKDOWN_PROMPT))
+
+
+
+
     def execute(self):
+        thread = Thread(target=self.countdown)
+        thread.start()
+
+
         logger.info(f"Executing KnockDownEvent for player at ({self.player.row},{self.player.column})")
         # if the player was carrying a victim,
         # that victim is lost. disassociate the
