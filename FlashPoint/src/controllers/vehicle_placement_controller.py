@@ -5,7 +5,7 @@ from src.UIComponents.interactable import Interactable
 from src.UIComponents.rect_label import RectLabel
 from src.UIComponents.text import Text
 from src.action_events.vehicle_placed_event import VehiclePlacedEvent
-from src.constants.state_enums import GameStateEnum, SpaceKindEnum
+from src.constants.state_enums import GameStateEnum, SpaceKindEnum, VehicleOrientationEnum
 from src.controllers.controller import Controller
 from src.core.event_queue import EventQueue
 from src.core.networking import Networking
@@ -13,6 +13,7 @@ from src.models.game_board.game_board_model import GameBoardModel
 from src.models.game_board.tile_model import TileModel
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
+from src.models.game_units.vehicle_model import VehicleModel
 from src.sprites.game_board import GameBoard
 from src.sprites.tile_sprite import TileSprite
 
@@ -112,7 +113,6 @@ class VehiclePlacementController(Controller):
         if not self.run_checks(tile_model):
             return
 
-
         self.send_event_and_close_menu(tile_model, None)
 
     def enable_prompts(self):
@@ -130,7 +130,9 @@ class VehiclePlacementController(Controller):
         if self.ambulance_placed:
             self.choose_ambulance_prompt.kill()
 
-        if self.ambulance_placed and self.engine_placed or self._current_player == GameStateModel.instance().players_turn:
+        ambulance: VehicleModel = GameStateModel.instance().game_board.ambulance
+        engine: VehicleModel = GameStateModel.instance().game_board.engine
+        if ambulance.orientation != VehicleOrientationEnum.UNSET and engine.orientation != VehicleOrientationEnum.UNSET:
             self.wait_prompt.kill()
 
         vehicle_type = "ENGINE" if self.ambulance_placed else "AMBULANCE"
