@@ -7,6 +7,7 @@ import threading
 import logging
 import time
 
+from src.action_events.end_turn_advance_fire import EndTurnAdvanceFireEvent
 from src.core.custom_event import CustomEvent
 from src.core.serializer import JSONSerializer
 from src.core.event_queue import EventQueue
@@ -470,7 +471,8 @@ class Networking:
                 GameStateModel.set_game(data)
                 return
             if isinstance(data, TurnEvent) or isinstance(data, ActionEvent):
-                data.execute()
+                exec_thread = threading.Thread(target=data.execute)
+                exec_thread.start()
 
         def get_server_reply(self):
             """
