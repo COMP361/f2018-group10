@@ -221,11 +221,10 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
         self._dodge_prompt.update(event_queue)
 
         if not self.ignore_area():
-            ChopController.instance().update(event_queue)
-            DoorController.instance().update(event_queue)
             TileInputController.update(event_queue)
             self._game_board_sprite.update(event_queue)
-
+            ChopController.instance().update(event_queue)
+            DoorController.instance().update(event_queue)
         if self._menu and not self._menu.is_closed:
             self._menu.update(event_queue)
 
