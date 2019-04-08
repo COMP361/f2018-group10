@@ -20,8 +20,6 @@ class PlaceHazmatEvent(ActionEvent):
 
     def __init__(self, seed: int = 0):
         super().__init__()
-        self.game: GameStateModel = GameStateModel.instance()
-        self.board = self.game.game_board
 
         if seed == 0:
             self.seed = random.randint(1, 6969)
@@ -32,6 +30,8 @@ class PlaceHazmatEvent(ActionEvent):
         random.seed(self.seed)
 
     def execute(self, *args, **kwargs):
+        self.game: GameStateModel = GameStateModel.instance()
+        self.board = self.game.game_board
         """
         Place hazmat on the game board, the number of hazmats are based on the selected game mode,
         as specified in the game manual

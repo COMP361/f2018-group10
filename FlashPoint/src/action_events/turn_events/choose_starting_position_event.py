@@ -15,10 +15,9 @@ class ChooseStartingPositionEvent(ActionEvent):
 
     def __init__(self, row: int, column: int):
         super().__init__()
-        game: GameStateModel = GameStateModel.instance()
         self._row = row
         self._column = column
-        self.player: PlayerModel = game.players_turn
+        self.player: PlayerModel = GameStateModel.instance().players_turn
 
     def execute(self):
         logger.info("Executing ChooseStartingPositionEvent")
