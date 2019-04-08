@@ -16,6 +16,9 @@ class PermissionReplyEvent(ActionEvent):
         self._target = target
 
     def execute(self, *args, **kwargs):
+        game: GameStateModel = GameStateModel.instance()
         if self._reply:
-            GameStateModel.instance().command = (self._source, self._target)
+            game.command = (self._source, self._target)
+            commander: PlayerModel = [player for player in game.players if player == self._source][0]
+            commander.special_ap = commander.special_ap - 1
             logger.info(f"Player {self._source.nickname} now commands {self._target.nickname}")

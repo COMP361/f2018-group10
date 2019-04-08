@@ -49,6 +49,7 @@ class GameStateModel(Model):
             self._chat_history = []
             self._dodge_reply = False
             self._command = (None, None)
+            self._commanded: List[PlayerModel] = []
             self._state = GameStateEnum.READY_TO_JOIN
             s = f"{self._host.row}, {self._host.column}"
             GameStateModel._instance = self
@@ -58,7 +59,6 @@ class GameStateModel(Model):
     # def notify_all_observers(self):
     #     self._notify_state()
     #     self._game_board.notify_all_observers()
-
 
     def _notify_player_added(self, player: PlayerModel):
         for obs in self._observers:
@@ -124,7 +124,15 @@ class GameStateModel(Model):
     @command.setter
     def command(self, command: Tuple[PlayerModel, PlayerModel]):
         self._command = command
+        self._commanded.append(command[1])
         self._notify_command()
+
+    @property
+    def commanded_list(self):
+        return self._commanded
+
+    def clear_commanded_list(self):
+        self._commanded.clear()
 
     @property
     def board_type(self) -> GameBoardTypeEnum:

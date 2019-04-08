@@ -40,7 +40,8 @@ class CommandPlayerController(Controller):
         if not TurnEvent.has_required_AP(self._current_player.special_ap, 1):
             return False
 
-        valid_players = [player for player in self.game.players if player != self._current_player]
+        valid_players = [player for player in self.game.players if player != self._current_player and
+                         player not in self.game.commanded_list]
         for player in valid_players:
             if (player.row, player.column) == (tile_model.row, tile_model.column):
                 return True
