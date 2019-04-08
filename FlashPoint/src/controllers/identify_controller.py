@@ -35,7 +35,31 @@ class IdentifyController(Controller):
         if not self._current_player == self.game.players_turn:
             return False
 
-        if self._current_player.role != PlayerRoleEnum.IMAGING:
+        if self._current_player.role not in [PlayerRoleEnum.IMAGING, PlayerRoleEnum.DOGE]:
+            return False
+
+        player_tile: TileModel = self.game.game_board.get_tile_at(self._current_player.row, self._current_player.column)
+        # Separately handle Doge's case
+        if self._current_player.role == PlayerRoleEnum.DOGE:
+            # If the tile is not the same as the player's
+            # nor is it adjacent to the player
+            if tile_model not in player_tile.adjacent_tiles.values() and tile_model != player_tile:
+                return False
+
+            # If the target tile is same as that of the player tile
+            if tile_model.row == player_tile.row and tile_model.column == player_tile.column:
+                for assoc_model in player_tile.associated_models:
+                    if isinstance(assoc_model, POIModel):
+                        return True
+
+            # If the target tile is adjacent to the player tile
+            for nb_tile in player_tile.adjacent_tiles.values():
+                if isinstance(nb_tile, TileModel):
+                    if tile_model.row == nb_tile.row and tile_model.column == nb_tile.column:
+                        for assoc_model in nb_tile.associated_models:
+                            if isinstance(assoc_model, POIModel):
+                                return True
+
             return False
 
         if not TurnEvent.has_required_AP(self._current_player.ap, 1):

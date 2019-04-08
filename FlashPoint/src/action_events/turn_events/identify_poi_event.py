@@ -1,6 +1,7 @@
 import logging
 
 from src.action_events.turn_events.turn_event import TurnEvent
+from src.constants.state_enums import PlayerRoleEnum
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.poi_model import POIModel
 
@@ -29,4 +30,5 @@ class IdentifyPOIEvent(TurnEvent):
                 self.game_board.flip_poi(model)
                 break
 
-        self.current_player.ap = self.current_player.ap - 1
+        if self.current_player.role != PlayerRoleEnum.DOGE:
+            self.current_player.ap = self.current_player.ap - 1
