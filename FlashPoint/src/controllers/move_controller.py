@@ -3,9 +3,10 @@ from typing import List
 import src.constants.color as Color
 from src.UIComponents.interactable import Interactable
 from src.action_events.turn_events.move_event import DijkstraTile, PriorityQueue, MoveEvent
-from src.constants.state_enums import PlayerStatusEnum, PlayerRoleEnum
+from src.constants.state_enums import PlayerStatusEnum, PlayerRoleEnum, WallStatusEnum
 from src.controllers.controller import Controller
 from src.core.networking import Networking
+from src.models.game_board.wall_model import WallModel
 from src.models.game_units.hazmat_model import HazmatModel
 
 from src.models.game_units.victim_model import VictimModel
@@ -127,34 +128,65 @@ class MoveController(PlayerObserver, Controller):
         if ap < 1:
             return False
 
-        has_obstacle = first_tile.tile_model.has_obstacle_in_direction(direction)
-        obstacle = first_tile.tile_model.get_obstacle_in_direction(direction)
         # If the path from the first tile to the second is not hindered by anything
-        # (i.e. there is a destroyed door or a destroyed wall or an open door or no obstacle)
         # then there exists the **possibility** of moving to the second tile.
         # Two cases then depending on whether the player is heading into a non-fire/fire space.
-        if not has_obstacle or (isinstance(obstacle, DoorModel) and obstacle.door_status == DoorStatusEnum.OPEN):
-            second_tile_status = second_tile.tile_model.space_status
-            # heading into a Safe/Smoke space
-            if second_tile_status != SpaceStatusEnum.FIRE:
-                if self._can_go_into_safe_smoke(ap, first_tile, second_tile):
+        if not self._is_path_clear(first_tile.tile_model, direction):
+            return False
+
+        second_tile_status = second_tile.tile_model.space_status
+        # heading into a Safe/Smoke space
+        if second_tile_status != SpaceStatusEnum.FIRE:
+            if self._can_go_into_safe_smoke(ap, first_tile, second_tile):
+                return True
+
+        # heading into a Fire space
+        else:
+            # When moving to a tile with fire, determine the reachable tiles
+            # from this tile itself. Since the source tile is included in
+            # the moveable tiles list, if the length of the list < 2, then
+            # we cannot go anywhere from this fire tile and therefore it
+            # would not be valid to add it to the list. Return False.
+            if self._can_go_into_fire(ap):
+                moveable_tiles_from_fire = self._determine_reachable_tiles(second_tile.tile_model.row, second_tile.tile_model.column, ap-2)
+                if len(moveable_tiles_from_fire) < 2:
+                    return False
+
+                cost_to_move = self._determine_cost_to_move(SpaceStatusEnum.FIRE)
+                if self._could_update_least_cost(cost_to_move, first_tile, second_tile):
                     return True
 
-            # heading into a Fire space
-            else:
-                # When moving to a tile with fire, determine the reachable tiles
-                # from this tile itself. Since the source tile is included in
-                # the moveable tiles list, if the length of the list < 2, then
-                # we cannot go anywhere from this fire tile and therefore it
-                # would not be valid to add it to the list. Return False.
-                if self._can_go_into_fire(ap):
-                    moveable_tiles_from_fire = self._determine_reachable_tiles(second_tile.tile_model.row, second_tile.tile_model.column, ap-2)
-                    if len(moveable_tiles_from_fire) < 2:
-                        return False
+        return False
 
-                    cost_to_move = self._determine_cost_to_move(SpaceStatusEnum.FIRE)
-                    if self._could_update_least_cost(cost_to_move, first_tile, second_tile):
-                        return True
+    def _is_path_clear(self, tile_model: TileModel, dirn: str) -> bool:
+        """
+        Determines if there is an obstacle blocking the
+        way from the tile in the direction 'dirn'.
+
+        :param tile_model: tile the player is moving from
+        :param dirn: direction from tile in which moving
+        :return: True if the path from the first tile to
+                the second is clear, False otherwise.
+        """
+        has_obstacle = tile_model.has_obstacle_in_direction(dirn)
+        obstacle = tile_model.get_obstacle_in_direction(dirn)
+        is_open_door = isinstance(obstacle, DoorModel) and obstacle.door_status == DoorStatusEnum.OPEN
+        is_damaged_wall = isinstance(obstacle, WallModel) and obstacle.wall_status == WallStatusEnum.DAMAGED
+        is_carrying_victim = isinstance(self.current_player.carrying_victim, VictimModel)
+        # there is a destroyed door or a destroyed wall or no obstacle or an open door or a damaged wall
+        if self.current_player.role == PlayerRoleEnum.DOGE:
+            if not has_obstacle or is_open_door:
+                # The Doge is not allowed to carry a
+                # victim through a damaged wall.
+                if is_carrying_victim and is_damaged_wall:
+                    return False
+                else:
+                    return True
+
+        # there is a destroyed door or a destroyed wall or no obstacle or an open door
+        else:
+            if not has_obstacle or is_open_door:
+                return True
 
         return False
 
@@ -217,9 +249,8 @@ class MoveController(PlayerObserver, Controller):
         :param space_status: status of the target space
         :return: cost to move into that space
         """
-        cost_to_move = 0
+        cost_to_move = 1
         if space_status != SpaceStatusEnum.FIRE:
-            cost_to_move = 1
             if isinstance(self.current_player.carrying_victim, VictimModel):
                 if self.current_player.role == PlayerRoleEnum.DOGE:
                     cost_to_move = 4

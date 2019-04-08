@@ -4,10 +4,11 @@ import logging
 
 from src.action_events.turn_events.turn_event import TurnEvent
 from src.constants.state_enums import SpaceStatusEnum, SpaceKindEnum, DoorStatusEnum, VictimStateEnum, \
-    GameKindEnum, PlayerRoleEnum
+    GameKindEnum, PlayerRoleEnum, WallStatusEnum
 from src.models.game_board.door_model import DoorModel
 from src.models.game_board.null_model import NullModel
 from src.models.game_board.tile_model import TileModel
+from src.models.game_board.wall_model import WallModel
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.hazmat_model import HazmatModel
 from src.models.game_units.player_model import PlayerModel
@@ -170,12 +171,7 @@ class MoveEvent(TurnEvent):
         :param second_tile:
         :return:
         """
-        has_obstacle = first_tile.tile_model.has_obstacle_in_direction(direction)
-        obstacle = first_tile.tile_model.get_obstacle_in_direction(direction)
-
-        if not has_obstacle or (isinstance(obstacle, DoorModel) and obstacle.door_status == DoorStatusEnum.OPEN):
-            pass
-        else:
+        if not self._is_path_clear(first_tile.tile_model, direction):
             return
 
         if second_tile.tile_model.space_status != SpaceStatusEnum.FIRE:
@@ -339,18 +335,7 @@ class MoveEvent(TurnEvent):
         :param tile_model: tile player is moving to
         :return:
         """
-        pts_to_deduct = 1
-        if tile_model.space_status != SpaceStatusEnum.FIRE:
-            if isinstance(self.fireman.carrying_victim, VictimModel):
-                # If a Doge drags a victim, it costs 4 AP.
-                if self.fireman.role == PlayerRoleEnum.DOGE:
-                    pts_to_deduct = 4
-                else:
-                    pts_to_deduct = 2
-            if isinstance(self.fireman.carrying_hazmat, HazmatModel):
-                pts_to_deduct = 2
-        else:
-            pts_to_deduct = 2
+        pts_to_deduct = self._determine_cost_to_move(tile_model.space_status)
 
         # If the fireman is a Rescue Specialist, subtract
         # from the special AP first and then from AP.
@@ -401,9 +386,8 @@ class MoveEvent(TurnEvent):
         :param space_status: status of the target space
         :return: cost to move into that space
         """
-        cost_to_move = 0
+        cost_to_move = 1
         if space_status != SpaceStatusEnum.FIRE:
-            cost_to_move = 1
             if isinstance(self.fireman.carrying_victim, VictimModel):
                 # If a Doge drags a victim, it costs 4 AP.
                 if self.fireman.role == PlayerRoleEnum.DOGE:
@@ -417,3 +401,35 @@ class MoveEvent(TurnEvent):
             cost_to_move = 2
 
         return cost_to_move
+
+    def _is_path_clear(self, tile_model: TileModel, dirn: str) -> bool:
+        """
+        Determines if there is an obstacle blocking the
+        way from the tile in the direction 'dirn'.
+
+        :param tile_model: tile the player is moving from
+        :param dirn: direction from tile in which moving
+        :return: True if the path from the first tile to
+                the second is clear, False otherwise.
+        """
+        has_obstacle = tile_model.has_obstacle_in_direction(dirn)
+        obstacle = tile_model.get_obstacle_in_direction(dirn)
+        is_open_door = isinstance(obstacle, DoorModel) and obstacle.door_status == DoorStatusEnum.OPEN
+        is_damaged_wall = isinstance(obstacle, WallModel) and obstacle.wall_status == WallStatusEnum.DAMAGED
+        is_carrying_victim = isinstance(self.fireman.carrying_victim, VictimModel)
+        # there is a destroyed door or a destroyed wall or no obstacle or an open door or a damaged wall
+        if self.fireman.role == PlayerRoleEnum.DOGE:
+            if not has_obstacle or is_open_door:
+                # The Doge is not allowed to carry a
+                # victim through a damaged wall.
+                if is_carrying_victim and is_damaged_wall:
+                    return False
+                else:
+                    return True
+
+        # there is a destroyed door or a destroyed wall or no obstacle or an open door
+        else:
+            if not has_obstacle or is_open_door:
+                return True
+
+        return False
