@@ -10,6 +10,7 @@ from src.action_events.dodge_reply_event import DodgeReplyEvent
 from src.action_events.end_game_event import EndGameEvent
 from src.action_events.fire_placement_event import FirePlacementEvent
 from src.action_events.choose_character_event import ChooseCharacterEvent
+from src.action_events.random_board_setup_event import RandomBoardSetupEvent
 from src.action_events.turn_events.drop_hazmat_event import DropHazmatEvent
 from src.action_events.turn_events.lead_victim_event import LeadVictimEvent
 from src.action_events.turn_events.pick_up_hazmat_event import PickupHazmatEvent
@@ -454,6 +455,10 @@ class JSONSerializer(object):
         return DodgeReplyEvent(payload['_reply'])
 
     @staticmethod
+    def _deserialize_random_board_event(payload: Dict) -> RandomBoardSetupEvent:
+        return RandomBoardSetupEvent(payload['_board_info'])
+
+    @staticmethod
     def deserialize(payload: Dict) -> object:
         """
         Grab an object and deserialize it.
@@ -561,6 +566,8 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_set_initial_poi_experienced_event(payload)
         elif object_type == DodgeReplyEvent.__name__:
             return JSONSerializer._deserialize_dodge_reply(payload)
+        elif object_type == RandomBoardSetupEvent.__name__:
+            return JSONSerializer._deserialize_random_board_event(payload)
         elif object_type == NullModel.__name__:
             return NullModel()
 
