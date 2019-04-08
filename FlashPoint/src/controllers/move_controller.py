@@ -69,15 +69,6 @@ class MoveController(PlayerObserver, Controller):
         # final list returned.
         moveable_tiles = []
         pq = PriorityQueue()
-        is_carrying_victim = False
-        is_carrying_hazmat = False
-        if isinstance(self.current_player.carrying_victim, VictimModel):
-            is_carrying_victim = True
-
-        if isinstance(self.current_player.carrying_hazmat, HazmatModel):
-            is_carrying_hazmat = True
-
-        is_carrying_something = is_carrying_victim or is_carrying_hazmat
 
         # Get the tiles of the board. Remove the source tile
         # from the list since it has to be initialised as a
@@ -109,7 +100,7 @@ class MoveController(PlayerObserver, Controller):
                 if isinstance(tile, NullModel):
                     continue
                 d_tile = dijkstra_tiles.get(str(tile.row) + ", " + str(tile.column))
-                can_travel_to = self._check_and_relax(direction, current_d_tile, d_tile, is_carrying_something, ap-current_d_tile.least_cost)
+                can_travel_to = self._check_and_relax(direction, current_d_tile, d_tile, ap-current_d_tile.least_cost)
                 # If it is possible to travel to the second tile,
                 # add it to the moveable tiles and insert it into
                 # the Priority Queue
@@ -121,12 +112,11 @@ class MoveController(PlayerObserver, Controller):
 
         return moveable_tiles
 
-    def _check_and_relax(self, direction: str, first_tile: DijkstraTile, second_tile: DijkstraTile, is_carrying_something: bool, ap: int) -> bool:
+    def _check_and_relax(self, direction: str, first_tile: DijkstraTile, second_tile: DijkstraTile, ap: int) -> bool:
         """
         Check if the player can move from the first tile
-        to the second depending on whether they are carrying
-        something or not and the AP they have. Update the least
-        cost to get to the second tile accordingly.
+        to the second depending on the AP they have. Update
+        the least cost to get to the second tile accordingly.
 
         :param first_tile:
         :param second_tile:
@@ -137,44 +127,122 @@ class MoveController(PlayerObserver, Controller):
         if ap < 1:
             return False
 
-        is_leading_victim = isinstance(self.current_player.leading_victim, VictimModel)
-
         has_obstacle = first_tile.tile_model.has_obstacle_in_direction(direction)
         obstacle = first_tile.tile_model.get_obstacle_in_direction(direction)
         # If the path from the first tile to the second is not hindered by anything
         # (i.e. there is a destroyed door or a destroyed wall or an open door or no obstacle)
         # then there exists the **possibility** of moving to the second tile.
-        # Two cases then depending on whether the player is carrying a victim/hazmat or not.
+        # Two cases then depending on whether the player is heading into a non-fire/fire space.
         if not has_obstacle or (isinstance(obstacle, DoorModel) and obstacle.door_status == DoorStatusEnum.OPEN):
             second_tile_status = second_tile.tile_model.space_status
-            # carrying a victim/hazmat
-            if is_carrying_something:
-                if second_tile_status != SpaceStatusEnum.FIRE and ap - 2 >= 0:
-                    if second_tile.least_cost > first_tile.least_cost + 2:
-                        second_tile.least_cost = first_tile.least_cost + 2
-                        return True
+            # heading into a Safe/Smoke space
+            if second_tile_status != SpaceStatusEnum.FIRE:
+                if self._can_go_into_safe_smoke(ap, first_tile, second_tile):
+                    return True
 
-            # not carrying a victim/hazmat
+            # heading into a Fire space
             else:
-                if second_tile_status != SpaceStatusEnum.FIRE and ap - 1 >= 0:
-                    if second_tile.least_cost > first_tile.least_cost + 1:
-                        second_tile.least_cost = first_tile.least_cost + 1
-                        return True
-
-                # If moving to a tile with fire, determine the reachable tiles
+                # When moving to a tile with fire, determine the reachable tiles
                 # from this tile itself. Since the source tile is included in
                 # the moveable tiles list, if the length of the list < 2, then
                 # we cannot go anywhere from this fire tile and therefore it
                 # would not be valid to add it to the list. Return False.
-                # (Also, cannot go to fire tile if leading a victim)
-                if second_tile_status == SpaceStatusEnum.FIRE and not is_leading_victim and ap - 2 >= 0:
+                if self._can_go_into_fire(ap):
                     moveable_tiles_from_fire = self._determine_reachable_tiles(second_tile.tile_model.row, second_tile.tile_model.column, ap-2)
                     if len(moveable_tiles_from_fire) < 2:
                         return False
 
-                    if second_tile.least_cost > first_tile.least_cost + 2:
-                        second_tile.least_cost = first_tile.least_cost + 2
+                    cost_to_move = self._determine_cost_to_move(SpaceStatusEnum.FIRE)
+                    if self._could_update_least_cost(cost_to_move, first_tile, second_tile):
                         return True
+
+        return False
+
+    def _can_go_into_fire(self, ap: int) -> bool:
+        """
+        Determines whether player can go
+        into fire. If the player is:
+        1. carrying a victim or
+        2. carrying a hazmat or
+        3. leading a victim or
+        4. is a doge
+        5. ap < cost to move
+        then he/she cannot go into the fire.
+
+        :param ap: player's AP
+        :return: True if player can go into this
+                fire space, False otherwise.
+        """
+        if isinstance(self.current_player.carrying_victim, VictimModel):
+            return False
+        if isinstance(self.current_player.carrying_hazmat, HazmatModel):
+            return False
+        if isinstance(self.current_player.leading_victim, VictimModel):
+            return False
+        if self.current_player.role == PlayerRoleEnum.DOGE:
+            return False
+
+        cost_to_move = self._determine_cost_to_move(SpaceStatusEnum.FIRE)
+        if ap < cost_to_move:
+            return False
+
+        return True
+
+    def _can_go_into_safe_smoke(self, ap: int, first_tile: DijkstraTile, second_tile: DijkstraTile) -> bool:
+        """
+        Determines whether player can go
+        into safe/smoke space.
+
+        :param ap: player's AP
+        :param first_tile: tile player is moving from
+        :param second_tile: tile player is moving to
+        :return: True if player can go into this
+                safe/smoke space, False otherwise.
+        """
+        # Can pass either Safe or Smoke to method
+        cost_to_move = self._determine_cost_to_move(SpaceStatusEnum.SAFE)
+        if ap < cost_to_move:
+            return False
+
+        return self._could_update_least_cost(cost_to_move, first_tile, second_tile)
+
+    def _determine_cost_to_move(self, space_status: SpaceStatusEnum) -> int:
+        """
+        Determine the cost to move
+        into a space depending on the
+        space status and player carrying
+        victim/hazmat.
+
+        :param space_status: status of the target space
+        :return: cost to move into that space
+        """
+        cost_to_move = 0
+        if space_status != SpaceStatusEnum.FIRE:
+            cost_to_move = 1
+            if isinstance(self.current_player.carrying_victim, VictimModel):
+                cost_to_move = 2
+            if isinstance(self.current_player.carrying_hazmat, HazmatModel):
+                cost_to_move = 2
+
+        else:
+            cost_to_move = 2
+
+        return cost_to_move
+
+    def _could_update_least_cost(self, cost_to_move: int, first_tile: DijkstraTile, second_tile: DijkstraTile) -> bool:
+        """
+        Determine whether the least cost of the
+        second tile could be updated while attempting
+        to move from the 1st tile to the 2nd tile.
+
+        :param cost_to_move: cost to move from 1st tile to 2nd tile
+        :param first_tile: tile player is moving from
+        :param second_tile: tile player is moving to
+        :return: True if the least cost of the 2nd tile could be updated, False otherwise.
+        """
+        if second_tile.least_cost > first_tile.least_cost + cost_to_move:
+            second_tile.least_cost = first_tile.least_cost + cost_to_move
+            return True
 
         return False
 

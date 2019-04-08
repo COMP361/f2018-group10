@@ -178,22 +178,14 @@ class MoveEvent(TurnEvent):
         else:
             return
 
-        cost_to_travel = 0
-        # Two separate cases depending on whether
-        # fireman is carrying a victim/hazmat or not.
-
-        # fireman is carrying a victim/hazmat
-        if isinstance(self.fireman.carrying_victim, VictimModel) or isinstance(self.fireman.carrying_hazmat, HazmatModel):
-            if second_tile.tile_model.space_status != SpaceStatusEnum.FIRE:
-                cost_to_travel = 2
-
-        # fireman is not carrying a victim/hazmat
+        if second_tile.tile_model.space_status != SpaceStatusEnum.FIRE:
+            # Can pass either Safe/Smoke to method
+            cost_to_travel = self._determine_cost_to_move(SpaceStatusEnum.SAFE)
         else:
-            if second_tile.tile_model.space_status != SpaceStatusEnum.FIRE:
-                cost_to_travel = 1
-            # fireman heading into fire and not leading a victim
-            elif second_tile.tile_model.space_status == SpaceStatusEnum.FIRE and not isinstance(self.fireman.leading_victim, VictimModel):
-                cost_to_travel = 2
+            if self._can_go_into_fire():
+                cost_to_travel = self._determine_cost_to_move(SpaceStatusEnum.FIRE)
+            else:
+                return
 
         # If it is cheaper to take this new way from
         # the first tile, change the least cost for
@@ -386,3 +378,50 @@ class MoveEvent(TurnEvent):
 
         else:
             self.fireman.ap = self.fireman.ap - pts_to_deduct
+
+    def _can_go_into_fire(self) -> bool:
+        """
+        Determines whether player can go
+        into fire. If the player is:
+        1. carrying a victim or
+        2. carrying a hazmat or
+        3. leading a victim or
+        4. is a doge
+        then he/she cannot go into the fire.
+
+        :return: True if player can go into this
+                fire space, False otherwise.
+        """
+        if isinstance(self.fireman.carrying_victim, VictimModel):
+            return False
+        if isinstance(self.fireman.carrying_hazmat, HazmatModel):
+            return False
+        if isinstance(self.fireman.leading_victim, VictimModel):
+            return False
+        if self.fireman.role == PlayerRoleEnum.DOGE:
+            return False
+
+        return True
+
+    def _determine_cost_to_move(self, space_status: SpaceStatusEnum) -> int:
+        """
+        Determine the cost to move
+        into a space depending on the
+        space status and player carrying
+        victim/hazmat.
+
+        :param space_status: status of the target space
+        :return: cost to move into that space
+        """
+        cost_to_move = 0
+        if space_status != SpaceStatusEnum.FIRE:
+            cost_to_move = 1
+            if isinstance(self.fireman.carrying_victim, VictimModel):
+                cost_to_move = 2
+            if isinstance(self.fireman.carrying_hazmat, HazmatModel):
+                cost_to_move = 2
+
+        else:
+            cost_to_move = 2
+
+        return cost_to_move
