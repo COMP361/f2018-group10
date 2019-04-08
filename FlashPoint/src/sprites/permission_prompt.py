@@ -16,16 +16,16 @@ class PermissionPrompt(object):
     """Prompt for the player deciding whether to allow to be commanded or not."""
 
     def __init__(self):
-        self.accept_button = RectButton(550-75, 310, 75, 50, Color.ORANGE, 0,
+        self.accept_button = RectButton(500-75, 310, 75, 50, Color.ORANGE, 0,
                                         Text(pygame.font.SysFont('Arial', 20), "Accept", Color.WHITE))
-        self.deny_button = RectButton(550+200, 310, 75, 50, Color.ORANGE, 0,
+        self.deny_button = RectButton(500+300, 310, 75, 50, Color.ORANGE, 0,
                                       Text(pygame.font.SysFont('Arial', 20), "Deny", Color.WHITE))
         self.accept_button.on_click(self._accept_on_click)
         self.deny_button.on_click(self._deny_on_click)
 
         self._source = None
         self._target = None
-        self.background = RectLabel(550, 300, 200, 75, Color.GREY, 0,
+        self.background = RectLabel(500, 300, 300, 75, Color.GREY, 0,
                                     Text(pygame.font.SysFont('Arial', 20), "Permission?", Color.WHITE))
 
         self._enabled = False

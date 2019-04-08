@@ -102,7 +102,6 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
         self._menu_btn = self._init_menu_button()
         self._chat_box = ChatBox(self._current_player)
 
-
         # Now add everything to the sprite group that needs to be added.
         self._init_active_sprites()
 
@@ -136,7 +135,6 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
                     hazmat_sprite = HazmatSprite(tile)
                     obj.add_observer(hazmat_sprite)
                     self._game_board_sprite.add(hazmat_sprite)
-
 
     def _init_controllers(self):
         """Instantiate all controllers."""
