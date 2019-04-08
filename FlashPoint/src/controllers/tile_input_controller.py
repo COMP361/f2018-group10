@@ -133,7 +133,8 @@ class TileInputController(GameStateObserver, Controller):
         pass
 
     def player_command(self, source: PlayerModel, target: PlayerModel):
-        pass
+        # Update the reachable tiles for the command
+        MoveController.instance().player_ap_changed(source.ap)
 
     @staticmethod
     def update(event_queue: EventQueue):
