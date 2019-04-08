@@ -8,6 +8,7 @@ class CustomEvent(object):
 
     Mostly used for switching scenes without causing circular imports.
     """
-    def __init__(self, type: Enum, **kwargs):
+    def __init__(self, type: Enum,*args, **kwargs):
+        self.args = args
         self.type = type
         self.__dict__.update(kwargs)
