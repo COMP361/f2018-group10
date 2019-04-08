@@ -73,7 +73,7 @@ class TileSprite(Interactable, TileObserver):
                                                        Color.ORANGE))
 
         self.resuscitate_button = RectButton(self.rect.x, self.rect.y, 120, 25, Color.BLACK, 0,
-                                              Text(pygame.font.SysFont('Arial', 15), "Resucasdjsa", Color.ORANGE))
+                                              Text(pygame.font.SysFont('Arial', 15), "Resuscitate", Color.ORANGE))
 
 
 
