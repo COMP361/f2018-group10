@@ -20,6 +20,7 @@ class SetInitialPOIExperiencedEvent(ActionEvent):
             self.seed = seed
 
         # Pick random location: roll dice
+        random.seed(self.seed)
         self.game: GameStateModel = GameStateModel.instance()
         self.game_board = self.game.game_board
         self.rand_nums = random.sample(range(len(self.game_board.poi_bank)), 3)
@@ -33,7 +34,6 @@ class SetInitialPOIExperiencedEvent(ActionEvent):
         :param kwargs:
         :return:
         """
-        random.seed(self.seed)
         logging.info("Executing Set Initial POI Experienced Event")
         locations = self._determine_locations()
         pois_to_remove = []

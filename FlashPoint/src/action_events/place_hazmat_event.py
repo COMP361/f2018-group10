@@ -28,6 +28,9 @@ class PlaceHazmatEvent(ActionEvent):
         else:
             self.seed = seed
 
+        # Pick random location: roll dice
+        random.seed(self.seed)
+
     def execute(self, *args, **kwargs):
         """
         Place hazmat on the game board, the number of hazmats are based on the selected game mode,
@@ -36,7 +39,6 @@ class PlaceHazmatEvent(ActionEvent):
         :param kwargs:
         :return:
         """
-        random.seed(self.seed)
         logger.info("Executing HazMat Placement Event")
         level = self.game.difficulty_level
 
