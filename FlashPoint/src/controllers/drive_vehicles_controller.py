@@ -56,7 +56,7 @@ class DriveVehiclesController(Controller):
         return row_match and column_match
 
     def _run_checks_drive_ambulance(self, tile_model: TileModel):
-        # Doge cannot drive vehicles
+        # Doge cannot drive ambulance
         if self._current_player.role == PlayerRoleEnum.DOGE:
             return False
 
@@ -71,6 +71,10 @@ class DriveVehiclesController(Controller):
         return True
 
     def _run_checks_drive_engine(self, tile_model: TileModel) -> bool:
+        # Doge cannot drive engine
+        if self._current_player.role == PlayerRoleEnum.DOGE:
+            return False
+
         if self._current_player != GameStateModel.instance().players_turn:
             return False
 
@@ -86,6 +90,10 @@ class DriveVehiclesController(Controller):
         return True
 
     def _run_checks_ride_vehicle(self, tile_model: TileModel, vehicle_type: str):
+        # Doge cannot ride vehicle
+        if self._current_player.role == PlayerRoleEnum.DOGE:
+            return False
+
         ambulance = GameStateModel.instance().game_board.ambulance
         engine = GameStateModel.instance().game_board.engine
 
@@ -93,6 +101,10 @@ class DriveVehiclesController(Controller):
         return self._player_is_in_vehicle_space(vehicle_type, tile_model) and not player_is_riding
 
     def _run_checks_dismount_vehicle(self, tile_model: TileModel, vehicle_type: str):
+        # Doge cannot dismount vehicle
+        if self._current_player.role == PlayerRoleEnum.DOGE:
+            return False
+
         game_board: GameBoardModel = GameStateModel.instance().game_board
         vehicle = game_board.ambulance if vehicle_type == "AMBULANCE" else game_board.engine
         player_is_riding = self._current_player in vehicle.passengers
