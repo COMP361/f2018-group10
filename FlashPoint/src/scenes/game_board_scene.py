@@ -339,10 +339,10 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
         self._command_notification.is_source = False
         self._command_notification.is_target = False
 
-        if source == self._current_player:
+        if source and source == self._current_player:
             self._command_notification.is_source = True
             self._notify_player_turn.end_btn_enabled = False
-        elif target == self._current_player:
+        elif target and target == self._current_player:
             self._command_notification.is_target = True
 
         if not source:
