@@ -17,7 +17,7 @@ from src.sprites.tile_sprite import TileSprite
 from src.sprites.wall_sprite import WallSprite
 
 
-class GridSprie(pygame.sprite.Group):
+class GridSprite(pygame.sprite.Group):
     """Class to Group Tile objects together, and implement Grid logic in to what will form the GameBoard."""
 
     def __init__(self, *sprites: pygame.sprite.Sprite,
