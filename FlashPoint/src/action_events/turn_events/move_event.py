@@ -106,7 +106,11 @@ class MoveEvent(TurnEvent):
     def __init__(self, dest: TileModel, moveable_tiles: List[TileModel]):
         super().__init__()
         game: GameStateModel = GameStateModel.instance()
-        self.fireman: PlayerModel = game.players_turn
+        # Check if player is commanding
+        if game.players_turn == game.command[0]:
+            self.fireman: PlayerModel = game.command[1]
+        else:
+            self.fireman: PlayerModel = game.players_turn
         self.source_tile = None
         self.destination = game.game_board.get_tile_at(dest.row, dest.column)
         self.moveable_tiles = []
@@ -135,7 +139,6 @@ class MoveEvent(TurnEvent):
                 self.source_tile.least_cost = 0
             if d_tile.tile_model.row == dest.row and d_tile.tile_model.column == dest.column:
                 self.destination = d_tile
-
 
     def execute(self):
         logger.info(f"Executing MoveEvent from ({self.fireman.row}, "

@@ -187,8 +187,6 @@ class GameStateModel(Model):
             self._players.append(player)
             self._notify_player_added(player)
 
-
-
     def get_player_by_ip(self, ip: str) -> PlayerModel:
         with GameStateModel.lock:
             matching_players = [player for player in self._players if player.ip == ip]
@@ -301,8 +299,6 @@ class GameStateModel(Model):
     def damage(self) -> int:
         with GameStateModel.lock:
             return self._damage
-
-
 
     @damage.setter
     def damage(self, damage: int):
