@@ -6,7 +6,7 @@ from threading import Thread
 from src.UIComponents.file_importer import FileImporter
 from src.action_events.knock_down_event import KnockDownEvent
 from src.action_events.replenish_poi_event import ReplenishPOIEvent
-from src.constants.enums.custom_event_enums import CustomEventEnum
+from src.constants.custom_event_enums import CustomEventEnum
 from src.core.custom_event import CustomEvent
 from src.core.event_queue import EventQueue
 from src.models.game_board.door_model import DoorModel

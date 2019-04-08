@@ -9,7 +9,7 @@ class KnockdownPrompt(object):
 
         self.image = pygame.Surface([400, 100])
         self.rect = self.image.get_rect()
-        self.rect.move_ip(480, 0)
+        self.rect.move_ip(480, 30)
         self.bg = pygame.image.load('media/GameHud/wood2.png')
 
         self.frame = pygame.image.load('media/GameHud/frame.png')

@@ -6,7 +6,7 @@ from threading import Thread
 import pygame
 import src.constants.color as Color
 from src.action_events.action_event import ActionEvent
-from src.constants.enums.custom_event_enums import CustomEventEnum
+from src.constants.custom_event_enums import CustomEventEnum
 from src.constants.state_enums import VictimStateEnum, GameKindEnum
 from src.core.custom_event import CustomEvent
 from src.core.event_queue import EventQueue

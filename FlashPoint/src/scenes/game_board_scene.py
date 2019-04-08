@@ -10,7 +10,6 @@ from src.action_events.fire_placement_event import FirePlacementEvent
 from src.action_events.set_initial_hotspot_event import SetInitialHotspotEvent
 from src.action_events.set_initial_poi_experienced_event import SetInitialPOIExperiencedEvent
 from src.constants.custom_event_enums import CustomEventEnum
-from src.constants.enums.custom_event_enums import CustomEventEnum
 from src.constants.state_enums import GameKindEnum, GameStateEnum, GameBoardTypeEnum
 from src.models.game_units.hazmat_model import HazmatModel
 from src.models.game_units.victim_model import VictimModel
@@ -253,10 +252,10 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
                 self._victim_saved_prompt.enabled = True
             elif event.type == CustomEventEnum.DISABLE_VICTIM_LOST_PROMPT:
                 self._victim_lost_prompt.enabled = False
-            elif event.type == CustomEventEnum.DISABLE_VICTIM_LOST_PROMPT:
+            elif event.type == CustomEventEnum.DISABLE_VICTIM_SAVED_PROMPT:
                 self._victim_saved_prompt.enabled = False
 
-            if event.type == CustomEventEnum.DODGE_PROMPT:
+            elif event.type == CustomEventEnum.DODGE_PROMPT:
                 self._dodge_prompt.enabled = True
 
     def ignore_area(self):

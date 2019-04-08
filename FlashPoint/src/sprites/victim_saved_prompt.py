@@ -9,7 +9,7 @@ class VictimSavedPrompt(object):
 
         self.image = pygame.Surface([400, 100])
         self.rect = self.image.get_rect()
-        self.rect.move_ip(480, 0)
+        self.rect.move_ip(480, 30)
         self.bg = pygame.image.load('media/GameHud/wood2.png')
 
         self.frame = pygame.image.load('media/GameHud/frame.png')
@@ -30,7 +30,7 @@ class VictimSavedPrompt(object):
     def draw(self,screen):
         if self.enabled:
             self.image.blit(self.bg, self.image.get_rect())
-            self.image.blit(self.text, self.text.get_rect().move((72,28)))
+            self.image.blit(self.text, self.text.get_rect().move((75,28)))
             self.image.blit(self.frame, self.image.get_rect())
 
             screen.blit(self.image,self.rect)
