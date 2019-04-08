@@ -386,16 +386,27 @@ class MoveEvent(TurnEvent):
         :param target_tile:
         :return: cost to move into target tile
         """
+        src_tile = self.game.game_board.get_tile_at(self.fireman.row, self.fireman.column)
+        movement_dirn = self._determine_movement_direction(src_tile, target_tile)
+        obstacle = src_tile.get_obstacle_in_direction(movement_dirn)
+        is_damaged_wall = isinstance(obstacle, WallModel) and obstacle.wall_status == WallStatusEnum.DAMAGED
+        is_doge = self.fireman.role == PlayerRoleEnum.DOGE
+
         space_status = target_tile.space_status
         cost_to_move = 1
         if space_status != SpaceStatusEnum.FIRE:
             if isinstance(self.fireman.carrying_victim, VictimModel):
                 # If a Doge drags a victim, it costs 4 AP.
-                if self.fireman.role == PlayerRoleEnum.DOGE:
+                if is_doge:
                     cost_to_move = 4
                 else:
                     cost_to_move = 2
+
             if isinstance(self.fireman.carrying_hazmat, HazmatModel):
+                cost_to_move = 2
+
+            # It takes the Doge 2 AP to squeeze through a damaged wall.
+            if is_doge and is_damaged_wall:
                 cost_to_move = 2
 
         else:
@@ -434,3 +445,18 @@ class MoveEvent(TurnEvent):
                 return True
 
         return False
+
+    def _determine_movement_direction(self, src_tile: TileModel, dest_tile: TileModel) -> str:
+        """
+        Determine the direction from the
+        source tile to the destination tile
+
+        :param src_tile:
+        :param dest_tile:
+        :return: string representation of movement direction
+        """
+        directions = ["North", "East", "West", "South"]
+        for dirn in directions:
+            nb_src_tile: TileModel = src_tile.get_tile_in_direction(dirn)
+            if nb_src_tile.row == dest_tile.row and nb_src_tile.column == dest_tile.column:
+                return dirn
