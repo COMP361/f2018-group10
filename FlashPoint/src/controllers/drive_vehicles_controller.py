@@ -2,7 +2,7 @@ from src.UIComponents.interactable import Interactable
 from src.action_events.turn_events.dismount_vehicle_event import DismountVehicleEvent
 from src.action_events.turn_events.drive_ambulance_event import DriveAmbulanceEvent
 from src.action_events.turn_events.ride_vehicle_event import RideVehicleEvent
-from src.constants.state_enums import SpaceKindEnum
+from src.constants.state_enums import SpaceKindEnum, PlayerRoleEnum
 from src.controllers.controller import Controller
 from src.core.networking import Networking
 from src.models.game_board.game_board_model import GameBoardModel
@@ -56,6 +56,10 @@ class DriveVehiclesController(Controller):
         return row_match and column_match
 
     def _run_checks_drive_ambulance(self, tile_model: TileModel):
+        # Doge cannot drive vehicles
+        if self._current_player.role == PlayerRoleEnum.DOGE:
+            return False
+
         if self._current_player != GameStateModel.instance().players_turn:
             return False
 
