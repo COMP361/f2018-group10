@@ -14,21 +14,11 @@ class ChopEvent(TurnEvent):
     def __init__(self, wall: WallModel):
         super().__init__()
         game: GameStateModel = GameStateModel.instance()
-        # Check if player is commanding
-        if game.players_turn == game.command[0]:
-            self.source: PlayerModel = game.command[0]
-            self.player: PlayerModel = game.command[1]
-        else:
-            self.source = None
-            self.player: PlayerModel = game.players_turn
+        self.player: PlayerModel = game.players_turn
         self.wall = game.game_board.get_tile_at(wall.id[0], wall.id[1]).get_obstacle_in_direction(wall.id[2])
 
     def execute(self):
-        if self.source:
-            player = self.source
-        else:
-            player = self.player
-
+        player = self.player
         logger.info("Executing Chop Event")
         GameStateModel.lock.acquire()
         game: GameStateModel = GameStateModel.instance()
