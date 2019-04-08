@@ -28,9 +28,6 @@ class PlaceHazmatEvent(ActionEvent):
         else:
             self.seed = seed
 
-        # Pick random location: roll dice
-        random.seed(self.seed)
-
     def execute(self, *args, **kwargs):
         """
         Place hazmat on the game board, the number of hazmats are based on the selected game mode,
@@ -53,6 +50,8 @@ class PlaceHazmatEvent(ActionEvent):
 
     def place_hazmat(self, hazmat_to_place: int):
         while hazmat_to_place > 0:
+            # Pick random location: roll dice
+            random.seed(self.seed)
             new_haz_row = self.game.roll_red_dice()
             new_haz_column = self.game.roll_black_dice()
             tile = self.board.get_tile_at(new_haz_row, new_haz_column)
