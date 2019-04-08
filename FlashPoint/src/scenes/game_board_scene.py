@@ -98,7 +98,6 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
         self._menu_btn = self._init_menu_button()
         self._chat_box = ChatBox(self._current_player)
 
-
         # Now add everything to the sprite group that needs to be added.
         self._init_active_sprites()
 
