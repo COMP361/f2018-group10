@@ -84,15 +84,9 @@ class LobbyScene(GameStateObserver):
 
     def set_ready(self):
         """Set the status of the current player to ready."""
-        box_size = (130,48)
         if not self.isReady:
             self.isReady = True
-            self.sprite_grp.remove(self.start_button)
-            self.start_button = RectButton(1050, 575, box_size[0], box_size[1], Color.GREY, 0,
-                                           Text(pygame.font.SysFont('Agency FB', 20), "Start", Color.GREEN))
-            self.start_button.change_bg_image('media/GameHud/wood2.png')
-            self.start_button.add_frame('media/GameHud/frame.png')
-            self.sprite_grp.add(self.start_button)
+            self.buttonReady.change_color(Color.STANDARDBTN)
             self._current_player.status = PlayerStatusEnum.READY
             event = ReadyEvent(self._current_player, True)
 
@@ -103,12 +97,7 @@ class LobbyScene(GameStateObserver):
                 Networking.get_instance().send_to_server(event)
         else:
             self.isReady = False
-            self.sprite_grp.remove(self.start_button)
-            self.start_button = RectButton(1050, 575, box_size[0], box_size[1], Color.GREY, 0,
-                                           Text(pygame.font.SysFont('Agency FB', 20), "Start", Color.GREEN))
-            self.start_button.change_bg_image('media/GameHud/wood2.png')
-            self.start_button.add_frame('media/GameHud/frame.png')
-            self.sprite_grp.add(self.start_button)
+            self.buttonReady.change_color(Color.GREY)
             self._current_player.status = PlayerStatusEnum.NOT_READY
             event = ReadyEvent(self._current_player, False)
             if self._current_player.ip == GameStateModel.instance().host.ip:
@@ -148,8 +137,6 @@ class LobbyScene(GameStateObserver):
         box_size = (130, 48)
         self.start_button = RectButton(1050, 575, box_size[0], box_size[1], Color.GREY, 0,
                                        Text(pygame.font.SysFont('Agency FB', 20), "Start", Color.GREY))
-        self.start_button.change_bg_image('media/GameHud/wood2.png')
-        self.start_button.add_frame('media/GameHud/frame.png')
         self.sprite_grp.add(self.start_button)
 
     def _init_background(self):
