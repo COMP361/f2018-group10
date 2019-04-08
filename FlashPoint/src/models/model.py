@@ -17,6 +17,10 @@ class Model(ABC):
     def observers(self) -> List[Observer]:
         return self._observers
 
+    @observers.setter
+    def observers(self,list:List[Observer]):
+        self._observers = list
+
     def add_observer(self, obs: Observer):
         self._observers.append(obs)
 

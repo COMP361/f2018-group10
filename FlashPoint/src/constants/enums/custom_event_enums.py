@@ -1,7 +1,6 @@
 from enum import Enum,auto
 
 class CustomEventEnum(Enum):
-    DODGE_PROMPT = auto()
     ENABLE_KNOCKDOWN_PROMPT = auto()
     DISABLE_KNOCKDOWN_PROMPT = auto()
     ENABLE_VICTIM_LOST_PROMPT = auto()

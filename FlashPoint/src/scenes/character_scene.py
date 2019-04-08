@@ -136,20 +136,25 @@ class CharacterScene(Scene):
     def _init_btn_back(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
         box_size = (130, 48)
         self.buttonBack = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
-                                     Text(pygame.font.SysFont('Arial', 20), text, color_text))
+                                     Text(pygame.font.SysFont('Agency FB', 25), text, Color.GREEN2))
+        self.buttonBack.change_bg_image('media/GameHud/wood2.png')
+        self.buttonBack.add_frame('media/GameHud/frame.png')
         self.sprite_grp.add(self.buttonBack)
 
     def _init_title_text(self):
         box_size = (400, 50)
         self.text_title = RectButton(400, 60, box_size[0], box_size[1], Color.BLACK, 0,
-                                     Text(pygame.font.SysFont('Arial', 35), "Character Selection", Color.WHITE))
-
+                                     Text(pygame.font.SysFont('Agency FB', 35), "Character Selection", Color.GREEN2))
+        self.text_title.change_bg_image('media/GameHud/wood2.png')
+        self.text_title.add_frame('media/GameHud/frame.png')
         self.sprite_grp.add(self.text_title)
 
     def _init_btn_confirm(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
         box_size = (130, 48)
         self.buttonConfirm = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
-                                        Text(pygame.font.SysFont('Arial', 20), text, color_text))
+                                        Text(pygame.font.SysFont('Arial', 25), text, Color.GREEN2))
+        self.buttonConfirm.change_bg_image('media/GameHud/wood2.png')
+        self.buttonConfirm.add_frame('media/GameHud/frame.png')
         self.sprite_grp.add(self.buttonConfirm)
 
     def create_label(self, x_pos: int, y_pos: int, width: int, height: int, count: int):
@@ -162,9 +167,13 @@ class CharacterScene(Scene):
             accept = False
 
         if not accept:
-            return RectLabel(x_pos - 15, y_pos - 15, width + 30, height + 30, Color.RED)
+            label =  RectLabel(x_pos - 15, y_pos - 15, width + 30, height + 30, Color.RED)
+            label.change_bg_image('media/GameHud/wood2.png')
+            return label
         else:
-            return RectLabel(x_pos - 15, y_pos - 15, width + 30, height + 30, Color.GREEN)
+            label =  RectLabel(x_pos - 15, y_pos - 15, width + 30, height + 30, Color.GREEN)
+            label.change_bg_image('media/GameHud/wood2.png')
+            return label
 
     def set_color(self, sprite: pygame.sprite.Sprite, i: int=0, enum:PlayerRoleEnum=None):
         accept = True
@@ -173,11 +182,14 @@ class CharacterScene(Scene):
             accept = False
         if isinstance(sprite, RectLabel):
             if accept:
-                sprite.change_color(Color.GREEN)
+                #sprite.change_color(Color.GREEN)
+                pygame.draw.rect(sprite.image, Color.GREEN, [0, 0, 130, 180], 7)
             else:
-                sprite.change_color(Color.RED)
+                #sprite.change_color(Color.RED)
+                pygame.draw.rect(sprite.image, Color.RED, [0, 0, 130, 180], 7)
             if self.character_enum == role:
-                sprite.change_color(Color.WHITE)
+                #sprite.change_color(Color.WHITE)
+                pygame.draw.rect(sprite.image, Color.WHITE, [0, 0, 130, 180], 7)
 
     def click_img(self, btn, enum: PlayerRoleEnum):
         self.character_enum = enum

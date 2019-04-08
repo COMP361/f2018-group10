@@ -64,3 +64,6 @@ class PlayerSprite(pygame.sprite.Sprite, PlayerObserver):
 
     def choose_starting_location(self):
         pass
+
+    def player_role_changed(self, role: PlayerRoleEnum):
+        pass
