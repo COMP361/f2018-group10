@@ -35,9 +35,10 @@ class ReplenishPOIEvent(ActionEvent):
         return True
 
     def execute(self):
+        logger.info("Executing ReplenishPOIEvent")
         self.game: GameStateModel = GameStateModel.instance()
         self.board = self.game.game_board
-        logger.info("Executing ReplenishPOIEvent")
+        
         if not self.check():
             logger.info("There are more than 3 poi's active, don't need to replenish.")
             return

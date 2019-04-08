@@ -1,12 +1,15 @@
 import logging
 
 from src.action_events.turn_events.turn_event import TurnEvent
+from src.constants.state_enums import VictimStateEnum
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.hazmat_model import HazmatModel
+from src.models.game_units.victim_model import VictimModel
 
 logger = logging.getLogger("FlashPoint")
 
-class RemoveHazmatEvent(TurnEvent):
+
+class ResuscitateEvent(TurnEvent):
 
     def __init__(self, row: int, column: int):
         super().__init__()
@@ -16,14 +19,15 @@ class RemoveHazmatEvent(TurnEvent):
         self.current_player = game.players_turn
 
     def execute(self):
-        logger.info("Executing Remove Hazmat Event")
+        logger.info("Executing Resuscitate Event")
         self.game: GameStateModel = GameStateModel.instance()
         self.game_board = self.game.game_board
         tile_model = self.game_board.get_tile_at(self.row, self.column)
         for model in tile_model.associated_models:
-            if isinstance(model, HazmatModel):
-                tile_model.remove_associated_model(model)
-                logger.info(f"Hazmat at: ({tile_model.row}, {tile_model.column}) removed.")
+            if isinstance(model, VictimModel):
+                model.state = VictimStateEnum.TREATED
+
+                logger.info(f"Victim at: ({tile_model.row}, {tile_model.column}) treated.")
                 break
 
-        self.current_player.ap = self.current_player.ap - 2
+        self.current_player.ap = self.current_player.ap - 1

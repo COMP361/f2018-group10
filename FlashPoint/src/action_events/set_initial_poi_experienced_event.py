@@ -32,9 +32,10 @@ class SetInitialPOIExperiencedEvent(ActionEvent):
         :param kwargs:
         :return:
         """
+        logging.info("Executing Set Initial POI Experienced Event")
         self.game: GameStateModel = GameStateModel.instance()
         self.game_board = self.game.game_board
-        logging.info("Executing Set Initial POI Experienced Event")
+        
         locations = self._determine_locations()
         pois_to_remove = []
         for i, index in enumerate(self.rand_nums):

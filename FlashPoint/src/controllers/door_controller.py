@@ -11,7 +11,7 @@ from src.models.game_board.door_model import DoorModel
 from src.sprites.door_sprite import DoorSprite
 from src.sprites.game_board import GameBoard
 from src.models.game_units.player_model import PlayerModel
-from src.constants.state_enums import GameStateEnum, DoorStatusEnum
+from src.constants.state_enums import GameStateEnum, DoorStatusEnum, PlayerRoleEnum
 from src.models.game_state_model import GameStateModel
 
 
@@ -33,6 +33,10 @@ class DoorController(object):
         return cls._instance
 
     def check(self, door_model: DoorModel) -> bool:
+        # Doge cannot open/close doors
+        if self.current_player.role == PlayerRoleEnum.DOGE:
+            return False
+
         valid_to_open_close = TurnEvent.has_required_AP(self.current_player.ap, 1)
         if not valid_to_open_close:
             return False

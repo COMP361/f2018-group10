@@ -28,6 +28,7 @@ from src.action_events.turn_events.extinguish_event import ExtinguishEvent
 from src.action_events.turn_events.move_event import MoveEvent
 from src.action_events.turn_events.pick_up_victim_event import PickupVictimEvent
 from src.action_events.turn_events.open_door_event import OpenDoorEvent
+from src.action_events.turn_events.resuscitate_victim_event import ResuscitateEvent
 from src.action_events.turn_events.ride_vehicle_event import RideVehicleEvent
 from src.action_events.turn_events.stop_leading_victim_event import StopLeadingVictimEvent
 from src.action_events.vehicle_placed_event import VehiclePlacedEvent
@@ -398,6 +399,11 @@ class JSONSerializer(object):
         return event
 
     @staticmethod
+    def _deserialize_resuscitate_event(payload: Dict) -> RemoveHazmatEvent:
+        event = ResuscitateEvent(payload['row'], payload['column'])
+        return event
+
+    @staticmethod
     def _deserialize_fire_placement_event(payload: Dict) -> FirePlacementEvent:
         seed = payload['seed']
         return FirePlacementEvent(seed)
@@ -513,6 +519,8 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_choose_character_event(payload)
         elif object_type == RemoveHazmatEvent.__name__:
             return JSONSerializer._deserialize_remove_hazmat_event(payload)
+        elif object_type == ResuscitateEvent.__name__:
+            return JSONSerializer._deserialize_resuscitate_event(payload)
         elif object_type == FirePlacementEvent.__name__:
             return JSONSerializer._deserialize_fire_placement_event(payload)
         elif object_type == SetInitialHotspotEvent.__name__:

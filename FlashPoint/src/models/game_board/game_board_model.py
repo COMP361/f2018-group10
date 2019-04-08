@@ -33,6 +33,7 @@ class GameBoardModel(Model):
         self._ambulance_spots = []
         self._engine_spots = []
         self._board_type = board_type
+        logger.info("Game board type: {bt}".format(bt=board_type))
 
         self._board_info = board_info
 

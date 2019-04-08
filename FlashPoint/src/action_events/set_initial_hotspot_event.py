@@ -42,9 +42,10 @@ class SetInitialHotspotEvent(ActionEvent):
         # even if 0 hotspots are to be placed
         # since the hotspot bank has to be set
         # at the end.
+        logger.info("Executing Set Initial Hot Spot Event")
         self.game: GameStateModel = GameStateModel.instance()
         self.game_board: GameBoardModel = self.game.game_board
-        logger.info("Executing Set Initial Hot Spot Event")
+
         self._determine_num_to_place()
         logger.info("{h} hotspots have to be placed".format(h=self.num_hotspots_to_place))
         num_placed = 0
