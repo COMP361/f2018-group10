@@ -30,7 +30,7 @@ class CommandNotification(object):
 
     def _init_end_command_btn(self):
         # End command button
-        self._end_command_btn = RectButton(1130, 350, 150, 50, background=Color.ORANGE,
+        self._end_command_btn = RectButton(1080, 450, 200, 50, background=Color.ORANGE,
                                            txt_obj=Text(pygame.font.SysFont('Arial', 23), "END COMMAND", Color.GREEN2))
         self._end_command_btn.change_bg_image('media/GameHud/wood2.png')
         self._end_command_btn.add_frame('media/GameHud/frame.png')
