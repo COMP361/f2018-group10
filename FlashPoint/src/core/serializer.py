@@ -456,7 +456,7 @@ class JSONSerializer(object):
 
     @staticmethod
     def _deserialize_random_board_event(payload: Dict) -> RandomBoardSetupEvent:
-        return RandomBoardSetupEvent(json.loads(payload['_board_info']))
+        return RandomBoardSetupEvent(payload['_board_info'])
 
     @staticmethod
     def deserialize(payload: Dict) -> object:
