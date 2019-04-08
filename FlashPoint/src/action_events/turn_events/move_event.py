@@ -417,7 +417,11 @@ class MoveEvent(TurnEvent):
         if space_status != SpaceStatusEnum.FIRE:
             cost_to_move = 1
             if isinstance(self.fireman.carrying_victim, VictimModel):
-                cost_to_move = 2
+                # If a Doge drags a victim, it costs 4 AP.
+                if self.fireman.role == PlayerRoleEnum.DOGE:
+                    cost_to_move = 4
+                else:
+                    cost_to_move = 2
             if isinstance(self.fireman.carrying_hazmat, HazmatModel):
                 cost_to_move = 2
 

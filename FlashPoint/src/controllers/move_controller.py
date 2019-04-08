@@ -220,7 +220,10 @@ class MoveController(PlayerObserver, Controller):
         if space_status != SpaceStatusEnum.FIRE:
             cost_to_move = 1
             if isinstance(self.current_player.carrying_victim, VictimModel):
-                cost_to_move = 2
+                if self.current_player.role == PlayerRoleEnum.DOGE:
+                    cost_to_move = 4
+                else:
+                    cost_to_move = 2
             if isinstance(self.current_player.carrying_hazmat, HazmatModel):
                 cost_to_move = 2
 
