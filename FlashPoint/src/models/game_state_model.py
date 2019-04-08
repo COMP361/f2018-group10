@@ -31,9 +31,9 @@ class GameStateModel(Model):
                  board_type: GameBoardTypeEnum,
                  difficulty: DifficultyLevelEnum = None
                  ):
-        logger.info("Initializing game state...")
 
         if not GameStateModel._instance:
+            logger.info("Initializing game state...")
             super().__init__()
             self._host = host
             self._max_desired_players = num_players
@@ -53,7 +53,6 @@ class GameStateModel(Model):
             self._chat_history = []
             self._dodge_reply = False
             self._state = GameStateEnum.READY_TO_JOIN
-            s = f"{self._host.row}, {self._host.column}"
             GameStateModel._instance = self
         else:
             raise Exception("GameStateModel is a Singleton")
@@ -61,7 +60,6 @@ class GameStateModel(Model):
     # def notify_all_observers(self):
     #     self._notify_state()
     #     self._game_board.notify_all_observers()
-
 
     def _notify_player_added(self, player: PlayerModel):
         for obs in self._observers:
@@ -80,8 +78,9 @@ class GameStateModel(Model):
             obs.notify_game_state(self._state)
 
     @staticmethod
-    def __del__():
+    def destroy():
         GameStateModel._instance = None
+        logger.info("GameStateModel deleted")
         if os.path.exists("media/board_layouts/random_inside_walls.json"):
             os.rmdir("media/board_layouts/random_inside_walls.json")
 
@@ -121,7 +120,7 @@ class GameStateModel(Model):
     def board_type(self, board_type: GameBoardTypeEnum):
         with GameStateModel.lock:
             self._board_type = board_type
-            if board_type != GameBoardTypeEnum.LOADED:
+            if not self.game_board.is_loaded:
                 self._game_board = GameBoardModel(board_type)
 
     @property

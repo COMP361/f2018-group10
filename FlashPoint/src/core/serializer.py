@@ -4,12 +4,13 @@ import json
 from typing import Dict, List
 import logging
 
-
+from src.action_events.board_setup_event import BoardSetupEvent
 from src.action_events.disconnect_event import DisconnectEvent
 from src.action_events.dodge_reply_event import DodgeReplyEvent
 from src.action_events.end_game_event import EndGameEvent
 from src.action_events.fire_placement_event import FirePlacementEvent
 from src.action_events.choose_character_event import ChooseCharacterEvent
+from src.action_events.random_board_setup_event import RandomBoardSetupEvent
 from src.action_events.turn_events.drop_hazmat_event import DropHazmatEvent
 from src.action_events.turn_events.lead_victim_event import LeadVictimEvent
 from src.action_events.turn_events.pick_up_hazmat_event import PickupHazmatEvent
@@ -56,7 +57,6 @@ from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 from src.sprites.game_board import GameBoard
 from src.sprites.hazmat_sprite import HazmatSprite
-from src.sprites.poi_sprite import POISprite
 
 logger = logging.getLogger("FlashPoint")
 
@@ -108,13 +108,16 @@ class JSONSerializer(object):
         for hazmat in picked_up_hazmats:
             tile = game.game_board.get_tile_at(hazmat.row, hazmat.column)
             tile.add_associated_model(hazmat)
-            GameBoard.instance().add(HazmatSprite(tile))
 
     @staticmethod
     def _restore_carried_victims(game: GameStateModel):
         """Helper for restoring GameBoardModel"""
         picked_up_victims = [player.carrying_victim for player in game.players
                              if not isinstance(player.carrying_victim, NullModel)]
+        for victim in picked_up_victims:
+            tile = game.game_board.get_tile_at(victim.row, victim.column)
+            tile.add_associated_model(victim)
+            game.game_board.active_pois.append(victim)
 
     @staticmethod
     def _restore_tile_state(game: GameStateModel, payload: Dict):
@@ -130,6 +133,8 @@ class JSONSerializer(object):
                 for assoc_model_dict in tile_dict['_associated_models']:
                     model: Model = JSONSerializer.deserialize(assoc_model_dict)
                     tile.add_associated_model(model)
+                    if isinstance(model, VictimModel) or isinstance(model, POIModel):
+                        game.game_board.active_pois.append(model)
 
     @staticmethod
     def _restore_wall_and_door_states(game: GameStateModel, payload: Dict):
@@ -176,14 +181,6 @@ class JSONSerializer(object):
         game.game_board.engine_spots = e_spots
 
     @staticmethod
-    def _restore_active_pois(game: GameStateModel, payload: Dict):
-        active_poi_dict = payload['_active_pois']
-        active = []
-        for poi_dict in active_poi_dict:
-            active.append(JSONSerializer.deserialize(poi_dict))
-        game.game_board.active_pois = active
-
-    @staticmethod
     def _restore_poi_bank(game: GameStateModel, payload: Dict):
         poi_bank_dict = payload['_poi_bank']
 
@@ -203,10 +200,8 @@ class JSONSerializer(object):
         JSONSerializer._restore_tile_state(game, payload)
         JSONSerializer._restore_parking_spots(game, payload) # Might not be necessary but oh well.
         JSONSerializer._restore_wall_and_door_states(game, payload)
-        JSONSerializer._restore_active_pois(game, payload)
         JSONSerializer._restore_poi_bank(game, payload)
         game.game_board.hotspot_bank = payload['_hotspot_bank']
-        game.board_type = GameBoardTypeEnum.LOADED
 
     @staticmethod
     def _deserialize_player(payload: Dict) -> PlayerModel:
@@ -428,21 +423,6 @@ class JSONSerializer(object):
         return event
 
     @staticmethod
-    def _deserialize_fire_placement_event(payload: Dict) -> FirePlacementEvent:
-        seed = payload['seed']
-        return FirePlacementEvent(seed)
-
-    @staticmethod
-    def _deserialize_set_initial_hotspot_event(payload: Dict) -> SetInitialHotspotEvent:
-        seed = payload['seed']
-        return SetInitialHotspotEvent(seed)
-
-    @staticmethod
-    def _deserialize_set_initial_poi_experienced_event(payload: Dict) -> SetInitialPOIExperiencedEvent:
-        seed = payload['seed']
-        return SetInitialPOIExperiencedEvent(seed)
-
-    @staticmethod
     def _deserialize_dismount_vehicle_event(payload: Dict) -> DismountVehicleEvent:
         return DismountVehicleEvent(payload['_vehicle_type'], player_index=payload['_player_index'])
 
@@ -458,6 +438,10 @@ class JSONSerializer(object):
     @staticmethod
     def _deserialize_dodge_reply(payload: Dict) -> DodgeReplyEvent:
         return DodgeReplyEvent(payload['_reply'])
+
+    @staticmethod
+    def _deserialize_random_board_event(payload: Dict) -> RandomBoardSetupEvent:
+        return RandomBoardSetupEvent(payload['_board_info'])
 
     @staticmethod
     def deserialize(payload: Dict) -> object:
@@ -559,14 +543,12 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_remove_hazmat_event(payload)
         elif object_type == ResuscitateEvent.__name__:
             return JSONSerializer._deserialize_resuscitate_event(payload)
-        elif object_type == FirePlacementEvent.__name__:
-            return JSONSerializer._deserialize_fire_placement_event(payload)
-        elif object_type == SetInitialHotspotEvent.__name__:
-            return JSONSerializer._deserialize_set_initial_hotspot_event(payload)
-        elif object_type == SetInitialPOIExperiencedEvent.__name__:
-            return JSONSerializer._deserialize_set_initial_poi_experienced_event(payload)
         elif object_type == DodgeReplyEvent.__name__:
             return JSONSerializer._deserialize_dodge_reply(payload)
+        elif object_type == RandomBoardSetupEvent.__name__:
+            return JSONSerializer._deserialize_random_board_event(payload)
+        elif object_type == BoardSetupEvent.__name__:
+            return BoardSetupEvent(payload['seed'])
         elif object_type == NullModel.__name__:
             return NullModel()
 

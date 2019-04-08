@@ -31,11 +31,11 @@ class Main(object):
 
         # Run main loop
         # FileImporter.play_music("media/music/intro_music/Kontrabandz-Get Down-kissvk.com.mp3", -1)
-      #  FileImporter.play_music("media/music/Get_Down.wav", -1)
+        #  FileImporter.play_music("media/music/Get_Down.wav", -1)
 
-        try:
-            while True:
-                # Lock frame rate at 60 FPS
+        while True:
+            # Lock frame rate at 60 FPS
+            try:
                 self.clock.tick(60)
                 EventQueue.fill_queue()
                 self.screen.fill(Color.BLACK)
@@ -55,10 +55,10 @@ class Main(object):
                 EventQueue.flush_queue()
 
                 pygame.display.flip()
-        except Exception as e:
-            info = sys.exc_info()
-            logger.error("Exception was raised! Continuing, even though we might be screwed.")
-            traceback.print_exception(*info)
+            except Exception as e:
+                info = sys.exc_info()
+                logger.error("Exception was raised! Continuing, even though we might be screwed.")
+                traceback.print_exception(*info)
 
 
 if __name__ == '__main__':

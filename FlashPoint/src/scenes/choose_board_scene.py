@@ -71,7 +71,7 @@ class ChooseBoardScene(object):
         self.button_board3 = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
                                         Text(pygame.font.SysFont('Agency FB', 25), text, color_text))
 
-        #self.button_board3.on_click(self.set_and_continue, GameBoardTypeEnum.ALTERNATIVE)
+        self.button_board3.on_click(self.set_and_continue, GameBoardTypeEnum.RANDOM)
         self.button_board3.change_bg_image('media/GameHud/wood2.png')
         self.button_board3.add_frame('media/GameHud/frame.png')
         self.sprite_grp.add(self.button_board3)
@@ -87,7 +87,7 @@ class ChooseBoardScene(object):
 
     @staticmethod
     def destroy_game_and_back():
-        GameStateModel.instance().__del__()
+        GameStateModel.instance().destroy()
         EventQueue.post(CustomEvent(ChangeSceneEnum.CREATEGAMEMENU))
 
     @staticmethod

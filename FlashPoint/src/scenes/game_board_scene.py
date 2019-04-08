@@ -6,6 +6,7 @@ from typing import List
 
 import pygame
 
+from src.action_events.board_setup_event import BoardSetupEvent
 from src.action_events.fire_placement_event import FirePlacementEvent
 from src.action_events.set_initial_hotspot_event import SetInitialHotspotEvent
 from src.action_events.set_initial_poi_experienced_event import SetInitialPOIExperiencedEvent
@@ -80,7 +81,7 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
         self._init_controllers()
 
         # Send initialization events
-        if self._game.board_type != GameBoardTypeEnum.LOADED:
+        if not self._game.game_board.is_loaded:
             self._send_game_board_initialize()
         else:
             self._init_loaded_sprites()
@@ -97,7 +98,6 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
         self._game_board_sprite = GameBoard(self._current_player)
         self._menu_btn = self._init_menu_button()
         self._chat_box = ChatBox(self._current_player)
-
 
         # Now add everything to the sprite group that needs to be added.
         self._init_active_sprites()
@@ -131,6 +131,7 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
                 if isinstance(obj, HazmatModel):
                     self._game_board_sprite.add(HazmatSprite(tile))
 
+
     def _init_controllers(self):
         """Instantiate all controllers."""
         ChopController(self._current_player)
@@ -147,14 +148,7 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
     def _send_game_board_initialize(self):
         """Send any game board initialization events."""
         if Networking.get_instance().is_host:
-            Networking.get_instance().send_to_all_client(FirePlacementEvent())
-
-            if self._game.rules == GameKindEnum.EXPERIENCED:
-                Networking.get_instance().send_to_all_client(SetInitialPOIExperiencedEvent())
-                Networking.get_instance().send_to_all_client(PlaceHazmatEvent())
-                Networking.get_instance().send_to_all_client(SetInitialHotspotEvent())
-            else:
-                Networking.get_instance().send_to_all_client(SetInitialPOIFamilyEvent())
+            Networking.get_instance().send_to_all_client(BoardSetupEvent())
 
         for player in self._game.players:
             player.set_initial_ap(self._game.rules)
