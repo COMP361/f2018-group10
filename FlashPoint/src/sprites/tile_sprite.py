@@ -43,6 +43,14 @@ class TileSprite(Interactable, TileObserver):
         self.fire_deck_gun_image = image.copy()
         self.fire_deck_gun_image.blit(pygame.image.load('media/all_markers/water_splash.png'), (0, 0, 128, 128))
         self.fire_deck_gun_image.get_rect().move_ip(x_offset, y_offset)
+
+
+        self.poi_placed = False
+        self.poi_placed_image = image.copy()
+        self.poi_placed_image.blit(pygame.image.load('media/all_markers/poi128.png'), (0, 0, 128, 128))
+        self.poi_placed_image.get_rect().move_ip(x_offset, y_offset)
+
+
         # Initialize if place is Fire, Smoke or Safe
         tile = GameStateModel.instance().game_board.get_tile_at(row, column)
         status = tile.space_status
@@ -188,18 +196,28 @@ class TileSprite(Interactable, TileObserver):
         self._mouse_pos = current_mouse_pos
 
     def draw(self, screen: pygame.Surface):
+
         if self.explosion:
             screen.blit(self.explosion_image, self.rect)
             self.counter -= 1
             if self.counter == 0:
                 self.explosion = False
                 self.counter = 80
+                screen.blit(self.image, self.rect)
         elif self.fire_deck_gun:
             screen.blit(self.fire_deck_gun_image,self.rect)
-            self.counter =- 1
+            self.counter -= 1
             if self.counter == 0:
-                self.fire_deck_gun = True
+                self.fire_deck_gun = False
                 self.counter = 80
+                screen.blit(self.image, self.rect)
+        elif self.poi_placed:
+            screen.blit(self.poi_placed_image, self.rect)
+            self.counter -= 1
+            if self.counter == 0:
+                self.poi_placed = False
+                self.counter = 80
+                screen.blit(self.image, self.rect)
         else:
             self._draw_hightlight()
             screen.blit(self.image, self.rect)
@@ -318,4 +336,4 @@ class TileSprite(Interactable, TileObserver):
         self._non_highlight_image.blit(new_surf, (0, 0))
 
     def tile_assoc_models_changed(self, assoc_models: List[Model]):
-        pass
+        self.poi_placed = True
