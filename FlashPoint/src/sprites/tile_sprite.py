@@ -1,3 +1,5 @@
+import time
+from threading import Thread
 from typing import Tuple, List
 
 import pygame
@@ -29,7 +31,12 @@ class TileSprite(Interactable, TileObserver):
         self._smoke_image = smoke_image
         self._non_highlight_image = image.copy()
         self._blank_image = image.copy()
+        self.explosion = False
+        self.explosion_counter = 100
+        self.explosion_image = image.copy()
+        self.explosion_image.blit(pygame.image.load('media/all_markers/explosian.png'), (0, 0, 128, 128))
 
+        self.explosion_image.get_rect().move_ip(x_offset,y_offset)
         # Initialize if place is Fire, Smoke or Safe
         tile = GameStateModel.instance().game_board.get_tile_at(row, column)
         status = tile.space_status
@@ -175,8 +182,15 @@ class TileSprite(Interactable, TileObserver):
         self._mouse_pos = current_mouse_pos
 
     def draw(self, screen: pygame.Surface):
-        self._draw_hightlight()
-        screen.blit(self.image, self.rect)
+        if self.explosion:
+            screen.blit(self.explosion_image, self.rect)
+            self.explosion_counter -= 1
+            if self.explosion_counter == 0:
+                self.explosion = False
+                self.explosion_counter = 100
+        else:
+            self._draw_hightlight()
+            screen.blit(self.image, self.rect)
 
     def draw_menu(self, screen: pygame.Surface):
         offset = 0
@@ -266,6 +280,10 @@ class TileSprite(Interactable, TileObserver):
         if self.is_clicked():
             self.click()
 
+
+
+
+
     def tile_status_changed(self, status: SpaceStatusEnum, is_hotspot: bool):
         new_surf = pygame.Surface([self._non_highlight_image.get_width(), self._non_highlight_image.get_height()])
         self._non_highlight_image = self._blank_image.copy()
@@ -279,6 +297,7 @@ class TileSprite(Interactable, TileObserver):
         elif status == SpaceStatusEnum.SMOKE:
             image_file = FileImporter.import_image("media/All Markers/smoke.png")
             new_surf.blit(image_file, (0, 0))
+
 
         if is_hotspot:
             hs_img = FileImporter.import_image("media/all_markers/hot_spot.png")

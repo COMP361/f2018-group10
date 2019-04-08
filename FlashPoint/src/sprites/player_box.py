@@ -23,14 +23,20 @@ class PlayerBox(PlayerObserver):
         self.background = RectLabel(self.background_position[0], self.background_position[1],
                                     self.background_position[2],
                                     self.background_position[3],
-                                    self.get_path_from_character_enum(self._assoc_player.role))
+                                    )
+        self.background.change_bg_image('media/GameHud/wood2.png')
+        self.background.add_frame(self.get_path_from_character_enum(self._assoc_player.role))
+        self.background.add_frame('media/GameHud/frame.png')
+
 
     def _init_text_box(self, color: Color):
 
         box_size = (self.txt_pos[2], self.txt_pos[3])
 
         user_box = RectLabel(self.txt_pos[0], self.txt_pos[1], box_size[0], box_size[1], color, 0,
-                             Text(pygame.font.SysFont('Arial', 20), self.player_username, (0, 255, 0, 0)))
+                             Text(pygame.font.SysFont('Agency FB', 27), self.player_username, color))
+        user_box.change_bg_image('media/GameHud/wood2.png')
+        user_box.add_frame('media/GameHud/frame.png')
         return user_box
 
     def get_path_from_character_enum(self, enum: PlayerRoleEnum):

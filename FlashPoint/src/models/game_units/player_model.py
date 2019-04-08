@@ -11,7 +11,7 @@ from src.models.model import Model
 
 logger = logging.getLogger("FlashPoint")
 
-class PlayerModel(Model):
+class PlayerModel(Model,object):
 
     def __init__(self, ip: str, nickname: str):
         super().__init__()
@@ -41,6 +41,13 @@ class PlayerModel(Model):
         player_status = "Player status: {status}".format(status=self.status)
         player_color = "Player color: {color}\n".format(color=self.color)
         return '\n'.join([player_pos, player_ap, player_carrying_victim, player_status, player_color])
+
+
+    def _notify_all_observers(self):
+        self._notify_ap()
+        self._notify_position()
+        self._notify_special_ap()
+        self._notify_status()
 
     def _notify_position(self):
         for obs in self.observers:
@@ -99,7 +106,6 @@ class PlayerModel(Model):
     def set_initial_ap(self, game_kind: GameKindEnum):
         """Set the initial AP and special AP for this player"""
         self.ap = 4
-
         if game_kind == GameKindEnum.EXPERIENCED:
             if self.role == PlayerRoleEnum.CAPTAIN:
                 self.special_ap = 2

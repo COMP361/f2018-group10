@@ -1,7 +1,7 @@
 from typing import Tuple, Optional, Union
 
 import pygame
-
+import src.constants.color as Color
 from src.UIComponents.text import Text
 from src.UIComponents.file_importer import FileImporter
 from src.UIComponents.components import Components
@@ -38,6 +38,7 @@ class RectLabel(pygame.sprite.Sprite, Components):
         self.outer_width = outer_width
         self.txt_obj = txt_obj
         self.txt_pos = txt_pos
+        self.rectangle = None
         self.frame = None
         self.image = None
         self.rect = None
@@ -48,7 +49,6 @@ class RectLabel(pygame.sprite.Sprite, Components):
         # If self.background is an instance of Tuple, we assign that RGB tuple as the background color
         # Otherwise, self.background is an imported image (Surface) so we try to import it and assign as the background
         self.image = pygame.Surface([self.width, self.height])
-
         if self.transparent_bg:
             self.image.set_colorkey(self.background)
 
@@ -76,6 +76,7 @@ class RectLabel(pygame.sprite.Sprite, Components):
     def change_color(self, color: Tuple[int, int, int]):
         self.background = color
         self._render()
+
 
     def add_frame(self,file_path:str):
         if FileImporter.file_exists(file_path):
