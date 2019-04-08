@@ -49,8 +49,10 @@ class FirePlacementEvent(ActionEvent):
         # until you get a non-fire space. Set the tile on fire, turn
         # hotspot to true and cause an explosion on that tile.
         logger.info("Second explosion")
+        random.seed(self.seed)
         tile_pos = [random.randint(1, 6), random.randint(1, 8)]
         while self.board.get_tile_at(tile_pos[0], tile_pos[1]).space_status == SpaceStatusEnum.FIRE:
+            random.seed(self.seed)
             tile_pos = [random.randint(1, 6), random.randint(1, 8)]
         print(tile_pos)
         tile = self.board.get_tile_at(tile_pos[0], tile_pos[1])
@@ -63,8 +65,10 @@ class FirePlacementEvent(ActionEvent):
         # hotspot to true and cause an explosion on that tile.
         logger.info("Third explosion")
         column = self.game.determine_black_dice_opposite_face(tile_pos[1])
+        random.seed(self.seed)
         tile_pos = [random.randint(1, 6), column]
         while self.board.get_tile_at(tile_pos[0], tile_pos[1]).space_status == SpaceStatusEnum.FIRE:
+            random.seed(self.seed)
             tile_pos = [random.randint(1, 6), column]
         print(tile_pos)
         tile = self.board.get_tile_at(tile_pos[0], tile_pos[1])
@@ -77,8 +81,10 @@ class FirePlacementEvent(ActionEvent):
         # hotspot to true and cause an explosion on that tile.
         if difficulty_lvl == DifficultyLevelEnum.HEROIC:
             logger.info("Fourth explosion")
+            random.seed(self.seed)
             tile_pos = [random.randint(1, 6), random.randint(1, 8)]
             while self.board.get_tile_at(tile_pos[0], tile_pos[1]).space_status == SpaceStatusEnum.FIRE:
+                random.seed(self.seed)
                 tile_pos = [random.randint(1, 6),  random.randint(1, 8)]
 
             tile = self.board.get_tile_at(tile_pos[0], tile_pos[1])
