@@ -30,8 +30,6 @@ class PlaceHazmatEvent(ActionEvent):
         random.seed(self.seed)
 
     def execute(self, *args, **kwargs):
-        self.game: GameStateModel = GameStateModel.instance()
-        self.board = self.game.game_board
         """
         Place hazmat on the game board, the number of hazmats are based on the selected game mode,
         as specified in the game manual
@@ -40,6 +38,8 @@ class PlaceHazmatEvent(ActionEvent):
         :return:
         """
         logger.info("Executing HazMat Placement Event")
+        self.game: GameStateModel = GameStateModel.instance()
+        self.board = self.game.game_board
         level = self.game.difficulty_level
 
         if level == DifficultyLevelEnum.RECRUIT:

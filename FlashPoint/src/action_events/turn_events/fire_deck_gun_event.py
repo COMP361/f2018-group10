@@ -23,9 +23,9 @@ class FireDeckGunEvent(TurnEvent):
 
         # Pick random location: roll dice
         random.seed(self.seed)
-        self.game: GameStateModel = GameStateModel.instance()
-        self.player = self.game.players_turn
-        self.engine = self.game.game_board.engine
+        game: GameStateModel = GameStateModel.instance()
+        self.player = game.players_turn
+        self.engine = game.game_board.engine
         self.target_tile: TileModel = NullModel()
 
     # TODO: Move this code to the controller for this event.
@@ -66,6 +66,7 @@ class FireDeckGunEvent(TurnEvent):
 
     def execute(self, *args, **kwargs):
         logger.info("Executing Fire Deck Gun Event")
+        self.game: GameStateModel = GameStateModel.instance()
         self._set_target_tile()
         self.target_tile.space_status = SpaceStatusEnum.SAFE
         directions = ["North", "East", "West", "South"]

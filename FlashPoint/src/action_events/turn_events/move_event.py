@@ -99,13 +99,13 @@ class MoveEvent(TurnEvent):
 
     def __init__(self, dest: TileModel, moveable_tiles: List[TileModel]):
         super().__init__()
-        self.game: GameStateModel = GameStateModel.instance()
-        self.fireman: PlayerModel = self.game.players_turn
+        game: GameStateModel = GameStateModel.instance()
+        self.fireman: PlayerModel = game.players_turn
         self.source_tile = None
-        self.destination = self.game.game_board.get_tile_at(dest.row, dest.column)
+        self.destination = game.game_board.get_tile_at(dest.row, dest.column)
         self.moveable_tiles = []
         for m_tile in moveable_tiles:
-            self.moveable_tiles.append(self.game.game_board.get_tile_at(m_tile.row, m_tile.column))
+            self.moveable_tiles.append(game.game_board.get_tile_at(m_tile.row, m_tile.column))
         self.dijkstra_tiles: List[DijkstraTile] = []
 
     def _init_dijkstra_tiles(self, dest: TileModel):
@@ -133,6 +133,7 @@ class MoveEvent(TurnEvent):
     def execute(self):
         logger.info(f"Executing MoveEvent from ({self.fireman.row}, "
                     f"{self.fireman.column}) to ({self.destination.row}, {self.destination.column})")
+        self.game: GameStateModel = GameStateModel.instance()
         # initialize the Dijkstra tiles
         self._init_dijkstra_tiles(self.destination)
         # Insert the Dijkstra tiles

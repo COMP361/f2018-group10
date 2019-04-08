@@ -23,8 +23,8 @@ class KnockDownEvent(ActionEvent):
         self.player = GameStateModel.instance().get_player_by_ip(player_ip)
 
     def execute(self):
-        self.game: GameStateModel = GameStateModel.instance()
         logger.info(f"Executing KnockDownEvent for player at ({self.player.row},{self.player.column})")
+        self.game: GameStateModel = GameStateModel.instance()
         # if the player was carrying/leading a victim,
         # that victim is lost. disassociate the
         # victim from the player and increment the
