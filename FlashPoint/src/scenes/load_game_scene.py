@@ -73,6 +73,7 @@ class LoadGameScene(object):
         game.board_type = GameBoardTypeEnum.LOADED
         # Restore GameBoard
         GameStateModel.set_game(game)
+        game.board_type = GameBoardTypeEnum.LOADED
         EventQueue.post(CustomEvent(ChangeSceneEnum.LOBBYSCENE))
 
     def _init_btn_back(self, x_pos: int, y_pos: int, text: str, color: color, color_text: color):

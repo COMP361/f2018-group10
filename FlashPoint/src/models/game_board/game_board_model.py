@@ -351,7 +351,8 @@ class GameBoardModel(Model):
         if not self._board_info:
             with open(inside_walls_doors_file, "r") as f:
                 inner_adjacencies = json.load(f)
-                self._board_info = inner_adjacencies
+                if self.board_type == GameBoardTypeEnum.RANDOM:
+                    self._board_info = inner_adjacencies
         else:
             inner_adjacencies = self._board_info
         for adjacency in inner_adjacencies:
