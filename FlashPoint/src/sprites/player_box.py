@@ -1,5 +1,5 @@
 import pygame
-
+import logging as logger
 from src.UIComponents.rect_label import RectLabel
 from src.UIComponents.text import Text
 from src.constants.state_enums import PlayerRoleEnum, PlayerStatusEnum
@@ -58,6 +58,10 @@ class PlayerBox(PlayerObserver):
             return "media/specialist_cards/rescue_specialist.png"
         elif enum == PlayerRoleEnum.FAMILY:
             return "media/specialist_cards/family.png"
+        elif enum == PlayerRoleEnum.DOGE:
+            return "media/specialist_cards/doge.png"
+        elif enum == PlayerRoleEnum.VETERAN:
+            return "media/specialist_cards/veteran.png"
 
     def draw(self, screen):
         self.text_box.draw(screen)
@@ -85,7 +89,11 @@ class PlayerBox(PlayerObserver):
     def player_carry_changed(self, carry):
         pass
 
+    def player_leading_victim_changed(self, leading_victim):
+        pass
+
     def player_role_changed(self, role: PlayerRoleEnum):
+        logger.info(f"new role: {role}")
         role_path = self.get_path_from_character_enum(role)
         self.background = (RectLabel(self.background_position[0], self.background_position[1], self.background_position[2],
                                      self.background_position[3], role_path))

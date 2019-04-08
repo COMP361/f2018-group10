@@ -1,5 +1,4 @@
 import os
-from typing import List
 
 import pygame
 
@@ -16,7 +15,6 @@ from src.constants.change_scene_enum import ChangeSceneEnum
 from src.core.event_queue import EventQueue
 from src.core.serializer import JSONSerializer
 from src.models.game_state_model import GameStateModel
-from src.models.game_units.hazmat_model import HazmatModel
 from src.models.game_units.player_model import PlayerModel
 
 RESOLUTION = (1280, 700)

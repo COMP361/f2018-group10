@@ -82,7 +82,7 @@ class WallSprite(pygame.sprite.Sprite, WallObserver):
         if status == WallStatusEnum.DAMAGED:
             self.damaged = True
         elif status == WallStatusEnum.DESTROYED:
-            self.damaged = True
+            self.damaged = False
             self.destroyed = True
 
     def draw(self, screen):

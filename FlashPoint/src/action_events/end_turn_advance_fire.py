@@ -88,7 +88,7 @@ class EndTurnAdvanceFireEvent(TurnEvent):
 
         # Add a hotspot marker to the last
         # target space of the advance_on_tile()
-        if self.board.hotspot_bank > 0:
+        if self.board.hotspot_bank > 0 and x > 1:
             self.initial_tile.is_hotspot = True
             self.board.hotspot_bank = self.board.hotspot_bank - 1
 
@@ -111,6 +111,14 @@ class EndTurnAdvanceFireEvent(TurnEvent):
         # replenish player's AP, irrespective
         # of role, by 4 (add/subtract points after).
         # special AP are not retained for the next turn.
+        # Handle Doge's case separately...
+        if self.player.role == PlayerRoleEnum.DOGE:
+            if self.player.ap > 6:
+                self.player.ap = 6
+
+            self.player.ap = self.player.ap + 12
+            return
+
         if self.player.ap > 4:
             self.player.ap = 4
 
@@ -330,6 +338,7 @@ class EndTurnAdvanceFireEvent(TurnEvent):
                 # an explosion.
                 for assoc_model in tile.associated_models:
                     if isinstance(assoc_model, HazmatModel):
+                        logger.info("Hazmat explosion occured on {t}".format(t=tile))
                         self.explosion(tile)
                         tile.remove_associated_model(assoc_model)
                         if self.board.hotspot_bank > 0:

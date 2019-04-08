@@ -12,9 +12,9 @@ class ChopEvent(TurnEvent):
 
     def __init__(self, wall: WallModel):
         super().__init__()
-        self.game: GameStateModel = GameStateModel.instance()
-        self.player = self.game.players_turn
-        self.wall = self.game.game_board.get_tile_at(wall.id[0], wall.id[1]).get_obstacle_in_direction(wall.id[2])
+        game: GameStateModel = GameStateModel.instance()
+        self.player = game.players_turn
+        self.wall = game.game_board.get_tile_at(wall.id[0], wall.id[1]).get_obstacle_in_direction(wall.id[2])
 
     def execute(self):
         logger.info("Executing Chop Event")

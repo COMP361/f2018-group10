@@ -30,3 +30,5 @@ FlashPoint/src/media/profiles.json
 FlashPoint/src/media/save_games.json
 
 FlashPoint/src/media/saved_games\.json
+
+FlashPoint/src/media/board_layouts/random_inside_walls_doors\.json

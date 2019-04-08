@@ -20,8 +20,6 @@ class PlaceHazmatEvent(ActionEvent):
 
     def __init__(self, seed: int = 0):
         super().__init__()
-        self.game: GameStateModel = GameStateModel.instance()
-        self.board = self.game.game_board
 
         if seed == 0:
             self.seed = random.randint(1, 6969)
@@ -40,6 +38,8 @@ class PlaceHazmatEvent(ActionEvent):
         :return:
         """
         logger.info("Executing HazMat Placement Event")
+        self.game: GameStateModel = GameStateModel.instance()
+        self.board = self.game.game_board
         level = self.game.difficulty_level
 
         if level == DifficultyLevelEnum.RECRUIT:

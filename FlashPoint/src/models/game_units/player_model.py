@@ -6,7 +6,7 @@ from src.models.game_board.null_model import NullModel
 from src.models.game_units.hazmat_model import HazmatModel
 from src.models.game_units.victim_model import VictimModel
 from src.observers.player_observer import PlayerObserver
-from src.constants.state_enums import PlayerStatusEnum, PlayerRoleEnum, GameKindEnum
+from src.constants.state_enums import PlayerStatusEnum, PlayerRoleEnum, GameKindEnum, VictimStateEnum
 from src.models.model import Model
 
 logger = logging.getLogger("FlashPoint")
@@ -26,6 +26,7 @@ class PlayerModel(Model,object):
         self._wins = 0
         self._losses = 0
         self._carrying_victim = NullModel()
+        self._leading_victim = NullModel()
         self._carrying_hazmat = NullModel()
         self._role = PlayerRoleEnum.FAMILY
 
@@ -80,18 +81,13 @@ class PlayerModel(Model,object):
         for obs in self.observers:
             obs.player_role_changed(self.role)
 
+    def _notify_leading_victim(self):
+        for obs in self.observers:
+            obs.player_leading_victim_changed(self.leading_victim)
+
     @property
     def observers(self) -> List[PlayerObserver]:
         return self._observers
-
-    @property
-    def role(self):
-        return self._role
-
-    @role.setter
-    def role(self, new_role: PlayerRoleEnum):
-        self._role = new_role
-        self._notify_role()
 
     @property
     def row(self) -> int:
@@ -123,6 +119,9 @@ class PlayerModel(Model,object):
 
             elif self.role == PlayerRoleEnum.RESCUE:
                 self.special_ap = 3
+
+            elif self.role == PlayerRoleEnum.DOGE:
+                self.ap = self.ap + 8
 
     @property
     def column(self) -> int:
@@ -218,6 +217,20 @@ class PlayerModel(Model,object):
         self._notify_carry()
 
     @property
+    def leading_victim(self) -> Union[VictimModel, NullModel]:
+        return self._leading_victim
+
+    @leading_victim.setter
+    def leading_victim(self, victim: VictimModel):
+        if isinstance(victim, VictimModel) and victim.state != VictimStateEnum.TREATED:
+            logger.error("Player cannot lead a victim that has not been treated! Abort!")
+            return
+
+        self._leading_victim = victim
+        logger.info("Player {nickname} leading victim: {lv}".format(nickname=self.nickname, lv=victim))
+        self._notify_leading_victim()
+
+    @property
     def carrying_hazmat(self) -> Union[HazmatModel, NullModel]:
         return self._carrying_hazmat
 
@@ -236,3 +249,4 @@ class PlayerModel(Model,object):
     def role(self, player_role: PlayerRoleEnum):
         self._role = player_role
         logger.info("Player {nickname} role: {r}".format(nickname=self.nickname, r=player_role.name))
+        self._notify_role()

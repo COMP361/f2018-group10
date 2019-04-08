@@ -1,3 +1,4 @@
+import os
 import random
 import logging
 from threading import RLock
@@ -38,6 +39,7 @@ class GameStateModel(Model):
             self._rules = game_kind
 
             self._board_type = board_type
+
             self._game_board = GameBoardModel(self._board_type)
 
             self._victims_saved = 0
@@ -45,7 +47,7 @@ class GameStateModel(Model):
             self._damage = 0
             self._max_damage = 24
             self._chat_history = []
-            self._saved_players = []
+            self._dodge_reply = False
             self._state = GameStateEnum.READY_TO_JOIN
             s = f"{self._host.row}, {self._host.column}"
             GameStateModel._instance = self
@@ -76,6 +78,8 @@ class GameStateModel(Model):
     @staticmethod
     def __del__():
         GameStateModel._instance = None
+        if os.path.exists("media/board_layouts/random_inside_walls.json"):
+            os.rmdir("media/board_layouts/random_inside_walls.json")
 
     @classmethod
     def instance(cls):
@@ -95,6 +99,14 @@ class GameStateModel(Model):
     def game_board(self, board: GameBoardModel):
         with GameStateModel.lock:
             self._game_board = board
+
+    @property
+    def dodge_reply(self) -> bool:
+        return self._dodge_reply
+
+    @dodge_reply.setter
+    def dodge_reply(self, reply: bool):
+        self._dodge_reply = reply
 
     @property
     def board_type(self) -> GameBoardTypeEnum:

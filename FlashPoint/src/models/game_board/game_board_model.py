@@ -3,6 +3,7 @@ import logging
 import random
 from typing import List, Tuple, Dict
 
+from src.core.random_board_generator import BoardGenerator
 from src.models.game_units.engine_model import EngineModel
 from src.models.game_units.ambulance_model import AmbulanceModel
 from src.models.model import Model
@@ -27,12 +28,15 @@ class GameBoardModel(Model):
     etc. This class is created inside of GameStateModel.
     """
 
-    def __init__(self, board_type: GameBoardTypeEnum):
+    def __init__(self, board_type: GameBoardTypeEnum, board_info=None):
         super().__init__()
         self._dimensions = (8, 10)
         self._ambulance_spots = []
         self._engine_spots = []
         self._board_type = board_type
+        logger.info("Game board type: {bt}".format(bt=board_type))
+
+        self._board_info = board_info
 
         self._tiles = None
         if self._board_type:
@@ -218,11 +222,12 @@ class GameBoardModel(Model):
             outside_doors_fname = "media/board_layouts/alternative_outside_door_locations.json"
             inside_walls_doors_fname = "media/board_layouts/alternative_inside_walls_doors.json"
 
-        # TODO: put in the names of the files for the random board details
-        # elif self.board_type == GameBoardTypeEnum.RANDOM:
-        #     amb_engine_parking_fname = ""
-        #     outside_doors_fname = ""
-        #     inside_walls_doors_fname = ""
+        elif self.board_type == GameBoardTypeEnum.RANDOM:
+            if not self._board_info:
+                BoardGenerator(8, 6, 1, 3).generate_inside_walls_doors()
+            amb_engine_parking_fname = "media/board_layouts/alternative_engine_ambulance_locations.json"
+            outside_doors_fname = "media/board_layouts/original_outside_door_locations.json"
+            inside_walls_doors_fname = "media/board_layouts/random_inside_walls_doors.json"
 
         return self._init_all_tiles_board(amb_engine_parking_fname, outside_doors_fname, inside_walls_doors_fname)
 
@@ -343,9 +348,12 @@ class GameBoardModel(Model):
         :param tiles: tiles of the board
         :return:
         """
-        with open(inside_walls_doors_file, "r") as f:
-            inner_adjacencies = json.load(f)
-
+        if not self._board_info:
+            with open(inside_walls_doors_file, "r") as f:
+                inner_adjacencies = json.load(f)
+                self._board_info = inner_adjacencies
+        else:
+            inner_adjacencies = self._board_info
         for adjacency in inner_adjacencies:
             if adjacency['obstacle_type'] == 'wall':
                 obstacle = WallModel(adjacency['first_pair'][0], adjacency['first_pair'][1], adjacency['first_dirn'])

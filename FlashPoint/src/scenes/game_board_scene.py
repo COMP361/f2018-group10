@@ -7,11 +7,14 @@ from typing import List
 import pygame
 
 from src.action_events.fire_placement_event import FirePlacementEvent
+from src.action_events.set_initial_hotspot_event import SetInitialHotspotEvent
 from src.action_events.set_initial_poi_experienced_event import SetInitialPOIExperiencedEvent
+from src.constants.custom_event_enums import CustomEventEnum
 from src.constants.enums.custom_event_enums import CustomEventEnum
 from src.constants.state_enums import GameKindEnum, GameStateEnum, GameBoardTypeEnum
 from src.models.game_units.hazmat_model import HazmatModel
 from src.models.game_units.victim_model import VictimModel
+from src.sprites.dodge_prompt import DodgePrompt
 from src.sprites.hazmat_sprite import HazmatSprite
 from src.sprites.knockdown_prompt import KnockdownPrompt
 from src.sprites.victim_lost_prompt import VictimLostPrompt
@@ -90,6 +93,7 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
         self._knockdown_prompt = KnockdownPrompt()
         self._victim_lost_prompt = VictimLostPrompt()
         self._victim_saved_prompt = VictimSavedPrompt()
+        self._dodge_prompt = DodgePrompt()
         self._game_board_sprite = GameBoard(self._current_player)
         self._menu_btn = self._init_menu_button()
         self._chat_box = ChatBox(self._current_player)
@@ -148,6 +152,7 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
             if self._game.rules == GameKindEnum.EXPERIENCED:
                 Networking.get_instance().send_to_all_client(SetInitialPOIExperiencedEvent())
                 Networking.get_instance().send_to_all_client(PlaceHazmatEvent())
+                Networking.get_instance().send_to_all_client(SetInitialHotspotEvent())
             else:
                 Networking.get_instance().send_to_all_client(SetInitialPOIFamilyEvent())
 
@@ -171,8 +176,6 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
         with open(self._save_games_file, mode='w', encoding='utf-8') as myFile:
             json.dump(temp, myFile)
 
-        self._menu.close()
-
     @staticmethod
     def _quit_btn_on_click():
         Networking.get_instance().disconnect()
@@ -181,7 +184,7 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
         DoorController._instance = None
         EventQueue.post(CustomEvent(ChangeSceneEnum.STARTSCENE))
 
-    # Example of how to use the MenuClass YOU NEED TO MAKE ALL YOUR BUTTONS EXTEND INTERACTABLE!!!!!!!!!!!!!!!!!
+    # Example of how to use the MenuClass YOU NEED TO MAKE ALL YOUR BUTTONS EXTEND INTERACTABLE!
     def _init_menu_button(self):
         btn = RectButton(0, 0, 30, 30, background=Color.GREEN, txt_obj=Text(pygame.font.SysFont('Arial', 23), ""))
         btn.on_click(self._open_menu)
@@ -219,6 +222,7 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
         self._victim_lost_prompt.draw(screen)
         self._victim_saved_prompt.draw(screen)
 
+        self._dodge_prompt.draw(screen)
         if self._menu and not self._menu.is_closed:
             self._menu.draw(screen)
 
@@ -227,13 +231,13 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
         self._active_sprites.update(event_queue)
         self._chat_box.update(event_queue)
         self._player_hud_sprites.update(event_queue)
+        self._dodge_prompt.update(event_queue)
 
         if not self.ignore_area():
+            TileInputController.update(event_queue)
             self._game_board_sprite.update(event_queue)
             ChopController.instance().update(event_queue)
             DoorController.instance().update(event_queue)
-            TileInputController.update(event_queue)
-
         if self._menu and not self._menu.is_closed:
             self._menu.update(event_queue)
 
@@ -251,6 +255,9 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
                 self._victim_lost_prompt.enabled = False
             elif event.type == CustomEventEnum.DISABLE_VICTIM_LOST_PROMPT:
                 self._victim_saved_prompt.enabled = False
+
+            if event.type == CustomEventEnum.DODGE_PROMPT:
+                self._dodge_prompt.enabled = True
 
     def ignore_area(self):
         """A region in which all inputs are ignored."""

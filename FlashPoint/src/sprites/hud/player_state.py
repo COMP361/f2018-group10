@@ -14,7 +14,10 @@ class PlayerState(Interactable, PlayerObserver):
     def player_carry_changed(self, carry):
         pass
 
-    def __init__(self, x: int, y: int, name: str, color: Color, current: PlayerModel,rules:GameKindEnum):
+    def player_leading_victim_changed(self, leading_victim):
+        pass
+
+    def __init__(self, x: int, y: int, name: str, color: Color, current: PlayerModel):
         current.add_observer(self)
 
         self.image = pygame.Surface([150, 64])
