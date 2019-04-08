@@ -45,10 +45,15 @@ class CommandNotification(object):
     @command.setter
     def command(self, command: Tuple[PlayerModel, PlayerModel]):
         (self._source, self._target) = command
-        self._notification.change_text(Text(pygame.font.SysFont('Agency FB', 30),
-                                            f"Commanding: {self._target.nickname}", Color.ORANGE))
-        self._wait_command.change_text(Text(pygame.font.SysFont('Agency FB', 30),
-                                            f"Commanded by: {self._source.nickname}", Color.ORANGE))
+        source_msg = "Commanding: None"
+        target_msg = "Commanded by: None"
+        if self._target:
+            source_msg = f"Commanding: {self._target.nickname}"
+        if self._source:
+            target_msg = f"Commanded by: {self._source.nickname}"
+
+        self._notification.change_text(Text(pygame.font.SysFont('Agency FB', 30), source_msg, Color.ORANGE))
+        self._wait_command.change_text(Text(pygame.font.SysFont('Agency FB', 30), target_msg, Color.ORANGE))
 
     @property
     def is_source(self) -> bool:
