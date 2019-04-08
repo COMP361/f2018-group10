@@ -136,7 +136,9 @@ class LobbyScene(GameStateObserver):
         """Button for starting the game once all players have clicked ready."""
         box_size = (130, 48)
         self.start_button = RectButton(1050, 575, box_size[0], box_size[1], Color.GREY, 0,
-                                       Text(pygame.font.SysFont('Agency FB', 20), "Start", Color.GREY))
+                                       Text(pygame.font.SysFont('Agency FB', 25), "Start", Color.RED))
+        self.start_button.change_bg_image('media/GameHud/wood2.png')
+        self.start_button.add_frame('media/GameHud/frame.png')
         self.sprite_grp.add(self.start_button)
 
     def _init_background(self):
@@ -218,8 +220,10 @@ class LobbyScene(GameStateObserver):
             label_width = 400
             label_left = (pygame.display.get_surface().get_size()[0] / 2) - (label_width / 2)
             ip_addr_label = RectLabel(label_left, 20, label_width, 50, (255, 255, 255),
-                                      txt_obj=(Text(pygame.font.SysFont('Arial', 24), ip_addr)))
-            ip_addr_label.set_transparent_background(True)
+                                      txt_obj=(Text(pygame.font.SysFont('Agency FB', 26), ip_addr,Color.GREEN2)))
+            ip_addr_label.change_bg_image('media/GameHud/wood2.png')
+            ip_addr_label.add_frame('media/GameHud/frame.png')
+            #ip_addr_label.set_transparent_background(True)
             self.sprite_grp.add(ip_addr_label)
 
     def _init_sprites(self):
@@ -268,11 +272,23 @@ class LobbyScene(GameStateObserver):
             game = GameStateModel.instance()
             players_ready = len([player for player in game.players if player.status == PlayerStatusEnum.READY])
             if players_ready == game.max_players:
-                self.start_button.enable()
-                self.start_button.change_color(Color.GREEN)
+                self.sprite_grp.remove(self.start_button)
+                self.start_button = RectButton(1050, 575, 130, 48, Color.RED, 0,
+                                               Text(pygame.font.SysFont('Agency FB', 25), "Start", Color.GREEN))
+                self.start_button.on_click(self.start_game)
+                self.start_button.change_bg_image('media/GameHud/wood2.png')
+                self.start_button.add_frame('media/GameHud/frame.png')
+                self.sprite_grp.add(self.start_button)
+
+                # self.start_button.txt_obj.set_color(Color.GREEN)
             else:
+                self.sprite_grp.remove(self.start_button)
+                self.start_button = RectButton(1050, 575, 130, 48, Color.GREEN, 0,
+                                               Text(pygame.font.SysFont('Agency FB', 25), "Start", Color.RED))
                 self.start_button.disable()
-                self.start_button.change_color(Color.GREY)
+                self.start_button.change_bg_image('media/GameHud/wood2.png')
+                self.start_button.add_frame('media/GameHud/frame.png')
+                self.sprite_grp.add(self.start_button)
 
         self.chat_box.update(event_queue)
 
