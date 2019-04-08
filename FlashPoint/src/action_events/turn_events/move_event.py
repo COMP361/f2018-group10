@@ -342,7 +342,11 @@ class MoveEvent(TurnEvent):
         pts_to_deduct = 1
         if tile_model.space_status != SpaceStatusEnum.FIRE:
             if isinstance(self.fireman.carrying_victim, VictimModel):
-                pts_to_deduct = 2
+                # If a Doge drags a victim, it costs 4 AP.
+                if self.fireman.role == PlayerRoleEnum.DOGE:
+                    pts_to_deduct = 4
+                else:
+                    pts_to_deduct = 2
             if isinstance(self.fireman.carrying_hazmat, HazmatModel):
                 pts_to_deduct = 2
         else:
