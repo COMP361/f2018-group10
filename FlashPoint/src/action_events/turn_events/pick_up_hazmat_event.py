@@ -10,10 +10,10 @@ logger = logging.getLogger("FlashPoint")
 
 class PickupHazmatEvent(TurnEvent):
 
-    def __init__(self, hazmat: HazmatModel):
+    def __init__(self, hazmat_row: int, hazmat_column: int):
         super().__init__()
         game: GameStateModel = GameStateModel.instance()
-        self.hazmat_tile = game.game_board.get_tile_at(hazmat.row, hazmat.column)
+        self.hazmat_tile = game.game_board.get_tile_at(hazmat_row, hazmat_column)
         for assoc_model in self.hazmat_tile.associated_models:
             if isinstance(assoc_model, HazmatModel):
                 self.hazmat = assoc_model

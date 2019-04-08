@@ -6,8 +6,12 @@ import logging
 
 
 from src.action_events.disconnect_event import DisconnectEvent
+from src.action_events.dodge_reply_event import DodgeReplyEvent
 from src.action_events.fire_placement_event import FirePlacementEvent
 from src.action_events.choose_character_event import ChooseCharacterEvent
+from src.action_events.turn_events.drop_hazmat_event import DropHazmatEvent
+from src.action_events.turn_events.lead_victim_event import LeadVictimEvent
+from src.action_events.turn_events.pick_up_hazmat_event import PickupHazmatEvent
 from src.action_events.turn_events.remove_hazmat_event import RemoveHazmatEvent
 from src.action_events.turn_events.identify_poi_event import IdentifyPOIEvent
 from src.action_events.place_hazmat_event import PlaceHazmatEvent
@@ -26,8 +30,10 @@ from src.action_events.turn_events.pick_up_victim_event import PickupVictimEvent
 from src.action_events.turn_events.open_door_event import OpenDoorEvent
 from src.action_events.turn_events.resuscitate_victim_event import ResuscitateEvent
 from src.action_events.turn_events.ride_vehicle_event import RideVehicleEvent
+from src.action_events.turn_events.stop_leading_victim_event import StopLeadingVictimEvent
 from src.action_events.vehicle_placed_event import VehiclePlacedEvent
 from src.models.game_board.door_model import DoorModel
+from src.models.game_board.game_board_model import GameBoardModel
 from src.models.game_board.null_model import NullModel
 from src.models.game_board.wall_model import WallModel
 from src.models.game_units.hazmat_model import HazmatModel
@@ -184,6 +190,8 @@ class JSONSerializer(object):
     @staticmethod
     def restore_game_board(game: GameStateModel, payload: Dict):
         """Special deserialize called from the GameStateModel deserializer."""
+        if payload['_board_info']:
+            game.game_board = GameBoardModel(GameBoardTypeEnum.RANDOM, payload['_board_info'])
         JSONSerializer._restore_carried_hazmats(game)
         JSONSerializer._restore_carried_victims(game)
         JSONSerializer._restore_tile_state(game, payload)
@@ -212,6 +220,8 @@ class JSONSerializer(object):
             player.carrying_hazmat = JSONSerializer.deserialize(payload['_carrying_hazmat'])
         if payload['_carrying_victim']:
             player.carrying_victim = JSONSerializer.deserialize(payload['_carrying_victim'])
+        if payload['_leading_victim']:
+            player.leading_victim = JSONSerializer.deserialize(payload['_leading_victim'])
         return player
 
     @staticmethod
@@ -260,8 +270,8 @@ class JSONSerializer(object):
     def _deserialize_move_event(payload: Dict):
         game_board = GameStateModel.instance().game_board
         destination = payload['destination']
-        # dest_model = game_board.get_tile_at(destination['_row'], destination['_column'])
         tile_list = payload['moveable_tiles']
+
         moveable_tiles = []
         for tile in tile_list:
             tile_model: TileModel = game_board.get_tile_at(tile['_row'], tile['_column'])
@@ -296,10 +306,8 @@ class JSONSerializer(object):
 
     @staticmethod
     def _deserialize_extinguish_event(payload: Dict) -> ExtinguishEvent:
-
         tile_dict = payload['extinguish_space']
         tile: TileModel = GameStateModel.instance().game_board.get_tile_at(tile_dict['_row'], tile_dict['_column'])
-        # GameStateModel.instance().game_board.set_single_tile_adjacencies(tile)
         return ExtinguishEvent(tile)
 
     @staticmethod
@@ -319,14 +327,34 @@ class JSONSerializer(object):
         return event
 
     @staticmethod
-    def _deserialize_drop_event(payload: Dict) -> DropVictimEvent:
-        victim: VictimModel = JSONSerializer.deserialize(payload['victim_tile'])
-        return DropVictimEvent(victim)
+    def _deserialize_drop_victim_event(payload: Dict) -> DropVictimEvent:
+        victim_tile: TileModel = JSONSerializer.deserialize(payload['victim_tile'])
+        return DropVictimEvent(victim_tile.row, victim_tile.column)
 
     @staticmethod
-    def _deserialize_pickup_event(payload: Dict) -> PickupVictimEvent:
-        victim: VictimModel = JSONSerializer.deserialize(payload['victim_tile'])
-        return PickupVictimEvent(victim)
+    def _deserialize_pickup_victim_event(payload: Dict) -> PickupVictimEvent:
+        victim_tile: TileModel = JSONSerializer.deserialize(payload['victim_tile'])
+        return PickupVictimEvent(victim_tile.row, victim_tile.column)
+
+    @staticmethod
+    def _deserialize_lead_victim_event(payload: Dict) -> LeadVictimEvent:
+        victim_tile: TileModel = JSONSerializer.deserialize(payload['victim_tile'])
+        return LeadVictimEvent(victim_tile.row, victim_tile.column)
+
+    @staticmethod
+    def _deserialize_stop_leading_victim_event(payload: Dict) -> StopLeadingVictimEvent:
+        victim_tile: TileModel = JSONSerializer.deserialize(payload['victim_tile'])
+        return StopLeadingVictimEvent(victim_tile.row, victim_tile.column)
+
+    @staticmethod
+    def _deserialize_drop_hazmat_event(payload: Dict) -> DropHazmatEvent:
+        hazmat_tile: TileModel = JSONSerializer.deserialize(payload['hazmat_tile'])
+        return DropHazmatEvent(hazmat_tile.row, hazmat_tile.column)
+
+    @staticmethod
+    def _deserialize_pickup_hazmat_event(payload: Dict) -> PickupHazmatEvent:
+        hazmat_tile: TileModel = JSONSerializer.deserialize(payload['hazmat_tile'])
+        return PickupHazmatEvent(hazmat_tile.row, hazmat_tile.column)
 
     @staticmethod
     def _deserialize_set_initial_poi_family_event(payload: Dict) -> SetInitialPOIFamilyEvent:
@@ -404,6 +432,10 @@ class JSONSerializer(object):
         return DisconnectEvent(player)
 
     @staticmethod
+    def _deserialize_dodge_reply(payload: Dict) -> DodgeReplyEvent:
+        return DodgeReplyEvent(payload['_reply'])
+
+    @staticmethod
     def deserialize(payload: Dict) -> object:
         """
         Grab an object and deserialize it.
@@ -452,9 +484,17 @@ class JSONSerializer(object):
         elif object_type == ExtinguishEvent.__name__:
             return JSONSerializer._deserialize_extinguish_event(payload)
         elif object_type == DropVictimEvent.__name__:
-            return JSONSerializer._deserialize_drop_event(payload)
+            return JSONSerializer._deserialize_drop_victim_event(payload)
         elif object_type == PickupVictimEvent.__name__:
-            return JSONSerializer._deserialize_pickup_event(payload)
+            return JSONSerializer._deserialize_pickup_victim_event(payload)
+        elif object_type == LeadVictimEvent.__name__:
+            return JSONSerializer._deserialize_lead_victim_event(payload)
+        elif object_type == StopLeadingVictimEvent.__name__:
+            return JSONSerializer._deserialize_stop_leading_victim_event(payload)
+        elif object_type == DropHazmatEvent.__name__:
+            return JSONSerializer._deserialize_drop_hazmat_event(payload)
+        elif object_type == PickupHazmatEvent.__name__:
+            return JSONSerializer._deserialize_pickup_hazmat_event(payload)
         elif object_type == OpenDoorEvent.__name__:
             return JSONSerializer._deserialize_open_door_event(payload)
         elif object_type == EndTurnAdvanceFireEvent.__name__:
@@ -487,6 +527,8 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_set_initial_hotspot_event(payload)
         elif object_type == SetInitialPOIExperiencedEvent.__name__:
             return JSONSerializer._deserialize_set_initial_poi_experienced_event(payload)
+        elif object_type == DodgeReplyEvent.__name__:
+            return JSONSerializer._deserialize_dodge_reply(payload)
         elif object_type == NullModel.__name__:
             return NullModel()
 
