@@ -20,9 +20,6 @@ class PlaceHazmatEvent(ActionEvent):
 
     def __init__(self, seed: int = 0):
         super().__init__()
-        self.game: GameStateModel = GameStateModel.instance()
-        self.board = self.game.game_board
-
         if seed == 0:
             self.seed = random.randint(1, 6969)
         else:
@@ -30,6 +27,8 @@ class PlaceHazmatEvent(ActionEvent):
 
         # Pick random location: roll dice
         random.seed(self.seed)
+        self.game: GameStateModel = GameStateModel.instance()
+        self.board = self.game.game_board
 
     def execute(self, *args, **kwargs):
         """
