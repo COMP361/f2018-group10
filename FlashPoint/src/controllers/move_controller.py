@@ -147,12 +147,12 @@ class MoveController(PlayerObserver, Controller):
             # the moveable tiles list, if the length of the list < 2, then
             # we cannot go anywhere from this fire tile and therefore it
             # would not be valid to add it to the list. Return False.
-            if self._can_go_into_fire(ap):
+            if self._can_go_into_fire(ap, second_tile.tile_model):
                 moveable_tiles_from_fire = self._determine_reachable_tiles(second_tile.tile_model.row, second_tile.tile_model.column, ap-2)
                 if len(moveable_tiles_from_fire) < 2:
                     return False
 
-                cost_to_move = self._determine_cost_to_move(SpaceStatusEnum.FIRE)
+                cost_to_move = self._determine_cost_to_move(second_tile.tile_model)
                 if self._could_update_least_cost(cost_to_move, first_tile, second_tile):
                     return True
 
@@ -190,7 +190,7 @@ class MoveController(PlayerObserver, Controller):
 
         return False
 
-    def _can_go_into_fire(self, ap: int) -> bool:
+    def _can_go_into_fire(self, ap: int, target_tile: TileModel) -> bool:
         """
         Determines whether player can go
         into fire. If the player is:
@@ -214,7 +214,7 @@ class MoveController(PlayerObserver, Controller):
         if self.current_player.role == PlayerRoleEnum.DOGE:
             return False
 
-        cost_to_move = self._determine_cost_to_move(SpaceStatusEnum.FIRE)
+        cost_to_move = self._determine_cost_to_move(target_tile)
         if ap < cost_to_move:
             return False
 
@@ -232,13 +232,13 @@ class MoveController(PlayerObserver, Controller):
                 safe/smoke space, False otherwise.
         """
         # Can pass either Safe or Smoke to method
-        cost_to_move = self._determine_cost_to_move(SpaceStatusEnum.SAFE)
+        cost_to_move = self._determine_cost_to_move(second_tile.tile_model)
         if ap < cost_to_move:
             return False
 
         return self._could_update_least_cost(cost_to_move, first_tile, second_tile)
 
-    def _determine_cost_to_move(self, space_status: SpaceStatusEnum) -> int:
+    def _determine_cost_to_move(self, target_tile: TileModel) -> int:
         """
         Determine the cost to move
         into a space depending on the
@@ -246,9 +246,10 @@ class MoveController(PlayerObserver, Controller):
         victim/hazmat. (leading a victim
         does not change the cost to move)
 
-        :param space_status: status of the target space
-        :return: cost to move into that space
+        :param target_tile:
+        :return: cost to move into target tile
         """
+        space_status = target_tile.space_status
         cost_to_move = 1
         if space_status != SpaceStatusEnum.FIRE:
             if isinstance(self.current_player.carrying_victim, VictimModel):

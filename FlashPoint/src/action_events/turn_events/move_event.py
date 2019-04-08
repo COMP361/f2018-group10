@@ -176,10 +176,10 @@ class MoveEvent(TurnEvent):
 
         if second_tile.tile_model.space_status != SpaceStatusEnum.FIRE:
             # Can pass either Safe/Smoke to method
-            cost_to_travel = self._determine_cost_to_move(SpaceStatusEnum.SAFE)
+            cost_to_travel = self._determine_cost_to_move(second_tile.tile_model)
         else:
             if self._can_go_into_fire():
-                cost_to_travel = self._determine_cost_to_move(SpaceStatusEnum.FIRE)
+                cost_to_travel = self._determine_cost_to_move(second_tile.tile_model)
             else:
                 return
 
@@ -335,7 +335,7 @@ class MoveEvent(TurnEvent):
         :param tile_model: tile player is moving to
         :return:
         """
-        pts_to_deduct = self._determine_cost_to_move(tile_model.space_status)
+        pts_to_deduct = self._determine_cost_to_move(tile_model)
 
         # If the fireman is a Rescue Specialist, subtract
         # from the special AP first and then from AP.
@@ -375,7 +375,7 @@ class MoveEvent(TurnEvent):
 
         return True
 
-    def _determine_cost_to_move(self, space_status: SpaceStatusEnum) -> int:
+    def _determine_cost_to_move(self, target_tile: TileModel) -> int:
         """
         Determine the cost to move
         into a space depending on the
@@ -383,9 +383,10 @@ class MoveEvent(TurnEvent):
         victim/hazmat. (leading a victim
         does not change the cost to move)
 
-        :param space_status: status of the target space
-        :return: cost to move into that space
+        :param target_tile:
+        :return: cost to move into target tile
         """
+        space_status = target_tile.space_status
         cost_to_move = 1
         if space_status != SpaceStatusEnum.FIRE:
             if isinstance(self.fireman.carrying_victim, VictimModel):
