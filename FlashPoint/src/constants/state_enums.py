@@ -112,6 +112,8 @@ class PlayerRoleEnum(Enum):
     IMAGING = auto()
     PARAMEDIC = auto()
     RESCUE = auto()
+    DOGE = auto()
+    VETERAN = auto()
 
 
 class VehicleOrientationEnum(Enum):

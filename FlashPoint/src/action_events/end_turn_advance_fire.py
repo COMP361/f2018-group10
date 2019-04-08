@@ -107,6 +107,14 @@ class EndTurnAdvanceFireEvent(TurnEvent):
         # replenish player's AP, irrespective
         # of role, by 4 (add/subtract points after).
         # special AP are not retained for the next turn.
+        # Handle Doge's case separately...
+        if self.player.role == PlayerRoleEnum.DOGE:
+            if self.player.ap > 6:
+                self.player.ap = 6
+
+            self.player.ap = self.player.ap + 12
+            return
+
         if self.player.ap > 4:
             self.player.ap = 4
 

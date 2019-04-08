@@ -110,6 +110,9 @@ class PlayerModel(Model):
             elif self.role == PlayerRoleEnum.RESCUE:
                 self.special_ap = 3
 
+            elif self.role == PlayerRoleEnum.DOGE:
+                self.ap = self.ap + 8
+
     @property
     def column(self) -> int:
         return self._column
