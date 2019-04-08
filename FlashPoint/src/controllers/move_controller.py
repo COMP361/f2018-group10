@@ -165,7 +165,7 @@ class MoveController(PlayerObserver, Controller):
         1. carrying a victim or
         2. carrying a hazmat or
         3. leading a victim or
-        4. is a doge
+        4. is a doge or
         5. ap < cost to move
         then he/she cannot go into the fire.
 
@@ -211,7 +211,8 @@ class MoveController(PlayerObserver, Controller):
         Determine the cost to move
         into a space depending on the
         space status and player carrying
-        victim/hazmat.
+        victim/hazmat. (leading a victim
+        does not change the cost to move)
 
         :param space_status: status of the target space
         :return: cost to move into that space
