@@ -1,6 +1,7 @@
 import itertools
 import json
 import os
+import random
 from datetime import datetime
 from typing import List
 
@@ -135,14 +136,15 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
     def _send_game_board_initialize(self):
         """Send any game board initialization events."""
         if Networking.get_instance().is_host:
-            Networking.get_instance().send_to_all_client(FirePlacementEvent())
+            seed = random.randint(1, 6969)
+            Networking.get_instance().send_to_all_client(FirePlacementEvent(seed))
 
             if self._game.rules == GameKindEnum.EXPERIENCED:
-                Networking.get_instance().send_to_all_client(SetInitialPOIExperiencedEvent())
-                Networking.get_instance().send_to_all_client(PlaceHazmatEvent())
-                Networking.get_instance().send_to_all_client(SetInitialHotspotEvent())
+                Networking.get_instance().send_to_all_client(SetInitialPOIExperiencedEvent(seed))
+                Networking.get_instance().send_to_all_client(PlaceHazmatEvent(seed))
+                Networking.get_instance().send_to_all_client(SetInitialHotspotEvent(seed))
             else:
-                Networking.get_instance().send_to_all_client(SetInitialPOIFamilyEvent())
+                Networking.get_instance().send_to_all_client(SetInitialPOIFamilyEvent(seed))
 
         for player in self._game.players:
             player.set_initial_ap(self._game.rules)
