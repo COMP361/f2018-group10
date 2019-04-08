@@ -31,10 +31,7 @@ class PickupHazmatEvent(TurnEvent):
         :return: True if the player is carrying
                 nothing, False otherwise.
         """
-        if isinstance(self.player.carrying_victim, VictimModel) or isinstance(self.player.carrying_hazmat, HazmatModel):
-            return False
-
-        return True
+        pass
 
     def execute(self):
         logger.info("Executing Pickup Hazmat Event")

@@ -1,12 +1,11 @@
 import os
-from typing import List
 
 import pygame
 
 import src.constants.color as color
 import json
 
-from src.constants.state_enums import GameKindEnum
+from src.constants.state_enums import GameKindEnum, GameBoardTypeEnum
 from src.core.custom_event import CustomEvent
 from src.UIComponents.rect_button import RectButton
 from src.UIComponents.rect_label import RectLabel
@@ -16,7 +15,6 @@ from src.constants.change_scene_enum import ChangeSceneEnum
 from src.core.event_queue import EventQueue
 from src.core.serializer import JSONSerializer
 from src.models.game_state_model import GameStateModel
-from src.models.game_units.hazmat_model import HazmatModel
 from src.models.game_units.player_model import PlayerModel
 
 RESOLUTION = (1280, 700)
@@ -69,6 +67,7 @@ class LoadGameScene(object):
         game.host = self._current_player
         game.players = [self._current_player]
 
+        game.board_type = GameBoardTypeEnum.LOADED
         # Restore GameBoard
         GameStateModel.set_game(game)
         EventQueue.post(CustomEvent(ChangeSceneEnum.LOBBYSCENE))

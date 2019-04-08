@@ -231,11 +231,13 @@ class TileModel(Model):
 
         self._associated_models.append(model)
         model.set_pos(self.row, self.column)
+        logger.info(f"An associated model was successfully dropped: {model}")
         self._notify_assoc_models()
 
     def remove_associated_model(self, model: Model):
         """CAUTION: YOUR MODEL MUST HAVE AN __EQ__ METHOD DEFINED FOR THIS TO WORK AS EXPECTED"""
         if model in self._associated_models:
+            logger.info(f"An associated model was succesfully picked up: {model}")
             self._associated_models.remove(model)
         self._notify_assoc_models()
 
@@ -254,4 +256,11 @@ class TileModel(Model):
         for model in self.associated_models:
             if isinstance(model, POIModel) or isinstance(model, VictimModel):
                 return True
+        return False
+
+    def has_hazmat(self) -> bool:
+        for model in self.associated_models:
+            if isinstance(model, HazmatModel):
+                return True
+
         return False

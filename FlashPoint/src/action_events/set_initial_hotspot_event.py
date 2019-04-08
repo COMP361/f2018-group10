@@ -8,6 +8,7 @@ from src.models.game_state_model import GameStateModel
 
 logger = logging.getLogger("FlashPoint")
 
+
 class SetInitialHotspotEvent(ActionEvent):
     """Event for placing Hot Spot markers at
         the beginning of the experienced game"""
@@ -19,10 +20,6 @@ class SetInitialHotspotEvent(ActionEvent):
         else:
             self.seed = seed
 
-        # Pick random location: roll dice
-        random.seed(self.seed)
-        self.game: GameStateModel = GameStateModel.instance()
-        self.game_board: GameBoardModel = self.game.game_board
         self.num_hotspots_to_place = 0
 
     def _determine_num_to_place(self):
@@ -43,6 +40,11 @@ class SetInitialHotspotEvent(ActionEvent):
         # even if 0 hotspots are to be placed
         # since the hotspot bank has to be set
         # at the end.
+
+        # Pick random location: roll dice
+        random.seed(self.seed)
+        self.game: GameStateModel = GameStateModel.instance()
+        self.game_board: GameBoardModel = self.game.game_board
         logger.info("Executing Set Initial Hot Spot Event")
         self._determine_num_to_place()
         logger.info("{h} hotspots have to be placed".format(h=self.num_hotspots_to_place))

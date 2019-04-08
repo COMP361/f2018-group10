@@ -66,9 +66,9 @@ class PlayerModel(Model):
         for obs in self.observers:
             obs.player_losses_changed(self.losses)
 
-    def _notify_carry(self):
+    def _notify_carry(self, model):
         for obs in self.observers:
-            obs.player_carry_changed(self.carrying_victim)
+            obs.player_carry_changed(model)
 
     def _notify_role(self):
         for obs in self.observers:
@@ -94,6 +94,8 @@ class PlayerModel(Model):
         logger.info("Player {nickname} position: ({row}, {column})".format(nickname=self.nickname, row=self.row, column=self.column))
         if isinstance(self.carrying_victim, VictimModel):
             self.carrying_victim.set_pos(row, column)
+        if isinstance(self.carrying_hazmat, HazmatModel):
+            self.carrying_hazmat.set_pos(row, column)
         self._notify_position()
 
     def set_initial_ap(self, game_kind: GameKindEnum):
@@ -205,7 +207,7 @@ class PlayerModel(Model):
     def carrying_victim(self, victim: VictimModel):
         self._carrying_victim = victim
         logger.info("Player {nickname} carrying victim: {cv}".format(nickname=self.nickname, cv=victim))
-        self._notify_carry()
+        self._notify_carry(self.carrying_victim)
 
     @property
     def leading_victim(self) -> Union[VictimModel, NullModel]:
@@ -230,7 +232,7 @@ class PlayerModel(Model):
         self._carrying_hazmat = hazmat
         logger.info("Player {nickname} carrying hazmat: {h}".format(nickname=self.nickname, h=hazmat))
         # TODO: Modify notify carry to account for carrying hazmats
-        # self._notify_carry()
+        self._notify_carry(self.carrying_hazmat)
 
     @property
     def role(self) -> PlayerRoleEnum:

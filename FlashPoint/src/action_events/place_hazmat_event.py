@@ -20,9 +20,6 @@ class PlaceHazmatEvent(ActionEvent):
 
     def __init__(self, seed: int = 0):
         super().__init__()
-        self.game: GameStateModel = GameStateModel.instance()
-        self.board = self.game.game_board
-
         if seed == 0:
             self.seed = random.randint(1, 6969)
         else:
@@ -39,6 +36,8 @@ class PlaceHazmatEvent(ActionEvent):
         :param kwargs:
         :return:
         """
+        self.game: GameStateModel = GameStateModel.instance()
+        self.board = self.game.game_board
         logger.info("Executing HazMat Placement Event")
         level = self.game.difficulty_level
 
@@ -72,6 +71,9 @@ class PlaceHazmatEvent(ActionEvent):
             if should_reroll:
                 continue
 
-            tile.add_associated_model(HazmatModel())
-            GameBoard.instance().add(HazmatSprite(tile))
+            model = HazmatModel()
+            sprite = HazmatSprite(tile)
+            tile.add_associated_model(model)
+            GameBoard.instance().add(sprite)
+            model.add_observer(sprite)
             hazmat_to_place -= 1

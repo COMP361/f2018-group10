@@ -3,12 +3,15 @@ from src.action_events.turn_events.drop_victim_event import DropVictimEvent
 from src.action_events.turn_events.pick_up_victim_event import PickupVictimEvent
 from src.controllers.controller import Controller
 from src.core.networking import Networking
+from src.models.game_board.null_model import NullModel
 from src.models.game_board.tile_model import TileModel
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 from src.models.game_units.victim_model import VictimModel
 from src.sprites.tile_sprite import TileSprite
+import logging
 
+logger = logging.getLogger("FlashPoint")
 
 class VictimController(Controller):
 
@@ -18,7 +21,6 @@ class VictimController(Controller):
         super().__init__(current_player)
         if VictimController._instance:
             raise Exception("Victim Controller is a singleton")
-
         VictimController._instance = self
 
     @classmethod
@@ -52,12 +54,22 @@ class VictimController(Controller):
 
     def send_event_and_close_menu(self, tile_model: TileModel, menu_to_close: Interactable):
         victims = [model for model in tile_model.associated_models if isinstance(model, VictimModel)]
+        logger.info(f"Player has a victim: {isinstance(self._current_player.carrying_victim, VictimModel)}")
+        victim = NullModel()
+
         if victims:
             victim = victims[0]
 
-        is_carrying = isinstance(self._current_player.carrying_victim, VictimModel)
+        if isinstance(victim, NullModel): #check if victim on player
+            victim = self._current_player.carrying_victim
+            if isinstance(victim, NullModel):
+                victim = self._current_player.leading_victim
+                if isinstance(victim, NullModel):
+                    return
 
-        check_func = self.check_drop if is_carrying else self.check_pickup
+        is_carrying = isinstance(self._current_player.carrying_victim, VictimModel)
+        is_leading = isinstance(self._current_player.leading_victim, VictimModel)
+        check_func = self.check_drop if (is_carrying or is_leading) else self.check_pickup
 
         if not check_func(tile_model):
             menu_to_close.disable()
