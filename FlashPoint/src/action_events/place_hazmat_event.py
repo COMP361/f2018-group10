@@ -27,8 +27,6 @@ class PlaceHazmatEvent(ActionEvent):
 
         # Pick random location: roll dice
         random.seed(self.seed)
-        self.game: GameStateModel = GameStateModel.instance()
-        self.board = self.game.game_board
 
     def execute(self, *args, **kwargs):
         """
@@ -38,6 +36,8 @@ class PlaceHazmatEvent(ActionEvent):
         :param kwargs:
         :return:
         """
+        self.game: GameStateModel = GameStateModel.instance()
+        self.board = self.game.game_board
         logger.info("Executing HazMat Placement Event")
         level = self.game.difficulty_level
 

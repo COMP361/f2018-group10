@@ -159,6 +159,7 @@ class EndTurnAdvanceFireEvent(TurnEvent):
                 return
         elif self.game_state.state == GameStateEnum.PLACING_VEHICLES:
             self._placing_vehicles_end_turn()
+            return
 
         # call next player
         self.game_state.next_player()
