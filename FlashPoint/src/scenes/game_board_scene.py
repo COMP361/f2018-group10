@@ -77,7 +77,6 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
 
         # Send initialization events
         if self._game.board_type != GameBoardTypeEnum.LOADED:
-            print("initialize")
             self._send_game_board_initialize()
         else:
             self._init_loaded_sprites()
