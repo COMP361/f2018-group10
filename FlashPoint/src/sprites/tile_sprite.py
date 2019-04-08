@@ -293,10 +293,6 @@ class TileSprite(Interactable, TileObserver):
         if self.is_clicked():
             self.click()
 
-
-
-
-
     def tile_status_changed(self, status: SpaceStatusEnum, is_hotspot: bool):
         new_surf = pygame.Surface([self._non_highlight_image.get_width(), self._non_highlight_image.get_height()])
         self._non_highlight_image = self._blank_image.copy()

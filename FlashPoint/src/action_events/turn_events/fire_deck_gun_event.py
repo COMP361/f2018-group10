@@ -16,7 +16,7 @@ logger = logging.getLogger("FlashPoint")
 
 class FireDeckGunEvent(TurnEvent):
 
-    def __init__(self, seed: int = 0):
+    def __init__(self, seed: int = 0, row: int = -1, column: int = -1):
         super().__init__()
         if seed == 0:
             self.seed = random.randint(1, 6969)
@@ -28,7 +28,10 @@ class FireDeckGunEvent(TurnEvent):
         game: GameStateModel = GameStateModel.instance()
         self.player = game.players_turn
         self.engine = game.game_board.engine
-        self.target_tile: TileModel = NullModel()
+        if row > -1 and column > -1:
+            self.target_tile: TileModel = game.game_board.get_tile_at(row, column)
+        else:
+            self.target_tile = NullModel()
 
     # TODO: Move this code to the controller for this event.
     def check(self) -> bool:
@@ -37,8 +40,10 @@ class FireDeckGunEvent(TurnEvent):
     def execute(self, *args, **kwargs):
         logger.info("Executing Fire Deck Gun Event")
         self.game: GameStateModel = GameStateModel.instance()
-        self._set_target_tile()
-        self.target_tile.space_status = SpaceStatusEnum.SAFE
+        if isinstance(self.target_tile, NullModel):
+            self._set_target_tile()
+        else:
+            self.target_tile.space_status = SpaceStatusEnum.SAFE
         directions = ["North", "East", "West", "South"]
         for dirn in directions:
             has_obstacle = self.target_tile.has_obstacle_in_direction(dirn)

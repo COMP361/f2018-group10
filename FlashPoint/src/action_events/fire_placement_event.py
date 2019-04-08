@@ -23,6 +23,7 @@ class FirePlacementEvent(ActionEvent):
             self.seed = seed
 
         # Pick random location: roll dice
+
         random.seed(self.seed)
 
     def execute(self):
