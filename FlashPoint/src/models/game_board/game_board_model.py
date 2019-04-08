@@ -47,6 +47,7 @@ class GameBoardModel(Model):
         self._ambulance = AmbulanceModel((8, 10))
         self._engine = EngineModel((8, 10))
         self._hotspot_bank: int = 0
+        self._is_loaded = False
 
 
     def notify_all_observers(self):
@@ -84,6 +85,15 @@ class GameBoardModel(Model):
     def get_tiles(self) -> List[List[TileModel]]:
         return self._tiles
 
+    @property
+    def is_loaded(self) -> bool:
+        """Return whether this board was loaded from a file"""
+        return self._is_loaded
+
+    @is_loaded.setter
+    def is_loaded(self, loaded: bool):
+        self._is_loaded = loaded
+        
     @property
     def board_type(self):
         return self._board_type
@@ -225,7 +235,7 @@ class GameBoardModel(Model):
         elif self.board_type == GameBoardTypeEnum.RANDOM:
             if not self._board_info:
                 BoardGenerator(8, 6, 1, 3).generate_inside_walls_doors()
-            amb_engine_parking_fname = "media/board_layouts/alternative_engine_ambulance_locations.json"
+            amb_engine_parking_fname = "media/board_layouts/original_engine_ambulance_locations.json"
             outside_doors_fname = "media/board_layouts/original_outside_door_locations.json"
             inside_walls_doors_fname = "media/board_layouts/random_inside_walls_doors.json"
 

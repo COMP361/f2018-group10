@@ -5,7 +5,6 @@ import pygame
 import src.constants.color as color
 import json
 
-from src.constants.state_enums import GameKindEnum, GameBoardTypeEnum
 from src.core.custom_event import CustomEvent
 from src.UIComponents.rect_button import RectButton
 from src.UIComponents.rect_label import RectLabel
@@ -37,7 +36,6 @@ class LoadGameScene(object):
 
         self._init_btn_back(20, 20, "Back", color.STANDARDBTN, color.GREEN2)
 
-
     def _init_background(self):
         box_size = (RESOLUTION[0], RESOLUTION[1])
         background_box = RectLabel(0, 0, box_size[0], box_size[1], "media/backgrounds/flashpoint_background.png")
@@ -56,12 +54,12 @@ class LoadGameScene(object):
         user_box = RectButton(x_pos, y_pos, box_size[0], box_size[1], clr, 0,
                               Text(pygame.font.SysFont('Agency FB', 20), text, color_text))
         user_box.change_bg_image('media/GameHud/wood2.png')
-        pygame.draw.rect(user_box.image, color.YELLOW, [0, 0, 350,32], 5)
+        pygame.draw.rect(user_box.image, color.YELLOW, [0, 0, 350, 32], 5)
 
-        user_box.on_click(self.load_game, GameKindEnum.FAMILY, save_data)
+        user_box.on_click(self.load_game, save_data)
         return user_box
 
-    def load_game(self, game_kind: GameKindEnum, save):
+    def load_game(self, save):
         """Instantiate a new family game and move to the lobby scene."""
         data = save
 
@@ -72,7 +70,7 @@ class LoadGameScene(object):
 
         # Restore GameBoard
         GameStateModel.set_game(game)
-        game.board_type = GameBoardTypeEnum.LOADED
+        game.game_board.is_loaded = True
         EventQueue.post(CustomEvent(ChangeSceneEnum.LOBBYSCENE))
 
     def _init_btn_back(self, x_pos: int, y_pos: int, text: str, color: color, color_text: color):
@@ -91,8 +89,6 @@ class LoadGameScene(object):
         user_box.add_frame('media/GameHud/frame.png')
         self.sprite_grp.add(user_box)
 
-
-
     @staticmethod
     def _init_text_bar(x_pos, y_pos, width, height):
         return InputBox(x=x_pos, y=y_pos, w=width, h=height)
@@ -107,12 +103,6 @@ class LoadGameScene(object):
 
     def draw(self, screen):
         self.sprite_grp.draw(screen)
-        # self._text_bar2.draw(screen)
-        #self.text_bar1.draw(screen)
-        # self.profile.draw(screen)
 
     def update(self, event_queue):
         self.sprite_grp.update(event_queue)
-        #self.text_bar1.update(event_queue)
-        # self.profile.update(event_queue)
-        # self._text_bar2.update(event_queue)

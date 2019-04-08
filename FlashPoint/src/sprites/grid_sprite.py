@@ -128,7 +128,9 @@ class GridSprite(pygame.sprite.Group):
         if type == GameBoardTypeEnum.ORIGINAL:
             str = "media/boards/board1.png"
             return str
-        else:
+        elif type == GameBoardTypeEnum.RANDOM:
+            return "media/boards/board3.png"
+        elif type == GameBoardTypeEnum.ALTERNATIVE:
             str = "media/boards/board2.png"
             return str
 
