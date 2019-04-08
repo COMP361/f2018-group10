@@ -130,6 +130,7 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
                 if isinstance(obj, HazmatModel):
                     self._game_board_sprite.add(HazmatSprite(tile))
 
+
     def _init_controllers(self):
         """Instantiate all controllers."""
         ChopController(self._current_player)

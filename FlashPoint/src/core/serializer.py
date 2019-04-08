@@ -56,7 +56,6 @@ from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 from src.sprites.game_board import GameBoard
 from src.sprites.hazmat_sprite import HazmatSprite
-from src.sprites.poi_sprite import POISprite
 
 logger = logging.getLogger("FlashPoint")
 
@@ -108,13 +107,16 @@ class JSONSerializer(object):
         for hazmat in picked_up_hazmats:
             tile = game.game_board.get_tile_at(hazmat.row, hazmat.column)
             tile.add_associated_model(hazmat)
-            GameBoard.instance().add(HazmatSprite(tile))
 
     @staticmethod
     def _restore_carried_victims(game: GameStateModel):
         """Helper for restoring GameBoardModel"""
         picked_up_victims = [player.carrying_victim for player in game.players
                              if not isinstance(player.carrying_victim, NullModel)]
+        for victim in picked_up_victims:
+            tile = game.game_board.get_tile_at(victim.row, victim.column)
+            tile.add_associated_model(victim)
+            game.game_board.active_pois.append(victim)
 
     @staticmethod
     def _restore_tile_state(game: GameStateModel, payload: Dict):
@@ -130,6 +132,8 @@ class JSONSerializer(object):
                 for assoc_model_dict in tile_dict['_associated_models']:
                     model: Model = JSONSerializer.deserialize(assoc_model_dict)
                     tile.add_associated_model(model)
+                    if isinstance(model, VictimModel) or isinstance(model, POIModel):
+                        game.game_board.active_pois.append(model)
 
     @staticmethod
     def _restore_wall_and_door_states(game: GameStateModel, payload: Dict):
@@ -176,14 +180,6 @@ class JSONSerializer(object):
         game.game_board.engine_spots = e_spots
 
     @staticmethod
-    def _restore_active_pois(game: GameStateModel, payload: Dict):
-        active_poi_dict = payload['_active_pois']
-        active = []
-        for poi_dict in active_poi_dict:
-            active.append(JSONSerializer.deserialize(poi_dict))
-        game.game_board.active_pois = active
-
-    @staticmethod
     def _restore_poi_bank(game: GameStateModel, payload: Dict):
         poi_bank_dict = payload['_poi_bank']
 
@@ -203,7 +199,6 @@ class JSONSerializer(object):
         JSONSerializer._restore_tile_state(game, payload)
         JSONSerializer._restore_parking_spots(game, payload) # Might not be necessary but oh well.
         JSONSerializer._restore_wall_and_door_states(game, payload)
-        JSONSerializer._restore_active_pois(game, payload)
         JSONSerializer._restore_poi_bank(game, payload)
         game.game_board.hotspot_bank = payload['_hotspot_bank']
         game.board_type = GameBoardTypeEnum.LOADED
