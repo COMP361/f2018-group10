@@ -3,7 +3,6 @@ import pygame
 import src.constants.main_constants as MainConst
 from src.sprites.player_sprite import PlayerSprite
 from src.UIComponents.rect_button import RectButton
-from src.action_events.fire_placement_event import FirePlacementEvent
 from src.UIComponents.file_importer import FileImporter
 from src.models.game_units.player_model import PlayerModel
 from src.sprites.grid_sprite import GridSprite

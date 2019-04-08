@@ -3,7 +3,7 @@ from datetime import datetime
 import pygame
 
 import src.constants.color as Color
-from src.constants.state_enums import PlayerStatusEnum
+from src.constants.state_enums import PlayerStatusEnum, GameKindEnum
 from src.core.event_queue import EventQueue
 from src.models.game_units.player_model import PlayerModel
 from src.observers.player_observer import PlayerObserver
@@ -14,10 +14,11 @@ class CurrentPlayerState(pygame.sprite.Sprite, PlayerObserver):
     def player_carry_changed(self, carry):
         pass
 
+
     def player_leading_victim_changed(self, leading_victim):
         pass
 
-    def __init__(self, x: int, y: int, name: str, color: Color, current: PlayerModel):
+    def __init__(self, x: int, y: int, name: str, color: Color, current: PlayerModel, rules: GameKindEnum):
         super().__init__()
         current.add_observer(self)
         bg = pygame.image.load('media/GameHud/wood2.png')
@@ -34,14 +35,15 @@ class CurrentPlayerState(pygame.sprite.Sprite, PlayerObserver):
         self.font_other = pygame.font.SysFont('Agency FB', 23)
         self.font_time = pygame.font.SysFont('Agency FB', 25)
         self.name = name
+        self.rules = rules
         self.ap = current.ap
         self.AP = f'AP: {self.ap}'
-        self.sap = 0
+        self.sap = current.special_ap
         self.SAP = f'Special AP:{self.sap}'
 
         self.text = self.font_name.render(self.name, True, Color.GREEN2)
-        self.text_AP = self.font_other.render(self.AP, True, Color.WHITE)
-        self.text_SAP = self.font_other.render(self.SAP, True, Color.WHITE)
+        self.text_AP = self.font_other.render(self.AP, True, Color.GREEN2)
+        self.text_SAP = self.font_other.render(self.SAP, True, Color.GREEN2)
         self.turn = False
         self.start = datetime.now()
         self.time_str = f"TOTAL TIME:"
@@ -53,7 +55,7 @@ class CurrentPlayerState(pygame.sprite.Sprite, PlayerObserver):
         self.AP_rect = self.text_AP.get_rect()
         self.AP_rect.move_ip(15, 50)
         self.SAP_rect = self.text_SAP.get_rect()
-        self.SAP_rect.move_ip(15, 70)
+        self.SAP_rect.move_ip(15, 72)
 
     def color_picker(self, color: Color):
         return {
@@ -73,6 +75,9 @@ class CurrentPlayerState(pygame.sprite.Sprite, PlayerObserver):
         self.image.blit(self.text, self.P_rect)
         self.image.blit(self.text_AP, self.AP_rect)
 
+        if self.rules is GameKindEnum.EXPERIENCED:
+            self.image.blit(self.text_SAP, self.SAP_rect)
+
         if self.turn:
             self.time_left_rect = self.text_time_left.get_rect()
             self.time_left_rect.move_ip(15, 100)
@@ -82,12 +87,12 @@ class CurrentPlayerState(pygame.sprite.Sprite, PlayerObserver):
         pass
 
     def player_ap_changed(self, updated_ap: int):
-        self.ap = updated_ap
-        self.AP = f'AP: {self.ap}'
+        self.AP = f'AP: {updated_ap}'
         self.text_AP = self.font_other.render(self.AP, True, Color.GREEN2)
 
-    def player_special_ap_changed(self, updated_ap: int):
-        pass
+    def player_special_ap_changed(self, updated_sap: int):
+        self.SAP = f'Special AP:{updated_sap}'
+        self.text_SAP = self.font_other.render(self.SAP, True, Color.GREEN2)
 
     def player_position_changed(self, x_pos: int, y_pos: int):
         pass
