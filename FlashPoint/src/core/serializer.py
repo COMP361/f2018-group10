@@ -212,7 +212,7 @@ class JSONSerializer(object):
 
         player = PlayerModel(ip, nickname)
         #player.set_pos(payload['_row'], payload['_column'])
-        player.set_pos(0,0)
+        player.set_pos(-1, -1)
         player.color = tuple(payload['_color'])
         player.status = PlayerStatusEnum(payload["_status"]["value"])
         player.ap = payload['_ap']
