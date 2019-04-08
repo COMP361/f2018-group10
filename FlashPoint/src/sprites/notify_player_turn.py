@@ -4,6 +4,7 @@ import time
 from threading import Thread
 
 import src.constants.color as Color
+from src.action_events.stop_command_event import StopCommandEvent
 from src.action_events.end_turn_advance_fire import EndTurnAdvanceFireEvent
 from src.UIComponents.rect_label import RectLabel
 from src.UIComponents.rect_button import RectButton
@@ -148,6 +149,10 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
         self._current_sprite.turn = False
         self.enabled = False
         self.running = False
+
+        command = GameStateModel.instance().command
+        if command[0]:
+            StopCommandEvent(command[0]).execute()
 
         if self.countdown_thread != threading.current_thread() and self.countdown_thread.is_alive():
             self.countdown_thread.join()
