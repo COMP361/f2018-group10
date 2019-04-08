@@ -93,7 +93,7 @@ class GameBoardModel(Model):
     @is_loaded.setter
     def is_loaded(self, loaded: bool):
         self._is_loaded = loaded
-        
+
     @property
     def board_type(self):
         return self._board_type
