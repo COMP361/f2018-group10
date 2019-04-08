@@ -11,7 +11,8 @@ from src.models.model import Model
 
 logger = logging.getLogger("FlashPoint")
 
-class PlayerModel(Model,object):
+
+class PlayerModel(Model, object):
 
     def __init__(self, ip: str, nickname: str):
         super().__init__()

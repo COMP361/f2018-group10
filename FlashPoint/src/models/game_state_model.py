@@ -367,7 +367,7 @@ class GameStateModel(Model):
 
     def all_players_have_chosen_location(self) -> bool:
         """If all player locations are positive, then we know that they have chosen their position."""
-        return all([player.row and player.column and player.column >= 0 and player.row >= 0 for player in self.players])
+        return all([player.column >= 0 and player.row >= 0 for player in self.players])
 
     def vehicles_have_been_placed(self) -> bool:
         ambulance_placed = self.game_board.ambulance.orientation != VehicleOrientationEnum.UNSET
