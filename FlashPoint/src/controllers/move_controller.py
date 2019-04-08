@@ -176,7 +176,7 @@ class MoveController(PlayerObserver, Controller):
         is_carrying_victim = isinstance(self.current_player.carrying_victim, VictimModel)
         # there is a destroyed door or a destroyed wall or no obstacle or an open door or a damaged wall
         if self.current_player.role == PlayerRoleEnum.DOGE:
-            if not has_obstacle or is_open_door:
+            if not has_obstacle or is_open_door or is_damaged_wall:
                 # The Doge is not allowed to carry a
                 # victim through a damaged wall.
                 if is_carrying_victim and is_damaged_wall:

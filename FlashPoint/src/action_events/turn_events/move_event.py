@@ -253,10 +253,11 @@ class MoveEvent(TurnEvent):
         """
         shortest_path.pop(0)
         for d_tile in shortest_path:
-            # update the position of the fireman
-            self.fireman.set_pos(d_tile.tile_model.row, d_tile.tile_model.column)
             self._deduct_player_points(d_tile.tile_model)
             self.resolve_victim_while_traveling(d_tile.tile_model)
+
+            # update the position of the fireman
+            self.fireman.set_pos(d_tile.tile_model.row, d_tile.tile_model.column)
 
             # Check the associated models of the tile.
             # If it contains any POIs, flip them over.
@@ -432,7 +433,7 @@ class MoveEvent(TurnEvent):
         is_carrying_victim = isinstance(self.fireman.carrying_victim, VictimModel)
         # there is a destroyed door or a destroyed wall or no obstacle or an open door or a damaged wall
         if self.fireman.role == PlayerRoleEnum.DOGE:
-            if not has_obstacle or is_open_door:
+            if not has_obstacle or is_open_door or is_damaged_wall:
                 # The Doge is not allowed to carry a
                 # victim through a damaged wall.
                 if is_carrying_victim and is_damaged_wall:
