@@ -14,12 +14,21 @@ class ExtinguishEvent(TurnEvent):
     def __init__(self, extinguish_space: TileModel):
         super().__init__()
         game: GameStateModel = GameStateModel.instance()
-        self.fireman: PlayerModel = game.players_turn
+        # Check if player is commanding
+        if game.players_turn == game.command[0]:
+            self.source: PlayerModel = game.command[0]
+            self.fireman: PlayerModel = game.command[1]
+        else:
+            self.source = None
+            self.fireman: PlayerModel = game.players_turn
         self.extinguish_space: TileModel = game.game_board.get_tile_at(extinguish_space.row, extinguish_space.column)
 
     def execute(self):
         logger.info(f"Executing Extinguish Event on {self.extinguish_space}")
-        fireman = self.fireman
+        if self.source:
+            fireman = self.source
+        else:
+            fireman = self.fireman
         extinguish_space = self.extinguish_space
 
         if extinguish_space.space_status == SpaceStatusEnum.SMOKE:

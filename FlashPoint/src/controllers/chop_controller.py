@@ -29,12 +29,20 @@ class ChopController(object):
     def instance(cls):
         return cls._instance
 
+    @property
+    def target(self) -> PlayerModel:
+        game: GameStateModel = GameStateModel.instance()
+        source: PlayerModel = game.command[0]
+        if source and self.current_player == source:
+            return [player for player in game.players if player == game.command[1]][0]
+        return self.current_player
+
     def check(self, wall: WallModel) -> bool:
         if not self.current_player == self.game.players_turn:
             return False
 
         # Doge cannot chop walls
-        if self.current_player.role == PlayerRoleEnum.DOGE:
+        if self.target.role == PlayerRoleEnum.DOGE:
             return False
 
         if self.current_player.role == PlayerRoleEnum.RESCUE:
@@ -45,7 +53,7 @@ class ChopController(object):
         if not valid_to_chop:
             return False
 
-        player_tile = self.board.get_tile_at(self.current_player.row, self.current_player.column)
+        player_tile = self.board.get_tile_at(self.target.row, self.target.column)
 
         if wall not in player_tile.adjacent_edge_objects.values():
             return False

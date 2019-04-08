@@ -34,13 +34,21 @@ class ExtinguishController(Controller):
     def instance(cls):
         return cls._instance
 
+    @property
+    def target(self) -> PlayerModel:
+        game: GameStateModel = GameStateModel.instance()
+        source: PlayerModel = game.command[0]
+        if source and self.current_player == source:
+            return [player for player in game.players if player == game.command[1]][0]
+        return self.current_player
+
     def run_checks(self, tile_model: TileModel) -> bool:
         # Doge cannot extinguish fire/smoke
-        if self.current_player.role == PlayerRoleEnum.DOGE:
+        if self.target.role == PlayerRoleEnum.DOGE:
             return False
 
-        player_tile: TileModel = GameStateModel.instance().game_board.get_tile_at(self.current_player.row,
-                                                                                  self.current_player.column)
+        player_tile: TileModel = GameStateModel.instance().game_board.get_tile_at(self.target.row,
+                                                                                  self.target.column)
 
         if tile_model not in player_tile.adjacent_tiles.values() and tile_model != player_tile:
             return False
