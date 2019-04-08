@@ -82,7 +82,7 @@ class EndTurnAdvanceFireEvent(TurnEvent):
 
         # Add a hotspot marker to the last
         # target space of the advance_on_tile()
-        if self.board.hotspot_bank > 0:
+        if self.board.hotspot_bank > 0 and x > 1:
             self.initial_tile.is_hotspot = True
             self.board.hotspot_bank = self.board.hotspot_bank - 1
 
@@ -328,6 +328,7 @@ class EndTurnAdvanceFireEvent(TurnEvent):
                 # an explosion.
                 for assoc_model in tile.associated_models:
                     if isinstance(assoc_model, HazmatModel):
+                        logger.info("Hazmat explosion occured on {t}".format(t=tile))
                         self.explosion(tile)
                         tile.remove_associated_model(assoc_model)
                         if self.board.hotspot_bank > 0:
