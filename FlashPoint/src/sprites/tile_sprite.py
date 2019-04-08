@@ -31,12 +31,18 @@ class TileSprite(Interactable, TileObserver):
         self._smoke_image = smoke_image
         self._non_highlight_image = image.copy()
         self._blank_image = image.copy()
+
+        self.counter = 80
+
         self.explosion = False
-        self.explosion_counter = 100
         self.explosion_image = image.copy()
         self.explosion_image.blit(pygame.image.load('media/all_markers/explosian.png'), (0, 0, 128, 128))
-
         self.explosion_image.get_rect().move_ip(x_offset,y_offset)
+
+        self.fire_deck_gun = False
+        self.fire_deck_gun_image = image.copy()
+        self.fire_deck_gun_image.blit(pygame.image.load('media/all_markers/water_splash.png'), (0, 0, 128, 128))
+        self.fire_deck_gun_image.get_rect().move_ip(x_offset, y_offset)
         # Initialize if place is Fire, Smoke or Safe
         tile = GameStateModel.instance().game_board.get_tile_at(row, column)
         status = tile.space_status
@@ -184,10 +190,16 @@ class TileSprite(Interactable, TileObserver):
     def draw(self, screen: pygame.Surface):
         if self.explosion:
             screen.blit(self.explosion_image, self.rect)
-            self.explosion_counter -= 1
-            if self.explosion_counter == 0:
+            self.counter -= 1
+            if self.counter == 0:
                 self.explosion = False
-                self.explosion_counter = 100
+                self.counter = 80
+        elif self.fire_deck_gun:
+            screen.blit(self.fire_deck_gun_image,self.rect)
+            self.counter =- 1
+            if self.counter == 0:
+                self.fire_deck_gun = True
+                self.counter = 80
         else:
             self._draw_hightlight()
             screen.blit(self.image, self.rect)
