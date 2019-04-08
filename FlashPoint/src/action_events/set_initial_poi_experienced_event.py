@@ -28,12 +28,12 @@ class SetInitialPOIExperiencedEvent(ActionEvent):
         :param kwargs:
         :return:
         """
+        self.game: GameStateModel = GameStateModel.instance()
+        self.game_board = self.game.game_board
         # Pick random location: roll dice
         random.seed(self.seed)
         self.rand_nums = random.sample(range(len(self.game_board.poi_bank)), 3)
         logging.info("Executing Set Initial POI Experienced Event")
-        self.game: GameStateModel = GameStateModel.instance()
-        self.game_board = self.game.game_board
         
         locations = self._determine_locations()
         pois_to_remove = []
