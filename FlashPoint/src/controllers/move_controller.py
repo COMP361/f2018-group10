@@ -5,6 +5,7 @@ from src.UIComponents.interactable import Interactable
 from src.action_events.turn_events.move_event import DijkstraTile, PriorityQueue, MoveEvent
 from src.constants.state_enums import PlayerStatusEnum, PlayerRoleEnum, WallStatusEnum
 from src.controllers.controller import Controller
+from src.core.flashpoint_exceptions import TilePositionOutOfBoundsException
 from src.core.networking import Networking
 from src.models.game_board.wall_model import WallModel
 from src.models.game_units.hazmat_model import HazmatModel
@@ -306,9 +307,13 @@ class MoveController(PlayerObserver, Controller):
         """
         directions = ["North", "East", "West", "South"]
         for dirn in directions:
-            nb_src_tile: TileModel = src_tile.get_tile_in_direction(dirn)
-            if nb_src_tile.row == dest_tile.row and nb_src_tile.column == dest_tile.column:
-                return dirn
+            try:
+                nb_src_tile: TileModel = src_tile.get_tile_in_direction(dirn)
+                if nb_src_tile.row == dest_tile.row and nb_src_tile.column == dest_tile.column:
+                    return dirn
+
+            except TilePositionOutOfBoundsException:
+                continue
 
     def _apply_highlight(self):
         for column in range(len(self.game_board_sprite.grid.grid)):  # First make them all hover_color to red
