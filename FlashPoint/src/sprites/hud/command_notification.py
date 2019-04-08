@@ -24,7 +24,7 @@ class CommandNotification(object):
         self._wait_command = RectLabel(500, 400, 300, 50, Color.GREY, 0,
                                        Text(pygame.font.SysFont('Agency FB', 30), f"Commanded by: None",
                                             Color.ORANGE))
-        self._end_command_btn = RectButton(1130, 500, 150, 50, background=Color.ORANGE,
+        self._end_command_btn = RectButton(1130, 350, 150, 50, background=Color.ORANGE,
                                            txt_obj=Text(pygame.font.SysFont('Arial', 23), "END COMMAND", Color.GREEN2))
         self._end_command_btn.on_click(self.end_command)
         self._is_source = False

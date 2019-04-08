@@ -108,19 +108,6 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
         btn.on_click(self._end_turn)
         return btn
 
-    @property
-    def end_btn_enabled(self):
-        return self.btn.enabled
-
-    @end_btn_enabled.setter
-    def end_btn_enabled(self, enable: bool):
-        if self.btn:
-            if enable:
-                self.btn.on_click(self._end_turn)
-            else:
-                print("remove")
-                self.btn.on_click(None)
-
     def countdown(self, count):
         while count and self.running:
             mins,secs = divmod(count, 60)

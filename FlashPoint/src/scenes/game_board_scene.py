@@ -341,12 +341,8 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
 
         if source and source == self._current_player:
             self._command_notification.is_source = True
-            self._notify_player_turn.end_btn_enabled = False
         elif target and target == self._current_player:
             self._command_notification.is_target = True
-
-        if not source:
-            self._notify_player_turn.end_btn_enabled = True
 
     def player_list_changed(self):
         # Refresh the list of players in HUD
