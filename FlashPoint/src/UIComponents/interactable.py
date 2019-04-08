@@ -53,8 +53,7 @@ class Interactable(pygame.sprite.Sprite):
 
             for event in event_queue:
                 if not isinstance(event, ChangeSceneEnum):
-                    if event.type == pygame.MOUSEBUTTONUP and event.button == 1 \
-                            and not self._clicked and self._is_enabled:
+                    if event.type == pygame.MOUSEBUTTONUP and event.button == 1 and not self._clicked:
                         self._clicked = True
                         self.click()
 
@@ -157,10 +156,6 @@ class Interactable(pygame.sprite.Sprite):
     @property
     def enabled(self):
         return self._is_enabled
-
-    @enabled.setter
-    def enabled(self, enable: bool):
-        self._is_enabled = enable
 
     # why is this so hard
     @property

@@ -273,7 +273,9 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
                 self._victim_lost_prompt.enabled = False
             elif event.type == CustomEventEnum.DISABLE_VICTIM_SAVED_PROMPT:
                 self._victim_saved_prompt.enabled = False
-
+            elif event.type == CustomEventEnum.PERMISSION_PROMPT:
+                if event.target == self._current_player:
+                    self.display_permission_prompt(event.source, event.target)
             elif event.type == CustomEventEnum.DODGE_PROMPT:
                 self._dodge_prompt.enabled = True
 

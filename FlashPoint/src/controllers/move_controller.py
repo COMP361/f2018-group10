@@ -52,11 +52,11 @@ class MoveController(PlayerObserver, Controller):
         return cls._instance
 
     @property
-    def target(self):
+    def target(self) -> PlayerModel:
         game: GameStateModel = GameStateModel.instance()
         source: PlayerModel = game.command[0]
         if source and self.current_player == source:
-            return [player for player in game.players if player == game.command[1]]
+            return [player for player in game.players if player == game.command[1]][0]
         return self.current_player
 
     def _determine_reachable_tiles(self, row: int, column: int, ap: int) -> List[TileModel]:

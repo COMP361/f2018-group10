@@ -124,9 +124,3 @@ class SceneManager(object):
                 elif event.type == ChangeSceneEnum.LOSESCENE:
                     self.next(LoseScene)
                     EventQueue.unblock()
-
-            if isinstance(self._active_scene, GameBoardScene):
-                for event in event_queue:
-                    if event.type == CustomEventEnum.PERMISSION_PROMPT:
-                        if event.target == self._current_player:
-                            self._active_scene.display_permission_prompt(event.source, event.target)

@@ -3,6 +3,8 @@ from typing import Tuple
 import pygame
 
 import src.constants.color as Color
+from src.action_events.stop_command_event import StopCommandEvent
+from src.core.networking import Networking
 from src.core.event_queue import EventQueue
 from src.models.game_units.player_model import PlayerModel
 from src.UIComponents.text import Text
@@ -24,8 +26,17 @@ class CommandNotification(object):
                                             Color.ORANGE))
         self._end_command_btn = RectButton(1130, 500, 150, 50, background=Color.ORANGE,
                                            txt_obj=Text(pygame.font.SysFont('Arial', 23), "END COMMAND", Color.GREEN2))
+        self._end_command_btn.on_click(self.end_command)
         self._is_source = False
         self._is_target = False
+
+    def end_command(self):
+        event = StopCommandEvent(self._source)
+
+        if Networking.get_instance().is_host:
+            Networking.get_instance().send_to_all_client(event)
+        else:
+            Networking.get_instance().send_to_server(event)
 
     @property
     def command(self) -> Tuple[PlayerModel, PlayerModel]:
