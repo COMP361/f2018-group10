@@ -43,7 +43,6 @@ class PlayerModel(Model, object):
         player_color = "Player color: {color}\n".format(color=self.color)
         return '\n'.join([player_pos, player_ap, player_carrying_victim, player_status, player_color])
 
-
     def _notify_all_observers(self):
         self._notify_ap()
         self._notify_position()
