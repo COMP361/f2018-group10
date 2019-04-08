@@ -32,6 +32,7 @@ from src.action_events.turn_events.ride_vehicle_event import RideVehicleEvent
 from src.action_events.turn_events.stop_leading_victim_event import StopLeadingVictimEvent
 from src.action_events.vehicle_placed_event import VehiclePlacedEvent
 from src.models.game_board.door_model import DoorModel
+from src.models.game_board.game_board_model import GameBoardModel
 from src.models.game_board.null_model import NullModel
 from src.models.game_board.wall_model import WallModel
 from src.models.game_units.hazmat_model import HazmatModel
@@ -188,6 +189,8 @@ class JSONSerializer(object):
     @staticmethod
     def restore_game_board(game: GameStateModel, payload: Dict):
         """Special deserialize called from the GameStateModel deserializer."""
+        if payload['_board_info']:
+            game.game_board = GameBoardModel(GameBoardTypeEnum.RANDOM, payload['_board_info'])
         JSONSerializer._restore_carried_hazmats(game)
         JSONSerializer._restore_carried_victims(game)
         JSONSerializer._restore_tile_state(game, payload)

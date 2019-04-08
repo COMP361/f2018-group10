@@ -24,10 +24,11 @@ class FirePlacementEvent(ActionEvent):
 
         # Pick random location: roll dice
         random.seed(self.seed)
+
+    def execute(self):
         self.game: GameStateModel = GameStateModel.instance()
         self.board: GameBoardModel = self.game.game_board
 
-    def execute(self):
         logger.info("Executing Fire Placement Event")
         if self.game.rules == GameKindEnum.FAMILY:
             self.board.set_fires_family()

@@ -1,3 +1,4 @@
+import os
 import random
 import logging
 from threading import RLock
@@ -38,6 +39,7 @@ class GameStateModel(Model):
             self._rules = game_kind
 
             self._board_type = board_type
+
             self._game_board = GameBoardModel(self._board_type)
 
             self._victims_saved = 0
@@ -71,6 +73,8 @@ class GameStateModel(Model):
     @staticmethod
     def __del__():
         GameStateModel._instance = None
+        if os.path.exists("media/board_layouts/random_inside_walls.json"):
+            os.rmdir("media/board_layouts/random_inside_walls.json")
 
     @classmethod
     def instance(cls):

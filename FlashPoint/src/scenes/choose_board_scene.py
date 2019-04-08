@@ -55,7 +55,7 @@ class ChooseBoardScene(object):
         box_size = (130, 48)
         self.button_board2 = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
                                         Text(pygame.font.SysFont('Arial', 20), text, color_text))
-        self.button_board2.on_click(self.set_and_continue, GameBoardTypeEnum.ALTERNATIVE)
+        self.button_board2.on_click(self.set_and_continue, GameBoardTypeEnum.RANDOM)
         self.sprite_grp.add(self.button_board2)
 
     def _init_btn_back(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
