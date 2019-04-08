@@ -17,7 +17,7 @@ from src.sprites.tile_sprite import TileSprite
 from src.sprites.wall_sprite import WallSprite
 
 
-class GridSprite(pygame.sprite.Group):
+class GridSprie(pygame.sprite.Group):
     """Class to Group Tile objects together, and implement Grid logic in to what will form the GameBoard."""
 
     def __init__(self, *sprites: pygame.sprite.Sprite,
@@ -43,9 +43,9 @@ class GridSprite(pygame.sprite.Group):
         """Initialize a grid of Tiles, add to self Sprite Group."""
         grid = []
         x_offset = 0
-        boardType = GameStateModel.instance().game_board.board_type
-        filePath = self.choose_board(boardType)
-        tile_images = Spritesheet(filePath, 10, 8).cell_images
+        board_type = GameStateModel.instance().game_board.board_type
+        file_path = self.choose_board(board_type)
+        tile_images = Spritesheet(file_path, 10, 8).cell_images
 
         for i in range(0, self.width):
             grid.append([])
@@ -125,7 +125,7 @@ class GridSprite(pygame.sprite.Group):
             door.update(event_queue)
 
     def choose_board(self,type :GameBoardTypeEnum):
-        if(type == GameBoardTypeEnum.ORIGINAL):
+        if type == GameBoardTypeEnum.ORIGINAL:
             str = "media/boards/board1.png"
             return str
         else:
