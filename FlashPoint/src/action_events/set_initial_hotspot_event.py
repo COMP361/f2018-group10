@@ -8,6 +8,7 @@ from src.models.game_state_model import GameStateModel
 
 logger = logging.getLogger("FlashPoint")
 
+
 class SetInitialHotspotEvent(ActionEvent):
     """Event for placing Hot Spot markers at
         the beginning of the experienced game"""
