@@ -3,6 +3,7 @@ from src.controllers.controller import Controller
 from src.controllers.drive_vehicles_controller import DriveVehiclesController
 from src.controllers.hazmat_controller import HazmatController
 from src.controllers.identify_controller import IdentifyController
+from src.controllers.resuscitate_controller import ResuscitateController
 from src.controllers.vehicle_placement_controller import VehiclePlacementController
 from src.controllers.victim_controller import VictimController
 from src.core.event_queue import EventQueue
@@ -41,6 +42,7 @@ class TileInputController(GameStateObserver, Controller):
             IdentifyController(current_player)
             HazmatController(current_player)
             CommandPlayerController(current_player)
+            ResuscitateController(current_player)
 
         GameStateModel.instance().add_observer(self)
         # Force notify observers
@@ -64,6 +66,7 @@ class TileInputController(GameStateObserver, Controller):
         IdentifyController._instance = None
         HazmatController._instance = None
         CommandPlayerController._instance = None
+        ResuscitateController._instance = None
 
     def _disable_all_menus(self):
         grid = self.game_board_sprite.grid.grid
@@ -91,6 +94,7 @@ class TileInputController(GameStateObserver, Controller):
             DriveVehiclesController.instance().process_input(tile_sprite)
             HazmatController.instance().process_input(tile_sprite)
             CommandPlayerController.instance().process_input(tile_sprite)
+            ResuscitateController.instance().process_input(tile_sprite)
 
     def notify_player_index(self, player_index: int):
         pass

@@ -1,9 +1,14 @@
 import random
 import logging
+import time
+from threading import Thread
 
-
+from src.UIComponents.file_importer import FileImporter
 from src.action_events.knock_down_event import KnockDownEvent
 from src.action_events.replenish_poi_event import ReplenishPOIEvent
+from src.constants.custom_event_enums import CustomEventEnum
+from src.core.custom_event import CustomEvent
+from src.core.event_queue import EventQueue
 from src.models.game_board.door_model import DoorModel
 from src.models.game_board.null_model import NullModel
 from src.models.game_board.wall_model import WallModel
@@ -16,6 +21,7 @@ from src.constants.state_enums import GameStateEnum, SpaceStatusEnum, WallStatus
     SpaceKindEnum, POIIdentityEnum, GameKindEnum, PlayerRoleEnum
 from src.action_events.turn_events.turn_event import TurnEvent
 from src.models.game_state_model import GameStateModel
+from src.sprites.game_board import GameBoard
 
 logger = logging.getLogger("FlashPoint")
 
@@ -75,7 +81,7 @@ class EndTurnAdvanceFireEvent(TurnEvent):
 
         # Add a hotspot marker to the last
         # target space of the advance_on_tile()
-        if self.board.hotspot_bank > 0:
+        if self.board.hotspot_bank > 0 and x > 1:
             self.initial_tile.is_hotspot = True
             self.board.hotspot_bank = self.board.hotspot_bank - 1
 
@@ -84,10 +90,9 @@ class EndTurnAdvanceFireEvent(TurnEvent):
         rp_event.execute()
 
         # ------ Replenish Player's points ----- #
-        self._replenish_player_points(self.player)
+        self._replenish_player_points()
 
-    @staticmethod
-    def _replenish_player_points(player):
+    def _replenish_player_points(self):
         """
         Replenishes a player's AP, special AP
         according to the rules for the different roles.
@@ -99,23 +104,31 @@ class EndTurnAdvanceFireEvent(TurnEvent):
         # replenish player's AP, irrespective
         # of role, by 4 (add/subtract points after).
         # special AP are not retained for the next turn.
-        if player.ap > 4:
-            player.ap = 4
+        # Handle Doge's case separately...
+        if self.player.role == PlayerRoleEnum.DOGE:
+            if self.player.ap > 6:
+                self.player.ap = 6
 
-        player.ap = player.ap + 4
+            self.player.ap = self.player.ap + 12
+            return
 
-        if player.role == PlayerRoleEnum.CAPTAIN:
-            player.special_ap = 2
+        if self.player.ap > 4:
+            self.player.ap = 4
 
-        elif player.role == PlayerRoleEnum.CAFS:
-            player.ap = player.ap - 1
-            player.special_ap = 3
+        self.player.ap = self.player.ap + 4
 
-        elif player.role == PlayerRoleEnum.GENERALIST:
-            player.ap = player.ap + 1
+        if self.player.role == PlayerRoleEnum.CAPTAIN:
+            self.player.special_ap = 2
 
-        elif player.role == PlayerRoleEnum.RESCUE:
-            player.special_ap = 3
+        elif self.player.role == PlayerRoleEnum.CAFS:
+            self.player.ap = self.player.ap - 1
+            self.player.special_ap = 3
+
+        elif self.player.role == PlayerRoleEnum.GENERALIST:
+            self.player.ap = self.player.ap + 1
+
+        elif self.player.role == PlayerRoleEnum.RESCUE:
+            self.player.special_ap = 3
 
     def _placing_players_end_turn(self):
         # If the last player has chosen a location, move the game into the next phase.
@@ -197,8 +210,12 @@ class EndTurnAdvanceFireEvent(TurnEvent):
         return flare_up_will_occur
 
     def explosion(self, origin_tile: TileModel):
+        FileImporter.play_music("media/music/explosion.mp3", 1)
         logger.info(f"Explosion occurred on {origin_tile}")
         game_state = GameStateModel.instance()
+        tile_sprite = GameBoard.instance().grid.grid[origin_tile.column][origin_tile.row]
+        tile_sprite.explosion = True
+
         for direction, obstacle in origin_tile.adjacent_edge_objects.items():
             # fire does not move to the neighbouring tile
             # damaging wall present along the tile
@@ -323,6 +340,7 @@ class EndTurnAdvanceFireEvent(TurnEvent):
                 # an explosion.
                 for assoc_model in tile.associated_models:
                     if isinstance(assoc_model, HazmatModel):
+                        logger.info("Hazmat explosion occured on {t}".format(t=tile))
                         self.explosion(tile)
                         tile.remove_associated_model(assoc_model)
                         if self.board.hotspot_bank > 0:
@@ -343,6 +361,12 @@ class EndTurnAdvanceFireEvent(TurnEvent):
                             tile.is_hotspot = True
                             self.board.hotspot_bank = self.board.hotspot_bank - 1
 
+
+    def countdown(self):
+        EventQueue.post(CustomEvent(CustomEventEnum.ENABLE_VICTIM_LOST_PROMPT))
+        time.sleep(5)
+        EventQueue.post(CustomEvent(CustomEventEnum.DISABLE_VICTIM_LOST_PROMPT))
+
     def affect_damages(self):
         """
         Affect any valid damages to firemen,
@@ -357,6 +381,9 @@ class EndTurnAdvanceFireEvent(TurnEvent):
             for model in assoc_models:
                 if isinstance(model, VictimModel):
                     logger.info(f"{model} was lost.")
+
+                    thread = Thread(target=self.countdown)
+                    thread.start()
                     self.game_state.victims_lost = self.game_state.victims_lost + 1
                     model: VictimModel = model
                     model.state = VictimStateEnum.LOST

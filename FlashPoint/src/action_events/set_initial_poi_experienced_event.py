@@ -19,9 +19,6 @@ class SetInitialPOIExperiencedEvent(ActionEvent):
         else:
             self.seed = seed
 
-        self.game: GameStateModel = GameStateModel.instance()
-        self.game_board = self.game.game_board
-
     def execute(self, *args, **kwargs):
         """
         Set the initial POIs for the experienced
@@ -35,6 +32,9 @@ class SetInitialPOIExperiencedEvent(ActionEvent):
         random.seed(self.seed)
         self.rand_nums = random.sample(range(len(self.game_board.poi_bank)), 3)
         logging.info("Executing Set Initial POI Experienced Event")
+        self.game: GameStateModel = GameStateModel.instance()
+        self.game_board = self.game.game_board
+        
         locations = self._determine_locations()
         pois_to_remove = []
         for i, index in enumerate(self.rand_nums):

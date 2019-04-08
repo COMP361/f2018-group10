@@ -19,10 +19,10 @@ class SetInitialHotspotEvent(ActionEvent):
             self.seed = random.randint(1, 6969)
         else:
             self.seed = seed
-
         self.num_hotspots_to_place = 0
 
     def _determine_num_to_place(self):
+
         # Determine the number of
         # hotspots that have to be placed.
         if self.game.difficulty_level != DifficultyLevelEnum.RECRUIT:
@@ -46,6 +46,9 @@ class SetInitialHotspotEvent(ActionEvent):
         self.game: GameStateModel = GameStateModel.instance()
         self.game_board: GameBoardModel = self.game.game_board
         logger.info("Executing Set Initial Hot Spot Event")
+        self.game: GameStateModel = GameStateModel.instance()
+        self.game_board: GameBoardModel = self.game.game_board
+
         self._determine_num_to_place()
         logger.info("{h} hotspots have to be placed".format(h=self.num_hotspots_to_place))
         num_placed = 0

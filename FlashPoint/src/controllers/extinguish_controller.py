@@ -35,6 +35,10 @@ class ExtinguishController(Controller):
         return cls._instance
 
     def run_checks(self, tile_model: TileModel) -> bool:
+        # Doge cannot extinguish fire/smoke
+        if self.current_player.role == PlayerRoleEnum.DOGE:
+            return False
+
         player_tile: TileModel = GameStateModel.instance().game_board.get_tile_at(self.current_player.row,
                                                                                   self.current_player.column)
 

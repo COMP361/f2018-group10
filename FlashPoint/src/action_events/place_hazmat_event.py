@@ -39,6 +39,8 @@ class PlaceHazmatEvent(ActionEvent):
         self.game: GameStateModel = GameStateModel.instance()
         self.board = self.game.game_board
         logger.info("Executing HazMat Placement Event")
+        self.game: GameStateModel = GameStateModel.instance()
+        self.board = self.game.game_board
         level = self.game.difficulty_level
 
         if level == DifficultyLevelEnum.RECRUIT:

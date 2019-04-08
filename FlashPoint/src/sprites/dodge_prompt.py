@@ -23,7 +23,21 @@ class DodgePrompt(object):
 
         self.background = RectLabel(550, 300, 200, 75, Color.GREY, 0,
                                     Text(pygame.font.SysFont('Arial', 20), "Dodge?", Color.WHITE))
+        self.enabled = False
+        self.disable()
 
+    def enable(self):
+        self.deny_button.enable()
+        self.accept_button.enable()
+        self.accept_button.on_click(self._accept_on_click)
+        self.deny_button.on_click(self._deny_on_click)
+        self.enabled = True
+
+    def disable(self):
+        self.deny_button.disable()
+        self.accept_button.disable()
+        self.accept_button.on_click(None)
+        self.deny_button.on_click(None)
         self.enabled = False
 
     def _send_reply_event(self, reply: bool):
@@ -33,11 +47,11 @@ class DodgePrompt(object):
             Networking.get_instance().send_to_server(DodgeReplyEvent(reply))
 
     def _deny_on_click(self):
-        self.enabled = False
+        self.disable()
         self._send_reply_event(False)
 
     def _accept_on_click(self):
-        self.enabled = False
+        self.disable()
         self._send_reply_event(True)
 
     def update(self, event_queue: EventQueue):

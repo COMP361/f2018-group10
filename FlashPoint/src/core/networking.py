@@ -1,3 +1,4 @@
+import json
 import traceback
 from typing import Union
 
@@ -8,6 +9,8 @@ import logging
 import time
 
 from src.action_events.end_turn_advance_fire import EndTurnAdvanceFireEvent
+from src.action_events.random_board_setup_event import RandomBoardSetupEvent
+from src.constants.state_enums import GameBoardTypeEnum
 from src.core.custom_event import CustomEvent
 from src.core.serializer import JSONSerializer
 from src.core.event_queue import EventQueue
@@ -379,6 +382,11 @@ class Networking:
                 if isinstance(data, JoinEvent):
                     data.execute()
                     Networking.get_instance().send_to_all_client(GameStateModel.instance())
+                    if GameStateModel.instance().game_board.board_type == GameBoardTypeEnum.RANDOM:
+                        with open("media/board_layouts/random_inside_walls_doors.json", "r+") as f:
+
+                            board_info = json.load(f)
+                        Networking.get_instance().send_to_all_client(RandomBoardSetupEvent(board_info))
                     return super(MastermindServerUDP, self).callback_client_handle(connection_object, data)
 
                 # send everything back to the clients to process

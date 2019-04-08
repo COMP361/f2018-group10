@@ -1,13 +1,21 @@
 from typing import List
 import time
 import logging
+from threading import Thread
+
 
 from src.action_events.turn_events.turn_event import TurnEvent
+from src.constants.custom_event_enums import CustomEventEnum
 from src.constants.state_enums import SpaceStatusEnum, SpaceKindEnum, DoorStatusEnum, VictimStateEnum, \
-    GameKindEnum, PlayerRoleEnum
+    GameKindEnum, PlayerRoleEnum, WallStatusEnum
+from src.core.flashpoint_exceptions import TilePositionOutOfBoundsException
+
+from src.core.custom_event import CustomEvent
+from src.core.event_queue import EventQueue
 from src.models.game_board.door_model import DoorModel
 from src.models.game_board.null_model import NullModel
 from src.models.game_board.tile_model import TileModel
+from src.models.game_board.wall_model import WallModel
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.hazmat_model import HazmatModel
 from src.models.game_units.player_model import PlayerModel
@@ -97,13 +105,13 @@ class MoveEvent(TurnEvent):
 
     def __init__(self, dest: TileModel, moveable_tiles: List[TileModel]):
         super().__init__()
-        self.game: GameStateModel = GameStateModel.instance()
-        self.fireman: PlayerModel = self.game.players_turn
+        game: GameStateModel = GameStateModel.instance()
+        self.fireman: PlayerModel = game.players_turn
         self.source_tile = None
-        self.destination = self.game.game_board.get_tile_at(dest.row, dest.column)
+        self.destination = game.game_board.get_tile_at(dest.row, dest.column)
         self.moveable_tiles = []
         for m_tile in moveable_tiles:
-            self.moveable_tiles.append(self.game.game_board.get_tile_at(m_tile.row, m_tile.column))
+            self.moveable_tiles.append(game.game_board.get_tile_at(m_tile.row, m_tile.column))
         self.dijkstra_tiles: List[DijkstraTile] = []
 
     def _init_dijkstra_tiles(self, dest: TileModel):
@@ -128,9 +136,11 @@ class MoveEvent(TurnEvent):
             if d_tile.tile_model.row == dest.row and d_tile.tile_model.column == dest.column:
                 self.destination = d_tile
 
+
     def execute(self):
         logger.info(f"Executing MoveEvent from ({self.fireman.row}, "
                     f"{self.fireman.column}) to ({self.destination.row}, {self.destination.column})")
+        self.game: GameStateModel = GameStateModel.instance()
         # initialize the Dijkstra tiles
         self._init_dijkstra_tiles(self.destination)
         # Insert the Dijkstra tiles
@@ -170,30 +180,17 @@ class MoveEvent(TurnEvent):
         :param second_tile:
         :return:
         """
-        has_obstacle = first_tile.tile_model.has_obstacle_in_direction(direction)
-        obstacle = first_tile.tile_model.get_obstacle_in_direction(direction)
-
-        if not has_obstacle or (isinstance(obstacle, DoorModel) and obstacle.door_status == DoorStatusEnum.OPEN):
-            pass
-        else:
+        if not self._is_path_clear(first_tile.tile_model, direction):
             return
 
-        cost_to_travel = 0
-        # Two separate cases depending on whether
-        # fireman is carrying a victim/hazmat or not.
-
-        # fireman is carrying a victim/hazmat
-        if isinstance(self.fireman.carrying_victim, VictimModel) or isinstance(self.fireman.carrying_hazmat, HazmatModel):
-            if second_tile.tile_model.space_status != SpaceStatusEnum.FIRE:
-                cost_to_travel = 2
-
-        # fireman is not carrying a victim/hazmat
+        if second_tile.tile_model.space_status != SpaceStatusEnum.FIRE:
+            # Can pass either Safe/Smoke to method
+            cost_to_travel = self._determine_cost_to_move(second_tile.tile_model)
         else:
-            if second_tile.tile_model.space_status != SpaceStatusEnum.FIRE:
-                cost_to_travel = 1
-            # fireman heading into fire and not leading a victim
-            elif second_tile.tile_model.space_status == SpaceStatusEnum.FIRE and not isinstance(self.fireman.leading_victim, VictimModel):
-                cost_to_travel = 2
+            if self._can_go_into_fire():
+                cost_to_travel = self._determine_cost_to_move(second_tile.tile_model)
+            else:
+                return
 
         # If it is cheaper to take this new way from
         # the first tile, change the least cost for
@@ -264,44 +261,11 @@ class MoveEvent(TurnEvent):
         """
         shortest_path.pop(0)
         for d_tile in shortest_path:
+            self._deduct_player_points(d_tile.tile_model)
+            self.resolve_victim_while_traveling(d_tile.tile_model)
+
             # update the position of the fireman
             self.fireman.set_pos(d_tile.tile_model.row, d_tile.tile_model.column)
-
-            # Two separate cases depending on whether
-            # fireman is carrying a victim/hazmat or not
-
-            # Fireman is carrying a victim/hazmat -
-            # 2 AP to carry victim/hazmat through Safe or
-            # Smoke space. Handle the case for when
-            # victim is carried outside of the building
-            # depending on the game mode. If the hazmat
-            # is carried outside of the building, it is disposed.
-            carrying_something = False
-
-            if isinstance(self.fireman.carrying_victim, VictimModel):
-                carrying_something = True
-                if d_tile.tile_model.space_status != SpaceStatusEnum.FIRE:
-                    self._deduct_player_points(2)
-                    if d_tile.tile_model.space_kind != SpaceKindEnum.INDOOR:
-                        self.resolve_victim_while_traveling(d_tile.tile_model)
-
-            if isinstance(self.fireman.carrying_hazmat, HazmatModel):
-                carrying_something = True
-                if d_tile.tile_model.space_status != SpaceStatusEnum.FIRE:
-                    self._deduct_player_points(2)
-                    if d_tile.tile_model.space_kind != SpaceKindEnum.INDOOR:
-                        self.fireman.carrying_hazmat = NullModel()
-
-            if isinstance(self.fireman.leading_victim, VictimModel):
-                self.resolve_victim_while_traveling(d_tile.tile_model)
-
-            # fireman is not carrying a victim/hazmat
-            if not carrying_something:
-                if d_tile.tile_model.space_status != SpaceStatusEnum.FIRE:
-                    self._deduct_player_points(1)
-                # fireman is heading into fire and is not leading a victim
-                elif d_tile.tile_model.space_status == SpaceStatusEnum.FIRE and not isinstance(self.fireman.leading_victim, VictimModel):
-                    self._deduct_player_points(2)
 
             # Check the associated models of the tile.
             # If it contains any POIs, flip them over.
@@ -348,13 +312,20 @@ class MoveEvent(TurnEvent):
             if not eq_to_first and not eq_to_second:
                 return
 
-        # For Family mode, can directly come here
-        # without the above checks.
+        # Family mode:
+        # If the target tile is indoors,
+        # we don't have to resolve the victim.
+        else:
+            if target_tile.space_kind == SpaceKindEnum.INDOOR:
+                return
+
         # For Experienced mode, we only reach here
         # if the target space is equal to one of
         # the ambulance's current location tiles.
         if isinstance(self.fireman.carrying_victim, VictimModel):
             self.fireman.carrying_victim.state = VictimStateEnum.RESCUED
+            thread = Thread(target=self.countdown)
+            thread.start()
             self.game.victims_saved = self.game.victims_saved + 1
             # remove the victim from the list of active POIs on the board
             # and disassociate the victim from the player
@@ -362,20 +333,33 @@ class MoveEvent(TurnEvent):
             self.fireman.carrying_victim = NullModel()
 
         if isinstance(self.fireman.leading_victim, VictimModel):
+            thread = Thread(target=self.countdown)
+            thread.start()
             self.fireman.leading_victim.state = VictimStateEnum.RESCUED
             self.game.victims_saved = self.game.victims_saved + 1
             self.game.game_board.remove_poi_or_victim(self.fireman.leading_victim)
             self.fireman.leading_victim = NullModel()
 
-    def _deduct_player_points(self, pts_to_deduct: int):
-        """
-        If the fireman is a Rescue Specialist, subtract
-        from the special AP first and then from AP.
-        If any other type of fireman, just subtract from AP.
+    def countdown(self):
+        EventQueue.post(CustomEvent(CustomEventEnum.ENABLE_VICTIM_SAVED_PROMPT))
+        time.sleep(5)
+        EventQueue.post(CustomEvent(CustomEventEnum.DISABLE_VICTIM_SAVED_PROMPT))
 
-        :param pts_to_deduct: number of points to deduct
+
+    def _deduct_player_points(self,tile_model:TileModel):
+        """
+        Deduct player points according to space status
+        and player carrying victim/hazmat. (leading a
+        victim does not change the points to deduct)
+
+        :param tile_model: tile player is moving to
         :return:
         """
+        pts_to_deduct = self._determine_cost_to_move(tile_model)
+
+        # If the fireman is a Rescue Specialist, subtract
+        # from the special AP first and then from AP.
+        # If any other type of fireman, just subtract from AP.
         if self.fireman.role == PlayerRoleEnum.RESCUE:
             while self.fireman.special_ap > 0 and pts_to_deduct > 0:
                 self.fireman.special_ap = self.fireman.special_ap - 1
@@ -386,3 +370,117 @@ class MoveEvent(TurnEvent):
 
         else:
             self.fireman.ap = self.fireman.ap - pts_to_deduct
+
+    def _can_go_into_fire(self) -> bool:
+        """
+        Determines whether player can go
+        into fire. If the player is:
+        1. carrying a victim or
+        2. carrying a hazmat or
+        3. leading a victim or
+        4. is a doge
+        then he/she cannot go into the fire.
+
+        :return: True if player can go into this
+                fire space, False otherwise.
+        """
+        if isinstance(self.fireman.carrying_victim, VictimModel):
+            return False
+        if isinstance(self.fireman.carrying_hazmat, HazmatModel):
+            return False
+        if isinstance(self.fireman.leading_victim, VictimModel):
+            return False
+        if self.fireman.role == PlayerRoleEnum.DOGE:
+            return False
+
+        return True
+
+    def _determine_cost_to_move(self, target_tile: TileModel) -> int:
+        """
+        Determine the cost to move
+        into a space depending on the
+        space status and player carrying
+        victim/hazmat. (leading a victim
+        does not change the cost to move)
+
+        :param target_tile:
+        :return: cost to move into target tile
+        """
+        src_tile = self.game.game_board.get_tile_at(self.fireman.row, self.fireman.column)
+        movement_dirn = self._determine_movement_direction(src_tile, target_tile)
+        obstacle = src_tile.get_obstacle_in_direction(movement_dirn)
+        is_damaged_wall = isinstance(obstacle, WallModel) and obstacle.wall_status == WallStatusEnum.DAMAGED
+        is_doge = self.fireman.role == PlayerRoleEnum.DOGE
+
+        space_status = target_tile.space_status
+        cost_to_move = 1
+        if space_status != SpaceStatusEnum.FIRE:
+            if isinstance(self.fireman.carrying_victim, VictimModel):
+                # If a Doge drags a victim, it costs 4 AP.
+                if is_doge:
+                    cost_to_move = 4
+                else:
+                    cost_to_move = 2
+
+            if isinstance(self.fireman.carrying_hazmat, HazmatModel):
+                cost_to_move = 2
+
+            # It takes the Doge 2 AP to squeeze through a damaged wall.
+            if is_doge and is_damaged_wall:
+                cost_to_move = 2
+
+        else:
+            cost_to_move = 2
+
+        return cost_to_move
+
+    def _is_path_clear(self, tile_model: TileModel, dirn: str) -> bool:
+        """
+        Determines if there is an obstacle blocking the
+        way from the tile in the direction 'dirn'.
+
+        :param tile_model: tile the player is moving from
+        :param dirn: direction from tile in which moving
+        :return: True if the path from the first tile to
+                the second is clear, False otherwise.
+        """
+        has_obstacle = tile_model.has_obstacle_in_direction(dirn)
+        obstacle = tile_model.get_obstacle_in_direction(dirn)
+        is_open_door = isinstance(obstacle, DoorModel) and obstacle.door_status == DoorStatusEnum.OPEN
+        is_damaged_wall = isinstance(obstacle, WallModel) and obstacle.wall_status == WallStatusEnum.DAMAGED
+        is_carrying_victim = isinstance(self.fireman.carrying_victim, VictimModel)
+        # there is a destroyed door or a destroyed wall or no obstacle or an open door or a damaged wall
+        if self.fireman.role == PlayerRoleEnum.DOGE:
+            if not has_obstacle or is_open_door or is_damaged_wall:
+                # The Doge is not allowed to carry a
+                # victim through a damaged wall.
+                if is_carrying_victim and is_damaged_wall:
+                    return False
+                else:
+                    return True
+
+        # there is a destroyed door or a destroyed wall or no obstacle or an open door
+        else:
+            if not has_obstacle or is_open_door:
+                return True
+
+        return False
+
+    def _determine_movement_direction(self, src_tile: TileModel, dest_tile: TileModel) -> str:
+        """
+        Determine the direction from the
+        source tile to the destination tile
+
+        :param src_tile:
+        :param dest_tile:
+        :return: string representation of movement direction
+        """
+        directions = ["North", "East", "West", "South"]
+        for dirn in directions:
+            try:
+                nb_src_tile: TileModel = src_tile.get_tile_in_direction(dirn)
+                if nb_src_tile.row == dest_tile.row and nb_src_tile.column == dest_tile.column:
+                    return dirn
+
+            except TilePositionOutOfBoundsException:
+                continue

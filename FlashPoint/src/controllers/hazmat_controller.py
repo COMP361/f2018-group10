@@ -55,6 +55,7 @@ class HazmatController(Controller):
         return False
 
     def run_checks(self, tile_model: TileModel) -> bool:
+
         player_tile = self.board.get_tile_at(self._current_player.row, self._current_player.column)
 
         if not self._current_player == self.game.players_turn:
