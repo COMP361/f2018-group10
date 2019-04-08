@@ -19,6 +19,9 @@ class PlayerSprite(pygame.sprite.Sprite, PlayerObserver):
     def player_carry_changed(self, carry):
         pass
 
+    def player_leading_victim_changed(self, leading_victim):
+        pass
+
     def __init__(self, current_player: PlayerModel, tile_model: TileModel, grid: GridSprite):
         super().__init__()
         self.grid = grid
@@ -60,4 +63,7 @@ class PlayerSprite(pygame.sprite.Sprite, PlayerObserver):
         pass
 
     def choose_starting_location(self):
+        pass
+
+    def player_role_changed(self, role: PlayerRoleEnum):
         pass

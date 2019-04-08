@@ -11,10 +11,10 @@ logger = logging.getLogger("FlashPoint")
 
 class PickupVictimEvent(TurnEvent):
 
-    def __init__(self, victim: VictimModel):
+    def __init__(self, victim_row: int, victim_column: int):
         super().__init__()
         game: GameStateModel = GameStateModel.instance()
-        self.victim_tile = game.game_board.get_tile_at(victim.row, victim.column)
+        self.victim_tile = game.game_board.get_tile_at(victim_row, victim_column)
         for assoc_model in self.victim_tile.associated_models:
             if isinstance(assoc_model, VictimModel):
                 self.victim = assoc_model

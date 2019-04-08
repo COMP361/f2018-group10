@@ -21,32 +21,33 @@ class SetInitialHotspotEvent(ActionEvent):
 
         # Pick random location: roll dice
         random.seed(self.seed)
-        self.game: GameStateModel = GameStateModel.instance()
-        self.game_board: GameBoardModel = self.game.game_board
         self.num_hotspots_to_place = 0
 
-    # TODO: Move this code to a controller
-    def check(self):
-        # If the number of hotspots to place
-        # are still zero after all the checks
-        # that means that the event should not
-        # be executed.
+    def _determine_num_to_place(self):
+
+        # Determine the number of
+        # hotspots that have to be placed.
         if self.game.difficulty_level != DifficultyLevelEnum.RECRUIT:
-            self.num_hotspots_to_place += 3
+            self.num_hotspots_to_place = self.num_hotspots_to_place + 3
 
         num_players = len(self.game.players)
         if num_players == 3:
-            self.num_hotspots_to_place += 2
+            self.num_hotspots_to_place = self.num_hotspots_to_place + 2
         elif num_players > 3:
-            self.num_hotspots_to_place += 3
-
-        if self.num_hotspots_to_place == 0:
-            return False
-
-        return True
+            self.num_hotspots_to_place = self.num_hotspots_to_place + 3
 
     def execute(self, *args, **kwargs):
+        # NOTE:
+        # Event still has to be executed
+        # even if 0 hotspots are to be placed
+        # since the hotspot bank has to be set
+        # at the end.
         logger.info("Executing Set Initial Hot Spot Event")
+        self.game: GameStateModel = GameStateModel.instance()
+        self.game_board: GameBoardModel = self.game.game_board
+
+        self._determine_num_to_place()
+        logger.info("{h} hotspots have to be placed".format(h=self.num_hotspots_to_place))
         num_placed = 0
         while num_placed < self.num_hotspots_to_place:
             row = self.game.roll_red_dice()

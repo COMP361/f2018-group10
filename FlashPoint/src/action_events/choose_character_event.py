@@ -14,12 +14,12 @@ class ChooseCharacterEvent(ActionEvent):
 
     def __init__(self, role: PlayerRoleEnum, player_index: int):
         super().__init__()
-        self._game: GameStateModel = GameStateModel.instance()
-        if self._game.rules == GameKindEnum.FAMILY:
+        game: GameStateModel = GameStateModel.instance()
+        if game.rules == GameKindEnum.FAMILY:
             raise WrongEventInstantiation(self)
         self._player_index = player_index
         self._role: PlayerRoleEnum = role
-        self.curr_player: PlayerModel = self._game.players[player_index]
+        self.curr_player: PlayerModel = game.players[player_index]
 
     def execute(self):
         logger.info("Executing ChooseCharacterEvent")

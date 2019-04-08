@@ -27,8 +27,11 @@ class FirePlacementEvent(ActionEvent):
 
     def execute(self):
         logger.info("Executing Fire Placement Event")
-        if GameStateModel.instance().rules == GameKindEnum.FAMILY:
-            GameStateModel.instance().game_board.set_fires_family()
+        self.game: GameStateModel = GameStateModel.instance()
+        self.board: GameBoardModel = self.game.game_board
+
+        if self.game.rules == GameKindEnum.FAMILY:
+            self.board.set_fires_family()
         else:
             self._set_fires_heroic_veteran_recruit(GameStateModel.instance().difficulty_level)
 

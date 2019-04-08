@@ -52,6 +52,7 @@ class VictimController(Controller):
 
     def send_event_and_close_menu(self, tile_model: TileModel, menu_to_close: Interactable):
         victims = [model for model in tile_model.associated_models if isinstance(model, VictimModel)]
+        victim = None
         if victims:
             victim = victims[0]
 
@@ -63,7 +64,11 @@ class VictimController(Controller):
             menu_to_close.disable()
             return
 
-        event = DropVictimEvent(self._current_player.carrying_victim) if is_carrying else PickupVictimEvent(victim)
+        if not victim and not is_carrying:
+            return
+
+        event = DropVictimEvent(self._current_player.carrying_victim.row, self._current_player.carrying_victim.column) if\
+            is_carrying else PickupVictimEvent(victim.row, victim.column)
 
         if Networking.get_instance().is_host:
             Networking.get_instance().send_to_all_client(event)

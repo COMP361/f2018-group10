@@ -4,6 +4,7 @@ from src.controllers.drive_vehicles_controller import DriveVehiclesController
 from src.controllers.fire_deck_gun_controller import FireDeckGunController
 from src.controllers.hazmat_controller import HazmatController
 from src.controllers.identify_controller import IdentifyController
+from src.controllers.resuscitate_controller import ResuscitateController
 from src.controllers.vehicle_placement_controller import VehiclePlacementController
 from src.controllers.victim_controller import VictimController
 from src.core.event_queue import EventQueue
@@ -40,6 +41,7 @@ class TileInputController(GameStateObserver, Controller):
             DriveVehiclesController(current_player)
             IdentifyController(current_player)
             HazmatController(current_player)
+            ResuscitateController(current_player)
             FireDeckGunController(current_player)
 
         GameStateModel.instance().add_observer(self)
@@ -63,6 +65,7 @@ class TileInputController(GameStateObserver, Controller):
         DriveVehiclesController._instance = None
         IdentifyController._instance = None
         HazmatController._instance = None
+        ResuscitateController._instance = None
         FireDeckGunController._instance = None
 
     def _disable_all_menus(self):
@@ -90,6 +93,7 @@ class TileInputController(GameStateObserver, Controller):
             IdentifyController.instance().process_input(tile_sprite)
             DriveVehiclesController.instance().process_input(tile_sprite)
             HazmatController.instance().process_input(tile_sprite)
+            ResuscitateController.instance().process_input(tile_sprite)
             FireDeckGunController.instance().process_input(tile_sprite)
 
     def notify_player_index(self, player_index: int):

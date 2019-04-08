@@ -1,3 +1,5 @@
+import time
+from threading import Thread
 from typing import Tuple, List
 
 import pygame
@@ -29,7 +31,12 @@ class TileSprite(Interactable, TileObserver):
         self._smoke_image = smoke_image
         self._non_highlight_image = image.copy()
         self._blank_image = image.copy()
+        self.explosion = False
+        self.explosion_counter = 100
+        self.explosion_image = image.copy()
+        self.explosion_image.blit(pygame.image.load('media/all_markers/explosian.png'), (0, 0, 128, 128))
 
+        self.explosion_image.get_rect().move_ip(x_offset,y_offset)
         # Initialize if place is Fire, Smoke or Safe
         tile = GameStateModel.instance().game_board.get_tile_at(row, column)
         status = tile.space_status
@@ -52,9 +59,9 @@ class TileSprite(Interactable, TileObserver):
         self.extinguish_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
                                             Text(pygame.font.SysFont('Arial', 15), "Extinguish", Color.ORANGE))
         self.pickup_victim_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
-                                               Text(pygame.font.SysFont('Arial', 15), "Pickup Victim", Color.ORANGE))
+                                               Text(pygame.font.SysFont('Arial', 15), "Move with Victim", Color.ORANGE))
         self.drop_victim_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
-                                             Text(pygame.font.SysFont('Arial', 15), "Drop Victim", Color.ORANGE))
+                                             Text(pygame.font.SysFont('Arial', 15), "Leave Victim", Color.ORANGE))
 
         self.drive_ambulance_here_button = RectButton(self.rect.x, self.rect.y, 120, 25, Color.BLACK, 0,
                                                       Text(pygame.font.SysFont('Arial', 15), "Drive Ambulance Here",
@@ -65,6 +72,7 @@ class TileSprite(Interactable, TileObserver):
                                                         Color.ORANGE))
         self.ride_vehicle_button = RectButton(self.rect.x, self.rect.y, 120, 25, Color.BLACK, 0,
                                               Text(pygame.font.SysFont('Arial', 15), "Ride Vehicle", Color.ORANGE))
+
         self.hazmat_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
                                         Text(pygame.font.SysFont('Arial', 20), "Remove Hazmat", Color.ORANGE))
 
@@ -74,6 +82,11 @@ class TileSprite(Interactable, TileObserver):
 
         self.fire_deck_gun_button = RectButton(self.rect.x, self.rect.y, 120, 25, Color.BLACK, 0,
                                                Text(pygame.font.SysFont('Arial', 15), "Fire Deckgun", Color.ORANGE))
+
+        self.resuscitate_button = RectButton(self.rect.x, self.rect.y, 120, 25, Color.BLACK, 0,
+                                              Text(pygame.font.SysFont('Arial', 15), "Resuscitate", Color.ORANGE))
+
+
 
         self.disable_all()
 
@@ -121,6 +134,7 @@ class TileSprite(Interactable, TileObserver):
         self.ride_vehicle_button.disable()
         self.dismount_vehicle_button.disable()
         self.hazmat_button.disable()
+        self.resuscitate_button.disable()
         self.fire_deck_gun_button.disable()
 
         # Important! Reset the on_clicks
@@ -134,6 +148,7 @@ class TileSprite(Interactable, TileObserver):
         self.ride_vehicle_button.on_click(None)
         self.dismount_vehicle_button.on_click(None)
         self.hazmat_button.on_click(None)
+        self.resuscitate_button.on_click(None)
         self.fire_deck_gun_button.on_click(None)
 
     def is_clicked(self):
@@ -173,8 +188,15 @@ class TileSprite(Interactable, TileObserver):
         self._mouse_pos = current_mouse_pos
 
     def draw(self, screen: pygame.Surface):
-        self._draw_hightlight()
-        screen.blit(self.image, self.rect)
+        if self.explosion:
+            screen.blit(self.explosion_image, self.rect)
+            self.explosion_counter -= 1
+            if self.explosion_counter == 0:
+                self.explosion = False
+                self.explosion_counter = 100
+        else:
+            self._draw_hightlight()
+            screen.blit(self.image, self.rect)
 
     def draw_menu(self, screen: pygame.Surface):
         offset = 0
@@ -239,6 +261,12 @@ class TileSprite(Interactable, TileObserver):
             self.hazmat_button.rect.y = self.rect.y + offset
             offset += 20
 
+        if self.resuscitate_button.enabled:
+            screen.blit(self.resuscitate_button.image, self.resuscitate_button.rect)
+            self.resuscitate_button.rect.x = self.rect.x
+            self.resuscitate_button.rect.y = self.rect.y + offset
+            offset += 20
+
         if self.fire_deck_gun_button.enabled:
             screen.blit(self.fire_deck_gun_button.image, self.fire_deck_gun_button.rect)
             self.fire_deck_gun_button.rect.x = self.rect.x
@@ -258,11 +286,16 @@ class TileSprite(Interactable, TileObserver):
         self.dismount_vehicle_button.update(event_queue)
         self.drive_engine_here_button.update(event_queue)
         self.hazmat_button.update(event_queue)
+        self.resuscitate_button.update(event_queue)
         self.fire_deck_gun_button.update(event_queue)
 
         self._scroll()
         if self.is_clicked():
             self.click()
+
+
+
+
 
     def tile_status_changed(self, status: SpaceStatusEnum, is_hotspot: bool):
         new_surf = pygame.Surface([self._non_highlight_image.get_width(), self._non_highlight_image.get_height()])
@@ -277,6 +310,7 @@ class TileSprite(Interactable, TileObserver):
         elif status == SpaceStatusEnum.SMOKE:
             image_file = FileImporter.import_image("media/All Markers/smoke.png")
             new_surf.blit(image_file, (0, 0))
+
 
         if is_hotspot:
             hs_img = FileImporter.import_image("media/all_markers/hot_spot.png")

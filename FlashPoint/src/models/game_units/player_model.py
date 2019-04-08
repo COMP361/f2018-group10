@@ -6,12 +6,12 @@ from src.models.game_board.null_model import NullModel
 from src.models.game_units.hazmat_model import HazmatModel
 from src.models.game_units.victim_model import VictimModel
 from src.observers.player_observer import PlayerObserver
-from src.constants.state_enums import PlayerStatusEnum, PlayerRoleEnum, GameKindEnum
+from src.constants.state_enums import PlayerStatusEnum, PlayerRoleEnum, GameKindEnum, VictimStateEnum
 from src.models.model import Model
 
 logger = logging.getLogger("FlashPoint")
 
-class PlayerModel(Model):
+class PlayerModel(Model,object):
 
     def __init__(self, ip: str, nickname: str):
         super().__init__()
@@ -26,6 +26,7 @@ class PlayerModel(Model):
         self._wins = 0
         self._losses = 0
         self._carrying_victim = NullModel()
+        self._leading_victim = NullModel()
         self._carrying_hazmat = NullModel()
         self._role = PlayerRoleEnum.FAMILY
 
@@ -40,6 +41,13 @@ class PlayerModel(Model):
         player_status = "Player status: {status}".format(status=self.status)
         player_color = "Player color: {color}\n".format(color=self.color)
         return '\n'.join([player_pos, player_ap, player_carrying_victim, player_status, player_color])
+
+
+    def _notify_all_observers(self):
+        self._notify_ap()
+        self._notify_position()
+        self._notify_special_ap()
+        self._notify_status()
 
     def _notify_position(self):
         for obs in self.observers:
@@ -73,6 +81,10 @@ class PlayerModel(Model):
         for obs in self.observers:
             obs.player_role_changed(self.role)
 
+    def _notify_leading_victim(self):
+        for obs in self.observers:
+            obs.player_leading_victim_changed(self.leading_victim)
+
     @property
     def observers(self) -> List[PlayerObserver]:
         return self._observers
@@ -94,7 +106,6 @@ class PlayerModel(Model):
     def set_initial_ap(self, game_kind: GameKindEnum):
         """Set the initial AP and special AP for this player"""
         self.ap = 4
-
         if game_kind == GameKindEnum.EXPERIENCED:
             if self.role == PlayerRoleEnum.CAPTAIN:
                 self.special_ap = 2
@@ -108,6 +119,9 @@ class PlayerModel(Model):
 
             elif self.role == PlayerRoleEnum.RESCUE:
                 self.special_ap = 3
+
+            elif self.role == PlayerRoleEnum.DOGE:
+                self.ap = self.ap + 8
 
     @property
     def column(self) -> int:
@@ -201,6 +215,20 @@ class PlayerModel(Model):
         self._carrying_victim = victim
         logger.info("Player {nickname} carrying victim: {cv}".format(nickname=self.nickname, cv=victim))
         self._notify_carry()
+
+    @property
+    def leading_victim(self) -> Union[VictimModel, NullModel]:
+        return self._leading_victim
+
+    @leading_victim.setter
+    def leading_victim(self, victim: VictimModel):
+        if isinstance(victim, VictimModel) and victim.state != VictimStateEnum.TREATED:
+            logger.error("Player cannot lead a victim that has not been treated! Abort!")
+            return
+
+        self._leading_victim = victim
+        logger.info("Player {nickname} leading victim: {lv}".format(nickname=self.nickname, lv=victim))
+        self._notify_leading_victim()
 
     @property
     def carrying_hazmat(self) -> Union[HazmatModel, NullModel]:

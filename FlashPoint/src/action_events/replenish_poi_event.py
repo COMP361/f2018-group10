@@ -23,8 +23,6 @@ class ReplenishPOIEvent(ActionEvent):
 
         # Pick random location: roll dice
         random.seed(self.seed)
-        self.game: GameStateModel = GameStateModel.instance()
-        self.board = self.game.game_board
 
     # Use this method to check whether
     # the POIs should be replenished or not
@@ -38,6 +36,9 @@ class ReplenishPOIEvent(ActionEvent):
 
     def execute(self):
         logger.info("Executing ReplenishPOIEvent")
+        self.game: GameStateModel = GameStateModel.instance()
+        self.board = self.game.game_board
+        
         if not self.check():
             logger.info("There are more than 3 poi's active, don't need to replenish.")
             return
