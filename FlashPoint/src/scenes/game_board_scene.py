@@ -165,8 +165,6 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
         with open(self._save_games_file, mode='w', encoding='utf-8') as myFile:
             json.dump(temp, myFile)
 
-        self._menu.close()
-
     @staticmethod
     def _quit_btn_on_click():
         Networking.get_instance().disconnect()
