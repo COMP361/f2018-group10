@@ -90,7 +90,7 @@ class TileSprite(Interactable, TileObserver):
                                               Text(pygame.font.SysFont('Arial', 15), "Resuscitate", Color.ORANGE))
 
         self.change_crew_button = RectButton(self.rect.x, self.rect.y, 120, 25, Color.BLACK, 0,
-                                             Text(pygame.font.SysFont('Arial', 15), "Change crew", Color.ORANGE))
+                                             Text(pygame.font.SysFont('Arial', 15), "Change Crew", Color.ORANGE))
 
         self.disable_all()
 

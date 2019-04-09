@@ -28,7 +28,7 @@ class PlayerModel(Model,object):
         self._carrying_victim = NullModel()
         self._leading_victim = NullModel()
         self._carrying_hazmat = NullModel()
-        self._role = PlayerRoleEnum.FAMILY
+        self._role: PlayerRoleEnum = PlayerRoleEnum.FAMILY
         self.has_moved = False
 
     def __eq__(self, other):
@@ -251,5 +251,5 @@ class PlayerModel(Model,object):
     @role.setter
     def role(self, player_role: PlayerRoleEnum):
         self._role = player_role
-        logger.info("Player {nickname} role: {r}".format(nickname=self.nickname, r=player_role.name))
+        logger.info("Player {nickname} role: {r}".format(nickname=self.nickname, r=player_role))
         self._notify_role()
