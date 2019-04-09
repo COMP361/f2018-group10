@@ -1,5 +1,3 @@
-from typing import List
-
 import pygame
 
 from src.core.event_queue import EventQueue
@@ -24,6 +22,9 @@ class HazmatSprite(HazmatObserver, pygame.sprite.Sprite):
     def hazmat_position_changed(self, row: int, col: int):
         self.tile_sprite = GameBoard.instance().grid.grid[col][row]
         self.rect = self.tile_sprite.rect
+
+        if row < 0 or col < 0:
+            self.kill()
 
     def update(self, event_queue: EventQueue):
         new_x = self.tile_sprite.rect.x

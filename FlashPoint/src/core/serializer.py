@@ -17,6 +17,7 @@ from src.action_events.random_board_setup_event import RandomBoardSetupEvent
 from src.action_events.turn_events.drop_hazmat_event import DropHazmatEvent
 from src.action_events.turn_events.lead_victim_event import LeadVictimEvent
 from src.action_events.turn_events.pick_up_hazmat_event import PickupHazmatEvent
+from src.action_events.turn_events.fire_deck_gun_event import FireDeckGunEvent
 from src.action_events.turn_events.remove_hazmat_event import RemoveHazmatEvent
 from src.action_events.turn_events.identify_poi_event import IdentifyPOIEvent
 from src.action_events.place_hazmat_event import PlaceHazmatEvent
@@ -209,7 +210,6 @@ class JSONSerializer(object):
         nickname = payload['_nickname']
 
         player = PlayerModel(ip, nickname)
-        #player.set_pos(payload['_row'], payload['_column'])
         player.set_pos(-1, -1)
         player.color = tuple(payload['_color'])
         player.status = PlayerStatusEnum(payload["_status"]["value"])
@@ -436,6 +436,10 @@ class JSONSerializer(object):
         return DisconnectEvent(player)
 
     @staticmethod
+    def _deserialize_fire_deck_gun_event(payload: Dict) -> FireDeckGunEvent:
+        return FireDeckGunEvent(payload['seed'], payload['row'], payload['col'])
+
+    @staticmethod
     def _deserialize_dodge_reply(payload: Dict) -> DodgeReplyEvent:
         return DodgeReplyEvent(payload['_reply'])
 
@@ -573,6 +577,8 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_permission_reply(payload)
         elif object_type == StopCommandEvent.__name__:
             return JSONSerializer._deserialize_stop_command_event(payload)
+        elif object_type == FireDeckGunEvent.__name__:
+            return JSONSerializer._deserialize_fire_deck_gun_event(payload)
 
         logger.warning(f"Could not deserialize object {object_type}, not of recognized type.")
 
