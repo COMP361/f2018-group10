@@ -44,13 +44,6 @@ class TileSprite(Interactable, TileObserver):
         self.fire_deck_gun_image.blit(pygame.image.load('media/all_markers/water_splash.png'), (0, 0, 128, 128))
         self.fire_deck_gun_image.get_rect().move_ip(x_offset, y_offset)
 
-
-        self.poi_placed = False
-        self.poi_placed_image = image.copy()
-        self.poi_placed_image.blit(pygame.image.load('media/all_markers/poi128.png'), (0, 0, 128, 128))
-        self.poi_placed_image.get_rect().move_ip(x_offset, y_offset)
-
-
         # Initialize if place is Fire, Smoke or Safe
         tile = GameStateModel.instance().game_board.get_tile_at(row, column)
         status = tile.space_status
@@ -95,8 +88,6 @@ class TileSprite(Interactable, TileObserver):
 
         self.resuscitate_button = RectButton(self.rect.x, self.rect.y, 120, 25, Color.BLACK, 0,
                                               Text(pygame.font.SysFont('Arial', 15), "Resuscitate", Color.ORANGE))
-
-
 
         self.disable_all()
 
@@ -211,13 +202,7 @@ class TileSprite(Interactable, TileObserver):
                 self.fire_deck_gun = False
                 self.counter = 80
                 screen.blit(self.image, self.rect)
-        elif self.poi_placed:
-            screen.blit(self.poi_placed_image, self.rect)
-            self.counter -= 1
-            if self.counter == 0:
-                self.poi_placed = False
-                self.counter = 80
-                screen.blit(self.image, self.rect)
+
         else:
             self._draw_hightlight()
             screen.blit(self.image, self.rect)
@@ -310,10 +295,6 @@ class TileSprite(Interactable, TileObserver):
         if self.is_clicked():
             self.click()
 
-
-
-
-
     def tile_status_changed(self, status: SpaceStatusEnum, is_hotspot: bool):
         new_surf = pygame.Surface([self._non_highlight_image.get_width(), self._non_highlight_image.get_height()])
         self._non_highlight_image = self._blank_image.copy()
@@ -328,7 +309,6 @@ class TileSprite(Interactable, TileObserver):
             image_file = FileImporter.import_image("media/All Markers/smoke.png")
             new_surf.blit(image_file, (0, 0))
 
-
         if is_hotspot:
             hs_img = FileImporter.import_image("media/all_markers/hot_spot.png")
             new_surf.blit(hs_img, (0, 0))
@@ -336,4 +316,4 @@ class TileSprite(Interactable, TileObserver):
         self._non_highlight_image.blit(new_surf, (0, 0))
 
     def tile_assoc_models_changed(self, assoc_models: List[Model]):
-        self.poi_placed = True
+        pass
