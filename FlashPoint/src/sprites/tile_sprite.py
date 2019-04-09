@@ -41,7 +41,8 @@ class TileSprite(Interactable, TileObserver):
 
         self.fire_deck_gun = False
         self.fire_deck_gun_image = image.copy()
-        self.fire_deck_gun_image.blit(pygame.image.load('media/all_markers/water_splash.png'), (0, 0, 128, 128))
+       # self.water = pygame.transform.scale(pygame.image.load('media/all_markers/water.png'),(128,128))
+        self.fire_deck_gun_image.blit(pygame.transform.scale(pygame.image.load('media/all_markers/water.png'),(128,128)), (0, 0, 128, 128))
         self.fire_deck_gun_image.get_rect().move_ip(x_offset, y_offset)
 
         # Initialize if place is Fire, Smoke or Safe

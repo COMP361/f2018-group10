@@ -1,6 +1,7 @@
 import logging
 import random
 
+from src.UIComponents.file_importer import FileImporter
 from src.action_events.turn_events.turn_event import TurnEvent
 from src.constants.state_enums import VehicleOrientationEnum, QuadrantEnum, SpaceStatusEnum, DoorStatusEnum, \
     WallStatusEnum
@@ -10,6 +11,7 @@ from src.models.game_board.null_model import NullModel
 from src.models.game_board.tile_model import TileModel
 from src.models.game_board.wall_model import WallModel
 from src.models.game_state_model import GameStateModel
+from src.sprites.game_board import GameBoard
 
 logger = logging.getLogger("FlashPoint")
 
@@ -47,6 +49,11 @@ class FireDeckGunEvent(TurnEvent):
             self._set_target_tile()
         else:
             self.target_tile.space_status = SpaceStatusEnum.SAFE
+
+        FileImporter.play_music("media/music/water_splash.mp3", 1)
+        tile_sprite = GameBoard.instance().grid.grid[self.target_tile.column][self.target_tile.row]
+        tile_sprite.fire_deck_gun = True
+
         directions = ["North", "East", "West", "South"]
         for dirn in directions:
             has_obstacle = self.target_tile.has_obstacle_in_direction(dirn)
