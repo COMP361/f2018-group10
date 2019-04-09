@@ -10,7 +10,7 @@ from src.UIComponents.rect_button import RectButton
 from src.UIComponents.rect_label import RectLabel
 from src.UIComponents.text import Text
 from src.UIComponents.scene import Scene
-from src.constants.state_enums import GameKindEnum, DifficultyLevelEnum
+from src.constants.state_enums import GameKindEnum, DifficultyLevelEnum, GameBoardTypeEnum
 from src.constants.change_scene_enum import ChangeSceneEnum
 from src.core.networking import Networking
 
@@ -45,11 +45,8 @@ class CreateGameMenuScene(Scene):
 
     def create_new_game(self, game_kind: GameKindEnum, difficulty_level: DifficultyLevelEnum = None):
         """Instantiate a new family game and move to the lobby scene."""
-        GameStateModel(self._current_player, 6, game_kind, None, difficulty_level)
-        if game_kind == GameKindEnum.FAMILY:
-            EventQueue.post(CustomEvent(ChangeSceneEnum.CHOOSEBOARDSCENE))
-        elif game_kind == GameKindEnum.EXPERIENCED:
-            EventQueue.post(CustomEvent(ChangeSceneEnum.CHOOSEBOARDSCENE))
+        GameStateModel(self._current_player, 6, game_kind, GameBoardTypeEnum.ORIGINAL, difficulty_level)
+        EventQueue.post(CustomEvent(ChangeSceneEnum.CHOOSEBOARDSCENE))
 
     # ----------------------------------------------- #
 
