@@ -101,6 +101,10 @@ class PlayerModel(Model,object):
         logger.info("Player {nickname} position: ({row}, {column})".format(nickname=self.nickname, row=self.row, column=self.column))
         if isinstance(self.carrying_victim, VictimModel):
             self.carrying_victim.set_pos(row, column)
+        if isinstance(self.leading_victim, VictimModel):
+            self.leading_victim.set_pos(row, column)
+        if isinstance(self.carrying_hazmat, HazmatModel):
+            self.carrying_hazmat.set_pos(row, column)
         self._notify_position()
 
     def set_initial_ap(self, game_kind: GameKindEnum):
@@ -238,8 +242,6 @@ class PlayerModel(Model,object):
     def carrying_hazmat(self, hazmat: HazmatModel):
         self._carrying_hazmat = hazmat
         logger.info("Player {nickname} carrying hazmat: {h}".format(nickname=self.nickname, h=hazmat))
-        # TODO: Modify notify carry to account for carrying hazmats
-        # self._notify_carry()
 
     @property
     def role(self) -> PlayerRoleEnum:

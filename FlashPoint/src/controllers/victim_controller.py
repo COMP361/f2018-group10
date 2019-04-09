@@ -40,9 +40,11 @@ class VictimController(Controller):
         for model in tile_model.associated_models:
             if isinstance(model, VictimModel) and model.state == VictimStateEnum.TREATED:
                 return not isinstance(self._current_player.leading_victim, VictimModel)
+        return False
 
-    def check_stop_lead(self) -> bool:
-        return isinstance(self._current_player.leading_victim, VictimModel)
+    def check_stop_lead(self, tile_model: TileModel) -> bool:
+        return isinstance(self._current_player.leading_victim, VictimModel) and \
+               tile_model.row == self._current_player.row and tile_model.column == self._current_player.column
 
     def check_pickup(self, tile: TileModel) -> bool:
         game: GameStateModel = GameStateModel.instance()
@@ -94,7 +96,6 @@ class VictimController(Controller):
 
         menu_to_close.disable()
 
-
     def send_drop_event(self, tile_model: TileModel, menu_to_close: Interactable):
         if not self.check_drop(tile_model):
             return
@@ -122,7 +123,7 @@ class VictimController(Controller):
         menu_to_close.disable()
 
     def send_stop_lead_event(self, tile_model: TileModel, menu_to_close: Interactable):
-        if not self.check_stop_lead():
+        if not self.check_stop_lead(tile_model):
             return
 
         event = StopLeadingVictimEvent(self._current_player.row, self._current_player.column)
@@ -133,7 +134,6 @@ class VictimController(Controller):
             Networking.get_instance().client.send(event)
 
         menu_to_close.disable()
-
 
     def run_checks(self, tile_model: TileModel) -> bool:
         """Not used since this class has two separate checks."""
@@ -150,7 +150,7 @@ class VictimController(Controller):
             tile_sprite.pickup_victim_button.enable()
             tile_sprite.pickup_victim_button.on_click(self.send_pickup_event, tile_model, tile_sprite.pickup_victim_button)
 
-        if self.check_stop_lead():
+        if self.check_stop_lead(tile_model):
             tile_sprite.stop_lead_button.enable()
             tile_sprite.stop_lead_button.on_click(self.send_stop_lead_event, tile_model, tile_sprite.stop_lead_button)
 
