@@ -71,4 +71,10 @@ class PlayerSprite(pygame.sprite.Sprite, PlayerObserver):
         pass
 
     def player_role_changed(self, role: PlayerRoleEnum):
-        pass
+
+        if self.associated_player.role == PlayerRoleEnum.DOGE:
+            self.associated_png = 'media/all_markers/DogePlayer.png'
+        else:
+            self.associated_png = self._associate_image(self.associated_player.color)
+
+        self.image = FileImporter.import_image(self.associated_png)

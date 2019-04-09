@@ -337,12 +337,6 @@ class TileSprite(Interactable, TileObserver):
             self.draw_btn(self.resuscitate_button, offset, screen)
             offset += 20
 
-        if self.change_crew_button.enabled:
-            screen.blit(self.change_crew_button.image, self.change_crew_button.rect)
-            self.change_crew_button.rect.x = self.rect.x
-            self.change_crew_button.rect.y = self.rect.y + offset
-            offset += 20
-
         if self.fire_deck_gun_button.enabled:
             screen.blit(self.fire_deck_gun_button.image, self.fire_deck_gun_button.rect)
             self.fire_deck_gun_button.rect.x = self.rect.x

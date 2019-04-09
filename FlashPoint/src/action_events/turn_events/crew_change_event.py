@@ -27,6 +27,23 @@ class CrewChangeEvent(TurnEvent):
         if self.curr_player.role == PlayerRoleEnum.CAPTAIN:
             self.curr_player.special_ap = 2
             self.curr_player.ap -= 2
+        elif self.curr_player.role == PlayerRoleEnum.CAFS:
+            self.curr_player.ap = self.curr_player.ap - 3
+            self.curr_player.special_ap = 3
+
+        elif self.curr_player.role == PlayerRoleEnum.GENERALIST:
+            self.curr_player.ap = self.curr_player.ap + 1 - 2
+
+        elif self.curr_player.role == PlayerRoleEnum.RESCUE:
+            self.curr_player.special_ap = 3
+            self.curr_player.ap -= 2
+
+        elif self.curr_player.role == PlayerRoleEnum.DOGE:
+            self.curr_player.ap = self.curr_player.ap + 8 - 2
+        else:
+            self.curr_player.ap -= 2
+
+        self.curr_player._notify_role()
 
 
     def determine_enum(self, role):
@@ -50,18 +67,3 @@ class CrewChangeEvent(TurnEvent):
             return PlayerRoleEnum.DOGE
         elif role == 11:
             return PlayerRoleEnum.VETERAN
-        elif self.curr_player.role == PlayerRoleEnum.CAFS:
-            self.curr_player.ap = self.curr_player.ap - 3
-            self.curr_player.special_ap = 3
-
-        elif self.curr_player.role == PlayerRoleEnum.GENERALIST:
-            self.curr_player.ap = self.curr_player.ap + 1 - 2
-
-        elif self.curr_player.role == PlayerRoleEnum.RESCUE:
-            self.curr_player.special_ap = 3
-            self.curr_player.ap -= 2
-
-        elif self.curr_player.role == PlayerRoleEnum.DOGE:
-            self.curr_player.ap = self.curr_player.ap + 8 - 2
-        else:
-            self.curr_player.ap -= 2
