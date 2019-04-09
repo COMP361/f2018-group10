@@ -29,6 +29,7 @@ class PlayerModel(Model,object):
         self._leading_victim = NullModel()
         self._carrying_hazmat = NullModel()
         self._role = PlayerRoleEnum.FAMILY
+        self.has_moved = False
 
     def __eq__(self, other):
         x = [other.ip == self.ip, other.nickname == self.nickname]
@@ -183,6 +184,7 @@ class PlayerModel(Model,object):
     @ap.setter
     def ap(self, ap: int):
         self._ap = ap
+        self.has_moved = True
         logger.info("Player {nickname} AP: {ap}".format(nickname=self.nickname, ap=self.ap))
         self._notify_ap()
 
@@ -193,6 +195,7 @@ class PlayerModel(Model,object):
     @special_ap.setter
     def special_ap(self, special_ap: int):
         self._special_ap = special_ap
+        self.has_moved = True
         logger.info("Player {nickname} special AP: {sp_ap}".format(nickname=self.nickname, sp_ap=self.special_ap))
         self._notify_special_ap()
 

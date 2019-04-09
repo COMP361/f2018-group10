@@ -89,6 +89,9 @@ class TileSprite(Interactable, TileObserver):
         self.resuscitate_button = RectButton(self.rect.x, self.rect.y, 120, 25, Color.BLACK, 0,
                                               Text(pygame.font.SysFont('Arial', 15), "Resuscitate", Color.ORANGE))
 
+        self.change_crew_button = RectButton(self.rect.x, self.rect.y, 120, 25, Color.BLACK, 0,
+                                             Text(pygame.font.SysFont('Arial', 15), "Change crew", Color.ORANGE))
+
         self.disable_all()
 
     def __str__(self):
@@ -136,6 +139,7 @@ class TileSprite(Interactable, TileObserver):
         self.dismount_vehicle_button.disable()
         self.hazmat_button.disable()
         self.resuscitate_button.disable()
+        self.change_crew_button.disable()
 
         # Important! Reset the on_clicks
         self.identify_button.on_click(None)
@@ -149,6 +153,7 @@ class TileSprite(Interactable, TileObserver):
         self.dismount_vehicle_button.on_click(None)
         self.hazmat_button.on_click(None)
         self.resuscitate_button.on_click(None)
+        self.change_crew_button.on_click(None)
 
     def is_clicked(self):
         if not self.hover():
@@ -276,6 +281,12 @@ class TileSprite(Interactable, TileObserver):
             self.resuscitate_button.rect.y = self.rect.y + offset
             offset += 20
 
+        if self.change_crew_button.enabled:
+            screen.blit(self.change_crew_button.image, self.change_crew_button.rect)
+            self.change_crew_button.rect.x = self.rect.x
+            self.change_crew_button.rect.y = self.rect.y + offset
+            offset += 20
+
     def update(self, event_queue: EventQueue):
         self.sprite_grp.update(event_queue)
 
@@ -290,6 +301,7 @@ class TileSprite(Interactable, TileObserver):
         self.drive_engine_here_button.update(event_queue)
         self.hazmat_button.update(event_queue)
         self.resuscitate_button.update(event_queue)
+        self.change_crew_button.update(event_queue)
 
         self._scroll()
         if self.is_clicked():
