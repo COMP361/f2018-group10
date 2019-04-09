@@ -22,7 +22,6 @@ class HazmatSprite(HazmatObserver, pygame.sprite.Sprite):
         self.image = FileImporter.import_image("media/all_markers/hazmat.png")
 
     def hazmat_position_changed(self, row: int, col: int):
-        logger.info(f"Hazmat moved: {row}, {col}")
         self.tile_sprite = GameBoard.instance().grid.grid[col][row]
         self.rect = self.tile_sprite.rect
 
