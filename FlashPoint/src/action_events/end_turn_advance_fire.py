@@ -133,6 +133,9 @@ class EndTurnAdvanceFireEvent(TurnEvent):
         elif self.player.role == PlayerRoleEnum.RESCUE:
             self.player.special_ap = 3
 
+        elif self.player.role == PlayerRoleEnum.VETERAN:
+            self.player.special_ap = 1
+
     def _placing_players_end_turn(self):
         # If the last player has chosen a location, move the game into the next phase.
         if self.game_state.rules == GameKindEnum.EXPERIENCED:
