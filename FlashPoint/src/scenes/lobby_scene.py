@@ -129,7 +129,7 @@ class LobbyScene(GameStateObserver):
                 self._init_start_game_button()
             else:
                 # Ready button is grey at first
-                self._init_ready(1050, 575, "Ready", Color.GREY, Color.BLACK)
+                self._init_ready(1050, 575, "Not Ready", Color.GREY, Color.BLACK)
 
             if not self._game.rules == GameKindEnum.FAMILY :
                 self._init_selec_char(1050, 475, "Select Character", Color.STANDARDBTN, Color.GREEN2)
