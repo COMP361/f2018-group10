@@ -9,10 +9,12 @@ from src.action_events.replenish_poi_event import ReplenishPOIEvent
 from src.constants.custom_event_enums import CustomEventEnum
 from src.core.custom_event import CustomEvent
 from src.core.event_queue import EventQueue
+from src.controllers.move_controller import MoveController
 from src.models.game_board.door_model import DoorModel
 from src.models.game_board.null_model import NullModel
 from src.models.game_board.wall_model import WallModel
 from src.models.game_units.hazmat_model import HazmatModel
+from src.models.game_units.player_model import PlayerModel
 from src.models.game_units.poi_model import POIModel
 from src.models.game_units.victim_model import VictimModel
 from src.models.game_board.tile_model import TileModel
@@ -72,13 +74,13 @@ class EndTurnAdvanceFireEvent(TurnEvent):
             flare_up_will_occur = self.advance_on_tile(self.initial_tile)
             self.flashover()
             self.resolve_hazmat_explosions()
-            self.affect_damages()
             # Preparing the dice for the next
             # iteration if a flare up is going to occur
             self.red_dice = self.game_state.roll_red_dice()
             self.black_dice = self.game_state.roll_black_dice()
             x += 1
 
+        self.affect_damages()
         # Add a hotspot marker to the last
         # target space of the advance_on_tile()
         if self.board.hotspot_bank > 0 and x > 1:
@@ -129,6 +131,9 @@ class EndTurnAdvanceFireEvent(TurnEvent):
 
         elif self.player.role == PlayerRoleEnum.RESCUE:
             self.player.special_ap = 3
+
+        elif self.player.role == PlayerRoleEnum.VETERAN:
+            self.player.special_ap = 1
 
     def _placing_players_end_turn(self):
         # If the last player has chosen a location, move the game into the next phase.
@@ -338,32 +343,39 @@ class EndTurnAdvanceFireEvent(TurnEvent):
 
         :return:
         """
-        for tile in self.game_state.game_board.tiles:
-            if tile.space_status == SpaceStatusEnum.FIRE:
-                # If the tile contains a Hazmat, trigger
-                # an explosion.
-                for assoc_model in tile.associated_models:
-                    if isinstance(assoc_model, HazmatModel):
-                        logger.info("Hazmat explosion occured on {t}".format(t=tile))
-                        self.explosion(tile)
-                        tile.remove_associated_model(assoc_model)
-                        if self.board.hotspot_bank > 0:
-                            tile.is_hotspot = True
-                            self.board.hotspot_bank = self.board.hotspot_bank - 1
+        any_explosions_happened = 1
+        # Keep going around the board
+        # until all explosions are resolved.
+        while any_explosions_happened > 0:
+            any_explosions_happened = 0
+            for tile in self.game_state.game_board.tiles:
+                if tile.space_status == SpaceStatusEnum.FIRE:
+                    # If the tile contains a Hazmat, trigger
+                    # an explosion.
+                    for assoc_model in tile.associated_models:
+                        if isinstance(assoc_model, HazmatModel):
+                            logger.info("Hazmat explosion occured on {t}".format(t=tile))
+                            self.explosion(tile)
+                            any_explosions_happened += 1
+                            tile.remove_associated_model(assoc_model)
+                            if self.board.hotspot_bank > 0:
+                                tile.is_hotspot = True
+                                self.board.hotspot_bank = self.board.hotspot_bank - 1
 
-                # If there are any players on the tile and
-                # if they are carrying a Hazmat, knock down
-                # the player, trigger an explosion and disassociate
-                # the Hazmat from the player.
-                players_on_tile = self.game_state.get_players_on_tile(tile.row, tile.column)
-                for player in players_on_tile:
-                    if isinstance(player.carrying_hazmat, HazmatModel):
-                        KnockDownEvent(player.ip).execute()
-                        self.explosion(tile)
-                        player.carrying_hazmat = NullModel()
-                        if self.board.hotspot_bank > 0:
-                            tile.is_hotspot = True
-                            self.board.hotspot_bank = self.board.hotspot_bank - 1
+                    # If there are any players on the tile and
+                    # if they are carrying a Hazmat, knock down
+                    # the player, trigger an explosion and disassociate
+                    # the Hazmat from the player.
+                    players_on_tile = self.game_state.get_players_on_tile(tile.row, tile.column)
+                    for player in players_on_tile:
+                        if isinstance(player.carrying_hazmat, HazmatModel):
+                            KnockDownEvent(player.ip).execute()
+                            self.explosion(tile)
+                            any_explosions_happened += 1
+                            player.carrying_hazmat = NullModel()
+                            if self.board.hotspot_bank > 0:
+                                tile.is_hotspot = True
+                                self.board.hotspot_bank = self.board.hotspot_bank - 1
 
 
     def countdown(self):
@@ -419,10 +431,70 @@ class EndTurnAdvanceFireEvent(TurnEvent):
 
             players_on_tile = self.game_state.get_players_on_tile(tile.row, tile.column)
             for player in players_on_tile:
-                KnockDownEvent(player.ip).execute()
+                if not self._dodge(player):
+                    KnockDownEvent(player.ip).execute()
 
         # removing any fire markers that were
         # placed outside of the building
         for tile in self.board.tiles:
             if tile.space_kind != SpaceKindEnum.INDOOR and tile.space_status == SpaceStatusEnum.FIRE:
                 tile.space_status = SpaceStatusEnum.SAFE
+
+    def _dodge(self, player: PlayerModel) -> bool:
+        """
+        Determines whether the player can
+        dodge (out of turn) to avoid being
+        knocked down and performs dodge.
+
+        :param player: player that is attempting to dodge
+        :return: True if player can avoid being knocked
+                down, False otherwise.
+        """
+        if player.role == PlayerRoleEnum.VETERAN and player.special_ap < 1:
+            return False
+
+        # player_tile = self.game_state.game_board.get_tile_at(player.row, player.column)
+        mc: MoveController = MoveController.instance()
+        # Disassociate the victim/hazmat that the player
+        # may be carrying temporarily to determine whether
+        # they are able to dodge or not
+        is_carrying_victim = isinstance(self.player.carrying_victim, VictimModel)
+        is_carrying_hazmat = isinstance(self.player.carrying_hazmat, HazmatModel)
+        if is_carrying_victim:
+            player_victim = self.player.carrying_victim
+            logger.info("Temporarily disassociate {v} from {p}".format(v=player_victim, p=player))
+            self.player.carrying_victim = NullModel()
+
+        if is_carrying_hazmat:
+            player_hazmat = self.player.carrying_hazmat
+            logger.info("Temporarily disassociate {h} from {p}".format(h=player_hazmat, p=player))
+            self.player.carrying_hazmat = NullModel()
+
+        moveable_tiles = mc._determine_reachable_tiles(player.row, player.column, player.special_ap)
+
+        # Since the moveable tiles contains the
+        # source tile, if the length of the list
+        # is < 2, then the player has nowhere
+        # to go to dodge.
+        if len(moveable_tiles) < 2:
+            # Player cannot dodge. Reassociate the carrying
+            # victim/hazmat that we took from them.
+            if is_carrying_victim:
+                logger.info("Resassociate {v} to {p}".format(v=player_victim, p=player))
+                self.player.carrying_victim = player_victim
+            if is_carrying_hazmat:
+                logger.info("Resassociate {h} to {p}".format(h=player_hazmat, p=player))
+                self.player.carrying_hazmat = player_hazmat
+
+            logger.info("{p} could not dodge".format(p=player))
+            return False
+
+        # Remove the source tile
+        # (don't really need it)
+        moveable_tiles.pop(0)
+        possible_target = moveable_tiles[0]
+        self.player.set_pos(possible_target.row, possible_target.column)
+        self.player.special_ap = self.player.special_ap - 1
+        logger.info("Player was able to dodge")
+
+        return True
