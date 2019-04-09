@@ -17,6 +17,7 @@ from src.sprites.tile_sprite import TileSprite
 
 logger = logging.getLogger("FlashPoint")
 
+
 class HazmatController(Controller):
 
     _instance = None
