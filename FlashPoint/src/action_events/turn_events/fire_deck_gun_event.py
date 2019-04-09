@@ -4,7 +4,7 @@ import random
 from src.UIComponents.file_importer import FileImporter
 from src.action_events.turn_events.turn_event import TurnEvent
 from src.constants.state_enums import VehicleOrientationEnum, QuadrantEnum, SpaceStatusEnum, DoorStatusEnum, \
-    WallStatusEnum
+    WallStatusEnum, PlayerRoleEnum
 from src.core.flashpoint_exceptions import FlippingDiceProblemException
 from src.models.game_board.door_model import DoorModel
 from src.models.game_board.null_model import NullModel
@@ -67,7 +67,10 @@ class FireDeckGunEvent(TurnEvent):
                 tile_sprite = GameBoard.instance().grid.grid[nb_tile.column][nb_tile.row]
                 tile_sprite.fire_deck_gun = True
 
-        self.player.ap = self.player.ap - 4
+        if self.player.role == PlayerRoleEnum.DRIVER:
+            self.player.ap -= 2
+        else:
+            self.player.ap -= 4
 
     def _set_target_tile(self):
         """

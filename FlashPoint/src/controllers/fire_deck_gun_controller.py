@@ -165,7 +165,7 @@ class FireDeckGunController(Controller):
     def send_event_and_close_menu(self, tile_model: TileModel, menu_to_close: Interactable,
                                   row: int = -1, column: int = -1):
 
-        event = FireDeckGunEvent(row, column)
+        event = FireDeckGunEvent(row=row, column=column)
 
         if not self.run_checks(tile_model):
             menu_to_close.disable()
