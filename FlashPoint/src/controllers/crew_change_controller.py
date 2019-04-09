@@ -95,6 +95,7 @@ class CrewChangeController(Controller):
             return
 
         event = CrewChangeEvent(self.role_to_change, self.game.players_turn_index)
+        self._current_player.has_moved = True
         if Networking.get_instance().is_host:
             Networking.get_instance().send_to_all_client(event)
         else:
@@ -103,6 +104,9 @@ class CrewChangeController(Controller):
     def display_menu(self, tile: TileModel):
         board_sprite: GameBoard = GameBoard.instance()
         players = self.game.players
+        for player in players:
+            logger.info(f"player role: {player.role}")
+            logger.info(f"is Driver? : {player.role == PlayerRoleEnum.DRIVER}")
         offset = 200
         self.button_back = RectButton(250, 100, 100, 50, Color.BLACK, 0,
                                       Text(pygame.font.SysFont('Agency FB', 25), "Back", Color.WHITE))
@@ -124,7 +128,6 @@ class CrewChangeController(Controller):
             offset += 50
 
         if not any([player.role == PlayerRoleEnum.DOGE for player in players]):
-            logger.info("Doge is instantiated")
             self.doge = RectButton(300, 0 + offset, 200, 50, Color.BLACK, 0,
                                    Text(pygame.font.SysFont('Agency FB', 25), "Doge", Color.WHITE))
             self.doge.on_click(self.decide_role, tile, self.doge, PlayerRoleEnum.DOGE)

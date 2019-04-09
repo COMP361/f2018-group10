@@ -446,7 +446,7 @@ class JSONSerializer(object):
 
     @staticmethod
     def _deserialize_crew_change_event(payload: Dict) -> CrewChangeEvent:
-        return CrewChangeEvent(payload['_role'], payload['_player_index'])
+        return CrewChangeEvent(payload['_role']['value'], payload['_player_index'])
 
     @staticmethod
     def deserialize(payload: Dict) -> object:
