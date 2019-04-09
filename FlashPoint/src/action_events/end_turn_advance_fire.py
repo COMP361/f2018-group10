@@ -347,6 +347,7 @@ class EndTurnAdvanceFireEvent(TurnEvent):
                     if isinstance(assoc_model, HazmatModel):
                         logger.info("Hazmat explosion occured on {t}".format(t=tile))
                         self.explosion(tile)
+                        assoc_model.set_pos(-7, -7)
                         tile.remove_associated_model(assoc_model)
                         if self.board.hotspot_bank > 0:
                             tile.is_hotspot = True
@@ -362,6 +363,7 @@ class EndTurnAdvanceFireEvent(TurnEvent):
                         logger.info("Hazmat explosion occured on {t}".format(t=tile))
                         self.explosion(tile)
                         self.dodge(player)
+                        player.carrying_hazmat.set_pos(-7, -7)
                         player.carrying_hazmat = NullModel()
                         if self.board.hotspot_bank > 0:
                             tile.is_hotspot = True
