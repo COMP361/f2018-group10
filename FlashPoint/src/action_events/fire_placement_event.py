@@ -59,7 +59,6 @@ class FirePlacementEvent(ActionEvent):
         while self.board.get_tile_at(tile_pos[0], tile_pos[1]).space_status == SpaceStatusEnum.FIRE:
             self._increment_seed()
             tile_pos = [random.randint(1, 6), random.randint(1, 8)]
-        print(tile_pos)
         tile = self.board.get_tile_at(tile_pos[0], tile_pos[1])
         self._perform_fire_hotspot_explosion(tile, advance_event)
 
