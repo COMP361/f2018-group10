@@ -213,7 +213,6 @@ class JSONSerializer(object):
         nickname = payload['_nickname']
 
         player = PlayerModel(ip, nickname)
-        #player.set_pos(payload['_row'], payload['_column'])
         player.set_pos(-1, -1)
         player.color = tuple(payload['_color'])
         player.status = PlayerStatusEnum(payload["_status"]["value"])
@@ -467,7 +466,7 @@ class JSONSerializer(object):
 
     @staticmethod
     def _deserialize_crew_change_event(payload: Dict) -> CrewChangeEvent:
-        return CrewChangeEvent(payload['_role']['value'], payload['_player_index'])
+        return CrewChangeEvent(PlayerRoleEnum(payload['_role']['value']), payload['_player_index'])
 
     @staticmethod
     def deserialize(payload: Dict) -> object:

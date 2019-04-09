@@ -1,6 +1,5 @@
-import logging
-
 import pygame
+
 import src.constants.color as Color
 from src.UIComponents.interactable import Interactable
 from src.UIComponents.rect_button import RectButton
@@ -16,8 +15,6 @@ from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 from src.sprites.game_board import GameBoard
 from src.sprites.tile_sprite import TileSprite
-
-logger = logging.getLogger("FlashPoint")
 
 
 class CrewChangeController(Controller):
@@ -63,7 +60,6 @@ class CrewChangeController(Controller):
         valid_to_do_event = TurnEvent.has_required_AP(self._current_player.ap, 2)
 
         if not valid_to_do_event:
-            logger.info("Player does not have enough AP to change crews.")
             return False
 
         engine_spots = self.board.engine_spots
@@ -78,14 +74,11 @@ class CrewChangeController(Controller):
                 valid_to_do_event = True
 
         if not valid_to_do_event:
-            logger.info("Player is not place on an engine spot! Cannot change crews.")
             return False
 
         if self._current_player.has_moved:
-            logger.info("Player has already made an action, cannot change crews.")
             return False
 
-        logger.info("Crew Changes Checks Have Passed")
         return True
 
     def send_event_and_close_menu(self, tile_model: TileModel, menu_to_close: Interactable):
@@ -105,9 +98,6 @@ class CrewChangeController(Controller):
         self.kill_all()
         board_sprite: GameBoard = GameBoard.instance()
         players = self.game.players
-        for player in players:
-            logger.info(f"player role: {player.role}")
-            logger.info(f"is Driver? : {player.role == PlayerRoleEnum.DRIVER}")
         offset = 200
         self.button_back = RectButton(250, 100, 100, 50, Color.BLACK, 0,
                                       Text(pygame.font.SysFont('Agency FB', 25), "Back", Color.WHITE))
