@@ -66,6 +66,9 @@ class DriveVehiclesController(Controller):
         if tile_model.space_kind != SpaceKindEnum.AMBULANCE_PARKING:
             return False
 
+        if self._current_player not in GameStateModel.instance().game_board.ambulance.passengers:
+            return False
+
         if not self._player_has_enough_ap("AMBULANCE", tile_model):
             return False
         return True
