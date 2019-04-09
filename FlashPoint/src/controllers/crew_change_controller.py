@@ -102,6 +102,7 @@ class CrewChangeController(Controller):
             Networking.get_instance().send_to_server(event)
 
     def display_menu(self, tile: TileModel):
+        self.kill_all()
         board_sprite: GameBoard = GameBoard.instance()
         players = self.game.players
         for player in players:
