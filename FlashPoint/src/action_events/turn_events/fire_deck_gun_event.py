@@ -36,10 +36,6 @@ class FireDeckGunEvent(TurnEvent):
         else:
             self.target_tile = NullModel()
 
-    # TODO: Move this code to the controller for this event.
-    def check(self) -> bool:
-        pass
-
     def execute(self, *args, **kwargs):
         logger.info("Executing Fire Deck Gun Event")
 
