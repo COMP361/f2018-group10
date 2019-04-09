@@ -22,14 +22,15 @@ class FireDeckGunEvent(TurnEvent):
             self.seed = random.randint(1, 6969)
         else:
             self.seed = seed
-
+        self.row = row
+        self.col = column
         # Pick random location: roll dice
         random.seed(self.seed)
         game: GameStateModel = GameStateModel.instance()
         self.player = game.players_turn
         self.engine = game.game_board.engine
         if row > -1 and column > -1:
-            self.target_tile: TileModel = game.game_board.get_tile_at(row, column)
+            self.target_tile: TileModel = game.game_board.get_tile_at(self.row, self.col)
         else:
             self.target_tile = NullModel()
 
@@ -39,7 +40,9 @@ class FireDeckGunEvent(TurnEvent):
 
     def execute(self, *args, **kwargs):
         logger.info("Executing Fire Deck Gun Event")
+
         self.game: GameStateModel = GameStateModel.instance()
+
         if isinstance(self.target_tile, NullModel):
             self._set_target_tile()
         else:

@@ -4,7 +4,7 @@ import json
 from typing import Dict, List
 import logging
 
-
+from src.action_events.board_setup_event import BoardSetupEvent
 from src.action_events.disconnect_event import DisconnectEvent
 from src.action_events.dodge_reply_event import DodgeReplyEvent
 from src.action_events.end_game_event import EndGameEvent
@@ -424,21 +424,6 @@ class JSONSerializer(object):
         return event
 
     @staticmethod
-    def _deserialize_fire_placement_event(payload: Dict) -> FirePlacementEvent:
-        seed = payload['seed']
-        return FirePlacementEvent(seed)
-
-    @staticmethod
-    def _deserialize_set_initial_hotspot_event(payload: Dict) -> SetInitialHotspotEvent:
-        seed = payload['seed']
-        return SetInitialHotspotEvent(seed)
-
-    @staticmethod
-    def _deserialize_set_initial_poi_experienced_event(payload: Dict) -> SetInitialPOIExperiencedEvent:
-        seed = payload['seed']
-        return SetInitialPOIExperiencedEvent(seed)
-
-    @staticmethod
     def _deserialize_dismount_vehicle_event(payload: Dict) -> DismountVehicleEvent:
         return DismountVehicleEvent(payload['_vehicle_type'], player_index=payload['_player_index'])
 
@@ -453,7 +438,7 @@ class JSONSerializer(object):
 
     @staticmethod
     def _deserialize_fire_deck_gun_event(payload: Dict) -> FireDeckGunEvent:
-        return FireDeckGunEvent(payload['seed'])
+        return FireDeckGunEvent(payload['seed'], payload['row'], payload['col'])
 
     @staticmethod
     def _deserialize_dodge_reply(payload: Dict) -> DodgeReplyEvent:
@@ -501,8 +486,6 @@ class JSONSerializer(object):
             return StartGameEvent()
         elif object_type == EndGameEvent.__name__:
             return JSONSerializer._deserialize_end_game_event(payload)
-        elif object_type == EndTurnEvent.__name__:
-            return JSONSerializer._deserialize_end_turn_event(payload)
         elif object_type == ChooseStartingPositionEvent.__name__:
             return JSONSerializer._deserialize_choose_position_event(payload)
         elif object_type == ChopEvent.__name__:
@@ -519,8 +502,6 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_disconnect_event(payload)
         elif object_type == ExtinguishEvent.__name__:
             return JSONSerializer._deserialize_extinguish_event(payload)
-        elif object_type == GameBoardModel.__name__:
-            return JSONSerializer._deserialize_game_board(payload)
         elif object_type == NullModel.__name__:
             return NullModel()
         elif object_type == DropVictimEvent.__name__:
@@ -563,16 +544,12 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_remove_hazmat_event(payload)
         elif object_type == ResuscitateEvent.__name__:
             return JSONSerializer._deserialize_resuscitate_event(payload)
-        elif object_type == FirePlacementEvent.__name__:
-            return JSONSerializer._deserialize_fire_placement_event(payload)
-        elif object_type == SetInitialHotspotEvent.__name__:
-            return JSONSerializer._deserialize_set_initial_hotspot_event(payload)
-        elif object_type == SetInitialPOIExperiencedEvent.__name__:
-            return JSONSerializer._deserialize_set_initial_poi_experienced_event(payload)
         elif object_type == DodgeReplyEvent.__name__:
             return JSONSerializer._deserialize_dodge_reply(payload)
         elif object_type == RandomBoardSetupEvent.__name__:
             return JSONSerializer._deserialize_random_board_event(payload)
+        elif object_type == BoardSetupEvent.__name__:
+            return BoardSetupEvent(payload['seed'])
         elif object_type == NullModel.__name__:
             return NullModel()
         elif object_type == FireDeckGunEvent.__name__:

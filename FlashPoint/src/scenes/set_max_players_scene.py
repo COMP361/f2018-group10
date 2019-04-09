@@ -39,7 +39,7 @@ class SetMaxPlayers(object):
     def _init_title_text(self):
         box_size = (500, 50)
         self.text_title = RectButton((int)(1280/2-250), 60, box_size[0], box_size[1], Color.BLACK, 0,
-                                     Text(pygame.font.SysFont('Agency FB', 35), "Set Number of Max Players", Color.WHITE))
+                                     Text(pygame.font.SysFont('Agency FB', 35), "Set Number of Max Players", Color.GREEN2))
         self.text_title.change_bg_image('media/GameHud/wood2.png')
         self.text_title.add_frame('media/GameHud/frame.png')
 

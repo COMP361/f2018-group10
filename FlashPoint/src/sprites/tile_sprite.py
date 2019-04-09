@@ -31,12 +31,19 @@ class TileSprite(Interactable, TileObserver):
         self._smoke_image = smoke_image
         self._non_highlight_image = image.copy()
         self._blank_image = image.copy()
+
+        self.counter = 80
+
         self.explosion = False
-        self.explosion_counter = 100
         self.explosion_image = image.copy()
         self.explosion_image.blit(pygame.image.load('media/all_markers/explosian.png'), (0, 0, 128, 128))
-
         self.explosion_image.get_rect().move_ip(x_offset,y_offset)
+
+        self.fire_deck_gun = False
+        self.fire_deck_gun_image = image.copy()
+        self.fire_deck_gun_image.blit(pygame.image.load('media/all_markers/water_splash.png'), (0, 0, 128, 128))
+        self.fire_deck_gun_image.get_rect().move_ip(x_offset, y_offset)
+
         # Initialize if place is Fire, Smoke or Safe
         tile = GameStateModel.instance().game_board.get_tile_at(row, column)
         status = tile.space_status
@@ -97,8 +104,6 @@ class TileSprite(Interactable, TileObserver):
         self.resuscitate_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
                                               Text(pygame.font.SysFont('Agency FB', 15), "Resuscitate", Color.ORANGE))
         pygame.draw.rect(self.resuscitate_button.image, Color.GREEN2, [0, 0, 100, 25], 3)
-
-
 
         self.disable_all()
 
@@ -200,12 +205,22 @@ class TileSprite(Interactable, TileObserver):
         self._mouse_pos = current_mouse_pos
 
     def draw(self, screen: pygame.Surface):
+
         if self.explosion:
             screen.blit(self.explosion_image, self.rect)
-            self.explosion_counter -= 1
-            if self.explosion_counter == 0:
+            self.counter -= 1
+            if self.counter == 0:
                 self.explosion = False
-                self.explosion_counter = 100
+                self.counter = 80
+                screen.blit(self.image, self.rect)
+        elif self.fire_deck_gun:
+            screen.blit(self.fire_deck_gun_image,self.rect)
+            self.counter -= 1
+            if self.counter == 0:
+                self.fire_deck_gun = False
+                self.counter = 80
+                screen.blit(self.image, self.rect)
+
         else:
             self._draw_hightlight()
             screen.blit(self.image, self.rect)
@@ -318,7 +333,6 @@ class TileSprite(Interactable, TileObserver):
         elif status == SpaceStatusEnum.SMOKE:
             image_file = FileImporter.import_image("media/All Markers/smoke.png")
             new_surf.blit(image_file, (0, 0))
-
 
         if is_hotspot:
             hs_img = FileImporter.import_image("media/all_markers/hot_spot.png")
