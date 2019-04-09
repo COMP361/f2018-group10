@@ -1,6 +1,7 @@
 import logging
 
 import src.constants.color as Color
+from src.core.flashpoint_exceptions import TooManyPlayersException
 from src.models.game_state_model import GameStateModel
 from src.action_events.action_event import ActionEvent
 from src.models.game_units.player_model import PlayerModel
@@ -39,5 +40,7 @@ class JoinEvent(ActionEvent):
             if color_available:
                 self.player.color = colors[color]
                 break
-
-        GameStateModel.instance().add_player(self.player)
+        try:
+            GameStateModel.instance().add_player(self.player)
+        except TooManyPlayersException:
+            raise

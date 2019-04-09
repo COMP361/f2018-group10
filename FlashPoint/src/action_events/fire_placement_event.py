@@ -32,7 +32,7 @@ class FirePlacementEvent(ActionEvent):
         if self.game.rules == GameKindEnum.FAMILY:
             self.board.set_fires_family()
         else:
-            self._set_fires_heroic_veteran_recruit(self.game.difficulty_level)
+            self._set_fires_heroic_veteran_recruit(GameStateModel.instance().difficulty_level)
 
     def _increment_seed(self):
         self.seed = self.seed + 1
@@ -46,7 +46,7 @@ class FirePlacementEvent(ActionEvent):
         # hotspot to true and cause an explosion on that tile.
         logger.info("First explosion")
         tile_pos = self._first_explosion_dice_roll()
-        tile = self.board.get_tile_at(tile_pos[0], tile_pos[1])
+        tile = GameStateModel.instance().game_board.get_tile_at(tile_pos[0], tile_pos[1])
         self._perform_fire_hotspot_explosion(tile, advance_event)
 
         # Second explosion:
@@ -59,7 +59,6 @@ class FirePlacementEvent(ActionEvent):
         while self.board.get_tile_at(tile_pos[0], tile_pos[1]).space_status == SpaceStatusEnum.FIRE:
             self._increment_seed()
             tile_pos = [random.randint(1, 6), random.randint(1, 8)]
-        print(tile_pos)
         tile = self.board.get_tile_at(tile_pos[0], tile_pos[1])
         self._perform_fire_hotspot_explosion(tile, advance_event)
 
@@ -92,7 +91,7 @@ class FirePlacementEvent(ActionEvent):
                 self._increment_seed()
                 tile_pos = [random.randint(1, 6),  random.randint(1, 8)]
 
-            tile = self.board.get_tile_at(tile_pos[0], tile_pos[1])
+            tile = GameStateModel.instance().game_board.get_tile_at(tile_pos[0], tile_pos[1])
             self._perform_fire_hotspot_explosion(tile, advance_event)
 
     def _perform_fire_hotspot_explosion(self, tile: TileModel, advance_event: EndTurnAdvanceFireEvent):

@@ -343,39 +343,35 @@ class EndTurnAdvanceFireEvent(TurnEvent):
 
         :return:
         """
-        any_explosions_happened = 1
-        # Keep going around the board
-        # until all explosions are resolved.
-        while any_explosions_happened > 0:
-            any_explosions_happened = 0
-            for tile in self.game_state.game_board.tiles:
-                if tile.space_status == SpaceStatusEnum.FIRE:
-                    # If the tile contains a Hazmat, trigger
-                    # an explosion.
-                    for assoc_model in tile.associated_models:
-                        if isinstance(assoc_model, HazmatModel):
-                            logger.info("Hazmat explosion occured on {t}".format(t=tile))
-                            self.explosion(tile)
-                            any_explosions_happened += 1
-                            tile.remove_associated_model(assoc_model)
-                            if self.board.hotspot_bank > 0:
-                                tile.is_hotspot = True
-                                self.board.hotspot_bank = self.board.hotspot_bank - 1
+        for tile in self.game_state.game_board.tiles:
+            if tile.space_status == SpaceStatusEnum.FIRE:
+                # If the tile contains a Hazmat, trigger
+                # an explosion.
+                for assoc_model in tile.associated_models:
+                    if isinstance(assoc_model, HazmatModel):
+                        logger.info("Hazmat explosion occured on {t}".format(t=tile))
+                        self.explosion(tile)
+                        assoc_model.set_pos(-7, -7)
+                        tile.remove_associated_model(assoc_model)
+                        if self.board.hotspot_bank > 0:
+                            tile.is_hotspot = True
+                            self.board.hotspot_bank = self.board.hotspot_bank - 1
 
-                    # If there are any players on the tile and
-                    # if they are carrying a Hazmat, knock down
-                    # the player, trigger an explosion and disassociate
-                    # the Hazmat from the player.
-                    players_on_tile = self.game_state.get_players_on_tile(tile.row, tile.column)
-                    for player in players_on_tile:
-                        if isinstance(player.carrying_hazmat, HazmatModel):
-                            KnockDownEvent(player.ip).execute()
-                            self.explosion(tile)
-                            any_explosions_happened += 1
-                            player.carrying_hazmat = NullModel()
-                            if self.board.hotspot_bank > 0:
-                                tile.is_hotspot = True
-                                self.board.hotspot_bank = self.board.hotspot_bank - 1
+                # If there are any players on the tile and
+                # if they are carrying a Hazmat, knock down
+                # the player, trigger an explosion and disassociate
+                # the Hazmat from the player.
+                players_on_tile = self.game_state.get_players_on_tile(tile.row, tile.column)
+                for player in players_on_tile:
+                    if isinstance(player.carrying_hazmat, HazmatModel):
+                        logger.info("Hazmat explosion occured on {t}".format(t=tile))
+                        self.explosion(tile)
+                        self.dodge(player)
+                        player.carrying_hazmat.set_pos(-7, -7)
+                        player.carrying_hazmat = NullModel()
+                        if self.board.hotspot_bank > 0:
+                            tile.is_hotspot = True
+                            self.board.hotspot_bank = self.board.hotspot_bank - 1
 
 
     def countdown(self):
@@ -431,8 +427,9 @@ class EndTurnAdvanceFireEvent(TurnEvent):
 
             players_on_tile = self.game_state.get_players_on_tile(tile.row, tile.column)
             for player in players_on_tile:
-                if not self._dodge(player):
-                    KnockDownEvent(player.ip).execute()
+                # Attempt to dodge and if it doesn't
+                # work, the player gets knocked down
+                self.dodge(player)
 
         # removing any fire markers that were
         # placed outside of the building
@@ -440,61 +437,97 @@ class EndTurnAdvanceFireEvent(TurnEvent):
             if tile.space_kind != SpaceKindEnum.INDOOR and tile.space_status == SpaceStatusEnum.FIRE:
                 tile.space_status = SpaceStatusEnum.SAFE
 
-    def _dodge(self, player: PlayerModel) -> bool:
+    def dodge(self, player: PlayerModel):
         """
         Determines whether the player can
         dodge (out of turn) to avoid being
         knocked down and performs dodge.
 
         :param player: player that is attempting to dodge
-        :return: True if player can avoid being knocked
-                down, False otherwise.
+        :return:
         """
-        if player.role == PlayerRoleEnum.VETERAN and player.special_ap < 1:
-            return False
+        logger.info("Attempting to dodge...")
+        if player.role != PlayerRoleEnum.VETERAN:
+            self._log_player_dodge(1, player)
+            KnockDownEvent(player.ip).execute()
+            return
 
-        # player_tile = self.game_state.game_board.get_tile_at(player.row, player.column)
-        mc: MoveController = MoveController.instance()
+        # If the player is a Veteran:
+        # 1. If it is their turn, they must have
+        # at least 1 AP to be able to dodge.
+        # 2. If it is not their turn, they must have
+        # at least 5 AP (so that they have 1 saved AP
+        # from the previous turn) to be able to dodge.
+        if player.role == PlayerRoleEnum.VETERAN:
+            if player == self.game_state.players_turn:
+                if player.ap < 1:
+                    return False
+            else:
+                if player.ap < 5:
+                    return False
+
+        player_tile = self.game_state.game_board.get_tile_at(player.row, player.column)
+        possible_dodge_target = NullModel()
+        for dirn, nb_tile in player_tile.adjacent_tiles.items():
+            if isinstance(nb_tile, TileModel):
+                has_obstacle = nb_tile.has_obstacle_in_direction(dirn)
+                obstacle = nb_tile.get_obstacle_in_direction(dirn)
+                is_open_door = isinstance(obstacle, DoorModel) and obstacle.door_status == DoorStatusEnum.OPEN
+                if not has_obstacle or is_open_door:
+                    if nb_tile.space_status != SpaceStatusEnum.FIRE:
+                        possible_dodge_target = nb_tile
+                        break
+
+        # If we couldn't find a potential space
+        # to dodge, the player cannot avoid being
+        # knocked down.
+        if isinstance(possible_dodge_target, NullModel):
+            self._log_player_dodge(1, player)
+            KnockDownEvent(player.ip).execute()
+            return
+
         # Disassociate the victim/hazmat that the player
-        # may be carrying temporarily to determine whether
-        # they are able to dodge or not
-        is_carrying_victim = isinstance(self.player.carrying_victim, VictimModel)
-        is_carrying_hazmat = isinstance(self.player.carrying_hazmat, HazmatModel)
+        # may be carrying since they cannot dodge with them
+        player_victim = player.carrying_victim
+        player_hazmat = player.carrying_hazmat
+        is_carrying_victim = isinstance(player_victim, VictimModel)
+        is_carrying_hazmat = isinstance(player_hazmat, HazmatModel)
         if is_carrying_victim:
-            player_victim = self.player.carrying_victim
-            logger.info("Temporarily disassociate {v} from {p}".format(v=player_victim, p=player))
-            self.player.carrying_victim = NullModel()
+            self._log_player_dodge(2, player, player_victim, player_tile)
+            player_tile.add_associated_model(player_victim)
+            player.carrying_victim = NullModel()
 
         if is_carrying_hazmat:
-            player_hazmat = self.player.carrying_hazmat
-            logger.info("Temporarily disassociate {h} from {p}".format(h=player_hazmat, p=player))
-            self.player.carrying_hazmat = NullModel()
+            self._log_player_dodge(2, player, player_hazmat, player_tile)
+            player_tile.add_associated_model(player_hazmat)
+            player.carrying_hazmat = NullModel()
 
-        moveable_tiles = mc._determine_reachable_tiles(player.row, player.column, player.special_ap)
+        self._log_player_dodge(3, player)
+        player.set_pos(possible_dodge_target.row, possible_dodge_target.column)
+        player.ap = player.ap - 1
 
-        # Since the moveable tiles contains the
-        # source tile, if the length of the list
-        # is < 2, then the player has nowhere
-        # to go to dodge.
-        if len(moveable_tiles) < 2:
-            # Player cannot dodge. Reassociate the carrying
-            # victim/hazmat that we took from them.
-            if is_carrying_victim:
-                logger.info("Resassociate {v} to {p}".format(v=player_victim, p=player))
-                self.player.carrying_victim = player_victim
-            if is_carrying_hazmat:
-                logger.info("Resassociate {h} to {p}".format(h=player_hazmat, p=player))
-                self.player.carrying_hazmat = player_hazmat
+    def _log_player_dodge(self, status: int, player: PlayerModel, model = None, tile: TileModel = None):
+        """
+        Log player information while
+        attempting to dodge.
 
-            logger.info("{p} could not dodge".format(p=player))
-            return False
+        :param status:
+            1 - cannot dodge
+            2 - disassociating model
+            3 - able to dodge
+        :param player:
+        :param model:
+        :return:
+        """
+        r = player.row
+        c = player.column
+        if status == 1:
+            logger.info("Player at ({row}, {col}) cannot dodge".format(row=r, col=c))
 
-        # Remove the source tile
-        # (don't really need it)
-        moveable_tiles.pop(0)
-        possible_target = moveable_tiles[0]
-        self.player.set_pos(possible_target.row, possible_target.column)
-        self.player.special_ap = self.player.special_ap - 1
-        logger.info("Player was able to dodge")
+        elif status == 2:
+            logger.info("Disassociate {m} from Player at ({row}, {col}) and give it to {t}".format(m=model, row=r, col=c, t=tile))
 
-        return True
+        elif status == 3:
+            logger.info("Player at ({row}, {col}) is able to dodge".format(row=r, col=c))
+
+        return
