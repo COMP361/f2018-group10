@@ -15,7 +15,7 @@ class OpenDoorEvent(TurnEvent):
         game: GameStateModel = GameStateModel.instance()
         self.door = game.game_board.get_tile_at(door.id[0], door.id[1]).get_obstacle_in_direction(door.id[2])
         # Check if player is commanding
-        if game.players_turn == game.command[0]:
+        if game.command[0] and game.players_turn == game.command[0]:
             self.source: PlayerModel = game.command[0]
             self.fireman: PlayerModel = game.command[1]
         else:
