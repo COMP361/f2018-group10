@@ -107,7 +107,7 @@ class MoveEvent(TurnEvent):
         super().__init__()
         game: GameStateModel = GameStateModel.instance()
         # Check if player is commanding
-        if game.players_turn == game.command[0]:
+        if game.command[0] and game.players_turn == game.command[0]:
             self.source: PlayerModel = game.command[0]
             self.fireman: PlayerModel = game.command[1]
         else:
