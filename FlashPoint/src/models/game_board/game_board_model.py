@@ -49,11 +49,9 @@ class GameBoardModel(Model):
         self._hotspot_bank: int = 0
         self._is_loaded = False
 
-
     def notify_all_observers(self):
         self._notify_active_poi()
         self._notify_walls_and_tiles()
-
 
     def _notify_walls_and_tiles(self):
 

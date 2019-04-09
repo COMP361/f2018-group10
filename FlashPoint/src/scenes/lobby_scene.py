@@ -26,13 +26,6 @@ class LobbyScene(GameStateObserver):
     def __init__(self, screen, current_player: PlayerModel):
         super().__init__()
         self._current_player = current_player
-
-
-        # if saved_game:
-        #     self._game = self.init_game_state()
-        # else:
-        #     self._game = GameStateModel.instance()
-
         self._game = GameStateModel.instance()
         self.player_boxes = []
 
@@ -40,7 +33,6 @@ class LobbyScene(GameStateObserver):
             self._current_player.color = Color.BLUE
             self._game.host.color = Color.BLUE
             self._current_player.status = PlayerStatusEnum.READY
-
 
         self._player_count = len(self._game.players)
         self.isReady = False
@@ -61,7 +53,7 @@ class LobbyScene(GameStateObserver):
         else:
             self._current_player.status = PlayerStatusEnum.NOT_READY
             self.buttonReady.on_click(self.set_ready)
-        self.buttonBack.on_click(self.go_back)
+        self.buttonBack.on_click(LobbyScene.go_back)
 
     @staticmethod
     def go_back():
