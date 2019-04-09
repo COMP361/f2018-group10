@@ -453,7 +453,7 @@ class JSONSerializer(object):
 
     @staticmethod
     def _deserialize_fire_deck_gun_event(payload: Dict) -> FireDeckGunEvent:
-        return FireDeckGunEvent(payload['seed'])
+        return FireDeckGunEvent(payload['seed'], payload['row'], payload['col'])
 
     @staticmethod
     def _deserialize_dodge_reply(payload: Dict) -> DodgeReplyEvent:
@@ -501,8 +501,6 @@ class JSONSerializer(object):
             return StartGameEvent()
         elif object_type == EndGameEvent.__name__:
             return JSONSerializer._deserialize_end_game_event(payload)
-        elif object_type == EndTurnEvent.__name__:
-            return JSONSerializer._deserialize_end_turn_event(payload)
         elif object_type == ChooseStartingPositionEvent.__name__:
             return JSONSerializer._deserialize_choose_position_event(payload)
         elif object_type == ChopEvent.__name__:
@@ -519,8 +517,6 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_disconnect_event(payload)
         elif object_type == ExtinguishEvent.__name__:
             return JSONSerializer._deserialize_extinguish_event(payload)
-        elif object_type == GameBoardModel.__name__:
-            return JSONSerializer._deserialize_game_board(payload)
         elif object_type == NullModel.__name__:
             return NullModel()
         elif object_type == DropVictimEvent.__name__:
