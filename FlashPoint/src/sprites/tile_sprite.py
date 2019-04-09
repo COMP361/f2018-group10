@@ -66,8 +66,14 @@ class TileSprite(Interactable, TileObserver):
         self.extinguish_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
                                             Text(pygame.font.SysFont('Arial', 15), "Extinguish", Color.ORANGE))
         self.pickup_victim_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
-                                               Text(pygame.font.SysFont('Arial', 15), "Move with Victim", Color.ORANGE))
+                                               Text(pygame.font.SysFont('Arial', 15), "Carry Victim", Color.ORANGE))
         self.drop_victim_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
+                                             Text(pygame.font.SysFont('Arial', 15), "Leave Victim", Color.ORANGE))
+
+        self.lead_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
+                                               Text(pygame.font.SysFont('Arial', 15), "Lead Victim", Color.ORANGE))
+
+        self.stop_lead_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
                                              Text(pygame.font.SysFont('Arial', 15), "Leave Victim", Color.ORANGE))
 
         self.drive_ambulance_here_button = RectButton(self.rect.x, self.rect.y, 120, 25, Color.BLACK, 0,
@@ -147,6 +153,8 @@ class TileSprite(Interactable, TileObserver):
         self.pickup_hazmat_button.disable()
         self.drop_hazmat_button.disable()
         self.resuscitate_button.disable()
+        self.lead_button.disable()
+        self.stop_lead_button.disable()
 
         # Important! Reset the on_clicks
         self.identify_button.on_click(None)
@@ -163,6 +171,8 @@ class TileSprite(Interactable, TileObserver):
         self.pickup_hazmat_button.on_click(None)
         self.drop_hazmat_button.on_click(None)
         self.resuscitate_button.on_click(None)
+        self.lead_button.on_click(None)
+        self.stop_lead_button.on_click(None)
 
     def is_clicked(self):
         if not self.hover():
@@ -279,6 +289,14 @@ class TileSprite(Interactable, TileObserver):
             self.draw_btn(self.command_button, offset, screen)
             offset += 20
 
+        if self.lead_button.enabled:
+            self.draw_btn(self.lead_button, offset, screen)
+            offset += 20
+
+        if self.stop_lead_button.enabled:
+            self.draw_btn(self.stop_lead_button, offset, screen)
+            offset += 20
+
     def draw_btn(self, button: RectButton, offset: int, screen: pygame.Surface):
         screen.blit(button.image, button.rect)
         button.rect.x = self.rect.x
@@ -301,6 +319,8 @@ class TileSprite(Interactable, TileObserver):
         self.drop_hazmat_button.update(event_queue)
         self.pickup_hazmat_button.update(event_queue)
         self.resuscitate_button.update(event_queue)
+        self.lead_button.update(event_queue)
+        self.stop_lead_button.update(event_queue)
 
         self._scroll()
         if self.is_clicked():
