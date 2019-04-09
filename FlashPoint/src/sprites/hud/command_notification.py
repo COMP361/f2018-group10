@@ -22,12 +22,12 @@ class CommandNotification(object):
                                        Text(pygame.font.SysFont('Agency FB', 30), f"Commanding: None",
                                             Color.GREEN2))
         self._notification.change_bg_image('media/GameHud/wood2.png')
-        self._notification.add_frame('media/GameHud/frame/png')
+        self._notification.add_frame('media/GameHud/frame.png')
         self._wait_command = RectLabel(500, 400, 300, 50, Color.GREY, 0,
                                        Text(pygame.font.SysFont('Agency FB', 30), f"Commanded by: None",
                                             Color.GREEN2))
         self._wait_command.change_bg_image('media/GameHud/wood2.png')
-        self._wait_command.add_frame('media/GameHud/frame/png')
+        self._wait_command.add_frame('media/GameHud/frame.png')
         self._init_end_command_btn()
         self._is_source = False
         self._is_target = False
