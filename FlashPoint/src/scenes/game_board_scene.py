@@ -262,7 +262,7 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
                 if event.target == self._current_player:
                     self.display_permission_prompt(event.source, event.target)
             elif event.type == CustomEventEnum.DODGE_PROMPT:
-                self._dodge_prompt.enabled = True
+                self._dodge_prompt.enable()
 
     def ignore_area(self):
         """A region in which all inputs are ignored."""
