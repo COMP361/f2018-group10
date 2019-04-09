@@ -32,6 +32,9 @@ class PlayerModel(Model, object):
         self._role = PlayerRoleEnum.FAMILY
 
     def __eq__(self, other):
+        if not isinstance(other, PlayerModel):
+            return False
+        
         x = [other.ip == self.ip, other.nickname == self.nickname]
         return all(x)
 
@@ -243,7 +246,7 @@ class PlayerModel(Model, object):
         self._carrying_hazmat = hazmat
         logger.info("Player {nickname} carrying hazmat: {h}".format(nickname=self.nickname, h=hazmat))
         # TODO: Modify notify carry to account for carrying hazmats
-        # self._notify_carry(self.carrying_hazmat)
+        self._notify_carry(self.carrying_hazmat)
 
     @property
     def role(self) -> PlayerRoleEnum:

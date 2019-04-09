@@ -194,7 +194,7 @@ class MoveController(PlayerObserver, Controller):
         obstacle = tile_model.get_obstacle_in_direction(dirn)
         is_open_door = isinstance(obstacle, DoorModel) and obstacle.door_status == DoorStatusEnum.OPEN
         is_damaged_wall = isinstance(obstacle, WallModel) and obstacle.wall_status == WallStatusEnum.DAMAGED
-        is_carrying_victim = isinstance(self.current_player.carrying_victim, VictimModel)
+        is_carrying_victim = isinstance(self.target.carrying_victim, VictimModel)
         # there is a destroyed door or a destroyed wall or no obstacle or an open door or a damaged wall
         if self.current_player.role == PlayerRoleEnum.DOGE:
             if not has_obstacle or is_open_door or is_damaged_wall:
@@ -227,13 +227,13 @@ class MoveController(PlayerObserver, Controller):
         :return: True if player can go into this
                 fire space, False otherwise.
         """
-        if isinstance(self.current_player.carrying_victim, VictimModel):
+        if isinstance(self.target.carrying_victim, VictimModel):
             return False
-        if isinstance(self.current_player.carrying_hazmat, HazmatModel):
+        if isinstance(self.target.carrying_hazmat, HazmatModel):
             return False
-        if isinstance(self.current_player.leading_victim, VictimModel):
+        if isinstance(self.target.leading_victim, VictimModel):
             return False
-        if self.current_player.role == PlayerRoleEnum.DOGE:
+        if self.target.role == PlayerRoleEnum.DOGE:
             return False
 
         cost_to_move = self._determine_cost_to_move(target_tile)
@@ -272,7 +272,7 @@ class MoveController(PlayerObserver, Controller):
         :return: cost to move into target tile
         """
         game: GameStateModel = GameStateModel.instance()
-        src_tile = game.game_board.get_tile_at(self.current_player.row, self.current_player.column)
+        src_tile = game.game_board.get_tile_at(self.target.row, self.target.column)
         movement_dirn = self._determine_movement_direction(src_tile, target_tile)
         obstacle = src_tile.get_obstacle_in_direction(movement_dirn)
         is_damaged_wall = isinstance(obstacle, WallModel) and obstacle.wall_status == WallStatusEnum.DAMAGED
@@ -281,14 +281,14 @@ class MoveController(PlayerObserver, Controller):
         space_status = target_tile.space_status
         cost_to_move = 1
         if space_status != SpaceStatusEnum.FIRE:
-            if isinstance(self.current_player.carrying_victim, VictimModel):
+            if isinstance(self.target.carrying_victim, VictimModel):
                 # If a Doge drags a victim, it costs 4 AP.
                 if is_doge:
                     cost_to_move = 4
                 else:
                     cost_to_move = 2
 
-            if isinstance(self.current_player.carrying_hazmat, HazmatModel):
+            if isinstance(self.target.carrying_hazmat, HazmatModel):
                 cost_to_move = 2
 
             # It takes the Doge 2 AP to squeeze through a damaged wall.
