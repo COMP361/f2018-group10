@@ -128,7 +128,7 @@ class GameStateModel(Model):
     @command.setter
     def command(self, command: Tuple[PlayerModel, PlayerModel]):
         self._command = command
-        if command[1].role is PlayerRoleEnum.CAFS:
+        if command[1] and command[1].role is PlayerRoleEnum.CAFS:
             self._commanded.append(command[1])
         self._notify_command()
 
