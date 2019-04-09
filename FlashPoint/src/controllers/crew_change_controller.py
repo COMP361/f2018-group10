@@ -98,71 +98,82 @@ class CrewChangeController(Controller):
         self.kill_all()
         board_sprite: GameBoard = GameBoard.instance()
         players = self.game.players
-        offset = 200
-        self.button_back = RectButton(250, 100, 100, 50, Color.BLACK, 0,
-                                      Text(pygame.font.SysFont('Agency FB', 25), "Back", Color.WHITE))
+        offset = 80
+        self.button_back = RectButton(1180, 30, 100, 50, Color.WOOD, 0,
+                                      Text(pygame.font.SysFont('Agency FB', 20), "Back", Color.GREEN2))
+        pygame.draw.rect(self.button_back.image,Color.GREEN2,[0,0,100,50],3)
         board_sprite.add(self.button_back)
         self.button_back.on_click(self.kill_all)
 
         if not any([player.role == PlayerRoleEnum.DRIVER for player in players]):
-            self.driver = RectButton(300, 0 + offset, 200, 50, Color.BLACK, 0,
-                                     Text(pygame.font.SysFont('Agency FB', 25), "Driver/Operator", Color.WHITE))
+            self.driver = RectButton(1180, 0 + offset, 100, 50, Color.WOOD, 0,
+                                     Text(pygame.font.SysFont('Agency FB', 20), "Driver/Operator", Color.GREEN2))
+            pygame.draw.rect(self.driver.image,Color.YELLOW,[0,0,100,50],3)
             self.driver.on_click(self.decide_role, tile, self.driver, PlayerRoleEnum.DRIVER)
+
             board_sprite.add(self.driver)
             offset += 50
 
         if not any([player.role == PlayerRoleEnum.VETERAN for player in players]):
-            self.veteran = RectButton(300, 0 + offset, 200, 50, Color.BLACK, 0,
-                                      Text(pygame.font.SysFont('Agency FB', 25), "Veteran", Color.WHITE))
+            self.veteran = RectButton(1180, 0 + offset, 100, 50, Color.WOOD, 0,
+                                      Text(pygame.font.SysFont('Agency FB', 20), "Veteran", Color.GREEN2))
+            pygame.draw.rect(self.veteran.image, Color.YELLOW, [0, 0, 100, 50], 3)
             self.veteran.on_click(self.decide_role, tile, self.veteran, PlayerRoleEnum.VETERAN)
             board_sprite.add(self.veteran)
             offset += 50
 
         if not any([player.role == PlayerRoleEnum.DOGE for player in players]):
-            self.doge = RectButton(300, 0 + offset, 200, 50, Color.BLACK, 0,
-                                   Text(pygame.font.SysFont('Agency FB', 25), "Doge", Color.WHITE))
+            self.doge = RectButton(1180, 0 + offset, 100, 50, Color.WOOD, 0,
+                                   Text(pygame.font.SysFont('Agency FB', 20), "Doge", Color.GREEN2))
+            pygame.draw.rect(self.doge.image, Color.YELLOW, [0, 0, 100, 50], 3)
             self.doge.on_click(self.decide_role, tile, self.doge, PlayerRoleEnum.DOGE)
             board_sprite.add(self.doge)
             offset += 50
 
         if not any([player.role == PlayerRoleEnum.RESCUE for player in players]):
-            self.rescue = RectButton(300, 0 + offset, 200, 50, Color.BLACK, 0,
-                                     Text(pygame.font.SysFont('Agency FB', 25), "Rescue", Color.WHITE))
+            self.rescue = RectButton(1180, 0 + offset, 100, 50, Color.WOOD, 0,
+                                     Text(pygame.font.SysFont('Agency FB', 20), "Rescue", Color.GREEN2))
+            pygame.draw.rect(self.rescue.image, Color.YELLOW, [0, 0, 100, 50], 3)
             self.rescue.on_click(self.decide_role, tile, self.rescue, PlayerRoleEnum.RESCUE)
             board_sprite.add(self.rescue)
             offset += 50
 
         if not any([player.role == PlayerRoleEnum.PARAMEDIC for player in players]):
-            self.paramedic = RectButton(300, 0 + offset, 200, 50, Color.BLACK, 0,
-                                        Text(pygame.font.SysFont('Agency FB', 25), "Paramedic", Color.WHITE))
+            self.paramedic = RectButton(1180, 0 + offset, 100, 50, Color.WOOD, 0,
+                                        Text(pygame.font.SysFont('Agency FB', 20), "Paramedic", Color.GREEN2))
             self.paramedic.on_click(self.decide_role, tile, self.paramedic, PlayerRoleEnum.PARAMEDIC)
+            pygame.draw.rect(self.paramedic.image, Color.YELLOW, [0, 0, 100, 50], 3)
             board_sprite.add(self.paramedic)
             offset += 50
 
         if not any([player.role == PlayerRoleEnum.IMAGING for player in players]):
-            self.imaging = RectButton(300, 0 + offset, 200, 50, Color.BLACK, 0,
-                                      Text(pygame.font.SysFont('Agency FB', 25), "Imaging Technician", Color.WHITE))
+            self.imaging = RectButton(1180, 0 + offset, 100, 50, Color.WOOD, 0,
+                                      Text(pygame.font.SysFont('Agency FB', 20), "Imaging Tech", Color.GREEN2))
+            pygame.draw.rect(self.imaging.image, Color.YELLOW, [0, 0, 100, 50], 3)
             self.imaging.on_click(self.decide_role, tile, self.driver, PlayerRoleEnum.IMAGING)
             board_sprite.add(self.imaging)
             offset += 50
 
         if not any([player.role == PlayerRoleEnum.CAFS for player in players]):
-            self.cafs = RectButton(300, 0 + offset, 200, 50, Color.BLACK, 0,
-                                   Text(pygame.font.SysFont('Agency FB', 25), "CAFS Firefighter", Color.WHITE))
+            self.cafs = RectButton(1180, 0 + offset, 100, 50, Color.WOOD, 0,
+                                   Text(pygame.font.SysFont('Agency FB', 20), "CAFS Firefighter", Color.GREEN2))
+            pygame.draw.rect(self.cafs.image, Color.YELLOW, [0, 0, 100, 50], 3)
             self.cafs.on_click(self.decide_role, tile, self.driver, PlayerRoleEnum.CAFS)
             board_sprite.add(self.cafs)
             offset += 50
 
         if not any([player.role == PlayerRoleEnum.GENERALIST for player in players]):
-            self.generalist = RectButton(300, 0 + offset, 200, 50, Color.BLACK, 0,
-                                         Text(pygame.font.SysFont('Agency FB', 25), "Generalist", Color.WHITE))
+            self.generalist = RectButton(1180, 0 + offset, 100, 50, Color.WOOD, 0,
+                                         Text(pygame.font.SysFont('Agency FB', 20), "Generalist", Color.GREEN2))
+            pygame.draw.rect(self.generalist.image, Color.YELLOW, [0, 0, 100, 50], 3)
             self.generalist.on_click(self.decide_role, tile, self.driver, PlayerRoleEnum.GENERALIST)
             board_sprite.add(self.generalist)
             offset += 50
 
         if not any([player.role == PlayerRoleEnum.CAPTAIN for player in players]):
-            self.captain = RectButton(300, 0 + offset, 200, 50, Color.BLACK, 0,
-                                      Text(pygame.font.SysFont('Agency FB', 25), "Captain", Color.WHITE))
+            self.captain = RectButton(1180, 0 + offset, 100, 50, Color.WOOD, 0,
+                                      Text(pygame.font.SysFont('Agency FB', 20), "Captain", Color.GREEN2))
+            pygame.draw.rect(self.captain.image, Color.YELLOW, [0, 0, 100, 50], 3)
             self.captain.on_click(self.decide_role, tile, self.driver, PlayerRoleEnum.CAPTAIN)
             board_sprite.add(self.captain)
             offset += 50

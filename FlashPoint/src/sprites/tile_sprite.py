@@ -85,15 +85,16 @@ class TileSprite(Interactable, TileObserver):
 
 
         self.lead_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.WOOD, 0,
-                                               Text(pygame.font.SysFont('Arial', 15), "Lead Victim", Color.GREEN2))
+                                               Text(pygame.font.SysFont('Agency FB', 15), "Lead Victim", Color.GREEN2))
 
         pygame.draw.rect(self.lead_button.image,Color.YELLOW,[0, 0, 100, 25],3)
 
-        self.change_crew_button = RectButton(self.rect.x, self.rect.y, 120, 25, Color.BLACK, 0,
-                                             Text(pygame.font.SysFont('Arial', 15), "Change Crew", Color.ORANGE))
+        self.change_crew_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.WOOD, 0,
+                                             Text(pygame.font.SysFont('Agency FB', 15), "Change Crew", Color.GREEN2))
+        pygame.draw.rect(self.change_crew_button.image, Color.YELLOW, [0, 0, 100, 25], 3)
 
         self.stop_lead_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.WOOD, 0,
-                                             Text(pygame.font.SysFont('Arial', 15), "Leave Victim", Color.GREEN2))
+                                             Text(pygame.font.SysFont('Agency FB', 15), "Leave Victim", Color.GREEN2))
 
         pygame.draw.rect(self.stop_lead_button.image,Color.YELLOW,[0, 0, 100, 25],3)
 
@@ -141,12 +142,12 @@ class TileSprite(Interactable, TileObserver):
         pygame.draw.rect(self.command_button.image, Color.YELLOW, [0, 0, 100, 25], 3)
 
         self.pickup_hazmat_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.WOOD, 0,
-                                               Text(pygame.font.SysFont('Arial', 15), "Pickup Hazmat", Color.GREEN2))
+                                               Text(pygame.font.SysFont('Agency FB', 15), "Pickup Hazmat", Color.GREEN2))
 
         pygame.draw.rect(self.pickup_hazmat_button.image, Color.YELLOW, [0, 0, 100, 25], 3)
 
         self.drop_hazmat_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.WOOD, 0,
-                                               Text(pygame.font.SysFont('Arial', 15), "Drop Hazmat", Color.GREEN2))
+                                               Text(pygame.font.SysFont('Agency FB', 15), "Drop Hazmat", Color.GREEN2))
 
         pygame.draw.rect(self.drop_hazmat_button.image, Color.YELLOW, [0, 0, 100, 25], 3)
 
