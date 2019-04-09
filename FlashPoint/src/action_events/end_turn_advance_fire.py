@@ -9,7 +9,6 @@ from src.action_events.replenish_poi_event import ReplenishPOIEvent
 from src.constants.custom_event_enums import CustomEventEnum
 from src.core.custom_event import CustomEvent
 from src.core.event_queue import EventQueue
-from src.controllers.move_controller import MoveController
 from src.models.game_board.door_model import DoorModel
 from src.models.game_board.null_model import NullModel
 from src.models.game_board.wall_model import WallModel
