@@ -29,7 +29,8 @@ class PlayerModel(Model, object):
         self._carrying_victim = NullModel()
         self._leading_victim = NullModel()
         self._carrying_hazmat = NullModel()
-        self._role = PlayerRoleEnum.FAMILY
+        self._role: PlayerRoleEnum = PlayerRoleEnum.FAMILY
+        self.has_moved = False
 
     def __eq__(self, other):
         if not isinstance(other, PlayerModel):
@@ -189,6 +190,7 @@ class PlayerModel(Model, object):
     @ap.setter
     def ap(self, ap: int):
         self._ap = ap
+        self.has_moved = True
         logger.info("Player {nickname} AP: {ap}".format(nickname=self.nickname, ap=self.ap))
         self._notify_ap()
 
@@ -199,6 +201,7 @@ class PlayerModel(Model, object):
     @special_ap.setter
     def special_ap(self, special_ap: int):
         self._special_ap = special_ap
+        self.has_moved = True
         logger.info("Player {nickname} special AP: {sp_ap}".format(nickname=self.nickname, sp_ap=self.special_ap))
         self._notify_special_ap()
 
@@ -254,5 +257,5 @@ class PlayerModel(Model, object):
     @role.setter
     def role(self, player_role: PlayerRoleEnum):
         self._role = player_role
-        logger.info("Player {nickname} role: {r}".format(nickname=self.nickname, r=player_role.name))
+        logger.info("Player {nickname} role: {r}".format(nickname=self.nickname, r=player_role))
         self._notify_role()

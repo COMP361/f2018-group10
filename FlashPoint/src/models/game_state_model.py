@@ -234,6 +234,8 @@ class GameStateModel(Model):
 
     def next_player(self):
         """Rotate to the next player in the players list, round robin style."""
+        for player in self.players:
+            player.has_moved = False
         with GameStateModel.lock:
             self._players_turn_index = (self._players_turn_index + 1) % len(self._players)
             self._notify_player_index()

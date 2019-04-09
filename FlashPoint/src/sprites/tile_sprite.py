@@ -85,12 +85,16 @@ class TileSprite(Interactable, TileObserver):
 
 
         self.lead_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.WOOD, 0,
-                                               Text(pygame.font.SysFont('Arial', 15), "Lead Victim", Color.GREEN2))
+                                               Text(pygame.font.SysFont('Agency FB', 15), "Lead Victim", Color.GREEN2))
 
         pygame.draw.rect(self.lead_button.image,Color.YELLOW,[0, 0, 100, 25],3)
 
+        self.change_crew_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.WOOD, 0,
+                                             Text(pygame.font.SysFont('Agency FB', 15), "Change Crew", Color.GREEN2))
+        pygame.draw.rect(self.change_crew_button.image, Color.YELLOW, [0, 0, 100, 25], 3)
+
         self.stop_lead_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.WOOD, 0,
-                                             Text(pygame.font.SysFont('Arial', 15), "Leave Victim", Color.GREEN2))
+                                             Text(pygame.font.SysFont('Agency FB', 15), "Leave Victim", Color.GREEN2))
 
         pygame.draw.rect(self.stop_lead_button.image,Color.YELLOW,[0, 0, 100, 25],3)
 
@@ -138,12 +142,12 @@ class TileSprite(Interactable, TileObserver):
         pygame.draw.rect(self.command_button.image, Color.YELLOW, [0, 0, 100, 25], 3)
 
         self.pickup_hazmat_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.WOOD, 0,
-                                               Text(pygame.font.SysFont('Arial', 15), "Pickup Hazmat", Color.GREEN2))
+                                               Text(pygame.font.SysFont('Agency FB', 15), "Pickup Hazmat", Color.GREEN2))
 
         pygame.draw.rect(self.pickup_hazmat_button.image, Color.YELLOW, [0, 0, 100, 25], 3)
 
         self.drop_hazmat_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.WOOD, 0,
-                                               Text(pygame.font.SysFont('Arial', 15), "Drop Hazmat", Color.GREEN2))
+                                               Text(pygame.font.SysFont('Agency FB', 15), "Drop Hazmat", Color.GREEN2))
 
         pygame.draw.rect(self.drop_hazmat_button.image, Color.YELLOW, [0, 0, 100, 25], 3)
 
@@ -199,6 +203,7 @@ class TileSprite(Interactable, TileObserver):
         self.resuscitate_button.disable()
         self.lead_button.disable()
         self.stop_lead_button.disable()
+        self.change_crew_button.disable()
         self.fire_deck_gun_button.disable()
 
         # Important! Reset the on_clicks
@@ -218,6 +223,7 @@ class TileSprite(Interactable, TileObserver):
         self.resuscitate_button.on_click(None)
         self.lead_button.on_click(None)
         self.stop_lead_button.on_click(None)
+        self.change_crew_button.on_click(None)
         self.fire_deck_gun_button.on_click(None)
 
     def is_clicked(self):
@@ -331,6 +337,12 @@ class TileSprite(Interactable, TileObserver):
             self.draw_btn(self.resuscitate_button, offset, screen)
             offset += 20
 
+        if self.change_crew_button.enabled:
+            screen.blit(self.change_crew_button.image, self.change_crew_button.rect)
+            self.change_crew_button.rect.x = self.rect.x
+            self.change_crew_button.rect.y = self.rect.y + offset
+            offset += 20
+
         if self.fire_deck_gun_button.enabled:
             screen.blit(self.fire_deck_gun_button.image, self.fire_deck_gun_button.rect)
             self.fire_deck_gun_button.rect.x = self.rect.x
@@ -374,6 +386,7 @@ class TileSprite(Interactable, TileObserver):
         self.fire_deck_gun_button.update(event_queue)
         self.lead_button.update(event_queue)
         self.stop_lead_button.update(event_queue)
+        self.change_crew_button.update(event_queue)
 
         self._scroll()
         if self.is_clicked():
