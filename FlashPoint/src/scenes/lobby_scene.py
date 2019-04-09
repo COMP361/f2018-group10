@@ -87,7 +87,6 @@ class LobbyScene(GameStateObserver):
                 self.isReady = True
                 self.sprite_grp.remove(self.buttonReady)
                 box_size = (130, 48)
-                self.isReady = False
                 self.buttonReady = RectButton(1050, 575, box_size[0], box_size[1], Color.BLACK, 0,
                                               Text(pygame.font.SysFont('Agency FB', 25), "Ready", Color.GREEN))
                 self.buttonReady.change_bg_image('media/GameHud/wood2.png')
@@ -105,7 +104,6 @@ class LobbyScene(GameStateObserver):
             self.isReady = False
             self.sprite_grp.remove(self.buttonReady)
             box_size = (130, 48)
-            self.isReady = False
             self.buttonReady = RectButton(1050, 575, box_size[0], box_size[1], Color.BLACK, 0,
                                           Text(pygame.font.SysFont('Agency FB', 25), "Not Ready", Color.GREY))
             self.buttonReady.change_bg_image('media/GameHud/wood2.png')
