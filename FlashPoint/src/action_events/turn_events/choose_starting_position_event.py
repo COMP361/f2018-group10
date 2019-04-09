@@ -17,12 +17,12 @@ class ChooseStartingPositionEvent(ActionEvent):
         super().__init__()
         self._row = row
         self._column = column
-        self.player: PlayerModel = GameStateModel.instance().players_turn
 
     def execute(self):
         logger.info("Executing ChooseStartingPositionEvent")
         game: GameStateModel = GameStateModel.instance()
+        player: PlayerModel = game.players_turn
         tile = game.game_board.get_tile_at(self._row, self._column)
-        player_sprite = PlayerSprite(self.player, tile, GameBoard.instance().grid)
+        player_sprite = PlayerSprite(player, tile, GameBoard.instance().grid)
         GameBoard.instance().add(player_sprite)
-        self.player.set_pos(tile.row, tile.column)
+        player.set_pos(tile.row, tile.column)

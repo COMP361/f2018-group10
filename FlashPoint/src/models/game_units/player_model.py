@@ -11,7 +11,8 @@ from src.models.model import Model
 
 logger = logging.getLogger("FlashPoint")
 
-class PlayerModel(Model,object):
+
+class PlayerModel(Model, object):
 
     def __init__(self, ip: str, nickname: str):
         super().__init__()
@@ -31,6 +32,8 @@ class PlayerModel(Model,object):
         self._role = PlayerRoleEnum.FAMILY
 
     def __eq__(self, other):
+        if not isinstance(other, PlayerModel):
+            return False
         x = [other.ip == self.ip, other.nickname == self.nickname]
         return all(x)
 
@@ -41,7 +44,6 @@ class PlayerModel(Model,object):
         player_status = "Player status: {status}".format(status=self.status)
         player_color = "Player color: {color}\n".format(color=self.color)
         return '\n'.join([player_pos, player_ap, player_carrying_victim, player_status, player_color])
-
 
     def _notify_all_observers(self):
         self._notify_ap()
@@ -73,9 +75,9 @@ class PlayerModel(Model,object):
         for obs in self.observers:
             obs.player_losses_changed(self.losses)
 
-    def _notify_carry(self):
+    def _notify_carry(self, model):
         for obs in self.observers:
-            obs.player_carry_changed(self.carrying_victim)
+            obs.player_carry_changed(model)
 
     def _notify_role(self):
         for obs in self.observers:
@@ -101,6 +103,10 @@ class PlayerModel(Model,object):
         logger.info("Player {nickname} position: ({row}, {column})".format(nickname=self.nickname, row=self.row, column=self.column))
         if isinstance(self.carrying_victim, VictimModel):
             self.carrying_victim.set_pos(row, column)
+        if isinstance(self.leading_victim, VictimModel):
+            self.leading_victim.set_pos(row, column)
+        if isinstance(self.carrying_hazmat, HazmatModel):
+            self.carrying_hazmat.set_pos(row, column)
         self._notify_position()
 
     def set_initial_ap(self, game_kind: GameKindEnum):
@@ -214,7 +220,7 @@ class PlayerModel(Model,object):
     def carrying_victim(self, victim: VictimModel):
         self._carrying_victim = victim
         logger.info("Player {nickname} carrying victim: {cv}".format(nickname=self.nickname, cv=victim))
-        self._notify_carry()
+        self._notify_carry(self.carrying_victim)
 
     @property
     def leading_victim(self) -> Union[VictimModel, NullModel]:
@@ -239,7 +245,7 @@ class PlayerModel(Model,object):
         self._carrying_hazmat = hazmat
         logger.info("Player {nickname} carrying hazmat: {h}".format(nickname=self.nickname, h=hazmat))
         # TODO: Modify notify carry to account for carrying hazmats
-        # self._notify_carry()
+        self._notify_carry(self.carrying_hazmat)
 
     @property
     def role(self) -> PlayerRoleEnum:

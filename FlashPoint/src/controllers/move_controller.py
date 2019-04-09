@@ -51,6 +51,14 @@ class MoveController(PlayerObserver, Controller):
     def instance(cls):
         return cls._instance
 
+    @property
+    def target(self) -> PlayerModel:
+        game: GameStateModel = GameStateModel.instance()
+        source: PlayerModel = game.command[0]
+        if source and self.current_player == source:
+            return [player for player in game.players if player == game.command[1]][0]
+        return self.current_player
+
     def _determine_reachable_tiles(self, row: int, column: int, ap: int) -> List[TileModel]:
         """
         Determines the list of tiles the player can
@@ -71,6 +79,15 @@ class MoveController(PlayerObserver, Controller):
         # final list returned.
         moveable_tiles = []
         pq = PriorityQueue()
+        is_carrying_victim = False
+        is_carrying_hazmat = False
+        if isinstance(self.target.carrying_victim, VictimModel):
+            is_carrying_victim = True
+
+        if isinstance(self.target.carrying_hazmat, HazmatModel):
+            is_carrying_hazmat = True
+
+        is_carrying_something = is_carrying_victim or is_carrying_hazmat
 
         # Get the tiles of the board. Remove the source tile
         # from the list since it has to be initialised as a
@@ -129,6 +146,10 @@ class MoveController(PlayerObserver, Controller):
         if ap < 1:
             return False
 
+        is_leading_victim = isinstance(self.target.leading_victim, VictimModel)
+
+        has_obstacle = first_tile.tile_model.has_obstacle_in_direction(direction)
+        obstacle = first_tile.tile_model.get_obstacle_in_direction(direction)
         # If the path from the first tile to the second is not hindered by anything
         # then there exists the **possibility** of moving to the second tile.
         # Two cases then depending on whether the player is heading into a non-fire/fire space.
@@ -173,7 +194,7 @@ class MoveController(PlayerObserver, Controller):
         obstacle = tile_model.get_obstacle_in_direction(dirn)
         is_open_door = isinstance(obstacle, DoorModel) and obstacle.door_status == DoorStatusEnum.OPEN
         is_damaged_wall = isinstance(obstacle, WallModel) and obstacle.wall_status == WallStatusEnum.DAMAGED
-        is_carrying_victim = isinstance(self.current_player.carrying_victim, VictimModel)
+        is_carrying_victim = isinstance(self.target.carrying_victim, VictimModel)
         # there is a destroyed door or a destroyed wall or no obstacle or an open door or a damaged wall
         if self.current_player.role == PlayerRoleEnum.DOGE:
             if not has_obstacle or is_open_door or is_damaged_wall:
@@ -206,13 +227,13 @@ class MoveController(PlayerObserver, Controller):
         :return: True if player can go into this
                 fire space, False otherwise.
         """
-        if isinstance(self.current_player.carrying_victim, VictimModel):
+        if isinstance(self.target.carrying_victim, VictimModel):
             return False
-        if isinstance(self.current_player.carrying_hazmat, HazmatModel):
+        if isinstance(self.target.carrying_hazmat, HazmatModel):
             return False
-        if isinstance(self.current_player.leading_victim, VictimModel):
+        if isinstance(self.target.leading_victim, VictimModel):
             return False
-        if self.current_player.role == PlayerRoleEnum.DOGE:
+        if self.target.role == PlayerRoleEnum.DOGE:
             return False
 
         cost_to_move = self._determine_cost_to_move(target_tile)
@@ -251,7 +272,7 @@ class MoveController(PlayerObserver, Controller):
         :return: cost to move into target tile
         """
         game: GameStateModel = GameStateModel.instance()
-        src_tile = game.game_board.get_tile_at(self.current_player.row, self.current_player.column)
+        src_tile = game.game_board.get_tile_at(self.target.row, self.target.column)
         movement_dirn = self._determine_movement_direction(src_tile, target_tile)
         obstacle = src_tile.get_obstacle_in_direction(movement_dirn)
         is_damaged_wall = isinstance(obstacle, WallModel) and obstacle.wall_status == WallStatusEnum.DAMAGED
@@ -260,14 +281,14 @@ class MoveController(PlayerObserver, Controller):
         space_status = target_tile.space_status
         cost_to_move = 1
         if space_status != SpaceStatusEnum.FIRE:
-            if isinstance(self.current_player.carrying_victim, VictimModel):
+            if isinstance(self.target.carrying_victim, VictimModel):
                 # If a Doge drags a victim, it costs 4 AP.
                 if is_doge:
                     cost_to_move = 4
                 else:
                     cost_to_move = 2
 
-            if isinstance(self.current_player.carrying_hazmat, HazmatModel):
+            if isinstance(self.target.carrying_hazmat, HazmatModel):
                 cost_to_move = 2
 
             # It takes the Doge 2 AP to squeeze through a damaged wall.
@@ -380,6 +401,7 @@ class MoveController(PlayerObserver, Controller):
 
     def player_role_changed(self, role):
         pass
+
     def player_special_ap_changed(self, updated_ap: int):
         # If the player is not a Rescue Specialist/CAFS, a change
         # in the special AP will not affect the moveable tiles.
@@ -396,7 +418,7 @@ class MoveController(PlayerObserver, Controller):
             ap = ap + self.current_player.special_ap
 
         self.moveable_tiles = self._determine_reachable_tiles(
-            self.current_player.row, self.current_player.column, ap)
+            self.target.row, self.target.column, ap)
         GameStateModel.instance().game_board.reset_tiles_visit_count()
 
     def player_status_changed(self, status: PlayerStatusEnum):

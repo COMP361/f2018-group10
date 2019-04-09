@@ -4,7 +4,9 @@ from src.constants.state_enums import VictimStateEnum
 from src.core.event_queue import EventQueue
 from src.observers.victim_observer import VictimObserver
 from src.UIComponents.file_importer import FileImporter
+import logging
 
+logger = logging.getLogger("FlashPoint")
 
 class VictimSprite(pygame.sprite.Sprite, VictimObserver):
 

@@ -152,7 +152,7 @@ class CharacterScene(Scene):
     def _init_btn_confirm(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
         box_size = (130, 48)
         self.buttonConfirm = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
-                                        Text(pygame.font.SysFont('Arial', 25), text, Color.GREEN2))
+                                        Text(pygame.font.SysFont('Agency FB', 25), text, Color.GREEN2))
         self.buttonConfirm.change_bg_image('media/GameHud/wood2.png')
         self.buttonConfirm.add_frame('media/GameHud/frame.png')
         self.sprite_grp.add(self.buttonConfirm)

@@ -19,10 +19,6 @@ class SetInitialPOIExperiencedEvent(ActionEvent):
         else:
             self.seed = seed
 
-        # Pick random location: roll dice
-        random.seed(self.seed)
-        self.rand_nums = random.sample(range(len(GameStateModel.instance().game_board.poi_bank)), 3)
-
     def execute(self, *args, **kwargs):
         """
         Set the initial POIs for the experienced
@@ -32,19 +28,36 @@ class SetInitialPOIExperiencedEvent(ActionEvent):
         :param kwargs:
         :return:
         """
-        logging.info("Executing Set Initial POI Experienced Event")
         self.game: GameStateModel = GameStateModel.instance()
         self.game_board = self.game.game_board
-        
-        locations = self._determine_locations()
+        # Pick random location: roll dice
+        random.seed(self.seed)
+        self.rand_nums = random.sample(range(len(self.game_board.poi_bank)), 3)
+        logging.info("Executing Set Initial POI Experienced Event")
+
         pois_to_remove = []
-        for i, index in enumerate(self.rand_nums):
+        pois_placed = 0
+        for index in self.rand_nums:
+            reroll = True
+            while reroll:
+                reroll = False
+                row = self.game.roll_red_dice()
+                column = self.game.roll_black_dice()
+                target_tile = self.game_board.get_tile_at(row, column)
+
+                for assoc_model in target_tile.associated_models:
+                    if isinstance(assoc_model, POIModel):
+                        reroll = True
+
+                if target_tile.space_status == SpaceStatusEnum.FIRE:
+                    reroll = True
+
             poi = self.game_board.get_poi_from_bank_by_index(index)
-            row = locations[i][0]
-            column = locations[i][1]
             self.game_board.add_poi_or_victim(poi)
             self.game_board.get_tile_at(row, column).add_associated_model(poi)
             pois_to_remove.append(poi)
+
+            pois_placed += 1
 
         for poi in pois_to_remove:
             self.game_board.remove_from_poi_bank(poi)

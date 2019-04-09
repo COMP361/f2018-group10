@@ -12,7 +12,7 @@ from src.core.event_queue import EventQueue
 from src.models.model import Model
 from src.models.game_board.game_board_model import GameBoardModel
 from src.constants.state_enums import GameKindEnum, DifficultyLevelEnum, GameStateEnum, VehicleOrientationEnum, \
-    GameBoardTypeEnum, PlayerStatusEnum
+    GameBoardTypeEnum, PlayerStatusEnum, PlayerRoleEnum
 from src.core.flashpoint_exceptions import TooManyPlayersException, InvalidGameKindException, PlayerNotFoundException
 from src.models.game_units.player_model import PlayerModel
 
@@ -31,9 +31,9 @@ class GameStateModel(Model):
                  board_type: GameBoardTypeEnum,
                  difficulty: DifficultyLevelEnum = None
                  ):
-        logger.info("Initializing game state...")
 
         if not GameStateModel._instance:
+            logger.info("Initializing game state...")
             super().__init__()
             self._host = host
             self._max_desired_players = num_players
@@ -52,8 +52,9 @@ class GameStateModel(Model):
             self._max_damage = 24
             self._chat_history = []
             self._dodge_reply = False
+            self._command = (None, None)
+            self._commanded: List[PlayerModel] = []
             self._state = GameStateEnum.READY_TO_JOIN
-            s = f"{self._host.row}, {self._host.column}"
             GameStateModel._instance = self
         else:
             raise Exception("GameStateModel is a Singleton")
@@ -61,7 +62,6 @@ class GameStateModel(Model):
     # def notify_all_observers(self):
     #     self._notify_state()
     #     self._game_board.notify_all_observers()
-
 
     def _notify_player_added(self, player: PlayerModel):
         for obs in self._observers:
@@ -79,9 +79,14 @@ class GameStateModel(Model):
         for obs in self._observers:
             obs.notify_game_state(self._state)
 
+    def _notify_command(self):
+        for obs in self._observers:
+            obs.player_command(self.command[0], self.command[1])
+
     @staticmethod
-    def __del__():
+    def destroy():
         GameStateModel._instance = None
+        logger.info("GameStateModel deleted")
         if os.path.exists("media/board_layouts/random_inside_walls.json"):
             os.rmdir("media/board_layouts/random_inside_walls.json")
 
@@ -113,6 +118,28 @@ class GameStateModel(Model):
         self._dodge_reply = reply
 
     @property
+    def command(self) -> Tuple[PlayerModel, PlayerModel]:
+        if self._command[0] and self._command[1]:
+            source = [player for player in self.players if player == self._command[0]][0]
+            target = [player for player in self.players if player == self._command[1]][0]
+            return source, target
+        return None, None
+
+    @command.setter
+    def command(self, command: Tuple[PlayerModel, PlayerModel]):
+        self._command = command
+        if command[1].role is PlayerRoleEnum.CAFS:
+            self._commanded.append(command[1])
+        self._notify_command()
+
+    @property
+    def commanded_list(self):
+        return self._commanded
+
+    def clear_commanded_list(self):
+        self._commanded.clear()
+
+    @property
     def board_type(self) -> GameBoardTypeEnum:
         with GameStateModel.lock:
             return self._board_type
@@ -121,7 +148,7 @@ class GameStateModel(Model):
     def board_type(self, board_type: GameBoardTypeEnum):
         with GameStateModel.lock:
             self._board_type = board_type
-            if board_type != GameBoardTypeEnum.LOADED:
+            if not self.game_board.is_loaded:
                 self._game_board = GameBoardModel(board_type)
 
     @property
@@ -172,8 +199,6 @@ class GameStateModel(Model):
                 raise TooManyPlayersException(player)
             self._players.append(player)
             self._notify_player_added(player)
-
-
 
     def get_player_by_ip(self, ip: str) -> PlayerModel:
         with GameStateModel.lock:
@@ -290,8 +315,6 @@ class GameStateModel(Model):
         with GameStateModel.lock:
             return self._damage
 
-
-
     @damage.setter
     def damage(self, damage: int):
         with GameStateModel.lock:
@@ -299,7 +322,7 @@ class GameStateModel(Model):
             logger.info("Game damage: {d}".format(d=damage))
             for obs in self._observers:
                 obs.damage_changed(damage)
-            if self._damage >= self.max_damage:
+            if self._damage == self.max_damage:
                 self._state = GameStateEnum.LOST
                 self.endgame()
 
