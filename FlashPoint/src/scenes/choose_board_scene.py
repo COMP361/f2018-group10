@@ -21,10 +21,9 @@ class ChooseBoardScene(object):
 
         self._init_background()
         self._init_title_text()
-        #self._init_back_box((int)(1280 / 2 - 250), 130, "", Color.GREY, Color.GREEN)
 
         self._init_board1(410, 400, "Original", Color.STANDARDBTN, Color.GREEN2)
-        self._init_board1(575, 400, "Alternative", Color.STANDARDBTN, Color.GREEN2)
+        self._init_board2(575, 400, "Alternative", Color.STANDARDBTN, Color.GREEN2)
         self._init_board3(740, 400, "Random", Color.STANDARDBTN, Color.GREEN2)
         self._init_btn_back(20, 20, "Back", Color.STANDARDBTN, Color.GREEN2)
 
