@@ -6,6 +6,7 @@ from typing import List
 
 import pygame
 
+from src.action_events.board_setup_event import BoardSetupEvent
 from src.action_events.fire_placement_event import FirePlacementEvent
 from src.action_events.set_initial_hotspot_event import SetInitialHotspotEvent
 from src.action_events.set_initial_poi_experienced_event import SetInitialPOIExperiencedEvent
@@ -86,6 +87,7 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
             self._init_loaded_sprites()
         self._game._notify_player_index()
 
+
     def _init_ui_elements(self):
         """Initialize all things to be drawn on this screen."""
         self._menu = None
@@ -96,7 +98,6 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
         self._game_board_sprite = GameBoard(self._current_player)
         self._menu_btn = self._init_menu_button()
         self._chat_box = ChatBox(self._current_player)
-
 
         # Now add everything to the sprite group that needs to be added.
         self._init_active_sprites()
@@ -147,14 +148,7 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
     def _send_game_board_initialize(self):
         """Send any game board initialization events."""
         if Networking.get_instance().is_host:
-            Networking.get_instance().send_to_all_client(FirePlacementEvent())
-
-            if self._game.rules == GameKindEnum.EXPERIENCED:
-                Networking.get_instance().send_to_all_client(SetInitialPOIExperiencedEvent())
-                Networking.get_instance().send_to_all_client(PlaceHazmatEvent())
-                Networking.get_instance().send_to_all_client(SetInitialHotspotEvent())
-            else:
-                Networking.get_instance().send_to_all_client(SetInitialPOIFamilyEvent())
+            Networking.get_instance().send_to_all_client(BoardSetupEvent())
 
         for player in self._game.players:
             player.set_initial_ap(self._game.rules)

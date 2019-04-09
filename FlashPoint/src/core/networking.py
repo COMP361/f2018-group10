@@ -215,8 +215,6 @@ class Networking:
                 self.host = None
             elif self.client:
                 logger.info("Disconnecting client")
-                #player_model = GameStateModel.instance().get_player_by_ip(self.get_ip())
-                #self.send_to_server(DisconnectEvent(player_model))
                 self.client.disconnect()
                 self.client.__del__()
                 self.client = None
@@ -459,7 +457,7 @@ class Networking:
                         traceback.print_exception(*info)
                         self.callback_disconnect()
                     except OSError:
-                        logger.error("OS ERROR, disconnecting client.")
+                        logger.warning("OS ERROR, disconnecting client.")
                         info = sys.exc_info()
                         traceback.print_exception(*info)
                         self.callback_disconnect()
