@@ -289,8 +289,6 @@ class GameStateModel(Model):
         with GameStateModel.lock:
             return self._damage
 
-
-
     @damage.setter
     def damage(self, damage: int):
         with GameStateModel.lock:
@@ -298,7 +296,7 @@ class GameStateModel(Model):
             logger.info("Game damage: {d}".format(d=damage))
             for obs in self._observers:
                 obs.damage_changed(damage)
-            if self._damage >= self.max_damage:
+            if self._damage == self.max_damage:
                 self._state = GameStateEnum.LOST
                 self.endgame()
 

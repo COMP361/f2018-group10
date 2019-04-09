@@ -7,11 +7,8 @@ from typing import List
 import pygame
 
 from src.action_events.board_setup_event import BoardSetupEvent
-from src.action_events.fire_placement_event import FirePlacementEvent
-from src.action_events.set_initial_hotspot_event import SetInitialHotspotEvent
-from src.action_events.set_initial_poi_experienced_event import SetInitialPOIExperiencedEvent
 from src.constants.custom_event_enums import CustomEventEnum
-from src.constants.state_enums import GameKindEnum, GameStateEnum, GameBoardTypeEnum
+from src.constants.state_enums import GameStateEnum
 from src.models.game_units.hazmat_model import HazmatModel
 from src.models.game_units.victim_model import VictimModel
 from src.sprites.dodge_prompt import DodgePrompt
@@ -24,11 +21,7 @@ from src.models.game_units.poi_model import POIModel
 from src.observers.GameBoardObserver import GameBoardObserver
 from src.observers.game_state_observer import GameStateObserver
 
-from src.action_events.place_hazmat_event import PlaceHazmatEvent
-from src.action_events.set_initial_poi_family_event import SetInitialPOIFamilyEvent
 from src.controllers.chop_controller import ChopController
-from src.controllers.move_controller import MoveController
-from src.controllers.win_lose_controller import WinLoseController
 from src.controllers.door_controller import DoorController
 from src.sprites.poi_sprite import POISprite
 from src.controllers.tile_input_controller import TileInputController
@@ -48,7 +41,6 @@ from src.sprites.hud.current_player_state import CurrentPlayerState
 from src.sprites.hud.time_bar import TimeBar
 from src.sprites.hud.ingame_states import InGameStates
 from src.sprites.player_sprite import PlayerSprite
-import src.constants.color as Color
 from src.UIComponents.rect_button import RectButton
 from src.UIComponents.text import Text
 from src.sprites.notify_player_turn import NotifyPlayerTurn
