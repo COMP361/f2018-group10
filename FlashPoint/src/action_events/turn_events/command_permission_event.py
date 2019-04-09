@@ -19,8 +19,6 @@ class CommandPermissionEvent(TurnEvent):
         super().__init__()
         self._source = source
         self._target = target
-        self.game: GameStateModel = GameStateModel.instance()
-        self.game_board = self.game.game_board
 
     def execute(self):
         logger.info(f"Player {self._source.nickname} is asking you for command permission")
