@@ -186,10 +186,14 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
         menu = MenuWindow([self._active_sprites, self._game_board_sprite], 500, 500, (400, 150))
 
         save_btn = RectButton(200, 150, 100, 50, Color.STANDARDBTN, 0,
-                              Text(pygame.font.SysFont('Agency FB', 20), "Save", Color.BLACK))
+                              Text(pygame.font.SysFont('Agency FB', 25), "Save", Color.GREEN2))
+        save_btn.change_bg_image('media/GameHud/wood2.png')
+        save_btn.add_frame('media/GameHud/frame.png')
 
         quit_btn = RectButton(200, 250, 100, 50, Color.STANDARDBTN, 0,
-                              Text(pygame.font.SysFont('Agency FB', 20), "Quit", Color.BLACK))
+                              Text(pygame.font.SysFont('Agency FB', 25), "Quit", Color.GREEN2))
+        quit_btn.change_bg_image('media/GameHud/wood2.png')
+        quit_btn.add_frame('media/GameHud/frame.png')
 
         back_btn = RectButton(50, 50, 50, 50, "media/GameHud/crosss.png", 0)
 
@@ -227,42 +231,48 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
 
     def update(self, event_queue: EventQueue):
         """Call the update() function of everything in this class."""
-        self._active_sprites.update(event_queue)
-        self._chat_box.update(event_queue)
-        self._player_hud_sprites.update(event_queue)
+        if not self.ignore_board():
+            self._active_sprites.update(event_queue)
+            self._chat_box.update(event_queue)
+            self._player_hud_sprites.update(event_queue)
 
         self._command_notification.update(event_queue)
 
         self._permission_prompt.update(event_queue)
         self._dodge_prompt.update(event_queue)
 
-        if not self.ignore_area():
+        if not self.ignore_area() and not self.ignore_board():
             TileInputController.update(event_queue)
             self._game_board_sprite.update(event_queue)
             ChopController.instance().update(event_queue)
             DoorController.instance().update(event_queue)
+
         if self._menu and not self._menu.is_closed:
             self._menu.update(event_queue)
 
-        for event in event_queue:
-            if event.type == CustomEventEnum.ENABLE_KNOCKDOWN_PROMPT:
-                self._knockdown_prompt.name = event.args[0]
-                self._knockdown_prompt.enabled = True
-            elif event.type == CustomEventEnum.DISABLE_KNOCKDOWN_PROMPT:
-                self._knockdown_prompt.enabled = False
-            elif event.type == CustomEventEnum.ENABLE_VICTIM_LOST_PROMPT:
-                self._victim_lost_prompt.enabled = True
-            elif event.type == CustomEventEnum.ENABLE_VICTIM_SAVED_PROMPT:
-                self._victim_saved_prompt.enabled = True
-            elif event.type == CustomEventEnum.DISABLE_VICTIM_LOST_PROMPT:
-                self._victim_lost_prompt.enabled = False
-            elif event.type == CustomEventEnum.DISABLE_VICTIM_SAVED_PROMPT:
-                self._victim_saved_prompt.enabled = False
-            elif event.type == CustomEventEnum.PERMISSION_PROMPT:
-                if event.target == self._current_player:
-                    self.display_permission_prompt(event.source, event.target)
-            elif event.type == CustomEventEnum.DODGE_PROMPT:
-                self._dodge_prompt.enable()
+        if not self.ignore_board():
+            for event in event_queue:
+                if event.type == CustomEventEnum.ENABLE_KNOCKDOWN_PROMPT:
+                    self._knockdown_prompt.name = event.args[0]
+                    self._knockdown_prompt.enabled = True
+                elif event.type == CustomEventEnum.DISABLE_KNOCKDOWN_PROMPT:
+                    self._knockdown_prompt.enabled = False
+                elif event.type == CustomEventEnum.ENABLE_VICTIM_LOST_PROMPT:
+                    self._victim_lost_prompt.enabled = True
+                elif event.type == CustomEventEnum.ENABLE_VICTIM_SAVED_PROMPT:
+                    self._victim_saved_prompt.enabled = True
+                elif event.type == CustomEventEnum.DISABLE_VICTIM_LOST_PROMPT:
+                    self._victim_lost_prompt.enabled = False
+                elif event.type == CustomEventEnum.DISABLE_VICTIM_SAVED_PROMPT:
+                    self._victim_saved_prompt.enabled = False
+                elif event.type == CustomEventEnum.PERMISSION_PROMPT:
+                    if event.target == self._current_player:
+                        self.display_permission_prompt(event.source, event.target)
+                elif event.type == CustomEventEnum.DODGE_PROMPT:
+                    self._dodge_prompt.enabled = True
+
+    def ignore_board(self):
+        return (self._menu and not self._menu.is_closed) or self._permission_prompt.enabled or self._dodge_prompt.enabled
 
     def ignore_area(self):
         """A region in which all inputs are ignored."""

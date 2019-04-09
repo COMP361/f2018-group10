@@ -220,6 +220,10 @@ class Networking:
                 self.client.__del__()
                 self.client = None
 
+            # Clears up game state model
+            if GameStateModel.instance():
+                GameStateModel._instance = None
+
         def send_to_server(self, data, compress=True, count: int = 0):
             """
             Send data to server
