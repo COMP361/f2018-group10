@@ -64,6 +64,8 @@ class FireDeckGunEvent(TurnEvent):
                     or (isinstance(obstacle, WallModel) and obstacle.wall_status == WallStatusEnum.DESTROYED):
                 nb_tile: TileModel = self.target_tile.get_tile_in_direction(dirn)
                 nb_tile.space_status = SpaceStatusEnum.SAFE
+                tile_sprite = GameBoard.instance().grid.grid[nb_tile.column][nb_tile.row]
+                tile_sprite.fire_deck_gun = True
 
         self.player.ap = self.player.ap - 4
 
