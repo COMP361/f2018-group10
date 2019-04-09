@@ -94,10 +94,9 @@ class TileSprite(Interactable, TileObserver):
                                               Text(pygame.font.SysFont('Agency FB', 15), "Ride Vehicle", Color.ORANGE))
         pygame.draw.rect(self.ride_vehicle_button.image, Color.GREEN2, [0, 0, 100, 25], 3)
 
-        self.hazmat_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
+        self.remove_hazmat_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
                                         Text(pygame.font.SysFont('Agency FB', 20), "Remove Hazmat", Color.ORANGE))
-        pygame.draw.rect(self.hazmat_button.image, Color.GREEN2, [0, 0, 100, 25], 3)
-
+        pygame.draw.rect(self.remove_hazmat_button.image, Color.GREEN2, [0, 0, 100, 25], 3)
         self.dismount_vehicle_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
                                                   Text(pygame.font.SysFont('Agency FB', 15), "Dismount Vehicle",
                                                        Color.ORANGE))
@@ -113,6 +112,14 @@ class TileSprite(Interactable, TileObserver):
 
         self.command_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
                                          Text(pygame.font.SysFont('Arial', 20), "Command", Color.ORANGE))
+        pygame.draw.rect(self.command_button.image, Color.GREEN2, [0, 0, 100, 25], 3)
+
+        self.pickup_hazmat_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
+                                               Text(pygame.font.SysFont('Arial', 20), "Pickup Hazmat", Color.ORANGE))
+        pygame.draw.rect(self.pickup_hazmat_button.image, Color.GREEN2, [0, 0, 100, 25], 3)
+        self.drop_hazmat_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
+                                               Text(pygame.font.SysFont('Arial', 20), "Drop Hazmat", Color.ORANGE))
+        pygame.draw.rect(self.drop_hazmat_button.image, Color.GREEN2, [0, 0, 100, 25], 3)
 
         self.disable_all()
 
