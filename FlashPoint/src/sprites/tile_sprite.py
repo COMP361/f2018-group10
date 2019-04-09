@@ -59,68 +59,93 @@ class TileSprite(Interactable, TileObserver):
         self.is_scrolling = False
 
         # ------- POP-UP MENU -------- #
-        self.identify_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
-                                          Text(pygame.font.SysFont('Agency FB', 15), "Identify", Color.ORANGE))
-        pygame.draw.rect(self.identify_button.image, Color.GREEN2, [0, 0, 100, 25], 3)
+        self.identify_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.WOOD, 0,
+                                          Text(pygame.font.SysFont('Agency FB', 15), "Identify", Color.GREEN2))
+        pygame.draw.rect(self.identify_button.image, Color.YELLOW, [0, 0, 100, 25], 3)
+        self.identify_button.change_bg_image('media/GameHud/wood2.png')
 
-        self.move_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
-                                      Text(pygame.font.SysFont('Agency FB', 15), "Move Here", Color.ORANGE))
-        pygame.draw.rect(self.move_button.image, Color.GREEN2, [0, 0, 100, 25], 3)
-        self.extinguish_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
-                                            Text(pygame.font.SysFont('Agency FB', 15), "Extinguish", Color.ORANGE))
-        pygame.draw.rect(self.extinguish_button.image, Color.GREEN2, [0, 0, 100, 25], 3)
-        self.pickup_victim_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
-                                               Text(pygame.font.SysFont('Arial', 15), "Carry Victim", Color.ORANGE))
-        pygame.draw.rect(self.pickup_victim_button.image, Color.GREEN2, [0, 0, 100, 25], 3)
-        self.drop_victim_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
-                                             Text(pygame.font.SysFont('Agency FB', 15), "Leave Victim", Color.ORANGE))
-        pygame.draw.rect(self.drop_victim_button.image, Color.GREEN2, [0, 0, 100, 25], 3)
+        self.move_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.WOOD, 0,
+                                      Text(pygame.font.SysFont('Agency FB', 15), "Move Here", Color.GREEN2))
+        pygame.draw.rect(self.move_button.image, Color.YELLOW, [0, 0, 100, 25], 3)
 
-        self.lead_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
-                                               Text(pygame.font.SysFont('Arial', 15), "Lead Victim", Color.ORANGE))
 
-        self.stop_lead_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
-                                             Text(pygame.font.SysFont('Arial', 15), "Leave Victim", Color.ORANGE))
+        self.extinguish_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.WOOD, 0,
+                                            Text(pygame.font.SysFont('Agency FB', 15), "Extinguish", Color.GREEN2))
+        pygame.draw.rect(self.extinguish_button.image, Color.YELLOW, [0, 0, 100, 25], 3)
 
-        self.drive_ambulance_here_button = RectButton(self.rect.x, self.rect.y, 120, 25, Color.BLACK, 0,
+
+        self.pickup_victim_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.WOOD, 0,
+                                               Text(pygame.font.SysFont('Arial', 15), "Carry Victim", Color.GREEN2))
+        pygame.draw.rect(self.pickup_victim_button.image, Color.YELLOW, [0, 0, 100, 25], 3)
+
+
+        self.drop_victim_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.WOOD, 0,
+                                             Text(pygame.font.SysFont('Agency FB', 15), "Leave Victim", Color.GREEN2))
+        pygame.draw.rect(self.drop_victim_button.image, Color.YELLOW, [0, 0, 100, 25], 3)
+
+
+        self.lead_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.WOOD, 0,
+                                               Text(pygame.font.SysFont('Arial', 15), "Lead Victim", Color.GREEN2))
+
+        pygame.draw.rect(self.lead_button.image,Color.YELLOW,[0, 0, 100, 25],3)
+
+        self.stop_lead_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.WOOD, 0,
+                                             Text(pygame.font.SysFont('Arial', 15), "Leave Victim", Color.GREEN2))
+
+        pygame.draw.rect(self.stop_lead_button.image,Color.YELLOW,[0, 0, 100, 25],3)
+
+        self.drive_ambulance_here_button = RectButton(self.rect.x, self.rect.y, 100, 15, Color.WOOD, 0,
                                                       Text(pygame.font.SysFont('Agency FB', 15), "Drive Ambulance Here",
-                                                           Color.ORANGE))
-        pygame.draw.rect(self.drive_ambulance_here_button.image, Color.GREEN2, [0, 0, 100, 25], 3)
+                                                           Color.GREEN2))
 
-        self.drive_engine_here_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
+        pygame.draw.rect(self.drive_ambulance_here_button.image, Color.YELLOW, [0, 0, 100, 25], 3)
+
+        self.drive_engine_here_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.WOOD, 0,
                                                    Text(pygame.font.SysFont('Agency FB', 15), "Drive Engine Here",
-                                                        Color.ORANGE))
-        pygame.draw.rect(self.drive_engine_here_button.image, Color.GREEN2, [0, 0, 100, 25], 3)
-        self.ride_vehicle_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
-                                              Text(pygame.font.SysFont('Agency FB', 15), "Ride Vehicle", Color.ORANGE))
-        pygame.draw.rect(self.ride_vehicle_button.image, Color.GREEN2, [0, 0, 100, 25], 3)
+                                                        Color.GREEN2))
 
-        self.remove_hazmat_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
-                                        Text(pygame.font.SysFont('Agency FB', 20), "Remove Hazmat", Color.ORANGE))
-        pygame.draw.rect(self.remove_hazmat_button.image, Color.GREEN2, [0, 0, 100, 25], 3)
-        self.dismount_vehicle_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
+        pygame.draw.rect(self.drive_engine_here_button.image, Color.YELLOW, [0, 0, 100, 25], 3)
+
+        self.ride_vehicle_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.WOOD, 0,
+                                              Text(pygame.font.SysFont('Agency FB', 15), "Ride Vehicle", Color.GREEN2))
+
+        pygame.draw.rect(self.ride_vehicle_button.image, Color.YELLOW, [0, 0, 100, 25], 3)
+
+        self.remove_hazmat_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.WOOD, 0,
+                                        Text(pygame.font.SysFont('Agency FB', 20), "Remove Hazmat", Color.GREEN2))
+
+        pygame.draw.rect(self.remove_hazmat_button.image, Color.YELLOW, [0, 0, 100, 25], 3)
+
+        self.dismount_vehicle_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.WOOD, 0,
                                                   Text(pygame.font.SysFont('Agency FB', 15), "Dismount Vehicle",
-                                                       Color.ORANGE))
-        pygame.draw.rect(self.dismount_vehicle_button.image, Color.GREEN2, [0, 0, 100, 25], 3)
+                                                       Color.GREEN2))
 
-        self.fire_deck_gun_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
-                                               Text(pygame.font.SysFont('Agency FB', 15), "Fire Deck Gun", Color.ORANGE))
-        pygame.draw.rect(self.fire_deck_gun_button.image, Color.GREEN2, [0, 0, 100, 25], 3)
+        pygame.draw.rect(self.dismount_vehicle_button.image, Color.YELLOW, [0, 0, 100, 25], 3)
 
-        self.resuscitate_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
-                                              Text(pygame.font.SysFont('Agency FB', 15), "Resuscitate", Color.ORANGE))
-        pygame.draw.rect(self.resuscitate_button.image, Color.GREEN2, [0, 0, 100, 25], 3)
+        self.fire_deck_gun_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.WOOD, 0,
+                                               Text(pygame.font.SysFont('Agency FB', 15), "Fire Deck Gun", Color.GREEN2))
 
-        self.command_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
-                                         Text(pygame.font.SysFont('Arial', 20), "Command", Color.ORANGE))
-        pygame.draw.rect(self.command_button.image, Color.GREEN2, [0, 0, 100, 25], 3)
+        pygame.draw.rect(self.fire_deck_gun_button.image, Color.YELLOW, [0, 0, 100, 25], 3)
 
-        self.pickup_hazmat_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
-                                               Text(pygame.font.SysFont('Arial', 20), "Pickup Hazmat", Color.ORANGE))
-        pygame.draw.rect(self.pickup_hazmat_button.image, Color.GREEN2, [0, 0, 100, 25], 3)
-        self.drop_hazmat_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
-                                               Text(pygame.font.SysFont('Arial', 20), "Drop Hazmat", Color.ORANGE))
-        pygame.draw.rect(self.drop_hazmat_button.image, Color.GREEN2, [0, 0, 100, 25], 3)
+        self.resuscitate_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.WOOD, 0,
+                                              Text(pygame.font.SysFont('Agency FB', 15), "Resuscitate", Color.GREEN2))
+
+        pygame.draw.rect(self.resuscitate_button.image, Color.YELLOW, [0, 0, 100, 25], 3)
+
+        self.command_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.WOOD, 0,
+                                         Text(pygame.font.SysFont('Arial', 20), "Command", Color.GREEN2))
+
+        pygame.draw.rect(self.command_button.image, Color.YELLOW, [0, 0, 100, 25], 3)
+
+        self.pickup_hazmat_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.WOOD, 0,
+                                               Text(pygame.font.SysFont('Arial', 15), "Pickup Hazmat", Color.GREEN2))
+
+        pygame.draw.rect(self.pickup_hazmat_button.image, Color.YELLOW, [0, 0, 100, 25], 3)
+
+        self.drop_hazmat_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.WOOD, 0,
+                                               Text(pygame.font.SysFont('Arial', 15), "Drop Hazmat", Color.GREEN2))
+
+        pygame.draw.rect(self.drop_hazmat_button.image, Color.YELLOW, [0, 0, 100, 25], 3)
 
         self.disable_all()
 
