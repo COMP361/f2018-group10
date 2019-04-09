@@ -75,6 +75,18 @@ class MoveController(PlayerObserver, Controller):
         # d_tile refers to a DijkstraTile
         # tile refers to a TileModel
 
+        # If the player is riding a vehicle, they
+        # cannot move until they dismount the vehicle
+        game: GameStateModel = GameStateModel.instance()
+        engine = game.game_board.engine
+        ambulance = game.game_board.ambulance
+        player_tile = game.game_board.get_tile_at(self.current_player.row, self.current_player.column)
+        if self.current_player in engine.passengers:
+            return [player_tile]
+
+        if self.current_player in ambulance.passengers:
+            return [player_tile]
+
         # moveable_tiles will be the
         # final list returned.
         moveable_tiles = []
