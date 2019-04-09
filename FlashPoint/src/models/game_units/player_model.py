@@ -32,6 +32,9 @@ class PlayerModel(Model, object):
         self._role = PlayerRoleEnum.FAMILY
 
     def __eq__(self, other):
+        if not isinstance(other, PlayerModel):
+            return False
+        
         x = [other.ip == self.ip, other.nickname == self.nickname]
         return all(x)
 
