@@ -359,9 +359,9 @@ class EndTurnAdvanceFireEvent(TurnEvent):
                 players_on_tile = self.game_state.get_players_on_tile(tile.row, tile.column)
                 for player in players_on_tile:
                     if isinstance(player.carrying_hazmat, HazmatModel):
-                        KnockDownEvent(player.ip).execute()
                         logger.info("Hazmat explosion occured on {t}".format(t=tile))
                         self.explosion(tile)
+                        self.dodge(player)
                         player.carrying_hazmat = NullModel()
                         if self.board.hotspot_bank > 0:
                             tile.is_hotspot = True
