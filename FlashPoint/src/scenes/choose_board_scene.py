@@ -87,7 +87,7 @@ class ChooseBoardScene(object):
 
     @staticmethod
     def destroy_game_and_back():
-        GameStateModel.instance().__del__()
+        GameStateModel.instance().destroy()
         EventQueue.post(CustomEvent(ChangeSceneEnum.CREATEGAMEMENU))
 
     @staticmethod

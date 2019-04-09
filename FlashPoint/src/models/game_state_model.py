@@ -1,3 +1,4 @@
+import json
 import os
 import random
 import logging
@@ -5,10 +6,13 @@ from threading import RLock
 
 from typing import List, Optional, Tuple
 
+from src.constants.change_scene_enum import ChangeSceneEnum
+from src.core.custom_event import CustomEvent
+from src.core.event_queue import EventQueue
 from src.models.model import Model
 from src.models.game_board.game_board_model import GameBoardModel
 from src.constants.state_enums import GameKindEnum, DifficultyLevelEnum, GameStateEnum, VehicleOrientationEnum, \
-    GameBoardTypeEnum
+    GameBoardTypeEnum, PlayerStatusEnum
 from src.core.flashpoint_exceptions import TooManyPlayersException, InvalidGameKindException, PlayerNotFoundException
 from src.models.game_units.player_model import PlayerModel
 
@@ -27,9 +31,9 @@ class GameStateModel(Model):
                  board_type: GameBoardTypeEnum,
                  difficulty: DifficultyLevelEnum = None
                  ):
-        logger.info("Initializing game state...")
 
         if not GameStateModel._instance:
+            logger.info("Initializing game state...")
             super().__init__()
             self._host = host
             self._max_desired_players = num_players
@@ -51,7 +55,6 @@ class GameStateModel(Model):
             self._command = (None, None)
             self._commanded: List[PlayerModel] = []
             self._state = GameStateEnum.READY_TO_JOIN
-            s = f"{self._host.row}, {self._host.column}"
             GameStateModel._instance = self
         else:
             raise Exception("GameStateModel is a Singleton")
@@ -81,8 +84,9 @@ class GameStateModel(Model):
             obs.player_command(self.command[0], self.command[1])
 
     @staticmethod
-    def __del__():
+    def destroy():
         GameStateModel._instance = None
+        logger.info("GameStateModel deleted")
         if os.path.exists("media/board_layouts/random_inside_walls.json"):
             os.rmdir("media/board_layouts/random_inside_walls.json")
 
@@ -286,7 +290,8 @@ class GameStateModel(Model):
             for obs in self._observers:
                 obs.saved_victims(victims_saved)
             if self._victims_saved >= 7:
-                self.state = GameStateEnum.WON
+                self._state = GameStateEnum.WON
+                self.endgame()
 
     @property
     def victims_lost(self) -> int:
@@ -301,7 +306,8 @@ class GameStateModel(Model):
             for obs in self._observers:
                 obs.dead_victims(victims_lost)
             if self._victims_lost >= 4:
-                self.state = GameStateEnum.LOST
+                self._state = GameStateEnum.LOST
+                self.endgame()
 
     @property
     def damage(self) -> int:
@@ -316,7 +322,8 @@ class GameStateModel(Model):
             for obs in self._observers:
                 obs.damage_changed(damage)
             if self._damage >= self.max_damage:
-                self.state = GameStateEnum.LOST
+                self._state = GameStateEnum.LOST
+                self.endgame()
 
     @property
     def max_damage(self) -> int:
@@ -403,3 +410,42 @@ class GameStateModel(Model):
             return 4
         elif prev_roll == 8:
             return 3
+
+    def endgame(self):
+
+        profiles = "media/profiles.json"
+
+        if self._state == GameStateEnum.LOST:
+            for player in self.players:
+
+                with open(profiles, mode='r+', encoding='utf-8') as file:
+                    temp = json.load(file)
+                    file.seek(0)
+                    file.truncate()
+                    for user in temp:
+                        if user['_nickname'] == player.nickname:
+                            losses = user['_losses']
+                            user['_losses'] = losses + 1
+                    json.dump(temp, file)
+                player.status = PlayerStatusEnum.NOT_READY
+
+            EventQueue.block()
+
+            EventQueue.post(CustomEvent(ChangeSceneEnum.LOSESCENE))
+
+        else:
+            for player in self.players:
+
+                with open(profiles, mode='r+', encoding='utf-8') as file:
+                    temp = json.load(file)
+                    file.seek(0)
+                    file.truncate()
+                    for user in temp:
+                        if user['_nickname'] == player.nickname:
+                            wins = user['_wins']
+                            user['_wins'] = wins + 1
+                    json.dump(temp, file)
+                player.status = PlayerStatusEnum.NOT_READY
+
+            EventQueue.block()
+            EventQueue.post(CustomEvent(ChangeSceneEnum.WINSCENE))

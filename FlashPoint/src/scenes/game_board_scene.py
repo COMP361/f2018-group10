@@ -7,6 +7,7 @@ from typing import List
 
 import pygame
 
+from src.action_events.board_setup_event import BoardSetupEvent
 from src.action_events.fire_placement_event import FirePlacementEvent
 from src.action_events.set_initial_hotspot_event import SetInitialHotspotEvent
 from src.action_events.set_initial_poi_experienced_event import SetInitialPOIExperiencedEvent
@@ -89,6 +90,7 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
             self._init_loaded_sprites()
         self._game._notify_player_index()
 
+
     def _init_ui_elements(self):
         """Initialize all things to be drawn on this screen."""
         self._menu = None
@@ -152,15 +154,7 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
     def _send_game_board_initialize(self):
         """Send any game board initialization events."""
         if Networking.get_instance().is_host:
-            seed = random.randint(1, 6969)
-            Networking.get_instance().send_to_all_client(FirePlacementEvent(seed))
-
-            if self._game.rules == GameKindEnum.EXPERIENCED:
-                Networking.get_instance().send_to_all_client(SetInitialPOIExperiencedEvent(seed))
-                Networking.get_instance().send_to_all_client(PlaceHazmatEvent(seed))
-                Networking.get_instance().send_to_all_client(SetInitialHotspotEvent(seed))
-            else:
-                Networking.get_instance().send_to_all_client(SetInitialPOIFamilyEvent(seed))
+            Networking.get_instance().send_to_all_client(BoardSetupEvent())
 
         for player in self._game.players:
             player.set_initial_ap(self._game.rules)

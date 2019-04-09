@@ -42,7 +42,7 @@ class StartScene(object):
 
         # Reset everything
         if GameStateModel.instance():
-            GameStateModel.__del__()
+            GameStateModel.destroy()
         if GameBoard.instance():
             GameBoard._instance = None
             TileInputController.__del__()

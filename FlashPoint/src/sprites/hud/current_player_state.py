@@ -39,7 +39,7 @@ class CurrentPlayerState(pygame.sprite.Sprite, PlayerObserver):
         self.ap = current.ap
         self.AP = f'AP: {self.ap}'
         self.sap = current.special_ap
-        self.SAP = f'Special AP:{self.sap}'
+        self.SAP = f'Special AP: {self.sap}'
 
         self.text = self.font_name.render(self.name, True, Color.GREEN2)
         self.text_AP = self.font_other.render(self.AP, True, Color.GREEN2)
@@ -91,7 +91,7 @@ class CurrentPlayerState(pygame.sprite.Sprite, PlayerObserver):
         self.text_AP = self.font_other.render(self.AP, True, Color.GREEN2)
 
     def player_special_ap_changed(self, updated_sap: int):
-        self.SAP = f'Special AP:{updated_sap}'
+        self.SAP = f'Special AP: {updated_sap}'
         self.text_SAP = self.font_other.render(self.SAP, True, Color.GREEN2)
 
     def player_position_changed(self, x_pos: int, y_pos: int):

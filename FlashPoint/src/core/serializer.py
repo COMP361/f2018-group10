@@ -7,6 +7,7 @@ import logging
 from src.action_events.stop_command_event import StopCommandEvent
 from src.action_events.permission_reply_event import PermissionReplyEvent
 from src.action_events.turn_events.command_permission_event import CommandPermissionEvent
+from src.action_events.board_setup_event import BoardSetupEvent
 from src.action_events.disconnect_event import DisconnectEvent
 from src.action_events.dodge_reply_event import DodgeReplyEvent
 from src.action_events.end_game_event import EndGameEvent
@@ -425,21 +426,6 @@ class JSONSerializer(object):
         return event
 
     @staticmethod
-    def _deserialize_fire_placement_event(payload: Dict) -> FirePlacementEvent:
-        seed = payload['seed']
-        return FirePlacementEvent(seed)
-
-    @staticmethod
-    def _deserialize_set_initial_hotspot_event(payload: Dict) -> SetInitialHotspotEvent:
-        seed = payload['seed']
-        return SetInitialHotspotEvent(seed)
-
-    @staticmethod
-    def _deserialize_set_initial_poi_experienced_event(payload: Dict) -> SetInitialPOIExperiencedEvent:
-        seed = payload['seed']
-        return SetInitialPOIExperiencedEvent(seed)
-
-    @staticmethod
     def _deserialize_dismount_vehicle_event(payload: Dict) -> DismountVehicleEvent:
         return DismountVehicleEvent(payload['_vehicle_type'], player_index=payload['_player_index'])
 
@@ -578,16 +564,12 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_remove_hazmat_event(payload)
         elif object_type == ResuscitateEvent.__name__:
             return JSONSerializer._deserialize_resuscitate_event(payload)
-        elif object_type == FirePlacementEvent.__name__:
-            return JSONSerializer._deserialize_fire_placement_event(payload)
-        elif object_type == SetInitialHotspotEvent.__name__:
-            return JSONSerializer._deserialize_set_initial_hotspot_event(payload)
-        elif object_type == SetInitialPOIExperiencedEvent.__name__:
-            return JSONSerializer._deserialize_set_initial_poi_experienced_event(payload)
         elif object_type == DodgeReplyEvent.__name__:
             return JSONSerializer._deserialize_dodge_reply(payload)
         elif object_type == RandomBoardSetupEvent.__name__:
             return JSONSerializer._deserialize_random_board_event(payload)
+        elif object_type == BoardSetupEvent.__name__:
+            return BoardSetupEvent(payload['seed'])
         elif object_type == NullModel.__name__:
             return NullModel()
         elif object_type == CommandPermissionEvent.__name__:
