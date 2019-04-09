@@ -84,9 +84,14 @@ class TileSprite(Interactable, TileObserver):
                                                            Color.ORANGE))
         self.ride_vehicle_button = RectButton(self.rect.x, self.rect.y, 120, 25, Color.BLACK, 0,
                                               Text(pygame.font.SysFont('Arial', 15), "Ride Vehicle", Color.ORANGE))
+        self.remove_hazmat_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
+                                               Text(pygame.font.SysFont('Arial', 20), "Remove Hazmat", Color.ORANGE))
 
-        self.hazmat_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
-                                        Text(pygame.font.SysFont('Arial', 20), "Remove Hazmat", Color.ORANGE))
+        self.pickup_hazmat_button = RectButton(self.rect.x, self.rect.y, 100,25,Color.BLACK, 0,
+                                               Text(pygame.font.SysFont('Arial', 20), "Pickup Hazmat", Color.ORANGE))
+
+        self.drop_hazmat_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
+                                               Text(pygame.font.SysFont('Arial', 20), "Drop Hazmat", Color.ORANGE))
 
         self.dismount_vehicle_button = RectButton(self.rect.x, self.rect.y, 120, 25, Color.BLACK, 0,
                                                   Text(pygame.font.SysFont('Arial', 15), "Dismount Vehicle",
@@ -94,6 +99,9 @@ class TileSprite(Interactable, TileObserver):
 
         self.resuscitate_button = RectButton(self.rect.x, self.rect.y, 120, 25, Color.BLACK, 0,
                                               Text(pygame.font.SysFont('Arial', 15), "Resuscitate", Color.ORANGE))
+
+        self.command_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.BLACK, 0,
+                                         Text(pygame.font.SysFont('Arial', 20), "Command", Color.ORANGE))
 
         self.disable_all()
 
@@ -140,7 +148,10 @@ class TileSprite(Interactable, TileObserver):
         self.drive_engine_here_button.disable()
         self.ride_vehicle_button.disable()
         self.dismount_vehicle_button.disable()
-        self.hazmat_button.disable()
+        self.command_button.disable()
+        self.remove_hazmat_button.disable()
+        self.pickup_hazmat_button.disable()
+        self.drop_hazmat_button.disable()
         self.resuscitate_button.disable()
         self.lead_button.disable()
         self.stop_lead_button.disable()
@@ -155,7 +166,10 @@ class TileSprite(Interactable, TileObserver):
         self.drive_engine_here_button.on_click(None)
         self.ride_vehicle_button.on_click(None)
         self.dismount_vehicle_button.on_click(None)
-        self.hazmat_button.on_click(None)
+        self.command_button.on_click(None)
+        self.remove_hazmat_button.on_click(None)
+        self.pickup_hazmat_button.on_click(None)
+        self.drop_hazmat_button.on_click(None)
         self.resuscitate_button.on_click(None)
         self.lead_button.on_click(None)
         self.stop_lead_button.on_click(None)
@@ -221,82 +235,72 @@ class TileSprite(Interactable, TileObserver):
         offset = 0
 
         if self.move_button.enabled:
-            screen.blit(self.move_button.image, self.move_button.rect)
-            self.move_button.rect.x = self.rect.x
-            self.move_button.rect.y = self.rect.y + offset
-            # self.move_button.change_pos(self.rect.x, self.rect.y + offset)
+            self.draw_btn(self.move_button, offset, screen)
             offset += 20
 
         if self.extinguish_button.enabled:
-            screen.blit(self.extinguish_button.image, self.extinguish_button.rect)
-            self.extinguish_button.rect.x = self.rect.x
-            self.extinguish_button.rect.y = self.rect.y + offset
-            # self.extinguish_button.change_pos(self.rect.x, self.rect.y + offset)
-            offset += 20
-        if self.pickup_victim_button.enabled:
-            screen.blit(self.pickup_victim_button.image, self.pickup_victim_button.rect)
-            self.pickup_victim_button.rect.x = self.rect.x
-            self.pickup_victim_button.rect.y = self.rect.y + offset
+            self.draw_btn(self.extinguish_button, offset, screen)
             offset += 20
 
-        elif self.drop_victim_button.enabled:
-            screen.blit(self.drop_victim_button.image, self.drop_victim_button.rect)
-            self.drop_victim_button.rect.x = self.rect.x
-            self.drop_victim_button.rect.y = self.rect.y + offset
+        if self.pickup_victim_button.enabled:
+            self.draw_btn(self.pickup_victim_button, offset, screen)
             offset += 20
+        elif self.drop_victim_button.enabled:
+            self.draw_btn(self.drop_victim_button, offset, screen)
+            offset += 20
+
         if self.drive_ambulance_here_button.enabled:
-            screen.blit(self.drive_ambulance_here_button.image, self.drive_ambulance_here_button.rect)
-            self.drive_ambulance_here_button.rect.x = self.rect.x
-            self.drive_ambulance_here_button.rect.y = self.rect.y + offset
+            self.draw_btn(self.drive_ambulance_here_button, offset, screen)
             offset += 20
 
         if self.drive_engine_here_button.enabled:
-            screen.blit(self.drive_engine_here_button.image, self.drive_engine_here_button.rect)
-            self.drive_engine_here_button.rect.x = self.rect.x
-            self.drive_engine_here_button.rect.y = self.rect.y + offset
+            self.draw_btn(self.drive_engine_here_button, offset, screen)
             offset += 20
 
         if self.identify_button.enabled:
-            screen.blit(self.identify_button.image, self.identify_button.rect)
-            self.identify_button.rect.x = self.rect.x
-            self.identify_button.rect.y = self.rect.y + offset
+            self.draw_btn(self.identify_button, offset, screen)
             offset += 20
 
         if self.ride_vehicle_button.enabled:
-            screen.blit(self.ride_vehicle_button.image, self.ride_vehicle_button.rect)
-            self.ride_vehicle_button.rect.x = self.rect.x
-            self.ride_vehicle_button.rect.y = self.rect.y + offset
+            self.draw_btn(self.ride_vehicle_button, offset, screen)
             offset += 20
 
         if self.dismount_vehicle_button.enabled:
-            screen.blit(self.dismount_vehicle_button.image, self.dismount_vehicle_button.rect)
-            self.dismount_vehicle_button.rect.x = self.rect.x
-            self.dismount_vehicle_button.rect.y = self.rect.y + offset
+            self.draw_btn(self.dismount_vehicle_button, offset, screen)
             offset += 20
 
-        if self.hazmat_button.enabled:
-            screen.blit(self.hazmat_button.image, self.hazmat_button.rect)
-            self.hazmat_button.rect.x = self.rect.x
-            self.hazmat_button.rect.y = self.rect.y + offset
+        if self.remove_hazmat_button.enabled:
+            self.draw_btn(self.remove_hazmat_button, offset, screen)
+            offset += 20
+
+        if self.pickup_hazmat_button.enabled:
+            self.draw_btn(self.pickup_hazmat_button, offset, screen)
+            offset += 20
+
+        elif self.drop_hazmat_button.enabled:
+            self.draw_btn(self.drop_hazmat_button, offset, screen)
             offset += 20
 
         if self.resuscitate_button.enabled:
-            screen.blit(self.resuscitate_button.image, self.resuscitate_button.rect)
-            self.resuscitate_button.rect.x = self.rect.x
-            self.resuscitate_button.rect.y = self.rect.y + offset
+            self.draw_btn(self.resuscitate_button, offset, screen)
+            offset += 20
+
+        if self.command_button.enabled:
+            self.draw_btn(self.command_button, offset, screen)
             offset += 20
 
         if self.lead_button.enabled:
-            screen.blit(self.lead_button.image, self.lead_button.rect)
-            self.lead_button.rect.x = self.rect.x
-            self.lead_button.rect.y = self.rect.y + offset
+            self.draw_btn(self.lead_button, offset, screen)
             offset += 20
 
         if self.stop_lead_button.enabled:
-            screen.blit(self.stop_lead_button.image, self.stop_lead_button.rect)
-            self.stop_lead_button.rect.x = self.rect.x
-            self.stop_lead_button.rect.y = self.rect.y + offset
+            self.draw_btn(self.stop_lead_button, offset, screen)
             offset += 20
+
+    def draw_btn(self, button: RectButton, offset: int, screen: pygame.Surface):
+        screen.blit(button.image, button.rect)
+        button.rect.x = self.rect.x
+        button.rect.y = self.rect.y + offset
 
     def update(self, event_queue: EventQueue):
         self.sprite_grp.update(event_queue)
@@ -310,7 +314,10 @@ class TileSprite(Interactable, TileObserver):
         self.ride_vehicle_button.update(event_queue)
         self.dismount_vehicle_button.update(event_queue)
         self.drive_engine_here_button.update(event_queue)
-        self.hazmat_button.update(event_queue)
+        self.command_button.update(event_queue)
+        self.remove_hazmat_button.update(event_queue)
+        self.drop_hazmat_button.update(event_queue)
+        self.pickup_hazmat_button.update(event_queue)
         self.resuscitate_button.update(event_queue)
         self.lead_button.update(event_queue)
         self.stop_lead_button.update(event_queue)

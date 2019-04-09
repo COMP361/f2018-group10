@@ -6,13 +6,16 @@ from src.action_events.turn_events.stop_leading_victim_event import StopLeadingV
 from src.constants.state_enums import VictimStateEnum, PlayerRoleEnum
 from src.controllers.controller import Controller
 from src.core.networking import Networking
+from src.models.game_board.null_model import NullModel
 from src.models.game_board.tile_model import TileModel
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.hazmat_model import HazmatModel
 from src.models.game_units.player_model import PlayerModel
 from src.models.game_units.victim_model import VictimModel
 from src.sprites.tile_sprite import TileSprite
+import logging
 
+logger = logging.getLogger("FlashPoint")
 
 class VictimController(Controller):
 
@@ -25,7 +28,6 @@ class VictimController(Controller):
         super().__init__(current_player)
         if VictimController._instance:
             raise Exception("Victim Controller is a singleton")
-
         VictimController._instance = self
 
     @classmethod
@@ -77,7 +79,9 @@ class VictimController(Controller):
 
     def send_pickup_event(self, tile_model: TileModel, menu_to_close: Interactable):
         victims = [model for model in tile_model.associated_models if isinstance(model, VictimModel)]
-        victim = None
+        logger.info(f"Player has a victim: {isinstance(self._current_player.carrying_victim, VictimModel)}")
+        victim = NullModel()
+
         if victims:
             victim = victims[0]
 

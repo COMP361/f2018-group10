@@ -11,7 +11,8 @@ from src.models.model import Model
 
 logger = logging.getLogger("FlashPoint")
 
-class PlayerModel(Model,object):
+
+class PlayerModel(Model, object):
 
     def __init__(self, ip: str, nickname: str):
         super().__init__()
@@ -41,7 +42,6 @@ class PlayerModel(Model,object):
         player_status = "Player status: {status}".format(status=self.status)
         player_color = "Player color: {color}\n".format(color=self.color)
         return '\n'.join([player_pos, player_ap, player_carrying_victim, player_status, player_color])
-
 
     def _notify_all_observers(self):
         self._notify_ap()
@@ -73,9 +73,9 @@ class PlayerModel(Model,object):
         for obs in self.observers:
             obs.player_losses_changed(self.losses)
 
-    def _notify_carry(self):
+    def _notify_carry(self, model):
         for obs in self.observers:
-            obs.player_carry_changed(self.carrying_victim)
+            obs.player_carry_changed(model)
 
     def _notify_role(self):
         for obs in self.observers:
@@ -218,7 +218,7 @@ class PlayerModel(Model,object):
     def carrying_victim(self, victim: VictimModel):
         self._carrying_victim = victim
         logger.info("Player {nickname} carrying victim: {cv}".format(nickname=self.nickname, cv=victim))
-        self._notify_carry()
+        self._notify_carry(self.carrying_victim)
 
     @property
     def leading_victim(self) -> Union[VictimModel, NullModel]:
@@ -242,6 +242,8 @@ class PlayerModel(Model,object):
     def carrying_hazmat(self, hazmat: HazmatModel):
         self._carrying_hazmat = hazmat
         logger.info("Player {nickname} carrying hazmat: {h}".format(nickname=self.nickname, h=hazmat))
+        # TODO: Modify notify carry to account for carrying hazmats
+        # self._notify_carry(self.carrying_hazmat)
 
     @property
     def role(self) -> PlayerRoleEnum:

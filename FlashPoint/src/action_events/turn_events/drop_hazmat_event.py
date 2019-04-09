@@ -24,12 +24,10 @@ class DropHazmatEvent(TurnEvent):
         :return: True if player is carrying a
                 hazmat, False otherwise.
         """
-        if isinstance(self.player.carrying_hazmat, HazmatModel):
-            return True
-
-        return False
+        pass
 
     def execute(self):
         logger.info("Executing Drop Hazmat Event")
+
         self.hazmat_tile.add_associated_model(self.player.carrying_hazmat)
         self.player.carrying_hazmat = NullModel()
