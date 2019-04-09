@@ -1,4 +1,4 @@
-from src.UIComponents.interactable import Interactable
+from src.controllers.command_player_controller import CommandPlayerController
 from src.controllers.controller import Controller
 from src.controllers.drive_vehicles_controller import DriveVehiclesController
 from src.controllers.fire_deck_gun_controller import FireDeckGunController
@@ -18,6 +18,7 @@ from src.controllers.choose_starting_position_controller import ChooseStartingPo
 from src.controllers.extinguish_controller import ExtinguishController
 from src.controllers.move_controller import MoveController
 from src.models.game_state_model import GameStateModel
+from src.UIComponents.interactable import Interactable
 
 
 class TileInputController(GameStateObserver, Controller):
@@ -41,6 +42,7 @@ class TileInputController(GameStateObserver, Controller):
             DriveVehiclesController(current_player)
             IdentifyController(current_player)
             HazmatController(current_player)
+            CommandPlayerController(current_player)
             ResuscitateController(current_player)
             FireDeckGunController(current_player)
 
@@ -65,6 +67,7 @@ class TileInputController(GameStateObserver, Controller):
         DriveVehiclesController._instance = None
         IdentifyController._instance = None
         HazmatController._instance = None
+        CommandPlayerController._instance = None
         ResuscitateController._instance = None
         FireDeckGunController._instance = None
 
@@ -93,6 +96,7 @@ class TileInputController(GameStateObserver, Controller):
             IdentifyController.instance().process_input(tile_sprite)
             DriveVehiclesController.instance().process_input(tile_sprite)
             HazmatController.instance().process_input(tile_sprite)
+            CommandPlayerController.instance().process_input(tile_sprite)
             ResuscitateController.instance().process_input(tile_sprite)
             FireDeckGunController.instance().process_input(tile_sprite)
 
@@ -131,6 +135,13 @@ class TileInputController(GameStateObserver, Controller):
 
     def player_removed(self, player: PlayerModel):
         pass
+
+    def player_command(self, source: PlayerModel, target: PlayerModel):
+        # Update the reachable tiles for the command
+        if source:
+            MoveController.instance().player_ap_changed(source.ap)
+        else:
+            MoveController.instance().player_ap_changed(self._current_player.ap)
 
     @staticmethod
     def update(event_queue: EventQueue):

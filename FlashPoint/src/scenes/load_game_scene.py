@@ -68,6 +68,7 @@ class LoadGameScene(object):
         game.host = self._current_player
         game.players = [self._current_player]
 
+        game.board_type = GameBoardTypeEnum.LOADED
         # Restore GameBoard
         GameStateModel.set_game(game)
         game.game_board.is_loaded = True
