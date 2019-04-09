@@ -4,18 +4,19 @@ import pygame
 
 import src.constants.color as Color
 import src.constants.fonts as Font
-from src.constants.state_enums import PlayerStatusEnum
+from src.core.serializer import JSONSerializer
+from src.core.networking import Networking
 from src.core.custom_event import CustomEvent
 from src.core.event_queue import EventQueue
+from src.core.flashpoint_exceptions import TooManyPlayersException
+from src.action_events.too_many_players_event import TooManyPlayersEvent
+from src.constants.state_enums import PlayerStatusEnum
 from src.models.game_units.player_model import PlayerModel
 from src.UIComponents.rect_button import RectButton
 from src.UIComponents.rect_label import RectLabel
 from src.UIComponents.text import Text
 from src.UIComponents.input_box import InputBox
 from src.constants.change_scene_enum import ChangeSceneEnum
-from src.core.networking import Networking
-from src.core.serializer import JSONSerializer
-from src.models.game_state_model import GameStateModel
 
 
 class JoinScene(object):
@@ -50,12 +51,22 @@ class JoinScene(object):
             reply = Networking.wait_for_reply()
             # Connection error will be raised if no reply
             if reply:
+                reply = JSONSerializer.deserialize(reply)
+                if isinstance(reply, TooManyPlayersEvent):
+                    raise TooManyPlayersException(self._current_player)
                 # GameStateModel.set_game(JSONSerializer.deserialize(reply))
                 EventQueue.post(CustomEvent(ChangeSceneEnum.LOBBYSCENE))
         except TimeoutError:
             msg = "Host not found."
             print(msg)
             self.init_error_message(msg)
+        except TooManyPlayersException:
+            msg = "Lobby is full. Cannot join the game."
+            print(msg)
+            self.init_error_message(msg)
+            # Disconnect client that's trying to connect
+            if not Networking.get_instance().is_host:
+                Networking.get_instance().client.disconnect()
         except Networking.Client.SocketError:
             msg = "Failed to establish connection."
             print(msg)

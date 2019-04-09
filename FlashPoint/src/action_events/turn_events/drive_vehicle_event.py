@@ -24,7 +24,7 @@ class DriveVehicleEvent(TurnEvent):
         self._board_model: GameBoardModel = GameStateModel.instance().game_board
 
     def _check_for_rescued_victims(self, parking_spot):
-        board : GameBoardModel = GameStateModel.instance().game_board
+        board: GameBoardModel = GameStateModel.instance().game_board
         tile = board.get_tile_at(parking_spot[0], parking_spot[1])
         second_tile = board.get_other_parking_tile(tile)
 
@@ -52,7 +52,7 @@ class DriveVehicleEvent(TurnEvent):
         destination_second_tile = self._board_model.get_other_parking_tile(destination_first_tile)
 
         ap_multiplier = self._board_model.get_distance_to_parking_spot(self._vehicle_type,
-            (destination_first_tile, destination_second_tile))
+                                                                    (destination_first_tile, destination_second_tile))
         self._player.ap = self._player.ap - 2*ap_multiplier
 
         if self._vehicle_type == "AMBULANCE":

@@ -77,7 +77,7 @@ class LoadGameScene(object):
     def _init_btn_back(self, x_pos: int, y_pos: int, text: str, color: color, color_text: color):
         box_size = (130, 48)
         button_back = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
-                                     Text(pygame.font.SysFont('Arial', 25), text, color_text))
+                                     Text(pygame.font.SysFont('Agency FB', 25), text, color_text))
         button_back.on_click(EventQueue.post, CustomEvent(ChangeSceneEnum.HOSTMENUSCENE))
         button_back.change_bg_image('media/GameHud/wood2.png')
         button_back.add_frame('media/GameHud/frame.png')
