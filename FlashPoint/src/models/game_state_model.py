@@ -128,7 +128,8 @@ class GameStateModel(Model):
     @command.setter
     def command(self, command: Tuple[PlayerModel, PlayerModel]):
         self._command = command
-        if command[1].role is PlayerRoleEnum.CAFS:
+        # Since CAFS can only be commanded once, we need to keep track of it
+        if command[1] and command[1].role is PlayerRoleEnum.CAFS:
             self._commanded.append(command[1])
         self._notify_command()
 
