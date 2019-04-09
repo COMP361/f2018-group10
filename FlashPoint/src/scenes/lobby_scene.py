@@ -85,7 +85,14 @@ class LobbyScene(GameStateObserver):
             if not (self._game.rules == GameKindEnum.FAMILY and self._current_player.role == PlayerRoleEnum.FAMILY) \
                     or self._game.rules == GameKindEnum.FAMILY:
                 self.isReady = True
-                self.buttonReady.change_color(Color.STANDARDBTN)
+                self.sprite_grp.remove(self.buttonReady)
+                box_size = (130, 48)
+                self.isReady = False
+                self.buttonReady = RectButton(1050, 575, box_size[0], box_size[1], Color.BLACK, 0,
+                                              Text(pygame.font.SysFont('Agency FB', 25), "Ready", Color.GREEN))
+                self.buttonReady.change_bg_image('media/GameHud/wood2.png')
+                self.buttonReady.add_frame('media/GameHud/frame.png')
+                self.sprite_grp.add(self.buttonReady)
                 self._current_player.status = PlayerStatusEnum.READY
                 event = ReadyEvent(self._current_player, True)
 
@@ -96,7 +103,14 @@ class LobbyScene(GameStateObserver):
                     Networking.get_instance().send_to_server(event)
         else:
             self.isReady = False
-            self.buttonReady.change_color(Color.GREY)
+            self.sprite_grp.remove(self.buttonReady)
+            box_size = (130, 48)
+            self.isReady = False
+            self.buttonReady = RectButton(1050, 575, box_size[0], box_size[1], Color.BLACK, 0,
+                                          Text(pygame.font.SysFont('Agency FB', 25), "Not Ready", Color.GREY))
+            self.buttonReady.change_bg_image('media/GameHud/wood2.png')
+            self.buttonReady.add_frame('media/GameHud/frame.png')
+            self.sprite_grp.add(self.buttonReady)
             self._current_player.status = PlayerStatusEnum.NOT_READY
             event = ReadyEvent(self._current_player, False)
             if self._current_player.ip == GameStateModel.instance().host.ip:
@@ -184,23 +198,23 @@ class LobbyScene(GameStateObserver):
         box_size = (position[2], position[3])
 
         user_box = RectLabel(position[0], position[1], box_size[0], box_size[1], color, 0,
-                             Text(pygame.font.SysFont('Arial', 20), text, (0, 255, 0, 0)))
+                             Text(pygame.font.SysFont('Agency FB', 20), text, (0, 255, 0, 0)))
         return user_box
 
     def _init_selec_char(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
         box_size = (170, 48)
         self.buttonSelChar = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
-                                        Text(pygame.font.SysFont('Arial', 25), text, color_text))
+                                        Text(pygame.font.SysFont('Agency FB', 25), text, color_text))
         self.buttonSelChar.change_bg_image('media/GameHud/wood2.png')
         self.buttonSelChar.add_frame('media/GameHud/frame.png')
         self.sprite_grp.add(self.buttonSelChar)
 
     def _init_ready(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
-        box_size = (130, 48)
 
+        box_size = (130, 48)
         self.isReady = False
         self.buttonReady = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
-                                      Text(pygame.font.SysFont('Arial', 25), text, color_text))
+                                      Text(pygame.font.SysFont('Agency FB', 25), text, Color.GREY))
         self.buttonReady.change_bg_image('media/GameHud/wood2.png')
         self.buttonReady.add_frame('media/GameHud/frame.png')
         self.sprite_grp.add(self.buttonReady)
@@ -208,7 +222,7 @@ class LobbyScene(GameStateObserver):
     def _init_btn_back(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
         box_size = (130, 48)
         self.buttonBack = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
-                                     Text(pygame.font.SysFont('Arial', 25), text, color_text))
+                                     Text(pygame.font.SysFont('Agency FB', 25), text, color_text))
         self.buttonBack.change_bg_image('media/GameHud/wood2.png')
         self.buttonBack.add_frame('media/GameHud/frame.png')
         self.sprite_grp.add(self.buttonBack)

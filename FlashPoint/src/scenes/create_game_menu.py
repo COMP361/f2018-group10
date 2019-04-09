@@ -62,7 +62,7 @@ class CreateGameMenuScene(Scene):
         box_size = (w, h)
 
         user_box = RectLabel(x_pos, y_pos, box_size[0], box_size[1], color, 0,
-                             Text(pygame.font.SysFont('Arial', 25), text, color_text))
+                             Text(pygame.font.SysFont('Agency FB', 25), text, color_text))
         user_box.change_bg_image('media/GameHud/wood2.png')
         user_box.add_frame('media/GameHud/frame.png')
         self.sprite_grp.add(user_box)
@@ -70,7 +70,7 @@ class CreateGameMenuScene(Scene):
     def _init_btn_family(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
         box_size = (130, 48)
         self.buttonFamily = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
-                                       Text(pygame.font.SysFont('Arial', 25), text, color_text))
+                                       Text(pygame.font.SysFont('Agency FB', 25), text, color_text))
         self.buttonFamily.change_bg_image('media/GameHud/wood2.png')
         pygame.draw.rect(self.buttonFamily.image, Color.GREEN2, [0, 0, box_size[0], box_size[1]], 11)
         self.sprite_grp.add(self.buttonFamily)
@@ -78,7 +78,7 @@ class CreateGameMenuScene(Scene):
     def _init_btn_rec(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
         box_size = (130, 48)
         self.buttonRecruit = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
-                                    Text(pygame.font.SysFont('Arial', 25), text, color_text))
+                                    Text(pygame.font.SysFont('Agency FB', 25), text, color_text))
         self.buttonRecruit.change_bg_image('media/GameHud/wood2.png')
         pygame.draw.rect(self.buttonRecruit.image, Color.GREEN, [0, 0, box_size[0], box_size[1]], 11)
         self.sprite_grp.add(self.buttonRecruit)
@@ -86,7 +86,7 @@ class CreateGameMenuScene(Scene):
     def _init_btn_veteran(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
         box_size = (130, 48)
         self.buttonVeteran = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
-                                    Text(pygame.font.SysFont('Arial', 25), text, color_text))
+                                    Text(pygame.font.SysFont('Agency FB', 25), text, color_text))
         self.buttonVeteran.change_bg_image('media/GameHud/wood2.png')
         pygame.draw.rect(self.buttonVeteran.image, Color.YELLOW, [0, 0, box_size[0], box_size[1]], 11)
         self.sprite_grp.add(self.buttonVeteran)
@@ -94,7 +94,7 @@ class CreateGameMenuScene(Scene):
     def _init_btn_heroic(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
         box_size = (130, 48)
         self.buttonHeroic = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
-                                    Text(pygame.font.SysFont('Arial', 25), text, color_text))
+                                    Text(pygame.font.SysFont('Agency FB', 25), text, color_text))
         self.buttonHeroic.change_bg_image('media/GameHud/wood2.png')
         pygame.draw.rect(self.buttonHeroic.image, Color.RED, [0, 0, box_size[0], box_size[1]], 11)
         self.sprite_grp.add(self.buttonHeroic)
@@ -102,7 +102,7 @@ class CreateGameMenuScene(Scene):
     def _init_btn_back(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
         box_size = (130, 48)
         self.buttonBack = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
-                                     Text(pygame.font.SysFont('Arial', 25), text, color_text))
+                                     Text(pygame.font.SysFont('Agency FB', 25), text, color_text))
         self.buttonBack.change_bg_image('media/GameHud/wood2.png')
         self.buttonBack.add_frame('media/GameHud/frame.png')
         self.sprite_grp.add(self.buttonBack)
