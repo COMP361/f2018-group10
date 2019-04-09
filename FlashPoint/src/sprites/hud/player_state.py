@@ -62,6 +62,11 @@ class PlayerState(Interactable, PlayerObserver):
         self.surface_for_text.fill(Color.GREY)
         self.surface_for_text.set_alpha(130)
 
+        self.surface_for_text_hover = pygame.Surface([150, 150])
+        self.surface_for_text_hover.fill(Color.GREY)
+        self.surface_for_text_hover.set_alpha(130)
+
+
 
 
     def color_picker(self, color: Color):
@@ -205,8 +210,27 @@ class PlayerState(Interactable, PlayerObserver):
                 self.image.blit(self.text_line1, self.text_line1_rect)
                 self.image.blit(self.text_line2, self.text_line2_rect)
                 self.image.blit(self.text_line3, self.text_line3_rect)
-            elif self.role == PlayerRoleEnum.CAPTAIN:
-                self.line_1 = ""
+            elif self.role == PlayerRoleEnum.DOGE:
+                self.line_1 = "DRAG(4 AP): carry a victim into"
+                self.line_2 = "an Adjacent space"
+                self.line_3 = "SQUEZZE(2 AP): move throug a"
+                self.line_4 = "damaged wall"
+                self.text_line1 = self.font_other.render(self.line_1, True, Color.GREEN2)
+                self.text_line2 = self.font_other.render(self.line_2, True, Color.GREEN2)
+                self.text_line3 = self.font_other.render(self.line_3, True, Color.GREEN2)
+                self.text_line4 = self.font_other.render(self.line_4, True, Color.GREEN2)
+                self.text_line1_rect = self.text_line1.get_rect()
+                self.text_line2_rect = self.text_line1.get_rect()
+                self.text_line3_rect = self.text_line1.get_rect()
+                self.text_line4_rect = self.text_line4.get_rect()
+                self.text_line1_rect.move_ip(15, 4)
+                self.text_line2_rect.move_ip(15, 15)
+                self.text_line3_rect.move_ip(15, 26)
+                self.text_line4_rect.move_ip(15, 37)
+                self.image.blit(self.text_line1, self.text_line1_rect)
+                self.image.blit(self.text_line2, self.text_line2_rect)
+                self.image.blit(self.text_line3, self.text_line3_rect)
+                self.image.blit(self.text_line4, self.text_line4_rect)
 
             self.image.blit(self.frame,self.image.get_rect())
 

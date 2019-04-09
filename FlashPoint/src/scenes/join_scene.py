@@ -24,10 +24,10 @@ class JoinScene(object):
         self.resolution = (1280, 700)
         self.sprite_grp = pygame.sprite.Group()
         self._init_background()
-        self._init_text_box(342, 350, "Enter IP:", Color.STANDARDBTN, Color.BLACK)
+        self._init_text_box(342, 350, "Enter IP:", Color.STANDARDBTN, Color.GREEN2)
         self._init_text_bar(500, 350, 400, 32)
-        self._init_btn(575, 536, "Connect", Color.STANDARDBTN, Color.BLACK)
-        self._init_btn_back(20, 20, "Back", Color.STANDARDBTN, Color.BLACK)
+        self._init_btn(625, 536, "Connect", Color.STANDARDBTN, Color.GREEN2)
+        self._init_btn_back(20, 20, "Back", Color.STANDARDBTN, Color.GREEN2)
         self._text_bar = self._init_text_bar(500, 350, 400, 32)
         self.error_msg = ""
         self.buttonBack.on_click(EventQueue.post, CustomEvent(ChangeSceneEnum.HOSTJOINSCENE, player=self._current_player))
@@ -69,7 +69,9 @@ class JoinScene(object):
         box_size = (136, 32)
 
         user_box = RectLabel(x_pos, y_pos, box_size[0], box_size[1], color, 0,
-                             Text(pygame.font.SysFont(Font.MAIN_FONT, 20), text, color_text))
+                             Text(pygame.font.SysFont('Agency FB', 25), text, color_text))
+        user_box.change_bg_image('media/GameHud/wood2.png')
+        user_box.add_frame('media/GameHud/frame.png')
 
         self.sprite_grp.add(user_box)
 
@@ -81,7 +83,9 @@ class JoinScene(object):
     def _init_btn(self, x_pos, y_pos, text, color: Color, color_text: Color):
         box_size = (130, 48)
         self.buttonConnect = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
-                                        Text(pygame.font.SysFont(Font.MAIN_FONT, 20), text, color_text))
+                                        Text(pygame.font.SysFont('Agency FB', 25), text, color_text))
+        self.buttonConnect.change_bg_image('media/GameHud/wood2.png')
+        self.buttonConnect.add_frame('media/GameHud/frame.png')
         self.sprite_grp.add(self.buttonConnect)
 
     def _init_text_bar(self, x_pos, y_pos, width, height):
@@ -92,7 +96,9 @@ class JoinScene(object):
     def _init_btn_back(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
         box_size = (130, 48)
         self.buttonBack = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
-                                     Text(pygame.font.SysFont('Agency FB', 20), text, color_text))
+                                     Text(pygame.font.SysFont('Agency FB', 25), text, color_text))
+        self.buttonBack.change_bg_image('media/GameHud/wood2.png')
+        self.buttonBack.add_frame('media/GameHud/frame.png')
         self.sprite_grp.add(self.buttonBack)
 
     def init_error_message(self, msg):
