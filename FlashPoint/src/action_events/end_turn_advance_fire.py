@@ -73,13 +73,13 @@ class EndTurnAdvanceFireEvent(TurnEvent):
             flare_up_will_occur = self.advance_on_tile(self.initial_tile)
             self.flashover()
             self.resolve_hazmat_explosions()
-            self.affect_damages()
             # Preparing the dice for the next
             # iteration if a flare up is going to occur
             self.red_dice = self.game_state.roll_red_dice()
             self.black_dice = self.game_state.roll_black_dice()
             x += 1
 
+        self.affect_damages()
         # Add a hotspot marker to the last
         # target space of the advance_on_tile()
         if self.board.hotspot_bank > 0 and x > 1:
@@ -130,6 +130,9 @@ class EndTurnAdvanceFireEvent(TurnEvent):
 
         elif self.player.role == PlayerRoleEnum.RESCUE:
             self.player.special_ap = 3
+
+        elif self.player.role == PlayerRoleEnum.VETERAN:
+            self.player.special_ap = 1
 
     def _placing_players_end_turn(self):
         # If the last player has chosen a location, move the game into the next phase.

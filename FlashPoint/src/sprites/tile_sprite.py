@@ -203,8 +203,8 @@ class TileSprite(Interactable, TileObserver):
         self.resuscitate_button.disable()
         self.lead_button.disable()
         self.stop_lead_button.disable()
-        self.change_crew_button.disable()
         self.fire_deck_gun_button.disable()
+        self.change_crew_button.disable()
 
         # Important! Reset the on_clicks
         self.identify_button.on_click(None)
@@ -223,8 +223,8 @@ class TileSprite(Interactable, TileObserver):
         self.resuscitate_button.on_click(None)
         self.lead_button.on_click(None)
         self.stop_lead_button.on_click(None)
-        self.change_crew_button.on_click(None)
         self.fire_deck_gun_button.on_click(None)
+        self.change_crew_button.on_click(None)
 
     def is_clicked(self):
         if not self.hover():
@@ -337,16 +337,16 @@ class TileSprite(Interactable, TileObserver):
             self.draw_btn(self.resuscitate_button, offset, screen)
             offset += 20
 
-        if self.change_crew_button.enabled:
-            screen.blit(self.change_crew_button.image, self.change_crew_button.rect)
-            self.change_crew_button.rect.x = self.rect.x
-            self.change_crew_button.rect.y = self.rect.y + offset
-            offset += 20
-
         if self.fire_deck_gun_button.enabled:
             screen.blit(self.fire_deck_gun_button.image, self.fire_deck_gun_button.rect)
             self.fire_deck_gun_button.rect.x = self.rect.x
             self.fire_deck_gun_button.rect.y = self.rect.y + offset
+            offset += 20
+
+        if self.change_crew_button.enabled:
+            screen.blit(self.change_crew_button.image, self.change_crew_button.rect)
+            self.change_crew_button.rect.x = self.rect.x
+            self.change_crew_button.rect.y = self.rect.y + offset
             offset += 20
 
         if self.command_button.enabled:
