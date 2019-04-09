@@ -17,9 +17,9 @@ class HostJoinScene(Scene):
         Scene.__init__(self, screen)
         self._current_player = current_player
         self._init_background()
-        self._init_btn_host(575, 481, "Host", Color.STANDARDBTN, Color.BLACK)
-        self._init_btn_join(575, 371, "Join", Color.STANDARDBTN, Color.BLACK)
-        self._init_btn_back(20, 20, "Back", Color.STANDARDBTN, Color.BLACK)
+        self._init_btn_host(575, 481, "Host", Color.STANDARDBTN, Color.GREEN2)
+        self._init_btn_join(575, 371, "Join", Color.STANDARDBTN, Color.GREEN2)
+        self._init_btn_back(20, 20, "Back", Color.STANDARDBTN, Color.GREEN2)
         self.buttonJoin.on_click(EventQueue.post, CustomEvent(ChangeSceneEnum.JOINSCENE))
         self.buttonBack.on_click(EventQueue.post, CustomEvent(ChangeSceneEnum.STARTSCENE))
         self.buttonHost.on_click(self.host)
@@ -44,17 +44,24 @@ class HostJoinScene(Scene):
     def _init_btn_join(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
         box_size = (130, 48)
         self.buttonJoin = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
-                                     Text(pygame.font.SysFont('Arial', 20), text, color_text))
+                                     Text(pygame.font.SysFont('Agency FB', 25), text, color_text))
+        self.buttonJoin.change_bg_image('media/GameHud/wood2.png')
+        self.buttonJoin.add_frame('media/GameHud/frame.png')
         self.sprite_grp.add(self.buttonJoin)
 
     def _init_btn_host(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
         box_size = (130, 48)
         self.buttonHost = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
-                                     Text(pygame.font.SysFont('Arial', 20), text, color_text))
+                                     Text(pygame.font.SysFont('Agency FB', 25), text, color_text))
+        self.buttonHost.change_bg_image('media/GameHud/wood2.png')
+        self.buttonHost.add_frame('media/GameHud/frame.png')
         self.sprite_grp.add(self.buttonHost)
 
     def _init_btn_back(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
         box_size = (130, 48)
         self.buttonBack = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
-                                     Text(pygame.font.SysFont('Arial', 20), text, color_text))
+                                     Text(pygame.font.SysFont('Agency FB', 25), text, color_text))
+        self.buttonBack.change_bg_image('media/GameHud/wood2.png')
+        self.buttonBack.add_frame('media/GameHud/frame.png')
+
         self.sprite_grp.add(self.buttonBack)

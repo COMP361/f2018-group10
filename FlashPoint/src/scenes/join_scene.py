@@ -4,18 +4,19 @@ import pygame
 
 import src.constants.color as Color
 import src.constants.fonts as Font
-from src.constants.state_enums import PlayerStatusEnum
+from src.core.serializer import JSONSerializer
+from src.core.networking import Networking
 from src.core.custom_event import CustomEvent
 from src.core.event_queue import EventQueue
+from src.core.flashpoint_exceptions import TooManyPlayersException
+from src.action_events.too_many_players_event import TooManyPlayersEvent
+from src.constants.state_enums import PlayerStatusEnum
 from src.models.game_units.player_model import PlayerModel
 from src.UIComponents.rect_button import RectButton
 from src.UIComponents.rect_label import RectLabel
 from src.UIComponents.text import Text
 from src.UIComponents.input_box import InputBox
 from src.constants.change_scene_enum import ChangeSceneEnum
-from src.core.networking import Networking
-from src.core.serializer import JSONSerializer
-from src.models.game_state_model import GameStateModel
 
 
 class JoinScene(object):
@@ -24,10 +25,10 @@ class JoinScene(object):
         self.resolution = (1280, 700)
         self.sprite_grp = pygame.sprite.Group()
         self._init_background()
-        self._init_text_box(342, 350, "Enter IP:", Color.STANDARDBTN, Color.BLACK)
+        self._init_text_box(342, 350, "Enter IP:", Color.STANDARDBTN, Color.GREEN2)
         self._init_text_bar(500, 350, 400, 32)
-        self._init_btn(575, 536, "Connect", Color.STANDARDBTN, Color.BLACK)
-        self._init_btn_back(20, 20, "Back", Color.STANDARDBTN, Color.BLACK)
+        self._init_btn(625, 536, "Connect", Color.STANDARDBTN, Color.GREEN2)
+        self._init_btn_back(20, 20, "Back", Color.STANDARDBTN, Color.GREEN2)
         self._text_bar = self._init_text_bar(500, 350, 400, 32)
         self.error_msg = ""
         self.buttonBack.on_click(EventQueue.post, CustomEvent(ChangeSceneEnum.HOSTJOINSCENE, player=self._current_player))
@@ -50,12 +51,22 @@ class JoinScene(object):
             reply = Networking.wait_for_reply()
             # Connection error will be raised if no reply
             if reply:
+                reply = JSONSerializer.deserialize(reply)
+                if isinstance(reply, TooManyPlayersEvent):
+                    raise TooManyPlayersException(self._current_player)
                 # GameStateModel.set_game(JSONSerializer.deserialize(reply))
                 EventQueue.post(CustomEvent(ChangeSceneEnum.LOBBYSCENE))
         except TimeoutError:
             msg = "Host not found."
             print(msg)
             self.init_error_message(msg)
+        except TooManyPlayersException:
+            msg = "Lobby is full. Cannot join the game."
+            print(msg)
+            self.init_error_message(msg)
+            # Disconnect client that's trying to connect
+            if not Networking.get_instance().is_host:
+                Networking.get_instance().client.disconnect()
         except Networking.Client.SocketError:
             msg = "Failed to establish connection."
             print(msg)
@@ -69,7 +80,9 @@ class JoinScene(object):
         box_size = (136, 32)
 
         user_box = RectLabel(x_pos, y_pos, box_size[0], box_size[1], color, 0,
-                             Text(pygame.font.SysFont(Font.MAIN_FONT, 20), text, color_text))
+                             Text(pygame.font.SysFont('Agency FB', 25), text, color_text))
+        user_box.change_bg_image('media/GameHud/wood2.png')
+        user_box.add_frame('media/GameHud/frame.png')
 
         self.sprite_grp.add(user_box)
 
@@ -81,7 +94,9 @@ class JoinScene(object):
     def _init_btn(self, x_pos, y_pos, text, color: Color, color_text: Color):
         box_size = (130, 48)
         self.buttonConnect = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
-                                        Text(pygame.font.SysFont(Font.MAIN_FONT, 20), text, color_text))
+                                        Text(pygame.font.SysFont('Agency FB', 25), text, color_text))
+        self.buttonConnect.change_bg_image('media/GameHud/wood2.png')
+        self.buttonConnect.add_frame('media/GameHud/frame.png')
         self.sprite_grp.add(self.buttonConnect)
 
     def _init_text_bar(self, x_pos, y_pos, width, height):
@@ -92,7 +107,9 @@ class JoinScene(object):
     def _init_btn_back(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
         box_size = (130, 48)
         self.buttonBack = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
-                                     Text(pygame.font.SysFont('Agency FB', 20), text, color_text))
+                                     Text(pygame.font.SysFont('Agency FB', 25), text, color_text))
+        self.buttonBack.change_bg_image('media/GameHud/wood2.png')
+        self.buttonBack.add_frame('media/GameHud/frame.png')
         self.sprite_grp.add(self.buttonBack)
 
     def init_error_message(self, msg):

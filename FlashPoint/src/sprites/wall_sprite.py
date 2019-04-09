@@ -34,8 +34,9 @@ class WallSprite(pygame.sprite.Sprite, WallObserver):
         self.tile_sprite = tile_sprite
         self._prev_x = self.tile_sprite.rect.x
         self._prev_y = self.tile_sprite.rect.y
-        self.button_input = RectButton(self.tile_sprite.rect.x, self.tile_sprite.rect.y, 100, 25, Color.BLACK, 0,
-                                       Text(pygame.font.SysFont('Arial', 20), "Chop Wall", Color.ORANGE))
+        self.button_input = RectButton(self.tile_sprite.rect.x, self.tile_sprite.rect.y, 100, 25, Color.WOOD, 0,
+                                       Text(pygame.font.SysFont('Agency FB', 20), "Chop Wall", Color.GREEN2))
+        pygame.draw.rect(self.button_input.image,Color.YELLOW,[0,0,100,25],3)
         self.button_input.disable()
         self.can_chop = False
 
@@ -82,10 +83,8 @@ class WallSprite(pygame.sprite.Sprite, WallObserver):
         if status == WallStatusEnum.DAMAGED:
             self.damaged = True
         elif status == WallStatusEnum.DESTROYED:
-            self.damaged = True
+            self.damaged = False
             self.destroyed = True
-        else:
-            raise Exception("Wall status changed back to Intact")
 
     def draw(self, screen):
         self.button.draw(screen)

@@ -13,9 +13,9 @@ class DismountVehicleEvent(ActionEvent):
 
     def __init__(self,  vehicle_type:str, player: PlayerModel=None, player_index: int=None):
         super().__init__()
-        self._game: GameStateModel = GameStateModel.instance()
+        game: GameStateModel = GameStateModel.instance()
         if player:
-            self._player_index = self._game.players.index(player)
+            self._player_index = game.players.index(player)
         elif player_index is not None:
             self._player_index = player_index
 
@@ -23,6 +23,7 @@ class DismountVehicleEvent(ActionEvent):
 
     def execute(self, *args, **kwargs):
         logger.info("Executing DismountVehicleEvent")
+        self._game: GameStateModel = GameStateModel.instance()
         player = self._game.players[self._player_index]
         game_board: GameBoardModel = self._game.game_board
         vehicle: VehicleModel = game_board.ambulance if self._vehicle_type == "AMBULANCE" else game_board.engine

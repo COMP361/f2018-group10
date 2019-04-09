@@ -1,26 +1,29 @@
 import itertools
 import json
 import os
+import random
 from datetime import datetime
 from typing import List
 
 import pygame
 
-from src.action_events.fire_placement_event import FirePlacementEvent
-from src.action_events.set_initial_poi_experienced_event import SetInitialPOIExperiencedEvent
+from src.action_events.board_setup_event import BoardSetupEvent
 from src.constants.custom_event_enums import CustomEventEnum
-from src.constants.state_enums import GameKindEnum, GameStateEnum, GameBoardTypeEnum
+from src.constants.state_enums import GameStateEnum
 from src.models.game_units.hazmat_model import HazmatModel
 from src.models.game_units.victim_model import VictimModel
+from src.sprites.hud.command_notification import CommandNotification
+from src.sprites.permission_prompt import PermissionPrompt
 from src.sprites.dodge_prompt import DodgePrompt
 from src.sprites.hazmat_sprite import HazmatSprite
+from src.sprites.knockdown_prompt import KnockdownPrompt
+from src.sprites.victim_lost_prompt import VictimLostPrompt
+from src.sprites.victim_saved_prompt import VictimSavedPrompt
 from src.sprites.victim_sprite import VictimSprite
 from src.models.game_units.poi_model import POIModel
 from src.observers.GameBoardObserver import GameBoardObserver
 from src.observers.game_state_observer import GameStateObserver
 
-from src.action_events.place_hazmat_event import PlaceHazmatEvent
-from src.action_events.set_initial_poi_family_event import SetInitialPOIFamilyEvent
 from src.controllers.chop_controller import ChopController
 from src.controllers.door_controller import DoorController
 from src.sprites.poi_sprite import POISprite
@@ -41,10 +44,10 @@ from src.sprites.hud.current_player_state import CurrentPlayerState
 from src.sprites.hud.time_bar import TimeBar
 from src.sprites.hud.ingame_states import InGameStates
 from src.sprites.player_sprite import PlayerSprite
-import src.constants.color as Color
 from src.UIComponents.rect_button import RectButton
 from src.UIComponents.text import Text
 from src.sprites.notify_player_turn import NotifyPlayerTurn
+import src.constants.color as Color
 
 
 class GameBoardScene(GameBoardObserver, GameStateObserver):
@@ -73,7 +76,7 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
         self._init_controllers()
 
         # Send initialization events
-        if self._game.board_type != GameBoardTypeEnum.LOADED:
+        if not self._game.game_board.is_loaded:
             self._send_game_board_initialize()
         else:
             self._init_loaded_sprites()
@@ -82,7 +85,12 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
     def _init_ui_elements(self):
         """Initialize all things to be drawn on this screen."""
         self._menu = None
+        self._knockdown_prompt = KnockdownPrompt()
+        self._victim_lost_prompt = VictimLostPrompt()
+        self._victim_saved_prompt = VictimSavedPrompt()
         self._dodge_prompt = DodgePrompt()
+        self._permission_prompt = PermissionPrompt()
+        self._command_notification = CommandNotification()
         self._game_board_sprite = GameBoard(self._current_player)
         self._menu_btn = self._init_menu_button()
         self._chat_box = ChatBox(self._current_player)
@@ -94,16 +102,16 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
         """Set all the initial Sprites and add them to the sprite Group."""
 
         for i, player in enumerate(self._game.players):
-            self._player_hud_sprites.add(PlayerState(0, 30 + 64 * i, player.nickname, player.color, player))
+            self._player_hud_sprites.add(PlayerState(0, 30 + 64 * i, player.nickname, player.color, player,self._game.rules))
 
         # Notify player turn stuff
         current_player_info_sprite = CurrentPlayerState(1130, 550, self._current_player.nickname,
-                                                        self._current_player.color, self._current_player)
+                                                        self._current_player.color, self._current_player,self._game.rules)
         self._active_sprites.add(current_player_info_sprite)
-        notify_player_turn = NotifyPlayerTurn(self._current_player, current_player_info_sprite,
-                                              self._active_sprites)
-        self._active_sprites.add(notify_player_turn)
-        self._active_sprites.add(notify_player_turn.init_not_your_turn())
+        self._notify_player_turn = NotifyPlayerTurn(self._current_player, current_player_info_sprite,
+                                                    self._active_sprites)
+        self._active_sprites.add(self._notify_player_turn)
+        self._active_sprites.add(self._notify_player_turn.init_not_your_turn())
 
         # HUD stuff
         self._active_sprites.add(TimeBar(0, 0))
@@ -117,7 +125,9 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
         for tile in self._game.game_board.tiles:
             for obj in tile.associated_models:
                 if isinstance(obj, HazmatModel):
-                    self._game_board_sprite.add(HazmatSprite(tile))
+                    hazmat_sprite = HazmatSprite(tile)
+                    obj.add_observer(hazmat_sprite)
+                    self._game_board_sprite.add(hazmat_sprite)
 
     def _init_controllers(self):
         """Instantiate all controllers."""
@@ -135,13 +145,7 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
     def _send_game_board_initialize(self):
         """Send any game board initialization events."""
         if Networking.get_instance().is_host:
-            Networking.get_instance().send_to_all_client(FirePlacementEvent())
-
-            if self._game.rules == GameKindEnum.EXPERIENCED:
-                Networking.get_instance().send_to_all_client(SetInitialPOIExperiencedEvent())
-                Networking.get_instance().send_to_all_client(PlaceHazmatEvent())
-            else:
-                Networking.get_instance().send_to_all_client(SetInitialPOIFamilyEvent())
+            Networking.get_instance().send_to_all_client(BoardSetupEvent())
 
         for player in self._game.players:
             player.set_initial_ap(self._game.rules)
@@ -163,8 +167,6 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
         with open(self._save_games_file, mode='w', encoding='utf-8') as myFile:
             json.dump(temp, myFile)
 
-        self._menu.close()
-
     @staticmethod
     def _quit_btn_on_click():
         Networking.get_instance().disconnect()
@@ -173,7 +175,7 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
         DoorController._instance = None
         EventQueue.post(CustomEvent(ChangeSceneEnum.STARTSCENE))
 
-    # Example of how to use the MenuClass YOU NEED TO MAKE ALL YOUR BUTTONS EXTEND INTERACTABLE!!!!!!!!!!!!!!!!!
+    # Example of how to use the MenuClass YOU NEED TO MAKE ALL YOUR BUTTONS EXTEND INTERACTABLE!
     def _init_menu_button(self):
         btn = RectButton(0, 0, 30, 30, background=Color.GREEN, txt_obj=Text(pygame.font.SysFont('Arial', 23), ""))
         btn.on_click(self._open_menu)
@@ -201,13 +203,25 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
 
         self._menu = menu
 
+    def display_permission_prompt(self, source: PlayerModel, target: PlayerModel):
+        self._permission_prompt.command = (source, target)
+        self._permission_prompt.enabled = True
+
     def draw(self, screen: pygame.display):
         """Draw all currently active sprites."""
         self._game_board_sprite.draw(screen)
         self._chat_box.draw(screen)
         self._active_sprites.draw(screen)
         self._player_hud_sprites.draw(screen)
+
+        self._command_notification.draw(screen)
+
+        self._permission_prompt.draw(screen)
+        self._knockdown_prompt.draw(screen)
+        self._victim_lost_prompt.draw(screen)
+        self._victim_saved_prompt.draw(screen)
         self._dodge_prompt.draw(screen)
+
         if self._menu and not self._menu.is_closed:
             self._menu.draw(screen)
 
@@ -216,19 +230,38 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
         self._active_sprites.update(event_queue)
         self._chat_box.update(event_queue)
         self._player_hud_sprites.update(event_queue)
+
+        self._command_notification.update(event_queue)
+
+        self._permission_prompt.update(event_queue)
         self._dodge_prompt.update(event_queue)
 
         if not self.ignore_area():
-            ChopController.instance().update(event_queue)
-            DoorController.instance().update(event_queue)
             TileInputController.update(event_queue)
             self._game_board_sprite.update(event_queue)
-
+            ChopController.instance().update(event_queue)
+            DoorController.instance().update(event_queue)
         if self._menu and not self._menu.is_closed:
             self._menu.update(event_queue)
 
         for event in event_queue:
-            if event.type == CustomEventEnum.DODGE_PROMPT:
+            if event.type == CustomEventEnum.ENABLE_KNOCKDOWN_PROMPT:
+                self._knockdown_prompt.name = event.args[0]
+                self._knockdown_prompt.enabled = True
+            elif event.type == CustomEventEnum.DISABLE_KNOCKDOWN_PROMPT:
+                self._knockdown_prompt.enabled = False
+            elif event.type == CustomEventEnum.ENABLE_VICTIM_LOST_PROMPT:
+                self._victim_lost_prompt.enabled = True
+            elif event.type == CustomEventEnum.ENABLE_VICTIM_SAVED_PROMPT:
+                self._victim_saved_prompt.enabled = True
+            elif event.type == CustomEventEnum.DISABLE_VICTIM_LOST_PROMPT:
+                self._victim_lost_prompt.enabled = False
+            elif event.type == CustomEventEnum.DISABLE_VICTIM_SAVED_PROMPT:
+                self._victim_saved_prompt.enabled = False
+            elif event.type == CustomEventEnum.PERMISSION_PROMPT:
+                if event.target == self._current_player:
+                    self.display_permission_prompt(event.source, event.target)
+            elif event.type == CustomEventEnum.DODGE_PROMPT:
                 self._dodge_prompt.enabled = True
 
     def ignore_area(self):
@@ -285,6 +318,16 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
                 if sprite.associated_player is player:
                     GameBoard.instance().remove(sprite)
                     break
+
+    def player_command(self, source: PlayerModel, target: PlayerModel):
+        self._command_notification.command = (source, target)
+        self._command_notification.is_source = False
+        self._command_notification.is_target = False
+
+        if source and source == self._current_player:
+            self._command_notification.is_source = True
+        elif target and target == self._current_player:
+            self._command_notification.is_target = True
 
     def player_list_changed(self):
         # Refresh the list of players in HUD

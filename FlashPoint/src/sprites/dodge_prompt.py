@@ -14,16 +14,43 @@ class DodgePrompt(object):
     """Prompt for the player deciding whether to dodge or not."""
 
     def __init__(self):
+
+        self.bg = pygame.image.load('media/GameHud/wood2.png')
+        self.frame = pygame.image.load('media/GameHud/frame.png')
+        self.frame = pygame.transform.scale(self.frame, (400, 100))
+
         self.accept_button = RectButton(550-75, 310, 75, 50, Color.ORANGE, 0,
-                                        Text(pygame.font.SysFont('Arial', 20), "Accept", Color.WHITE))
+                                        Text(pygame.font.SysFont('Agency FB', 25), "Accept", Color.GREEN2))
+        self.accept_button.change_bg_image('media/GameHud/wood2.png')
+        self.accept_button.add_frame('media/GameHud/frame.png')
+
+
         self.deny_button = RectButton(550+200, 310, 75, 50, Color.ORANGE, 0,
-                                      Text(pygame.font.SysFont('Arial', 20), "Deny", Color.WHITE))
+                                      Text(pygame.font.SysFont('Agency FB', 25), "Deny", Color.GREEN2))
+        self.deny_button.change_bg_image('media/GameHud/wood2.png')
+        self.deny_button.add_frame('media/GameHud/frame.png')
         self.accept_button.on_click(self._accept_on_click)
         self.deny_button.on_click(self._deny_on_click)
 
         self.background = RectLabel(550, 300, 200, 75, Color.GREY, 0,
-                                    Text(pygame.font.SysFont('Arial', 20), "Dodge?", Color.WHITE))
+                                    Text(pygame.font.SysFont('Agency FB', 25), "Dodge?", Color.GREEN2))
+        self.background.change_bg_image('media/GameHud/wood2.png')
+        self.background.add_frame('media/GameHud/frame.png')
+        self.enabled = False
+        self.disable()
 
+    def enable(self):
+        self.deny_button.enable()
+        self.accept_button.enable()
+        self.accept_button.on_click(self._accept_on_click)
+        self.deny_button.on_click(self._deny_on_click)
+        self.enabled = True
+
+    def disable(self):
+        self.deny_button.disable()
+        self.accept_button.disable()
+        self.accept_button.on_click(None)
+        self.deny_button.on_click(None)
         self.enabled = False
 
     def _send_reply_event(self, reply: bool):
@@ -33,11 +60,11 @@ class DodgePrompt(object):
             Networking.get_instance().send_to_server(DodgeReplyEvent(reply))
 
     def _deny_on_click(self):
-        self.enabled = False
+        self.disable()
         self._send_reply_event(False)
 
     def _accept_on_click(self):
-        self.enabled = False
+        self.disable()
         self._send_reply_event(True)
 
     def update(self, event_queue: EventQueue):

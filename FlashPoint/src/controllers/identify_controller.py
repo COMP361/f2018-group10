@@ -1,9 +1,10 @@
 from src.UIComponents.interactable import Interactable
 from src.action_events.turn_events.identify_poi_event import IdentifyPOIEvent
 from src.action_events.turn_events.turn_event import TurnEvent
-from src.constants.state_enums import GameKindEnum, PlayerRoleEnum
+from src.constants.state_enums import GameKindEnum, PlayerRoleEnum, DoorStatusEnum
 from src.controllers.controller import Controller
 from src.core.networking import Networking
+from src.models.game_board.door_model import DoorModel
 from src.models.game_board.game_board_model import GameBoardModel
 from src.models.game_board.tile_model import TileModel
 from src.models.game_state_model import GameStateModel
@@ -35,7 +36,32 @@ class IdentifyController(Controller):
         if not self._current_player == self.game.players_turn:
             return False
 
-        if self._current_player.role != PlayerRoleEnum.IMAGING:
+        if self._current_player.role not in [PlayerRoleEnum.IMAGING, PlayerRoleEnum.DOGE]:
+            return False
+
+        player_tile: TileModel = self.game.game_board.get_tile_at(self._current_player.row, self._current_player.column)
+        # Separately handle Doge's case
+        if self._current_player.role == PlayerRoleEnum.DOGE:
+            # If the tile is not adjacent to the player
+            if tile_model not in player_tile.adjacent_tiles.values():
+                return False
+
+            for direction, nb_tile in player_tile.adjacent_tiles.items():
+                if isinstance(nb_tile, TileModel):
+                    has_obstacle = player_tile.has_obstacle_in_direction(direction)
+                    obstacle = player_tile.get_obstacle_in_direction(direction)
+                    is_open_door = isinstance(obstacle, DoorModel) and obstacle.door_status == DoorStatusEnum.OPEN
+                    # If there is an obstacle in the given
+                    # direction which is not an open door,
+                    # cannot reveal POI in that space.
+                    if has_obstacle and not is_open_door:
+                        return False
+
+                    if tile_model.row == nb_tile.row and tile_model.column == nb_tile.column:
+                        for assoc_model in nb_tile.associated_models:
+                            if isinstance(assoc_model, POIModel):
+                                return True
+
             return False
 
         if not TurnEvent.has_required_AP(self._current_player.ap, 1):

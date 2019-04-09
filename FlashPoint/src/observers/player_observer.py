@@ -41,3 +41,7 @@ class PlayerObserver(Observer, ABC):
     @abstractmethod
     def player_role_changed(self, role: PlayerRoleEnum):
         pass
+
+    @abstractmethod
+    def player_leading_victim_changed(self, leading_victim):
+        pass

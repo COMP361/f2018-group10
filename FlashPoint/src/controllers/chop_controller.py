@@ -33,6 +33,10 @@ class ChopController(object):
         if not self.current_player == self.game.players_turn:
             return False
 
+        # Doge cannot chop walls
+        if self.current_player.role == PlayerRoleEnum.DOGE:
+            return False
+
         if self.current_player.role == PlayerRoleEnum.RESCUE:
             valid_to_chop = TurnEvent.has_required_AP(self.current_player.ap, 1)
         else:

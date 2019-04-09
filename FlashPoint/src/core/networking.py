@@ -1,3 +1,4 @@
+import json
 import traceback
 from typing import Union
 
@@ -7,7 +8,9 @@ import threading
 import logging
 import time
 
-from src.action_events.end_turn_advance_fire import EndTurnAdvanceFireEvent
+from src.action_events.random_board_setup_event import RandomBoardSetupEvent
+from src.constants.state_enums import GameBoardTypeEnum
+from src.core.flashpoint_exceptions import TooManyPlayersException
 from src.core.custom_event import CustomEvent
 from src.core.serializer import JSONSerializer
 from src.core.event_queue import EventQueue
@@ -18,6 +21,7 @@ from src.action_events.turn_events.turn_event import TurnEvent
 from src.action_events.join_event import JoinEvent
 from src.action_events.dummy_event import DummyEvent
 from src.action_events.disconnect_event import DisconnectEvent
+from src.action_events.too_many_players_event import TooManyPlayersEvent
 from src.external.Mastermind import *
 
 logger = logging.getLogger("FlashPoint")
@@ -210,10 +214,8 @@ class Networking:
                 self.host.disconnect()
                 self.host.__del__()
                 self.host = None
-            elif self.client:
+            if self.client:
                 logger.info("Disconnecting client")
-                #player_model = GameStateModel.instance().get_player_by_ip(self.get_ip())
-                #self.send_to_server(DisconnectEvent(player_model))
                 self.client.disconnect()
                 self.client.__del__()
                 self.client = None
@@ -377,8 +379,17 @@ class Networking:
                     return super(MastermindServerUDP, self).callback_client_handle(connection_object, data)
 
                 if isinstance(data, JoinEvent):
-                    data.execute()
-                    Networking.get_instance().send_to_all_client(GameStateModel.instance())
+                    try:
+                        data.execute()
+                        Networking.get_instance().send_to_all_client(GameStateModel.instance())
+                        if GameStateModel.instance().game_board.board_type == GameBoardTypeEnum.RANDOM:
+                            with open("media/board_layouts/random_inside_walls_doors.json", "r+") as f:
+
+                                board_info = json.load(f)
+                            Networking.get_instance().send_to_all_client(RandomBoardSetupEvent(board_info))
+                    except TooManyPlayersException:
+                        # Informs the client that the lobby is full
+                        Networking.get_instance().send_to_client(connection_object.address[0], TooManyPlayersEvent())
                     return super(MastermindServerUDP, self).callback_client_handle(connection_object, data)
 
                 # send everything back to the clients to process
@@ -451,7 +462,7 @@ class Networking:
                         traceback.print_exception(*info)
                         self.callback_disconnect()
                     except OSError:
-                        logger.error("OS ERROR, disconnecting client.")
+                        logger.warning("OS ERROR, disconnecting client.")
                         info = sys.exc_info()
                         traceback.print_exception(*info)
                         self.callback_disconnect()
@@ -504,9 +515,10 @@ class Networking:
             Define callback here when client's connection to host is interrupted.
             :return:
             """
-            logger.warning("It seems that client is not connected...")
-            Networking.get_instance().disconnect()
-            EventQueue.post(CustomEvent(ChangeSceneEnum.DISCONNECT))
+            if Networking.get_instance().is_host:
+                logger.warning("It seems that client is not connected...")
+                Networking.get_instance().disconnect()
+                EventQueue.post(CustomEvent(ChangeSceneEnum.DISCONNECT))
 
         class SocketError(Exception):
             pass

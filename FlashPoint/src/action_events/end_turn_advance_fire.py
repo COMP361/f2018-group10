@@ -1,13 +1,19 @@
 import random
 import logging
+import time
+from threading import Thread
 
-
+from src.UIComponents.file_importer import FileImporter
 from src.action_events.knock_down_event import KnockDownEvent
 from src.action_events.replenish_poi_event import ReplenishPOIEvent
+from src.constants.custom_event_enums import CustomEventEnum
+from src.core.custom_event import CustomEvent
+from src.core.event_queue import EventQueue
 from src.models.game_board.door_model import DoorModel
 from src.models.game_board.null_model import NullModel
 from src.models.game_board.wall_model import WallModel
 from src.models.game_units.hazmat_model import HazmatModel
+from src.models.game_units.player_model import PlayerModel
 from src.models.game_units.poi_model import POIModel
 from src.models.game_units.victim_model import VictimModel
 from src.models.game_board.tile_model import TileModel
@@ -16,6 +22,7 @@ from src.constants.state_enums import GameStateEnum, SpaceStatusEnum, WallStatus
     SpaceKindEnum, POIIdentityEnum, GameKindEnum, PlayerRoleEnum
 from src.action_events.turn_events.turn_event import TurnEvent
 from src.models.game_state_model import GameStateModel
+from src.sprites.game_board import GameBoard
 
 logger = logging.getLogger("FlashPoint")
 
@@ -47,13 +54,6 @@ class EndTurnAdvanceFireEvent(TurnEvent):
         else:
             self.seed = seed
 
-        # Pick random location: roll dice
-        random.seed(self.seed)
-
-        self.red_dice = GameStateModel.instance().roll_red_dice()
-        self.black_dice = GameStateModel.instance().roll_black_dice()
-        self.directions = ["North", "South", "East", "West"]
-
     def _main_phase_end_turn(self):
         # ------ AdvanceFire ------ #
         # Change state of tile depending on previous state
@@ -73,16 +73,16 @@ class EndTurnAdvanceFireEvent(TurnEvent):
             flare_up_will_occur = self.advance_on_tile(self.initial_tile)
             self.flashover()
             self.resolve_hazmat_explosions()
-            self.affect_damages()
             # Preparing the dice for the next
             # iteration if a flare up is going to occur
             self.red_dice = self.game_state.roll_red_dice()
             self.black_dice = self.game_state.roll_black_dice()
             x += 1
 
+        self.affect_damages()
         # Add a hotspot marker to the last
         # target space of the advance_on_tile()
-        if self.board.hotspot_bank > 0:
+        if self.board.hotspot_bank > 0 and x > 1:
             self.initial_tile.is_hotspot = True
             self.board.hotspot_bank = self.board.hotspot_bank - 1
 
@@ -105,6 +105,14 @@ class EndTurnAdvanceFireEvent(TurnEvent):
         # replenish player's AP, irrespective
         # of role, by 4 (add/subtract points after).
         # special AP are not retained for the next turn.
+        # Handle Doge's case separately...
+        if self.player.role == PlayerRoleEnum.DOGE:
+            if self.player.ap > 6:
+                self.player.ap = 6
+
+            self.player.ap = self.player.ap + 12
+            return
+
         if self.player.ap > 4:
             self.player.ap = 4
 
@@ -122,6 +130,9 @@ class EndTurnAdvanceFireEvent(TurnEvent):
 
         elif self.player.role == PlayerRoleEnum.RESCUE:
             self.player.special_ap = 3
+
+        elif self.player.role == PlayerRoleEnum.VETERAN:
+            self.player.special_ap = 1
 
     def _placing_players_end_turn(self):
         # If the last player has chosen a location, move the game into the next phase.
@@ -141,24 +152,37 @@ class EndTurnAdvanceFireEvent(TurnEvent):
             logger.info("Not all vehicles have been placed. Not moving to next game phase.")
 
     def execute(self):
-        logger.info("Executing EndTurnAdvanceFireEvent")
-
         self.game_state: GameStateModel = GameStateModel.instance()
         self.board: GameBoardModel = self.game_state.game_board
+        logger.info("Executing EndTurnAdvanceFireEvent")
+
+        # Pick random location: roll dice
+        random.seed(self.seed)
+
+        self.red_dice = GameStateModel.instance().roll_red_dice()
+        self.black_dice = GameStateModel.instance().roll_black_dice()
+        self.directions = ["North", "South", "East", "West"]
+
+        # Clear commanded list
+        self.game_state.clear_commanded_list()
+
         if self.game_state.state == GameStateEnum.MAIN_GAME:
             self._main_phase_end_turn()
 
-        elif (self.game_state.state == GameStateEnum.PLACING_PLAYERS
-              and self.game_state.all_players_have_chosen_location()):
-            self._placing_players_end_turn()
-        elif not self.game_state.all_players_have_chosen_location():
-            logger.info("Not all players have chosen starting location, not moving to next game phase.")
-            if not self.game_state.players_turn.has_pos:
-                logger.info("The player did not choose a location, not moving to next player.")
-                self.game_state._notify_player_index()
-                return
+        elif self.game_state.state == GameStateEnum.PLACING_PLAYERS:
+            if self.game_state.all_players_have_chosen_location():
+                self._placing_players_end_turn()
+            else:
+                logger.info("Not all players have chosen starting location, not moving to next game phase.")
+                if not self.game_state.players_turn.has_pos:
+                    logger.info("The player did not choose a location, not moving to next player.")
+                    self.game_state._notify_player_index()
+                    return
+
         elif self.game_state.state == GameStateEnum.PLACING_VEHICLES:
             self._placing_vehicles_end_turn()
+            self.game_state._notify_player_index()
+            return
 
         # call next player
         self.game_state.next_player()
@@ -194,8 +218,12 @@ class EndTurnAdvanceFireEvent(TurnEvent):
         return flare_up_will_occur
 
     def explosion(self, origin_tile: TileModel):
+        FileImporter.play_music("media/music/explosion.mp3", 1)
         logger.info(f"Explosion occurred on {origin_tile}")
         game_state = GameStateModel.instance()
+        tile_sprite = GameBoard.instance().grid.grid[origin_tile.column][origin_tile.row]
+        tile_sprite.explosion = True
+
         for direction, obstacle in origin_tile.adjacent_edge_objects.items():
             # fire does not move to the neighbouring tile
             # damaging wall present along the tile
@@ -320,7 +348,9 @@ class EndTurnAdvanceFireEvent(TurnEvent):
                 # an explosion.
                 for assoc_model in tile.associated_models:
                     if isinstance(assoc_model, HazmatModel):
+                        logger.info("Hazmat explosion occured on {t}".format(t=tile))
                         self.explosion(tile)
+                        assoc_model.set_pos(-7, -7)
                         tile.remove_associated_model(assoc_model)
                         if self.board.hotspot_bank > 0:
                             tile.is_hotspot = True
@@ -333,12 +363,20 @@ class EndTurnAdvanceFireEvent(TurnEvent):
                 players_on_tile = self.game_state.get_players_on_tile(tile.row, tile.column)
                 for player in players_on_tile:
                     if isinstance(player.carrying_hazmat, HazmatModel):
-                        KnockDownEvent(player.ip).execute()
+                        logger.info("Hazmat explosion occured on {t}".format(t=tile))
                         self.explosion(tile)
+                        self.dodge(player)
+                        player.carrying_hazmat.set_pos(-7, -7)
                         player.carrying_hazmat = NullModel()
                         if self.board.hotspot_bank > 0:
                             tile.is_hotspot = True
                             self.board.hotspot_bank = self.board.hotspot_bank - 1
+
+
+    def countdown(self):
+        EventQueue.post(CustomEvent(CustomEventEnum.ENABLE_VICTIM_LOST_PROMPT))
+        time.sleep(5)
+        EventQueue.post(CustomEvent(CustomEventEnum.DISABLE_VICTIM_LOST_PROMPT))
 
     def affect_damages(self):
         """
@@ -354,6 +392,9 @@ class EndTurnAdvanceFireEvent(TurnEvent):
             for model in assoc_models:
                 if isinstance(model, VictimModel):
                     logger.info(f"{model} was lost.")
+
+                    thread = Thread(target=self.countdown)
+                    thread.start()
                     self.game_state.victims_lost = self.game_state.victims_lost + 1
                     model: VictimModel = model
                     model.state = VictimStateEnum.LOST
@@ -385,10 +426,107 @@ class EndTurnAdvanceFireEvent(TurnEvent):
 
             players_on_tile = self.game_state.get_players_on_tile(tile.row, tile.column)
             for player in players_on_tile:
-                KnockDownEvent(player.ip).execute()
+                # Attempt to dodge and if it doesn't
+                # work, the player gets knocked down
+                self.dodge(player)
 
         # removing any fire markers that were
         # placed outside of the building
         for tile in self.board.tiles:
             if tile.space_kind != SpaceKindEnum.INDOOR and tile.space_status == SpaceStatusEnum.FIRE:
                 tile.space_status = SpaceStatusEnum.SAFE
+
+    def dodge(self, player: PlayerModel):
+        """
+        Determines whether the player can
+        dodge (out of turn) to avoid being
+        knocked down and performs dodge.
+
+        :param player: player that is attempting to dodge
+        :return:
+        """
+        logger.info("Attempting to dodge...")
+        if player.role != PlayerRoleEnum.VETERAN:
+            self._log_player_dodge(1, player)
+            KnockDownEvent(player.ip).execute()
+            return
+
+        # If the player is a Veteran:
+        # 1. If it is their turn, they must have
+        # at least 1 AP to be able to dodge.
+        # 2. If it is not their turn, they must have
+        # at least 5 AP (so that they have 1 saved AP
+        # from the previous turn) to be able to dodge.
+        if player.role == PlayerRoleEnum.VETERAN:
+            if player == self.game_state.players_turn:
+                if player.ap < 1:
+                    return False
+            else:
+                if player.ap < 5:
+                    return False
+
+        player_tile = self.game_state.game_board.get_tile_at(player.row, player.column)
+        possible_dodge_target = NullModel()
+        for dirn, nb_tile in player_tile.adjacent_tiles.items():
+            if isinstance(nb_tile, TileModel):
+                has_obstacle = nb_tile.has_obstacle_in_direction(dirn)
+                obstacle = nb_tile.get_obstacle_in_direction(dirn)
+                is_open_door = isinstance(obstacle, DoorModel) and obstacle.door_status == DoorStatusEnum.OPEN
+                if not has_obstacle or is_open_door:
+                    if nb_tile.space_status != SpaceStatusEnum.FIRE:
+                        possible_dodge_target = nb_tile
+                        break
+
+        # If we couldn't find a potential space
+        # to dodge, the player cannot avoid being
+        # knocked down.
+        if isinstance(possible_dodge_target, NullModel):
+            self._log_player_dodge(1, player)
+            KnockDownEvent(player.ip).execute()
+            return
+
+        # Disassociate the victim/hazmat that the player
+        # may be carrying since they cannot dodge with them
+        player_victim = player.carrying_victim
+        player_hazmat = player.carrying_hazmat
+        is_carrying_victim = isinstance(player_victim, VictimModel)
+        is_carrying_hazmat = isinstance(player_hazmat, HazmatModel)
+        if is_carrying_victim:
+            self._log_player_dodge(2, player, player_victim, player_tile)
+            player_tile.add_associated_model(player_victim)
+            player.carrying_victim = NullModel()
+
+        if is_carrying_hazmat:
+            self._log_player_dodge(2, player, player_hazmat, player_tile)
+            player_tile.add_associated_model(player_hazmat)
+            player.carrying_hazmat = NullModel()
+
+        self._log_player_dodge(3, player)
+        player.set_pos(possible_dodge_target.row, possible_dodge_target.column)
+        player.ap = player.ap - 1
+
+    def _log_player_dodge(self, status: int, player: PlayerModel, model = None, tile: TileModel = None):
+        """
+        Log player information while
+        attempting to dodge.
+
+        :param status:
+            1 - cannot dodge
+            2 - disassociating model
+            3 - able to dodge
+        :param player:
+        :param model:
+        :return:
+        """
+        r = player.row
+        c = player.column
+        if status == 1:
+            logger.info("Player at ({row}, {col}) cannot dodge".format(row=r, col=c))
+
+        elif status == 2:
+            logger.info("Disassociate {m} from Player at ({row}, {col}) and give it to {t}".format(m=model, row=r, col=c, t=tile))
+
+        elif status == 3:
+            logger.info("Player at ({row}, {col}) is able to dodge".format(row=r, col=c))
+
+        return

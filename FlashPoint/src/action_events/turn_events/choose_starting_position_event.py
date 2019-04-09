@@ -15,15 +15,14 @@ class ChooseStartingPositionEvent(ActionEvent):
 
     def __init__(self, row: int, column: int):
         super().__init__()
-        game: GameStateModel = GameStateModel.instance()
         self._row = row
         self._column = column
-        self.player: PlayerModel = game.players_turn
 
     def execute(self):
         logger.info("Executing ChooseStartingPositionEvent")
         game: GameStateModel = GameStateModel.instance()
+        player: PlayerModel = game.players_turn
         tile = game.game_board.get_tile_at(self._row, self._column)
-        player_sprite = PlayerSprite(self.player, tile, GameBoard.instance().grid)
+        player_sprite = PlayerSprite(player, tile, GameBoard.instance().grid)
         GameBoard.instance().add(player_sprite)
-        self.player.set_pos(tile.row, tile.column)
+        player.set_pos(tile.row, tile.column)

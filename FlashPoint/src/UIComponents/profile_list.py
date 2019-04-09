@@ -9,7 +9,7 @@ from src.UIComponents.components import Components
 from src.UIComponents.rect_button import RectButton
 from src.UIComponents.text import Text
 import src.constants.color as color
-
+import src.constants.color as Color
 
 class ProfileList(pygame.sprite.Sprite, Components):
     def __init__(self,
@@ -23,7 +23,7 @@ class ProfileList(pygame.sprite.Sprite, Components):
         pygame.sprite.Sprite.__init__(self)
         Components.__init__(self, x, y, width, height)
         self._limit = limit
-        self.background = background
+        self.background = 'media/GameHud/wood2.png'
         self.outer_width = outer_width
         self.image = None
         self.rect = None
@@ -48,6 +48,7 @@ class ProfileList(pygame.sprite.Sprite, Components):
             image_file = FileImporter.import_image(self.background)
             image_file = pygame.transform.scale(image_file, (self.width, self.height))
             self.image.blit(image_file, (0, 0))
+            pygame.draw.rect(self.image, Color.YELLOW, [0, 0,self.width, self.height], 11)
 
         self.rect.x = self.x
         self.rect.y = self.y
@@ -74,7 +75,7 @@ class ProfileList(pygame.sprite.Sprite, Components):
             y = self.y + 20
 
             btn = RectButton(x, y, width, height, color.STANDARDBTN, 0,
-                             Text(pygame.font.SysFont('Agency FB', 20), "Empty", color.BLACK))
+                             Text(pygame.font.SysFont('Agency FB', 25), "Empty", color.BLACK))
             remove_btn = RectButton(btn.x, (btn.y + self.height-80)+10, btn.width, 30, color.YELLOW, 0,
                                     Text(pygame.font.SysFont('Agency FB', 16), "Remove", color.BLACK))
             s = RectLabel(btn.x,(btn.y + self.height-120),btn.width,30,color.STANDARDBTN, 0,

@@ -9,14 +9,18 @@ from src.scenes.host_join_scene import HostJoinScene
 from src.scenes.host_menu_scene import HostMenuScene
 from src.scenes.join_scene import JoinScene
 from src.scenes.load_game_scene import LoadGameScene
+from src.scenes.lose_scene import LoseScene
 from src.scenes.start_scene import StartScene
 from src.scenes.set_max_players_scene import SetMaxPlayers
 from src.scenes.create_game_menu import CreateGameMenuScene
 from src.core.event_queue import EventQueue
 from src.scenes.character_scene import CharacterScene
 from src.scenes.lobby_scene import LobbyScene
+from src.constants.custom_event_enums import CustomEventEnum
 from src.constants.change_scene_enum import ChangeSceneEnum
 import src.constants.main_constants as MainConst
+from src.scenes.win_scene import WinScene
+from src.scenes.lose_scene import LoseScene
 
 logger = logging.getLogger("SManager")
 logger.setLevel(logging.INFO)
@@ -115,3 +119,9 @@ class SceneManager(object):
                 elif event.type == ChangeSceneEnum.GAMEBOARDSCENE:
                     EventQueue.unblock()
                     self.next(GameBoardScene, self._current_player)
+                elif event.type == ChangeSceneEnum.WINSCENE:
+                    self.next(WinScene)
+                    EventQueue.unblock()
+                elif event.type == ChangeSceneEnum.LOSESCENE:
+                    self.next(LoseScene)
+                    EventQueue.unblock()

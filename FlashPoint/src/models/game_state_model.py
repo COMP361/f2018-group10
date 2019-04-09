@@ -1,13 +1,18 @@
+import json
+import os
 import random
 import logging
 from threading import RLock
 
 from typing import List, Optional, Tuple
 
+from src.constants.change_scene_enum import ChangeSceneEnum
+from src.core.custom_event import CustomEvent
+from src.core.event_queue import EventQueue
 from src.models.model import Model
 from src.models.game_board.game_board_model import GameBoardModel
 from src.constants.state_enums import GameKindEnum, DifficultyLevelEnum, GameStateEnum, VehicleOrientationEnum, \
-    GameBoardTypeEnum
+    GameBoardTypeEnum, PlayerStatusEnum, PlayerRoleEnum
 from src.core.flashpoint_exceptions import TooManyPlayersException, InvalidGameKindException, PlayerNotFoundException
 from src.models.game_units.player_model import PlayerModel
 
@@ -26,9 +31,9 @@ class GameStateModel(Model):
                  board_type: GameBoardTypeEnum,
                  difficulty: DifficultyLevelEnum = None
                  ):
-        logger.info("Initializing game state...")
 
         if not GameStateModel._instance:
+            logger.info("Initializing game state...")
             super().__init__()
             self._host = host
             self._max_desired_players = num_players
@@ -38,6 +43,7 @@ class GameStateModel(Model):
             self._rules = game_kind
 
             self._board_type = board_type
+
             self._game_board = GameBoardModel(self._board_type)
 
             self._victims_saved = 0
@@ -46,11 +52,16 @@ class GameStateModel(Model):
             self._max_damage = 24
             self._chat_history = []
             self._dodge_reply = False
+            self._command = (None, None)
+            self._commanded: List[PlayerModel] = []
             self._state = GameStateEnum.READY_TO_JOIN
-
             GameStateModel._instance = self
         else:
             raise Exception("GameStateModel is a Singleton")
+
+    # def notify_all_observers(self):
+    #     self._notify_state()
+    #     self._game_board.notify_all_observers()
 
     def _notify_player_added(self, player: PlayerModel):
         for obs in self._observers:
@@ -68,9 +79,16 @@ class GameStateModel(Model):
         for obs in self._observers:
             obs.notify_game_state(self._state)
 
+    def _notify_command(self):
+        for obs in self._observers:
+            obs.player_command(self.command[0], self.command[1])
+
     @staticmethod
-    def __del__():
+    def destroy():
         GameStateModel._instance = None
+        logger.info("GameStateModel deleted")
+        if os.path.exists("media/board_layouts/random_inside_walls.json"):
+            os.rmdir("media/board_layouts/random_inside_walls.json")
 
     @classmethod
     def instance(cls):
@@ -100,6 +118,29 @@ class GameStateModel(Model):
         self._dodge_reply = reply
 
     @property
+    def command(self) -> Tuple[PlayerModel, PlayerModel]:
+        if self._command[0] and self._command[1]:
+            source = [player for player in self.players if player == self._command[0]][0]
+            target = [player for player in self.players if player == self._command[1]][0]
+            return source, target
+        return None, None
+
+    @command.setter
+    def command(self, command: Tuple[PlayerModel, PlayerModel]):
+        self._command = command
+        # Since CAFS can only be commanded once, we need to keep track of it
+        if command[1] and command[1].role is PlayerRoleEnum.CAFS:
+            self._commanded.append(command[1])
+        self._notify_command()
+
+    @property
+    def commanded_list(self):
+        return self._commanded
+
+    def clear_commanded_list(self):
+        self._commanded.clear()
+
+    @property
     def board_type(self) -> GameBoardTypeEnum:
         with GameStateModel.lock:
             return self._board_type
@@ -108,7 +149,7 @@ class GameStateModel(Model):
     def board_type(self, board_type: GameBoardTypeEnum):
         with GameStateModel.lock:
             self._board_type = board_type
-            if board_type != GameBoardTypeEnum.LOADED:
+            if not self.game_board.is_loaded:
                 self._game_board = GameBoardModel(board_type)
 
     @property
@@ -193,6 +234,8 @@ class GameStateModel(Model):
 
     def next_player(self):
         """Rotate to the next player in the players list, round robin style."""
+        for player in self.players:
+            player.has_moved = False
         with GameStateModel.lock:
             self._players_turn_index = (self._players_turn_index + 1) % len(self._players)
             self._notify_player_index()
@@ -251,7 +294,8 @@ class GameStateModel(Model):
             for obs in self._observers:
                 obs.saved_victims(victims_saved)
             if self._victims_saved >= 7:
-                self.state = GameStateEnum.WON
+                self._state = GameStateEnum.WON
+                self.endgame()
 
     @property
     def victims_lost(self) -> int:
@@ -266,7 +310,8 @@ class GameStateModel(Model):
             for obs in self._observers:
                 obs.dead_victims(victims_lost)
             if self._victims_lost >= 4:
-                self.state = GameStateEnum.LOST
+                self._state = GameStateEnum.LOST
+                self.endgame()
 
     @property
     def damage(self) -> int:
@@ -280,8 +325,9 @@ class GameStateModel(Model):
             logger.info("Game damage: {d}".format(d=damage))
             for obs in self._observers:
                 obs.damage_changed(damage)
-            if self._damage >= self.max_damage:
-                self.state = GameStateEnum.LOST
+            if self._damage == self.max_damage:
+                self._state = GameStateEnum.LOST
+                self.endgame()
 
     @property
     def max_damage(self) -> int:
@@ -368,3 +414,42 @@ class GameStateModel(Model):
             return 4
         elif prev_roll == 8:
             return 3
+
+    def endgame(self):
+
+        profiles = "media/profiles.json"
+
+        if self._state == GameStateEnum.LOST:
+            for player in self.players:
+
+                with open(profiles, mode='r+', encoding='utf-8') as file:
+                    temp = json.load(file)
+                    file.seek(0)
+                    file.truncate()
+                    for user in temp:
+                        if user['_nickname'] == player.nickname:
+                            losses = user['_losses']
+                            user['_losses'] = losses + 1
+                    json.dump(temp, file)
+                player.status = PlayerStatusEnum.NOT_READY
+
+            EventQueue.block()
+
+            EventQueue.post(CustomEvent(ChangeSceneEnum.LOSESCENE))
+
+        else:
+            for player in self.players:
+
+                with open(profiles, mode='r+', encoding='utf-8') as file:
+                    temp = json.load(file)
+                    file.seek(0)
+                    file.truncate()
+                    for user in temp:
+                        if user['_nickname'] == player.nickname:
+                            wins = user['_wins']
+                            user['_wins'] = wins + 1
+                    json.dump(temp, file)
+                player.status = PlayerStatusEnum.NOT_READY
+
+            EventQueue.block()
+            EventQueue.post(CustomEvent(ChangeSceneEnum.WINSCENE))

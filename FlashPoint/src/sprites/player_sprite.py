@@ -2,6 +2,7 @@ import pygame
 
 from src.models.game_board.tile_model import TileModel
 from src.models.game_units.player_model import PlayerModel
+from src.models.game_units.victim_model import VictimModel
 from src.sprites.grid_sprite import GridSprite
 
 from src.UIComponents.file_importer import FileImporter
@@ -19,6 +20,9 @@ class PlayerSprite(pygame.sprite.Sprite, PlayerObserver):
     def player_carry_changed(self, carry):
         pass
 
+    def player_leading_victim_changed(self, leading_victim):
+        pass
+
     def __init__(self, current_player: PlayerModel, tile_model: TileModel, grid: GridSprite):
         super().__init__()
         self.grid = grid
@@ -27,7 +31,11 @@ class PlayerSprite(pygame.sprite.Sprite, PlayerObserver):
         self.rect = self.tile_sprite.rect
         self.associated_player = current_player
         self.associated_player.add_observer(self)
-        self.associated_png = self._associate_image(self.associated_player.color)
+        if self.associated_player.role == PlayerRoleEnum.DOGE:
+            self.associated_png = 'media/all_markers/DogePlayer.png'
+        else:
+            self.associated_png = self._associate_image(self.associated_player.color)
+
         self.image = FileImporter.import_image(self.associated_png)
 
     def _associate_image(self, color: Color):
@@ -61,3 +69,12 @@ class PlayerSprite(pygame.sprite.Sprite, PlayerObserver):
 
     def choose_starting_location(self):
         pass
+
+    def player_role_changed(self, role: PlayerRoleEnum):
+
+        if self.associated_player.role == PlayerRoleEnum.DOGE:
+            self.associated_png = 'media/all_markers/DogePlayer.png'
+        else:
+            self.associated_png = self._associate_image(self.associated_player.color)
+
+        self.image = FileImporter.import_image(self.associated_png)

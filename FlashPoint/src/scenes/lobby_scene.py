@@ -1,3 +1,5 @@
+from typing import Optional, List
+
 import pygame
 
 import src.constants.color as Color
@@ -46,10 +48,12 @@ class LobbyScene(GameStateObserver):
             self.isReady = True
             self.start_button.on_click(self.start_game)
             self.start_button.disable()
+            if self._game.rules == GameKindEnum.EXPERIENCED and self._current_player.role == PlayerRoleEnum.FAMILY:
+                self._current_player.status = PlayerStatusEnum.NOT_READY
         else:
             self._current_player.status = PlayerStatusEnum.NOT_READY
             self.buttonReady.on_click(self.set_ready)
-        self.buttonBack.on_click(self.go_back)
+        self.buttonBack.on_click(LobbyScene.go_back)
 
     @staticmethod
     def go_back():
@@ -61,6 +65,10 @@ class LobbyScene(GameStateObserver):
         game = GameStateModel.instance()
         players_ready = len([player for player in game.players if player.status == PlayerStatusEnum.READY])
 
+        if not self._game.rules == GameKindEnum.FAMILY:
+            if any(player.role == PlayerRoleEnum.FAMILY for player in game.players):
+                return
+
         if not players_ready == game.max_players:
             self.not_enough_players_ready_prompt()
             return
@@ -68,25 +76,43 @@ class LobbyScene(GameStateObserver):
 
         if Networking.get_instance().is_host:
             # Kill the broadcast
+            for box in self.player_boxes:
+                box.delete_class()
             Networking.get_instance().stop_broadcast.set()
             Networking.get_instance().send_to_all_client(StartGameEvent())
 
     def set_ready(self):
         """Set the status of the current player to ready."""
         if not self.isReady:
-            self.isReady = True
-            self.buttonReady.change_color(Color.STANDARDBTN)
-            self._current_player.status = PlayerStatusEnum.READY
-            event = ReadyEvent(self._current_player, True)
+            if not (self._game.rules == GameKindEnum.FAMILY and self._current_player.role == PlayerRoleEnum.FAMILY) \
+                    or self._game.rules == GameKindEnum.FAMILY:
+                self.isReady = True
+                self.sprite_grp.remove(self.buttonReady)
+                box_size = (130, 48)
+                self.buttonReady = RectButton(1050, 575, box_size[0], box_size[1], Color.BLACK, 0,
+                                              Text(pygame.font.SysFont('Agency FB', 25), "Ready", Color.GREEN))
+                self.buttonReady.change_bg_image('media/GameHud/wood2.png')
+                self.buttonReady.add_frame('media/GameHud/frame.png')
+                self.buttonReady.on_click(self.set_ready)
+                self.sprite_grp.add(self.buttonReady)
+                self._current_player.status = PlayerStatusEnum.READY
+                event = ReadyEvent(self._current_player, True)
 
-            if self._current_player.ip == GameStateModel.instance().host.ip:
-                event.execute()
-                Networking.get_instance().send_to_all_client(event)
-            else:
-                Networking.get_instance().send_to_server(event)
+                if self._current_player.ip == GameStateModel.instance().host.ip:
+                    event.execute()
+                    Networking.get_instance().send_to_all_client(event)
+                else:
+                    Networking.get_instance().send_to_server(event)
         else:
             self.isReady = False
-            self.buttonReady.change_color(Color.GREY)
+            self.sprite_grp.remove(self.buttonReady)
+            box_size = (130, 48)
+            self.buttonReady = RectButton(1050, 575, box_size[0], box_size[1], Color.BLACK, 0,
+                                          Text(pygame.font.SysFont('Agency FB', 25), "Not Ready", Color.GREY))
+            self.buttonReady.change_bg_image('media/GameHud/wood2.png')
+            self.buttonReady.add_frame('media/GameHud/frame.png')
+            self.buttonReady.on_click(self.set_ready)
+            self.sprite_grp.add(self.buttonReady)
             self._current_player.status = PlayerStatusEnum.NOT_READY
             event = ReadyEvent(self._current_player, False)
             if self._current_player.ip == GameStateModel.instance().host.ip:
@@ -101,16 +127,16 @@ class LobbyScene(GameStateObserver):
         self.chat_box = ChatBox(self._current_player)
 
         if not reuse:
-            self._init_btn_back(20, 20, "Exit", Color.STANDARDBTN, Color.BLACK)
+            self._init_btn_back(20, 20, "Exit", Color.STANDARDBTN, Color.GREEN2)
 
             if self._current_player.ip == GameStateModel.instance().host.ip:
                 self._init_start_game_button()
             else:
                 # Ready button is grey at first
-                self._init_ready(1050, 575, "Ready", Color.GREY, Color.BLACK)
+                self._init_ready(1050, 575, "Not Ready", Color.GREY, Color.BLACK)
 
             if not self._game.rules == GameKindEnum.FAMILY :
-                self._init_selec_char(1050, 475, "Select Character", Color.STANDARDBTN, Color.BLACK)
+                self._init_selec_char(1050, 475, "Select Character", Color.STANDARDBTN, Color.GREEN2)
         else:
             if not self._game.rules == GameKindEnum.FAMILY:
                 self.sprite_grp.add(self.buttonSelChar)
@@ -125,7 +151,9 @@ class LobbyScene(GameStateObserver):
         """Button for starting the game once all players have clicked ready."""
         box_size = (130, 48)
         self.start_button = RectButton(1050, 575, box_size[0], box_size[1], Color.GREY, 0,
-                                       Text(pygame.font.SysFont('Agency FB', 20), "Start", Color.BLACK))
+                                       Text(pygame.font.SysFont('Agency FB', 25), "Start", Color.RED))
+        self.start_button.change_bg_image('media/GameHud/wood2.png')
+        self.start_button.add_frame('media/GameHud/frame.png')
         self.sprite_grp.add(self.start_button)
 
     def _init_background(self):
@@ -172,27 +200,33 @@ class LobbyScene(GameStateObserver):
         box_size = (position[2], position[3])
 
         user_box = RectLabel(position[0], position[1], box_size[0], box_size[1], color, 0,
-                             Text(pygame.font.SysFont('Arial', 20), text, (0, 255, 0, 0)))
+                             Text(pygame.font.SysFont('Agency FB', 20), text, (0, 255, 0, 0)))
         return user_box
 
     def _init_selec_char(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
-        box_size = (130, 48)
+        box_size = (170, 48)
         self.buttonSelChar = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
-                                        Text(pygame.font.SysFont('Arial', 20), text, color_text))
+                                        Text(pygame.font.SysFont('Agency FB', 25), text, color_text))
+        self.buttonSelChar.change_bg_image('media/GameHud/wood2.png')
+        self.buttonSelChar.add_frame('media/GameHud/frame.png')
         self.sprite_grp.add(self.buttonSelChar)
 
     def _init_ready(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
-        box_size = (130, 48)
 
+        box_size = (130, 48)
         self.isReady = False
         self.buttonReady = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
-                                      Text(pygame.font.SysFont('Arial', 20), text, color_text))
+                                      Text(pygame.font.SysFont('Agency FB', 25), text, Color.GREY))
+        self.buttonReady.change_bg_image('media/GameHud/wood2.png')
+        self.buttonReady.add_frame('media/GameHud/frame.png')
         self.sprite_grp.add(self.buttonReady)
 
     def _init_btn_back(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
         box_size = (130, 48)
         self.buttonBack = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
-                                     Text(pygame.font.SysFont('Arial', 20), text, color_text))
+                                     Text(pygame.font.SysFont('Agency FB', 25), text, color_text))
+        self.buttonBack.change_bg_image('media/GameHud/wood2.png')
+        self.buttonBack.add_frame('media/GameHud/frame.png')
         self.sprite_grp.add(self.buttonBack)
 
     def _init_ip_addr(self):
@@ -201,8 +235,10 @@ class LobbyScene(GameStateObserver):
             label_width = 400
             label_left = (pygame.display.get_surface().get_size()[0] / 2) - (label_width / 2)
             ip_addr_label = RectLabel(label_left, 20, label_width, 50, (255, 255, 255),
-                                      txt_obj=(Text(pygame.font.SysFont('Arial', 24), ip_addr)))
-            ip_addr_label.set_transparent_background(True)
+                                      txt_obj=(Text(pygame.font.SysFont('Agency FB', 26), ip_addr,Color.GREEN2)))
+            ip_addr_label.change_bg_image('media/GameHud/wood2.png')
+            ip_addr_label.add_frame('media/GameHud/frame.png')
+            #ip_addr_label.set_transparent_background(True)
             self.sprite_grp.add(ip_addr_label)
 
     def _init_sprites(self):
@@ -250,12 +286,25 @@ class LobbyScene(GameStateObserver):
         if Networking.get_instance().is_host:
             game = GameStateModel.instance()
             players_ready = len([player for player in game.players if player.status == PlayerStatusEnum.READY])
+
             if players_ready == game.max_players:
-                self.start_button.enable()
-                self.start_button.change_color(Color.GREEN)
+                self.sprite_grp.remove(self.start_button)
+                self.start_button = RectButton(1050, 575, 130, 48, Color.RED, 0,
+                                               Text(pygame.font.SysFont('Agency FB', 25), "Start", Color.GREEN))
+                self.start_button.on_click(self.start_game)
+                self.start_button.change_bg_image('media/GameHud/wood2.png')
+                self.start_button.add_frame('media/GameHud/frame.png')
+                self.sprite_grp.add(self.start_button)
+
+                # self.start_button.txt_obj.set_color(Color.GREEN)
             else:
+                self.sprite_grp.remove(self.start_button)
+                self.start_button = RectButton(1050, 575, 130, 48, Color.GREEN, 0,
+                                               Text(pygame.font.SysFont('Agency FB', 25), "Start", Color.RED))
                 self.start_button.disable()
-                self.start_button.change_color(Color.GREY)
+                self.start_button.change_bg_image('media/GameHud/wood2.png')
+                self.start_button.add_frame('media/GameHud/frame.png')
+                self.sprite_grp.add(self.start_button)
 
         self.chat_box.update(event_queue)
 
@@ -286,4 +335,7 @@ class LobbyScene(GameStateObserver):
         pass
 
     def player_removed(self, player: PlayerModel):
+        pass
+
+    def player_command(self, source: PlayerModel, target: PlayerModel):
         pass

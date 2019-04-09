@@ -12,16 +12,18 @@ class RemoveHazmatEvent(TurnEvent):
         super().__init__()
         self.row = row
         self.column = column
-        self.game: GameStateModel = GameStateModel.instance()
-        self.game_board = self.game.game_board
-        self.current_player = self.game.players_turn
+        game: GameStateModel = GameStateModel.instance()
+        self.current_player = game.players_turn
 
     def execute(self):
         logger.info("Executing Remove Hazmat Event")
+        self.game: GameStateModel = GameStateModel.instance()
+        self.game_board = self.game.game_board
         tile_model = self.game_board.get_tile_at(self.row, self.column)
         for model in tile_model.associated_models:
             if isinstance(model, HazmatModel):
                 tile_model.remove_associated_model(model)
+                model.set_pos(-1, -1)
                 logger.info(f"Hazmat at: ({tile_model.row}, {tile_model.column}) removed.")
                 break
 

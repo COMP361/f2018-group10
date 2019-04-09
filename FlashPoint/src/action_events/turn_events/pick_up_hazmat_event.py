@@ -10,10 +10,10 @@ logger = logging.getLogger("FlashPoint")
 
 class PickupHazmatEvent(TurnEvent):
 
-    def __init__(self, hazmat: HazmatModel):
+    def __init__(self, hazmat_row: int, hazmat_column: int):
         super().__init__()
         game: GameStateModel = GameStateModel.instance()
-        self.hazmat_tile = game.game_board.get_tile_at(hazmat.row, hazmat.column)
+        self.hazmat_tile = game.game_board.get_tile_at(hazmat_row, hazmat_column)
         for assoc_model in self.hazmat_tile.associated_models:
             if isinstance(assoc_model, HazmatModel):
                 self.hazmat = assoc_model
@@ -31,10 +31,7 @@ class PickupHazmatEvent(TurnEvent):
         :return: True if the player is carrying
                 nothing, False otherwise.
         """
-        if isinstance(self.player.carrying_victim, VictimModel) or isinstance(self.player.carrying_hazmat, HazmatModel):
-            return False
-
-        return True
+        pass
 
     def execute(self):
         logger.info("Executing Pickup Hazmat Event")

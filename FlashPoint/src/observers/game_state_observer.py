@@ -14,6 +14,7 @@ class GameStateObserver(Observer):
     @abstractmethod
     def notify_game_state(self, game_state: GameStateEnum):
         pass
+    
     @abstractmethod
     def damage_changed(self,new_damage:int):
         pass
@@ -32,4 +33,8 @@ class GameStateObserver(Observer):
 
     @abstractmethod
     def player_removed(self, player: PlayerModel):
+        pass
+
+    @abstractmethod
+    def player_command(self, source: PlayerModel, target: PlayerModel):
         pass

@@ -3,6 +3,7 @@ import logging
 import random
 from typing import List, Tuple, Dict
 
+from src.core.random_board_generator import BoardGenerator
 from src.models.game_units.engine_model import EngineModel
 from src.models.game_units.ambulance_model import AmbulanceModel
 from src.models.model import Model
@@ -16,6 +17,7 @@ from src.constants.state_enums import SpaceKindEnum, SpaceStatusEnum, POIIdentit
 from src.models.game_board.wall_model import WallModel
 from src.models.game_board.door_model import DoorModel
 from src.models.game_units.victim_model import VictimModel
+from src.models.model import Model
 
 logger = logging.getLogger("FlashPoint")
 
@@ -26,12 +28,15 @@ class GameBoardModel(Model):
     etc. This class is created inside of GameStateModel.
     """
 
-    def __init__(self, board_type: GameBoardTypeEnum):
+    def __init__(self, board_type: GameBoardTypeEnum, board_info=None):
         super().__init__()
         self._dimensions = (8, 10)
         self._ambulance_spots = []
         self._engine_spots = []
         self._board_type = board_type
+        logger.info("Game board type: {bt}".format(bt=board_type))
+
+        self._board_info = board_info
 
         self._tiles = None
         if self._board_type:
@@ -42,6 +47,34 @@ class GameBoardModel(Model):
         self._ambulance = AmbulanceModel((8, 10))
         self._engine = EngineModel((8, 10))
         self._hotspot_bank: int = 0
+        self._is_loaded = False
+
+    def notify_all_observers(self):
+        self._notify_active_poi()
+        self._notify_walls_and_tiles()
+
+    def _notify_walls_and_tiles(self):
+
+        for tile in self.tiles:
+            for obs in tile.observers:
+                obs.tile_status_changed(tile.space_status)
+
+            for edge in tile.adjacent_edge_objects.values():
+                if isinstance(edge, NullModel):
+                    continue
+
+                if isinstance(edge, WallModel):
+                    for obs in edge.observers:
+                        obs.wall_status_changed(edge.wall_status)
+                elif isinstance(edge, DoorModel):
+                    for obs in edge.observers:
+                        obs.door_status_changed(edge.door_status)
+
+    # def _notify_pois(self):
+    #     for poi in self.active_pois:
+    #         for obs in poi.observers:
+    #             obs.poi_status_changed(poi.status)
+    #             obs.poi_position_changed(poi.row, poi.column)
 
     def _notify_active_poi(self):
         for obs in self._observers:
@@ -49,6 +82,15 @@ class GameBoardModel(Model):
 
     def get_tiles(self) -> List[List[TileModel]]:
         return self._tiles
+
+    @property
+    def is_loaded(self) -> bool:
+        """Return whether this board was loaded from a file"""
+        return self._is_loaded
+
+    @is_loaded.setter
+    def is_loaded(self, loaded: bool):
+        self._is_loaded = loaded
 
     @property
     def board_type(self):
@@ -82,6 +124,9 @@ class GameBoardModel(Model):
             for column in range(len(self._tiles[row])):
                 tile_list.append(self.get_tile_at(row, column))
         return tile_list
+    @tiles.setter
+    def tiles(self, tiles):
+        self._tiles = tiles
 
     @property
     def ambulance_spots(self) -> List[Tuple[TileModel]]:
@@ -185,11 +230,12 @@ class GameBoardModel(Model):
             outside_doors_fname = "media/board_layouts/alternative_outside_door_locations.json"
             inside_walls_doors_fname = "media/board_layouts/alternative_inside_walls_doors.json"
 
-        # TODO: put in the names of the files for the random board details
-        # elif self.board_type == GameBoardTypeEnum.RANDOM:
-        #     amb_engine_parking_fname = ""
-        #     outside_doors_fname = ""
-        #     inside_walls_doors_fname = ""
+        elif self.board_type == GameBoardTypeEnum.RANDOM:
+            if not self._board_info:
+                BoardGenerator(8, 6, 1, 3).generate_inside_walls_doors()
+            amb_engine_parking_fname = "media/board_layouts/original_engine_ambulance_locations.json"
+            outside_doors_fname = "media/board_layouts/original_outside_door_locations.json"
+            inside_walls_doors_fname = "media/board_layouts/random_inside_walls_doors.json"
 
         return self._init_all_tiles_board(amb_engine_parking_fname, outside_doors_fname, inside_walls_doors_fname)
 
@@ -310,9 +356,13 @@ class GameBoardModel(Model):
         :param tiles: tiles of the board
         :return:
         """
-        with open(inside_walls_doors_file, "r") as f:
-            inner_adjacencies = json.load(f)
-
+        if not self._board_info:
+            with open(inside_walls_doors_file, "r") as f:
+                inner_adjacencies = json.load(f)
+                if self.board_type == GameBoardTypeEnum.RANDOM:
+                    self._board_info = inner_adjacencies
+        else:
+            inner_adjacencies = self._board_info
         for adjacency in inner_adjacencies:
             if adjacency['obstacle_type'] == 'wall':
                 obstacle = WallModel(adjacency['first_pair'][0], adjacency['first_pair'][1], adjacency['first_dirn'])

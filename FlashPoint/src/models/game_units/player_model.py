@@ -6,12 +6,13 @@ from src.models.game_board.null_model import NullModel
 from src.models.game_units.hazmat_model import HazmatModel
 from src.models.game_units.victim_model import VictimModel
 from src.observers.player_observer import PlayerObserver
-from src.constants.state_enums import PlayerStatusEnum, PlayerRoleEnum, GameKindEnum
+from src.constants.state_enums import PlayerStatusEnum, PlayerRoleEnum, GameKindEnum, VictimStateEnum
 from src.models.model import Model
 
 logger = logging.getLogger("FlashPoint")
 
-class PlayerModel(Model):
+
+class PlayerModel(Model, object):
 
     def __init__(self, ip: str, nickname: str):
         super().__init__()
@@ -26,10 +27,14 @@ class PlayerModel(Model):
         self._wins = 0
         self._losses = 0
         self._carrying_victim = NullModel()
+        self._leading_victim = NullModel()
         self._carrying_hazmat = NullModel()
-        self._role = PlayerRoleEnum.FAMILY
+        self._role: PlayerRoleEnum = PlayerRoleEnum.FAMILY
+        self.has_moved = False
 
     def __eq__(self, other):
+        if not isinstance(other, PlayerModel):
+            return False
         x = [other.ip == self.ip, other.nickname == self.nickname]
         return all(x)
 
@@ -40,6 +45,12 @@ class PlayerModel(Model):
         player_status = "Player status: {status}".format(status=self.status)
         player_color = "Player color: {color}\n".format(color=self.color)
         return '\n'.join([player_pos, player_ap, player_carrying_victim, player_status, player_color])
+
+    def _notify_all_observers(self):
+        self._notify_ap()
+        self._notify_position()
+        self._notify_special_ap()
+        self._notify_status()
 
     def _notify_position(self):
         for obs in self.observers:
@@ -65,26 +76,21 @@ class PlayerModel(Model):
         for obs in self.observers:
             obs.player_losses_changed(self.losses)
 
-    def _notify_carry(self):
+    def _notify_carry(self, model):
         for obs in self.observers:
-            obs.player_carry_changed(self.carrying_victim)
+            obs.player_carry_changed(model)
 
     def _notify_role(self):
         for obs in self.observers:
             obs.player_role_changed(self.role)
 
+    def _notify_leading_victim(self):
+        for obs in self.observers:
+            obs.player_leading_victim_changed(self.leading_victim)
+
     @property
     def observers(self) -> List[PlayerObserver]:
         return self._observers
-
-    @property
-    def role(self):
-        return self._role
-
-    @role.setter
-    def role(self, new_role: PlayerRoleEnum):
-        self._role = new_role
-        self._notify_role()
 
     @property
     def row(self) -> int:
@@ -98,12 +104,15 @@ class PlayerModel(Model):
         logger.info("Player {nickname} position: ({row}, {column})".format(nickname=self.nickname, row=self.row, column=self.column))
         if isinstance(self.carrying_victim, VictimModel):
             self.carrying_victim.set_pos(row, column)
+        if isinstance(self.leading_victim, VictimModel):
+            self.leading_victim.set_pos(row, column)
+        if isinstance(self.carrying_hazmat, HazmatModel):
+            self.carrying_hazmat.set_pos(row, column)
         self._notify_position()
 
     def set_initial_ap(self, game_kind: GameKindEnum):
         """Set the initial AP and special AP for this player"""
         self.ap = 4
-
         if game_kind == GameKindEnum.EXPERIENCED:
             if self.role == PlayerRoleEnum.CAPTAIN:
                 self.special_ap = 2
@@ -117,6 +126,12 @@ class PlayerModel(Model):
 
             elif self.role == PlayerRoleEnum.RESCUE:
                 self.special_ap = 3
+
+            elif self.role == PlayerRoleEnum.DOGE:
+                self.ap = self.ap + 8
+
+            elif self.role == PlayerRoleEnum.VETERAN:
+                self.special_ap = 1
 
     @property
     def column(self) -> int:
@@ -178,6 +193,7 @@ class PlayerModel(Model):
     @ap.setter
     def ap(self, ap: int):
         self._ap = ap
+        self.has_moved = True
         logger.info("Player {nickname} AP: {ap}".format(nickname=self.nickname, ap=self.ap))
         self._notify_ap()
 
@@ -188,6 +204,7 @@ class PlayerModel(Model):
     @special_ap.setter
     def special_ap(self, special_ap: int):
         self._special_ap = special_ap
+        self.has_moved = True
         logger.info("Player {nickname} special AP: {sp_ap}".format(nickname=self.nickname, sp_ap=self.special_ap))
         self._notify_special_ap()
 
@@ -209,7 +226,21 @@ class PlayerModel(Model):
     def carrying_victim(self, victim: VictimModel):
         self._carrying_victim = victim
         logger.info("Player {nickname} carrying victim: {cv}".format(nickname=self.nickname, cv=victim))
-        self._notify_carry()
+        self._notify_carry(self.carrying_victim)
+
+    @property
+    def leading_victim(self) -> Union[VictimModel, NullModel]:
+        return self._leading_victim
+
+    @leading_victim.setter
+    def leading_victim(self, victim: VictimModel):
+        if isinstance(victim, VictimModel) and victim.state != VictimStateEnum.TREATED:
+            logger.error("Player cannot lead a victim that has not been treated! Abort!")
+            return
+
+        self._leading_victim = victim
+        logger.info("Player {nickname} leading victim: {lv}".format(nickname=self.nickname, lv=victim))
+        self._notify_leading_victim()
 
     @property
     def carrying_hazmat(self) -> Union[HazmatModel, NullModel]:
@@ -220,7 +251,7 @@ class PlayerModel(Model):
         self._carrying_hazmat = hazmat
         logger.info("Player {nickname} carrying hazmat: {h}".format(nickname=self.nickname, h=hazmat))
         # TODO: Modify notify carry to account for carrying hazmats
-        # self._notify_carry()
+        self._notify_carry(self.carrying_hazmat)
 
     @property
     def role(self) -> PlayerRoleEnum:
@@ -229,4 +260,5 @@ class PlayerModel(Model):
     @role.setter
     def role(self, player_role: PlayerRoleEnum):
         self._role = player_role
-        logger.info("Player {nickname} role: {r}".format(nickname=self.nickname, r=player_role.name))
+        logger.info("Player {nickname} role: {r}".format(nickname=self.nickname, r=player_role))
+        self._notify_role()

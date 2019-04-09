@@ -9,10 +9,10 @@ logger = logging.getLogger("FlashPoint")
 
 class DropHazmatEvent(TurnEvent):
 
-    def __init__(self, hazmat: HazmatModel):
+    def __init__(self, hazmat_row: int, hazmat_column):
         super().__init__()
         game: GameStateModel = GameStateModel.instance()
-        self.hazmat_tile = game.game_board.get_tile_at(hazmat.row, hazmat.column)
+        self.hazmat_tile = game.game_board.get_tile_at(hazmat_row, hazmat_column)
         self.player = game.players_turn
 
     # TODO: Move this code to the controller.
@@ -24,12 +24,10 @@ class DropHazmatEvent(TurnEvent):
         :return: True if player is carrying a
                 hazmat, False otherwise.
         """
-        if isinstance(self.player.carrying_hazmat, HazmatModel):
-            return True
-
-        return False
+        pass
 
     def execute(self):
         logger.info("Executing Drop Hazmat Event")
+
         self.hazmat_tile.add_associated_model(self.player.carrying_hazmat)
         self.player.carrying_hazmat = NullModel()

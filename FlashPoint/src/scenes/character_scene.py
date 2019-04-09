@@ -25,33 +25,39 @@ class CharacterScene(Scene):
         self._game = GameStateModel.instance()
 
         self.create_label(0, 0, 100, 150, 1)
-        self.create_butn_img(250, 150, 99, 150,
+        self.create_butn_img(150, 150, 99, 150,
                              "media/specialist_cards/cafs_firefighter.png", 1)
 
-        self.create_butn_img(450, 150, 100, 150,
+        self.create_butn_img(350, 150, 100, 150,
                              "media/specialist_cards/driver_operator.png", 2)
 
-        self.create_butn_img(650, 150, 100, 150,
+        self.create_butn_img(550, 150, 100, 150,
                              "media/specialist_cards/fire_captain.png", 3)
 
-        self.create_butn_img(850, 150, 99, 150,
+        self.create_butn_img(750, 150, 99, 150,
                              "media/specialist_cards/generalist.png", 4)
 
-        self.create_butn_img(250, 450, 100, 150,
+        self.create_butn_img(150, 450, 100, 150,
                              "media/specialist_cards/hazmat_technician.png", 5)
 
-        self.create_butn_img(450, 450, 99, 150,
+        self.create_butn_img(350, 450, 99, 150,
                              "media/specialist_cards/imaging_technician.png", 6)
 
-        self.create_butn_img(650, 450, 99, 150,
+        self.create_butn_img(550, 450, 99, 150,
                              "media/specialist_cards/paramedic.png", 7)
 
-        self.create_butn_img(850, 450, 98, 150,
+        self.create_butn_img(750, 450, 98, 150,
                              "media/specialist_cards/rescue_specialist.png", 8)
+
+        self.create_butn_img(950, 150, 98, 150,
+                             "media/specialist_cards/doge.png", 9)
+
+        self.create_butn_img(950, 450, 99, 150,
+                             "media/specialist_cards/veteran.png", 10)
 
         self._init_btn_back(20, 20, "Back", Color.STANDARDBTN, Color.BLACK)
 
-        self._init_btn_confirm(1050, 575, "Confirm", Color.STANDARDBTN, Color.BLACK)
+        self._init_btn_confirm(1100, 575, "Confirm", Color.STANDARDBTN, Color.BLACK)
 
         self._init_title_text()
         self.character_enum: PlayerRoleEnum = None
@@ -118,26 +124,37 @@ class CharacterScene(Scene):
         elif count == 7:
             return PlayerRoleEnum.PARAMEDIC
 
-        else:
+        elif count == 8:
             return PlayerRoleEnum.RESCUE
+
+        elif count == 9:
+            return PlayerRoleEnum.DOGE
+
+        elif count == 10:
+            return PlayerRoleEnum.VETERAN
 
     def _init_btn_back(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
         box_size = (130, 48)
         self.buttonBack = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
-                                     Text(pygame.font.SysFont('Arial', 20), text, color_text))
+                                     Text(pygame.font.SysFont('Agency FB', 25), text, Color.GREEN2))
+        self.buttonBack.change_bg_image('media/GameHud/wood2.png')
+        self.buttonBack.add_frame('media/GameHud/frame.png')
         self.sprite_grp.add(self.buttonBack)
 
     def _init_title_text(self):
         box_size = (400, 50)
         self.text_title = RectButton(400, 60, box_size[0], box_size[1], Color.BLACK, 0,
-                                     Text(pygame.font.SysFont('Arial', 35), "Character Selection", Color.WHITE))
-
+                                     Text(pygame.font.SysFont('Agency FB', 35), "Character Selection", Color.GREEN2))
+        self.text_title.change_bg_image('media/GameHud/wood2.png')
+        self.text_title.add_frame('media/GameHud/frame.png')
         self.sprite_grp.add(self.text_title)
 
     def _init_btn_confirm(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
         box_size = (130, 48)
         self.buttonConfirm = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
-                                        Text(pygame.font.SysFont('Arial', 20), text, color_text))
+                                        Text(pygame.font.SysFont('Agency FB', 25), text, Color.GREEN2))
+        self.buttonConfirm.change_bg_image('media/GameHud/wood2.png')
+        self.buttonConfirm.add_frame('media/GameHud/frame.png')
         self.sprite_grp.add(self.buttonConfirm)
 
     def create_label(self, x_pos: int, y_pos: int, width: int, height: int, count: int):
@@ -150,9 +167,13 @@ class CharacterScene(Scene):
             accept = False
 
         if not accept:
-            return RectLabel(x_pos - 15, y_pos - 15, width + 30, height + 30, Color.RED)
+            label =  RectLabel(x_pos - 15, y_pos - 15, width + 30, height + 30, Color.RED)
+            label.change_bg_image('media/GameHud/wood2.png')
+            return label
         else:
-            return RectLabel(x_pos - 15, y_pos - 15, width + 30, height + 30, Color.GREEN)
+            label =  RectLabel(x_pos - 15, y_pos - 15, width + 30, height + 30, Color.GREEN)
+            label.change_bg_image('media/GameHud/wood2.png')
+            return label
 
     def set_color(self, sprite: pygame.sprite.Sprite, i: int=0, enum:PlayerRoleEnum=None):
         accept = True
@@ -161,11 +182,14 @@ class CharacterScene(Scene):
             accept = False
         if isinstance(sprite, RectLabel):
             if accept:
-                sprite.change_color(Color.GREEN)
+                #sprite.change_color(Color.GREEN)
+                pygame.draw.rect(sprite.image, Color.GREEN, [0, 0, 130, 180], 7)
             else:
-                sprite.change_color(Color.RED)
+                #sprite.change_color(Color.RED)
+                pygame.draw.rect(sprite.image, Color.RED, [0, 0, 130, 180], 7)
             if self.character_enum == role:
-                sprite.change_color(Color.WHITE)
+                #sprite.change_color(Color.WHITE)
+                pygame.draw.rect(sprite.image, Color.WHITE, [0, 0, 130, 180], 7)
 
     def click_img(self, btn, enum: PlayerRoleEnum):
         self.character_enum = enum

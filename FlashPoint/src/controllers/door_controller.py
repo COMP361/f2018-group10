@@ -11,7 +11,7 @@ from src.models.game_board.door_model import DoorModel
 from src.sprites.door_sprite import DoorSprite
 from src.sprites.game_board import GameBoard
 from src.models.game_units.player_model import PlayerModel
-from src.constants.state_enums import GameStateEnum, DoorStatusEnum
+from src.constants.state_enums import GameStateEnum, DoorStatusEnum, PlayerRoleEnum
 from src.models.game_state_model import GameStateModel
 
 
@@ -32,12 +32,24 @@ class DoorController(object):
     def instance(cls):
         return cls._instance
 
+    @property
+    def target(self) -> PlayerModel:
+        game: GameStateModel = GameStateModel.instance()
+        source: PlayerModel = game.command[0]
+        if source and self.current_player == source:
+            return [player for player in game.players if player == game.command[1]][0]
+        return self.current_player
+
     def check(self, door_model: DoorModel) -> bool:
+        # Doge cannot open/close doors
+        if self.target.role == PlayerRoleEnum.DOGE:
+            return False
+
         valid_to_open_close = TurnEvent.has_required_AP(self.current_player.ap, 1)
         if not valid_to_open_close:
             return False
 
-        player_tile = self.board.get_tile_at(self.current_player.row, self.current_player.column)
+        player_tile = self.board.get_tile_at(self.target.row, self.target.column)
 
         if door_model not in player_tile.adjacent_edge_objects.values():
             return False

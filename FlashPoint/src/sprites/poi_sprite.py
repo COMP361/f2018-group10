@@ -16,13 +16,16 @@ class POISprite(pygame.sprite.Sprite, POIObserver):
 
     def __init__(self, poi: POIModel):
         super().__init__()
-        self.image = FileImporter.import_image("media/all_markers/poi.png")
+        self.image = FileImporter.import_image('media/all_markers/poi128.png')
+        self.small_image = FileImporter.import_image("media/all_markers/poi.png")
         self.rect = self.image.get_rect()
         self.poi_model = poi
         self.row = poi.row
         self.column = poi.column
         self.poi_model.add_observer(self)
         self.tile_sprite = GameBoard.instance().grid.grid[poi.column][poi.row]
+
+        self.counter = 80
 
     def poi_status_changed(self, status: POIStatusEnum, victim: VictimModel):
         if status == POIStatusEnum.REVEALED and victim:
@@ -40,7 +43,10 @@ class POISprite(pygame.sprite.Sprite, POIObserver):
         self.column = column
 
     def update(self, event_queue: EventQueue):
-        new_x = self.tile_sprite.rect.x+70
+        new_x = self.tile_sprite.rect.x
         new_y = self.tile_sprite.rect.y
         self.rect.x = new_x
         self.rect.y = new_y
+        self.counter -= 1
+        if self.counter <= 0:
+            self.image = self.small_image

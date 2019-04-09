@@ -1,8 +1,8 @@
 import pygame
-
+import logging as logger
 from src.UIComponents.rect_label import RectLabel
 from src.UIComponents.text import Text
-from src.constants.state_enums import PlayerRoleEnum, PlayerStatusEnum
+from src.constants.state_enums import PlayerRoleEnum, PlayerStatusEnum, GameStateEnum
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 from src.observers.player_observer import PlayerObserver
@@ -13,7 +13,7 @@ class PlayerBox(PlayerObserver):
 
     def __init__(self, text_position, background_position, username: str, player: PlayerModel, color: Color):
         super().__init__()
-        self._game = GameStateModel.instance()
+        self._game:GameStateModel = GameStateModel.instance()
         self._assoc_player = player
         self._assoc_player.add_observer(self)
         self.player_username = username
@@ -23,14 +23,22 @@ class PlayerBox(PlayerObserver):
         self.background = RectLabel(self.background_position[0], self.background_position[1],
                                     self.background_position[2],
                                     self.background_position[3],
-                                    self.get_path_from_character_enum(self._assoc_player.role))
+                                    )
+        self.background.change_bg_image('media/GameHud/wood2.png')
+        self.background.add_frame(self.get_path_from_character_enum(self._assoc_player.role))
+        self.background.add_frame('media/GameHud/frame.png')
+
+    def delete_class(self):
+        self._assoc_player.remove_observer(self)
 
     def _init_text_box(self, color: Color):
 
         box_size = (self.txt_pos[2], self.txt_pos[3])
 
         user_box = RectLabel(self.txt_pos[0], self.txt_pos[1], box_size[0], box_size[1], color, 0,
-                             Text(pygame.font.SysFont('Arial', 20), self.player_username, (0, 255, 0, 0)))
+                             Text(pygame.font.SysFont('Agency FB', 27), self.player_username, color))
+        user_box.change_bg_image('media/GameHud/wood2.png')
+        user_box.add_frame('media/GameHud/frame.png')
         return user_box
 
     def get_path_from_character_enum(self, enum: PlayerRoleEnum):
@@ -52,6 +60,10 @@ class PlayerBox(PlayerObserver):
             return "media/specialist_cards/rescue_specialist.png"
         elif enum == PlayerRoleEnum.FAMILY:
             return "media/specialist_cards/family.png"
+        elif enum == PlayerRoleEnum.DOGE:
+            return "media/specialist_cards/doge.png"
+        elif enum == PlayerRoleEnum.VETERAN:
+            return "media/specialist_cards/veteran.png"
 
     def draw(self, screen):
         self.text_box.draw(screen)
@@ -79,7 +91,13 @@ class PlayerBox(PlayerObserver):
     def player_carry_changed(self, carry):
         pass
 
+    def player_leading_victim_changed(self, leading_victim):
+        pass
+
     def player_role_changed(self, role: PlayerRoleEnum):
-        role_path = self.get_path_from_character_enum(role)
-        self.background = (RectLabel(self.background_position[0], self.background_position[1], self.background_position[2],
-                                     self.background_position[3], role_path))
+        if self._game.state == GameStateEnum.READY_TO_JOIN:
+            logger.info(f"new role: {role}")
+            role_path = self.get_path_from_character_enum(role)
+            logger.info(f"Role Path is: {role_path}")
+            self.background = (RectLabel(self.background_position[0], self.background_position[1], self.background_position[2],
+                                         self.background_position[3], role_path))
