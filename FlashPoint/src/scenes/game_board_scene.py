@@ -186,10 +186,14 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
         menu = MenuWindow([self._active_sprites, self._game_board_sprite], 500, 500, (400, 150))
 
         save_btn = RectButton(200, 150, 100, 50, Color.STANDARDBTN, 0,
-                              Text(pygame.font.SysFont('Agency FB', 20), "Save", Color.BLACK))
+                              Text(pygame.font.SysFont('Agency FB', 25), "Save", Color.GREEN2))
+        save_btn.change_bg_image('media/GameHud/wood2.png')
+        save_btn.add_frame('media/GameHud/frame.png')
 
         quit_btn = RectButton(200, 250, 100, 50, Color.STANDARDBTN, 0,
-                              Text(pygame.font.SysFont('Agency FB', 20), "Quit", Color.BLACK))
+                              Text(pygame.font.SysFont('Agency FB', 25), "Quit", Color.GREEN2))
+        quit_btn.change_bg_image('media/GameHud/wood2.png')
+        quit_btn.add_frame('media/GameHud/frame.png')
 
         back_btn = RectButton(50, 50, 50, 50, "media/GameHud/crosss.png", 0)
 
