@@ -53,13 +53,6 @@ class EndTurnAdvanceFireEvent(TurnEvent):
         else:
             self.seed = seed
 
-        # Pick random location: roll dice
-        random.seed(self.seed)
-
-        self.red_dice = GameStateModel.instance().roll_red_dice()
-        self.black_dice = GameStateModel.instance().roll_black_dice()
-        self.directions = ["North", "South", "East", "West"]
-
     def _main_phase_end_turn(self):
         # ------ AdvanceFire ------ #
         # Change state of tile depending on previous state
@@ -155,24 +148,37 @@ class EndTurnAdvanceFireEvent(TurnEvent):
             logger.info("Not all vehicles have been placed. Not moving to next game phase.")
 
     def execute(self):
-        logger.info("Executing EndTurnAdvanceFireEvent")
-
         self.game_state: GameStateModel = GameStateModel.instance()
         self.board: GameBoardModel = self.game_state.game_board
+        logger.info("Executing EndTurnAdvanceFireEvent")
+
+        # Pick random location: roll dice
+        random.seed(self.seed)
+
+        self.red_dice = GameStateModel.instance().roll_red_dice()
+        self.black_dice = GameStateModel.instance().roll_black_dice()
+        self.directions = ["North", "South", "East", "West"]
+
+        # Clear commanded list
+        self.game_state.clear_commanded_list()
+
         if self.game_state.state == GameStateEnum.MAIN_GAME:
             self._main_phase_end_turn()
 
-        elif (self.game_state.state == GameStateEnum.PLACING_PLAYERS
-              and self.game_state.all_players_have_chosen_location()):
-            self._placing_players_end_turn()
-        elif not self.game_state.all_players_have_chosen_location():
-            logger.info("Not all players have chosen starting location, not moving to next game phase.")
-            if not self.game_state.players_turn.has_pos:
-                logger.info("The player did not choose a location, not moving to next player.")
-                self.game_state._notify_player_index()
-                return
+        elif self.game_state.state == GameStateEnum.PLACING_PLAYERS:
+            if self.game_state.all_players_have_chosen_location():
+                self._placing_players_end_turn()
+            else:
+                logger.info("Not all players have chosen starting location, not moving to next game phase.")
+                if not self.game_state.players_turn.has_pos:
+                    logger.info("The player did not choose a location, not moving to next player.")
+                    self.game_state._notify_player_index()
+                    return
+
         elif self.game_state.state == GameStateEnum.PLACING_VEHICLES:
             self._placing_vehicles_end_turn()
+            self.game_state._notify_player_index()
+            return
 
         # call next player
         self.game_state.next_player()

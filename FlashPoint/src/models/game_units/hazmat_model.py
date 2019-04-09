@@ -1,7 +1,8 @@
 import logging
+from typing import List
 
 from src.models.model import Model
-
+from src.observers.hazmat_observer import HazmatObserver
 logger = logging.getLogger("FlashPoint")
 
 
@@ -27,6 +28,12 @@ class HazmatModel(Model):
         self._row = row
         self._column = column
         logger.info(self.__str__())
+        for obs in self.observers:
+            obs.hazmat_position_changed(self._row, self._column)
+
+    @property
+    def observers(self) -> List[HazmatObserver]:
+        return self._observers
 
     def __eq__(self, other):
         if isinstance(other, HazmatModel):

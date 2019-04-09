@@ -71,11 +71,14 @@ class ReplenishPOIEvent(ActionEvent):
             else:
                 try:
                     (new_poi_row, new_poi_column) = self.check_arrow_path(new_poi_row, new_poi_column)
+                    self.board.reset_tiles_visit_count()
                     new_poi.set_pos(new_poi_row, new_poi_column)
                     tile = self.board.get_tile_at(new_poi_row, new_poi_column)
                 except NoAvailableTileException:
                     should_roll = True
                     continue
+                finally:
+                    self.board.reset_tiles_visit_count()
 
             if self.game.get_players_on_tile(tile.row, tile.column):
                 if new_poi.identity == POIIdentityEnum.FALSE_ALARM:
@@ -108,12 +111,15 @@ class ReplenishPOIEvent(ActionEvent):
 
         (row_ptr, column_ptr) = self.get_next_tile(row, column)
 
-        while (row_ptr, column_ptr) != (row, column):
+        tile = self.game.game_board.get_tile_at(row_ptr, column_ptr)
+        while tile.visit_count == 0:
+            tile.visit_count += 1
             logger.info(f"Attempting to place new poi on location: {row_ptr}, {column_ptr}")
             if self.place_check_experienced(row_ptr, column_ptr):
                 return row_ptr, column_ptr
             else:
                 (row_ptr, column_ptr) = self.get_next_tile(row_ptr, column_ptr)
+                tile = self.game.game_board.get_tile_at(row_ptr, column_ptr)
 
         raise NoAvailableTileException
 
