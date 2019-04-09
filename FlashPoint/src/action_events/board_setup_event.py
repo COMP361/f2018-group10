@@ -1,4 +1,5 @@
 import random
+import time
 
 from src.action_events.action_event import ActionEvent
 from src.action_events.fire_placement_event import FirePlacementEvent
@@ -8,6 +9,7 @@ from src.action_events.set_initial_poi_experienced_event import SetInitialPOIExp
 from src.action_events.set_initial_poi_family_event import SetInitialPOIFamilyEvent
 from src.constants.state_enums import GameKindEnum
 from src.models.game_state_model import GameStateModel
+from src.sprites.game_board import GameBoard
 
 
 class BoardSetupEvent(ActionEvent):
@@ -25,6 +27,8 @@ class BoardSetupEvent(ActionEvent):
         random.seed(self.seed)
 
     def execute(self, *args, **kwargs):
+        while not GameBoard.instance():
+            time.sleep(0.1)
         FirePlacementEvent(self.seed).execute()
 
         if GameStateModel.instance().rules == GameKindEnum.EXPERIENCED:

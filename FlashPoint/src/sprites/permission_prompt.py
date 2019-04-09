@@ -17,16 +17,22 @@ class PermissionPrompt(object):
 
     def __init__(self):
         self.accept_button = RectButton(500-75, 310, 75, 50, Color.ORANGE, 0,
-                                        Text(pygame.font.SysFont('Arial', 20), "Accept", Color.WHITE))
+                                        Text(pygame.font.SysFont('Agency FB', 20), "Accept", Color.GREEN2))
+        self.accept_button.change_bg_image('media/GameHud/wood2.png')
+        self.accept_button.add_frame('media/GameHud/frame.png')
         self.deny_button = RectButton(500+300, 310, 75, 50, Color.ORANGE, 0,
-                                      Text(pygame.font.SysFont('Arial', 20), "Deny", Color.WHITE))
+                                      Text(pygame.font.SysFont('Agency FB', 20), "Deny", Color.GREEN2))
+        self.deny_button.change_bg_image('media/GameHud/wood2.png')
+        self.deny_button.add_frame('media/GameHud/frame.png')
         self.accept_button.on_click(self._accept_on_click)
         self.deny_button.on_click(self._deny_on_click)
 
         self._source = None
         self._target = None
         self.background = RectLabel(500, 300, 300, 75, Color.GREY, 0,
-                                    Text(pygame.font.SysFont('Arial', 20), "Permission?", Color.WHITE))
+                                    Text(pygame.font.SysFont('Agency FB', 20), "Permission?", Color.GREEN2))
+        self.background.change_bg_image('media/GameHud/wood2.png')
+        self.background.add_frame('media/GameHud/frame.png')
 
         self._enabled = False
 
