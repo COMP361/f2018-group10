@@ -314,7 +314,7 @@ class FireDeckGunController(Controller):
         self.max_input += 1
         board_sprite: GameBoard = GameBoard.instance()
         self.kill_all()
-        new_tile: TileModel = self._set_target_tile(black_dice)
+        new_tile: TileModel = self._set_target_tile(-1,black_dice)
 
         if self.max_input == 2:
             self.max_input = 0
