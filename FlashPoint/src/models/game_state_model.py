@@ -12,7 +12,7 @@ from src.core.event_queue import EventQueue
 from src.models.model import Model
 from src.models.game_board.game_board_model import GameBoardModel
 from src.constants.state_enums import GameKindEnum, DifficultyLevelEnum, GameStateEnum, VehicleOrientationEnum, \
-    GameBoardTypeEnum, PlayerStatusEnum
+    GameBoardTypeEnum, PlayerStatusEnum, PlayerRoleEnum
 from src.core.flashpoint_exceptions import TooManyPlayersException, InvalidGameKindException, PlayerNotFoundException
 from src.models.game_units.player_model import PlayerModel
 
@@ -128,7 +128,8 @@ class GameStateModel(Model):
     @command.setter
     def command(self, command: Tuple[PlayerModel, PlayerModel]):
         self._command = command
-        self._commanded.append(command[1])
+        if command[1].role is PlayerRoleEnum.CAFS:
+            self._commanded.append(command[1])
         self._notify_command()
 
     @property
