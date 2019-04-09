@@ -231,42 +231,48 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
 
     def update(self, event_queue: EventQueue):
         """Call the update() function of everything in this class."""
-        self._active_sprites.update(event_queue)
-        self._chat_box.update(event_queue)
-        self._player_hud_sprites.update(event_queue)
+        if not self.ignore_board():
+            self._active_sprites.update(event_queue)
+            self._chat_box.update(event_queue)
+            self._player_hud_sprites.update(event_queue)
 
         self._command_notification.update(event_queue)
 
         self._permission_prompt.update(event_queue)
         self._dodge_prompt.update(event_queue)
 
-        if not self.ignore_area():
+        if not self.ignore_area() and not self.ignore_board():
             TileInputController.update(event_queue)
             self._game_board_sprite.update(event_queue)
             ChopController.instance().update(event_queue)
             DoorController.instance().update(event_queue)
+
         if self._menu and not self._menu.is_closed:
             self._menu.update(event_queue)
 
-        for event in event_queue:
-            if event.type == CustomEventEnum.ENABLE_KNOCKDOWN_PROMPT:
-                self._knockdown_prompt.name = event.args[0]
-                self._knockdown_prompt.enabled = True
-            elif event.type == CustomEventEnum.DISABLE_KNOCKDOWN_PROMPT:
-                self._knockdown_prompt.enabled = False
-            elif event.type == CustomEventEnum.ENABLE_VICTIM_LOST_PROMPT:
-                self._victim_lost_prompt.enabled = True
-            elif event.type == CustomEventEnum.ENABLE_VICTIM_SAVED_PROMPT:
-                self._victim_saved_prompt.enabled = True
-            elif event.type == CustomEventEnum.DISABLE_VICTIM_LOST_PROMPT:
-                self._victim_lost_prompt.enabled = False
-            elif event.type == CustomEventEnum.DISABLE_VICTIM_SAVED_PROMPT:
-                self._victim_saved_prompt.enabled = False
-            elif event.type == CustomEventEnum.PERMISSION_PROMPT:
-                if event.target == self._current_player:
-                    self.display_permission_prompt(event.source, event.target)
-            elif event.type == CustomEventEnum.DODGE_PROMPT:
-                self._dodge_prompt.enabled = True
+        if not self.ignore_board():
+            for event in event_queue:
+                if event.type == CustomEventEnum.ENABLE_KNOCKDOWN_PROMPT:
+                    self._knockdown_prompt.name = event.args[0]
+                    self._knockdown_prompt.enabled = True
+                elif event.type == CustomEventEnum.DISABLE_KNOCKDOWN_PROMPT:
+                    self._knockdown_prompt.enabled = False
+                elif event.type == CustomEventEnum.ENABLE_VICTIM_LOST_PROMPT:
+                    self._victim_lost_prompt.enabled = True
+                elif event.type == CustomEventEnum.ENABLE_VICTIM_SAVED_PROMPT:
+                    self._victim_saved_prompt.enabled = True
+                elif event.type == CustomEventEnum.DISABLE_VICTIM_LOST_PROMPT:
+                    self._victim_lost_prompt.enabled = False
+                elif event.type == CustomEventEnum.DISABLE_VICTIM_SAVED_PROMPT:
+                    self._victim_saved_prompt.enabled = False
+                elif event.type == CustomEventEnum.PERMISSION_PROMPT:
+                    if event.target == self._current_player:
+                        self.display_permission_prompt(event.source, event.target)
+                elif event.type == CustomEventEnum.DODGE_PROMPT:
+                    self._dodge_prompt.enabled = True
+
+    def ignore_board(self):
+        return (self._menu and not self._menu.is_closed) or self._permission_prompt.enabled or self._dodge_prompt.enabled
 
     def ignore_area(self):
         """A region in which all inputs are ignored."""
