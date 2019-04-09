@@ -91,6 +91,7 @@ class LobbyScene(GameStateObserver):
                                               Text(pygame.font.SysFont('Agency FB', 25), "Ready", Color.GREEN))
                 self.buttonReady.change_bg_image('media/GameHud/wood2.png')
                 self.buttonReady.add_frame('media/GameHud/frame.png')
+                self.buttonReady.on_click(self.set_ready)
                 self.sprite_grp.add(self.buttonReady)
                 self._current_player.status = PlayerStatusEnum.READY
                 event = ReadyEvent(self._current_player, True)
@@ -108,6 +109,7 @@ class LobbyScene(GameStateObserver):
                                           Text(pygame.font.SysFont('Agency FB', 25), "Not Ready", Color.GREY))
             self.buttonReady.change_bg_image('media/GameHud/wood2.png')
             self.buttonReady.add_frame('media/GameHud/frame.png')
+            self.buttonReady.on_click(self.set_ready)
             self.sprite_grp.add(self.buttonReady)
             self._current_player.status = PlayerStatusEnum.NOT_READY
             event = ReadyEvent(self._current_player, False)
