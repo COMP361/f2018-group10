@@ -87,7 +87,6 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
             self._init_loaded_sprites()
         self._game._notify_player_index()
 
-
     def _init_ui_elements(self):
         """Initialize all things to be drawn on this screen."""
         self._menu = None

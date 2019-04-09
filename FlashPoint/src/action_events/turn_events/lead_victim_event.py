@@ -21,20 +21,6 @@ class LeadVictimEvent(TurnEvent):
 
         self.player: PlayerModel = game.players_turn
 
-    # TODO: Move this check code to the controller
-    def check(self) -> bool:
-        """
-        If the player is already leading
-        a victim, they cannot lead another victim.
-
-        :return: True if the player is not leading
-                a victim, False otherwise.
-        """
-        if isinstance(self.player.leading_victim, VictimModel):
-            return False
-
-        return True
-
     def execute(self):
         logger.info("Executing Lead Victim Event")
         self.player.leading_victim = self.victim
