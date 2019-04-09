@@ -106,7 +106,13 @@ class MoveEvent(TurnEvent):
     def __init__(self, dest: TileModel, moveable_tiles: List[TileModel]):
         super().__init__()
         game: GameStateModel = GameStateModel.instance()
-        self.fireman: PlayerModel = game.players_turn
+        # Check if player is commanding
+        if game.command[0] and game.players_turn == game.command[0]:
+            self.source: PlayerModel = game.command[0]
+            self.fireman: PlayerModel = game.command[1]
+        else:
+            self.source = None
+            self.fireman: PlayerModel = game.players_turn
         self.source_tile = None
         self.destination = game.game_board.get_tile_at(dest.row, dest.column)
         self.moveable_tiles = []
@@ -135,7 +141,6 @@ class MoveEvent(TurnEvent):
                 self.source_tile.least_cost = 0
             if d_tile.tile_model.row == dest.row and d_tile.tile_model.column == dest.column:
                 self.destination = d_tile
-
 
     def execute(self):
         logger.info(f"Executing MoveEvent from ({self.fireman.row}, "
@@ -345,7 +350,6 @@ class MoveEvent(TurnEvent):
         time.sleep(5)
         EventQueue.post(CustomEvent(CustomEventEnum.DISABLE_VICTIM_SAVED_PROMPT))
 
-
     def _deduct_player_points(self,tile_model:TileModel):
         """
         Deduct player points according to space status
@@ -357,19 +361,24 @@ class MoveEvent(TurnEvent):
         """
         pts_to_deduct = self._determine_cost_to_move(tile_model)
 
+        if self.source:
+            target = self.source
+        else:
+            target = self.fireman
+
         # If the fireman is a Rescue Specialist, subtract
         # from the special AP first and then from AP.
         # If any other type of fireman, just subtract from AP.
-        if self.fireman.role == PlayerRoleEnum.RESCUE:
-            while self.fireman.special_ap > 0 and pts_to_deduct > 0:
-                self.fireman.special_ap = self.fireman.special_ap - 1
+        if target.role == PlayerRoleEnum.RESCUE:
+            while target.special_ap > 0 and pts_to_deduct > 0:
+                target.special_ap = target.special_ap - 1
                 pts_to_deduct = pts_to_deduct - 1
 
             if pts_to_deduct > 0:
-                self.fireman.ap = self.fireman.ap - pts_to_deduct
+                target.ap = target.ap - pts_to_deduct
 
         else:
-            self.fireman.ap = self.fireman.ap - pts_to_deduct
+            target.ap = target.ap - pts_to_deduct
 
     def _can_go_into_fire(self) -> bool:
         """

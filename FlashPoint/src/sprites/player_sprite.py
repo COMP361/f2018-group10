@@ -2,6 +2,7 @@ import pygame
 
 from src.models.game_board.tile_model import TileModel
 from src.models.game_units.player_model import PlayerModel
+from src.models.game_units.victim_model import VictimModel
 from src.sprites.grid_sprite import GridSprite
 
 from src.UIComponents.file_importer import FileImporter

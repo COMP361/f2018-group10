@@ -16,9 +16,11 @@ from src.scenes.create_game_menu import CreateGameMenuScene
 from src.core.event_queue import EventQueue
 from src.scenes.character_scene import CharacterScene
 from src.scenes.lobby_scene import LobbyScene
+from src.constants.custom_event_enums import CustomEventEnum
 from src.constants.change_scene_enum import ChangeSceneEnum
 import src.constants.main_constants as MainConst
 from src.scenes.win_scene import WinScene
+from src.scenes.lose_scene import LoseScene
 
 logger = logging.getLogger("SManager")
 logger.setLevel(logging.INFO)
@@ -123,4 +125,3 @@ class SceneManager(object):
                 elif event.type == ChangeSceneEnum.LOSESCENE:
                     self.next(LoseScene)
                     EventQueue.unblock()
-
