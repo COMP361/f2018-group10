@@ -62,7 +62,7 @@ class TileSprite(Interactable, TileObserver):
         self.identify_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.WOOD, 0,
                                           Text(pygame.font.SysFont('Agency FB', 15), "Identify", Color.GREEN2))
         pygame.draw.rect(self.identify_button.image, Color.YELLOW, [0, 0, 100, 25], 3)
-        self.identify_button.change_bg_image('media/GameHud/wood2.png')
+    
 
         self.move_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.WOOD, 0,
                                       Text(pygame.font.SysFont('Agency FB', 15), "Move Here", Color.GREEN2))
@@ -98,7 +98,7 @@ class TileSprite(Interactable, TileObserver):
 
         pygame.draw.rect(self.stop_lead_button.image,Color.YELLOW,[0, 0, 100, 25],3)
 
-        self.drive_ambulance_here_button = RectButton(self.rect.x, self.rect.y, 100, 15, Color.WOOD, 0,
+        self.drive_ambulance_here_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.WOOD, 0,
                                                       Text(pygame.font.SysFont('Agency FB', 15), "Drive Ambulance Here",
                                                            Color.GREEN2))
 
@@ -285,81 +285,81 @@ class TileSprite(Interactable, TileObserver):
 
     def draw_menu(self, screen: pygame.Surface):
         offset = 0
-
+        inc = 30
         if self.move_button.enabled:
             self.draw_btn(self.move_button, offset, screen)
-            offset += 20
+            offset += inc
 
         if self.extinguish_button.enabled:
             self.draw_btn(self.extinguish_button, offset, screen)
-            offset += 20
+            offset += inc
 
         if self.pickup_victim_button.enabled:
             self.draw_btn(self.pickup_victim_button, offset, screen)
-            offset += 20
+            offset += inc
         elif self.drop_victim_button.enabled:
             self.draw_btn(self.drop_victim_button, offset, screen)
-            offset += 20
+            offset += inc
 
         if self.drive_ambulance_here_button.enabled:
             self.draw_btn(self.drive_ambulance_here_button, offset, screen)
-            offset += 20
+            offset += inc
 
         if self.drive_engine_here_button.enabled:
             self.draw_btn(self.drive_engine_here_button, offset, screen)
-            offset += 20
+            offset += inc
 
         if self.identify_button.enabled:
             self.draw_btn(self.identify_button, offset, screen)
-            offset += 20
+            offset += inc
 
         if self.ride_vehicle_button.enabled:
             self.draw_btn(self.ride_vehicle_button, offset, screen)
-            offset += 20
+            offset += inc
 
         if self.dismount_vehicle_button.enabled:
             self.draw_btn(self.dismount_vehicle_button, offset, screen)
-            offset += 20
+            offset += inc
 
         if self.remove_hazmat_button.enabled:
             self.draw_btn(self.remove_hazmat_button, offset, screen)
-            offset += 20
+            offset += inc
 
         if self.pickup_hazmat_button.enabled:
             self.draw_btn(self.pickup_hazmat_button, offset, screen)
-            offset += 20
+            offset += inc
 
         elif self.drop_hazmat_button.enabled:
             self.draw_btn(self.drop_hazmat_button, offset, screen)
-            offset += 20
+            offset += inc
 
         if self.resuscitate_button.enabled:
             self.draw_btn(self.resuscitate_button, offset, screen)
-            offset += 20
+            offset += inc
 
         if self.fire_deck_gun_button.enabled:
             screen.blit(self.fire_deck_gun_button.image, self.fire_deck_gun_button.rect)
             self.fire_deck_gun_button.rect.x = self.rect.x
             self.fire_deck_gun_button.rect.y = self.rect.y + offset
-            offset += 20
+            offset += inc
 
         if self.change_crew_button.enabled:
             screen.blit(self.change_crew_button.image, self.change_crew_button.rect)
             self.change_crew_button.rect.x = self.rect.x
             self.change_crew_button.rect.y = self.rect.y + offset
-            offset += 20
+            offset += inc
 
         if self.command_button.enabled:
             self.draw_btn(self.command_button, offset, screen)
-            offset += 20
+            offset += inc
 
         if self.lead_button.enabled:
             self.draw_btn(self.lead_button, offset, screen)
-            offset += 20
+            offset += inc
 
         if self.stop_lead_button.enabled:
             self.draw_btn(self.stop_lead_button, offset, screen)
-            offset += 20
+            offset += inc
 
     def draw_btn(self, button: RectButton, offset: int, screen: pygame.Surface):
         screen.blit(button.image, button.rect)
