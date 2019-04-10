@@ -62,7 +62,7 @@ class TileSprite(Interactable, TileObserver):
         self.identify_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.WOOD, 0,
                                           Text(pygame.font.SysFont('Agency FB', 15), "Identify", Color.GREEN2))
         pygame.draw.rect(self.identify_button.image, Color.YELLOW, [0, 0, 100, 25], 3)
-        self.identify_button.change_bg_image('media/GameHud/wood2.png')
+    
 
         self.move_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.WOOD, 0,
                                       Text(pygame.font.SysFont('Agency FB', 15), "Move Here", Color.GREEN2))
