@@ -342,4 +342,4 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
         # Refresh the list of players in HUD
         self._player_hud_sprites.empty()
         for i, player in enumerate(self._game.players):
-            self._player_hud_sprites.add(PlayerState(0, 30 + 64 * i, player.nickname, player.color, player))
+            self._player_hud_sprites.add(PlayerState(0, 30 + 64 * i, player.nickname, player.color, player, self._game.rules))
