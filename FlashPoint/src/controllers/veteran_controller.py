@@ -57,8 +57,8 @@ class VeteranController(Controller, PlayerObserver):
 
     def veteran_give_experience(self):
         """
-        Give 1 free AP to all the players
-        in the vicinity of the veteran.
+        Give 1 free AP to the current player
+        in the vicinity of the veteran if applicable.
 
         :return:
         """
@@ -73,18 +73,22 @@ class VeteranController(Controller, PlayerObserver):
             return
 
         veteran_vicinity = self._determine_vicinity_veteran(veteran.row, veteran.column)
-        for player in self.game.players:
-            if player == veteran:
-                continue
+        if self._current_player == veteran:
+            return
 
-            can_player_reach_vet = self._can_player_reach_veteran(player, veteran, veteran_vicinity)
-            if not can_player_reach_vet:
-                continue
+        # Player can only receive
+        # extra AP once per turn
+        if self._current_player.has_AP_from_veteran:
+            return
 
-            # Player gains an extra AP
-            # because of the Veteran
-            player.ap = player.ap + 1
-            player.received_AP_from_veteran = True
+        can_player_reach_vet = self._can_player_reach_veteran(self._current_player, veteran, veteran_vicinity)
+        if not can_player_reach_vet:
+            return
+
+        # Player gains an extra AP
+        # because of the Veteran
+        self._current_player.ap = self._current_player.ap + 1
+        self._current_player.has_AP_from_veteran = True
 
     def _determine_vicinity_veteran(self, veteran_row: int, veteran_col: int) -> List[TileModel]:
         """

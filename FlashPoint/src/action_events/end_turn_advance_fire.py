@@ -46,7 +46,7 @@ class EndTurnAdvanceFireEvent(TurnEvent):
     """
     def __init__(self, seed: int = 0):
         super().__init__()
-        self.player = GameStateModel.instance().players_turn
+        self.player: PlayerModel = GameStateModel.instance().players_turn
         self.initial_tile: TileModel = None
 
         if seed == 0:
@@ -130,6 +130,15 @@ class EndTurnAdvanceFireEvent(TurnEvent):
 
         elif self.player.role == PlayerRoleEnum.RESCUE:
             self.player.special_ap = 3
+
+        else:
+            pass
+
+        if self.player.has_AP_from_veteran:
+            if self.player.ap > 0:
+                logger.info("Taking away free AP given by Veteran to Player at ({r}, {c})".format(r=self.player.row, c=self.player.column))
+                self.player.ap = self.player.ap - 1
+            self.player.has_AP_from_veteran = False
 
     def _placing_players_end_turn(self):
         # If the last player has chosen a location, move the game into the next phase.
