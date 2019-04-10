@@ -78,5 +78,7 @@ class PermissionPrompt(object):
     def command(self, command: Tuple[PlayerModel, PlayerModel]):
         self._source = command[0]
         self._target = command[1]
-        self.background.change_text(Text(pygame.font.SysFont('Arial', 20),
-                                         f"{self._source.nickname} wants to command you", Color.WHITE))
+        self.background.change_text(Text(pygame.font.SysFont('Agency FB', 20),
+                                         f"{self._source.nickname} wants to command you", Color.GREEN2))
+        self.background.change_bg_image('media/GameHud/wood2.png')
+        self.background.add_frame('media/GameHud/frame.png')
