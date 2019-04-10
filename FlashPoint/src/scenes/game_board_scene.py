@@ -121,7 +121,7 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
         # HUD stuff
         self._active_sprites.add(TimeBar(0, 0))
         self._active_sprites.add(
-            InGameStates(250, 650, self._game.damage, self._game.victims_saved, self._game.victims_lost))
+            InGameStates(250, 650, self._game.damage, self._game.victims_lost, self._game.victims_saved))
         self._active_sprites.add(self._menu_btn)
 
     def _init_loaded_sprites(self):

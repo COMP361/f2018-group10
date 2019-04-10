@@ -15,7 +15,8 @@ from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 from src.sprites.game_board import GameBoard
 from src.sprites.tile_sprite import TileSprite
-
+import logging
+logger = logging.getLogger("FlashPoint")
 
 class CrewChangeController(Controller):
     _instance = None
@@ -182,12 +183,12 @@ class CrewChangeController(Controller):
             offset += 41
 
         if not any([player.role == PlayerRoleEnum.HAZMAT for player in players]):
-            self.driver = RectButton(1180, 0 + offset, 100, 40, Color.WOOD, 0,
+            self.hazmat = RectButton(1180, 0 + offset, 100, 40, Color.WOOD, 0,
                                      Text(pygame.font.SysFont('Agency FB', 20), "Driver/Operator", Color.GREEN2))
             pygame.draw.rect(self.driver.image, Color.YELLOW, [0, 0, 100, 40], 3)
-            self.driver.on_click(self.decide_role, tile, self.driver, PlayerRoleEnum.DRIVER)
+            self.hazmat.on_click(self.decide_role, tile, self.hazmat, PlayerRoleEnum.HAZMAT)
 
-            board_sprite.add(self.driver)
+            board_sprite.add(self.hazmat)
             offset += 41
 
     def decide_role(self, tile: TileModel, button, role: PlayerRoleEnum):
@@ -207,6 +208,7 @@ class CrewChangeController(Controller):
         if self.doge:
             self.doge.kill()
         if self.driver:
+            logger.info("Driver got killled")
             self.driver.kill()
         if self.hazmat:
             self.hazmat.kill()
