@@ -83,7 +83,6 @@ class TileSprite(Interactable, TileObserver):
                                              Text(pygame.font.SysFont('Agency FB', 15), "Leave Victim", Color.GREEN2))
         pygame.draw.rect(self.drop_victim_button.image, Color.YELLOW, [0, 0, 100, 25], 3)
 
-
         self.lead_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.WOOD, 0,
                                                Text(pygame.font.SysFont('Agency FB', 15), "Lead Victim", Color.GREEN2))
 
