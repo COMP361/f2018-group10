@@ -332,6 +332,7 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
                 if sprite.associated_player is player:
                     GameBoard.instance().remove(sprite)
                     break
+        self._notify_player_turn._end_turn()
 
     def player_command(self, source: PlayerModel, target: PlayerModel):
         self._command_notification.command = (source, target)
