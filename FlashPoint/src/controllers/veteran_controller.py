@@ -38,12 +38,12 @@ class VeteranController(Controller, PlayerObserver):
         return cls._instance
 
     def send_event(self):
-        event = VeteranGiveExperienceEvent(self._current_player)
-        if Networking.get_instance().is_host:
-            Networking.get_instance().send_to_all_client(event)
-        else:
-            Networking.get_instance().send_to_server(event)
-
+        pass
+        # event = VeteranGiveExperienceEvent(self._current_player)
+        # if Networking.get_instance().is_host:
+        #     Networking.get_instance().send_to_all_client(event)
+        # else:
+        #     Networking.get_instance().send_to_server(event)
 
     @staticmethod
     def __del__():
