@@ -38,6 +38,9 @@ class CommandPlayerController(Controller):
         if self._current_player.role != PlayerRoleEnum.CAPTAIN:
             return False
 
+        if self.game.command[0] and self.game.command[0] == self._current_player:
+            return False
+
         if not TurnEvent.has_required_AP(self._current_player.special_ap, 1):
             return False
 
