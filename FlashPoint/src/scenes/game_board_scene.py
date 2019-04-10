@@ -300,7 +300,7 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
 
         for poi in active_pois:
             if isinstance(poi, POIModel):
-                self._game_board_sprite.add(POISprite(poi))
+                self._game_board_sprite.pois.add(POISprite(poi))
             elif isinstance(poi, VictimModel):
                 victim_sprite = VictimSprite(poi.row, poi.column)
                 poi.add_observer(victim_sprite)
