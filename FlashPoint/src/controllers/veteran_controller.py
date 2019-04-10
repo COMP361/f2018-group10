@@ -58,9 +58,10 @@ class VeteranController(Controller, PlayerObserver):
     def veteran_give_experience(self):
         """
         Give 1 free AP to the CURRENT player
-        in the vicinity of the veteran if applicable.
+        in the vicinity of the Veteran if applicable.
         Give the dodge ability to ALL the players
-        in the vicinity of the veteran.
+        in the vicinity of the Veteran if applicable,
+        else take that ability away.
 
         :return:
         """

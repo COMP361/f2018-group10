@@ -275,5 +275,9 @@ class PlayerModel(Model, object):
 
     @allowed_to_dodge.setter
     def allowed_to_dodge(self, permission: bool):
+        # Doge is not allowed to dodge
+        if self.role == PlayerRoleEnum.DOGE:
+            return
+        
         self._allowed_to_dodge = permission
         logger.info("Player {nickname} allowed to dodge: {p}".format(nickname=self.nickname, p=permission))
