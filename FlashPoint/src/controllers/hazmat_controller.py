@@ -34,6 +34,9 @@ class HazmatController(Controller):
             raise Exception("HazmatController should not exist in Family Mode!")
 
         HazmatController._instance = self
+        self.drop = False
+        self.pickup = False
+        self.remove = False
 
     @classmethod
     def instance(cls):
@@ -92,16 +95,20 @@ class HazmatController(Controller):
     def send_event_and_close_menu(self, tile_model: TileModel, menu_to_close: Interactable):
         event = None
 
-        if self.run_checks(tile_model):
+        if self.run_checks(tile_model) and self.remove:
             event = RemoveHazmatEvent(tile_model.row, tile_model.column)
 
-        elif self.run_checks_pickup(tile_model):
+        elif self.run_checks_pickup(tile_model) and self.pickup:
 
             event = PickupHazmatEvent(tile_model.row, tile_model.column)
 
-        elif self.run_checks_drop(tile_model):
+        elif self.run_checks_drop(tile_model) and self.drop:
 
             event = DropHazmatEvent(tile_model.row, tile_model.column)
+
+        self.drop = False
+        self.pickup = False
+        self.remove = False
 
         if event:
             if Networking.get_instance().is_host:
@@ -117,14 +124,14 @@ class HazmatController(Controller):
         if self.run_checks(tile):
             tile_sprite.remove_hazmat_button.enable()
             tile_sprite.remove_hazmat_button.on_click\
-                (self.send_event_and_close_menu, tile, tile_sprite.remove_hazmat_button)
+                (self.remove_ev, tile, tile_sprite.remove_hazmat_button)
         else:
             tile_sprite.remove_hazmat_button.disable()
 
         if self.run_checks_pickup(tile):
             tile_sprite.pickup_hazmat_button.enable()
             tile_sprite.pickup_hazmat_button.on_click\
-                (self.send_event_and_close_menu, tile, tile_sprite.pickup_hazmat_button)
+                (self.pickup_ev, tile, tile_sprite.pickup_hazmat_button)
 
         else:
             tile_sprite.pickup_hazmat_button.disable()
@@ -132,4 +139,23 @@ class HazmatController(Controller):
         if self.run_checks_drop(tile):
             tile_sprite.drop_hazmat_button.enable()
             tile_sprite.drop_hazmat_button.on_click\
-                (self.send_event_and_close_menu, tile, tile_sprite.drop_hazmat_button)
+                (self.drop_ev, tile, tile_sprite.drop_hazmat_button)
+
+    def remove_ev(self, tile: TileModel, button):
+        self.remove = True
+        self.drop = False
+        self.pickup = False
+        self.send_event_and_close_menu(tile, button)
+
+
+    def pickup_ev(self, tile: TileModel, button):
+        self.pickup = True
+        self.remove = False
+        self.drop = False
+        self.send_event_and_close_menu(tile, button)
+
+    def drop_ev(self, tile: TileModel, button):
+        self.drop = True
+        self.remove = False
+        self.pickup = False
+        self.send_event_and_close_menu(tile, button)
