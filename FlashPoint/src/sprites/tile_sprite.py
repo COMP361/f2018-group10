@@ -98,7 +98,7 @@ class TileSprite(Interactable, TileObserver):
 
         pygame.draw.rect(self.stop_lead_button.image,Color.YELLOW,[0, 0, 100, 25],3)
 
-        self.drive_ambulance_here_button = RectButton(self.rect.x, self.rect.y, 100, 15, Color.WOOD, 0,
+        self.drive_ambulance_here_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.WOOD, 0,
                                                       Text(pygame.font.SysFont('Agency FB', 15), "Drive Ambulance Here",
                                                            Color.GREEN2))
 
@@ -356,7 +356,7 @@ class TileSprite(Interactable, TileObserver):
         if self.lead_button.enabled:
             self.draw_btn(self.lead_button, offset, screen)
             offset += inc
-            
+
         if self.stop_lead_button.enabled:
             self.draw_btn(self.stop_lead_button, offset, screen)
             offset += inc
