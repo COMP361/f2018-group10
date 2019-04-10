@@ -24,6 +24,7 @@ class GameBoard(pygame.sprite.Group):
         self.rect = self.image.get_rect()
         self.grid = GridSprite(x_coord=self.rect.left, y_coord=self.rect.top, current_player=current_player)
         self.background = FileImporter.import_image("media/backgrounds/WoodBack.jpeg")
+        self.pois = pygame.sprite.Group()
         self.top_ui = pygame.sprite.Group()
         GameBoard._instance = self
 
@@ -43,6 +44,9 @@ class GameBoard(pygame.sprite.Group):
         for sprite in self:
             if isinstance(sprite, PlayerSprite):
                 self.image.blit(sprite.image, sprite.rect)
+
+        for sprite in self.pois.sprites():
+            self.image.blit(sprite.image, sprite.rect)
 
         for sprite in itertools.chain(self.grid, self.grid.walls):
             if isinstance(sprite, RectButton) and not sprite.enabled:
