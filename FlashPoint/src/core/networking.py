@@ -430,6 +430,7 @@ class Networking:
             self._signaler = threading.Thread(target=self.send_blocking_signal)
             self._receiver = threading.Thread(target=self.receive_data_from_server)
             self._reply_queue = []
+            self._send_queue = []
 
         def connect(self, ip, port):
             super(MastermindClientUDP, self).connect(ip, port)
@@ -445,7 +446,8 @@ class Networking:
             """
             # pause_receive is irrelevant now
             # self._pause_receive.set()
-            super(MastermindClientUDP, self).send(JSONSerializer.serialize(data), compression)
+            self._send_queue.append(data)
+            # super(MastermindClientUDP, self).send(JSONSerializer.serialize(data), compression)
             # self._pause_receive.clear()
             return
 
@@ -503,15 +505,17 @@ class Networking:
             if len(self._reply_queue) > 0:
                 return self._reply_queue.pop(0)
 
-        def send_blocking_signal(self):
+        def send_blocking_signal(self, compression=True):
             """
             Informs the host of the client's existence, so that it doesn't get disconnected automatically
             :return:
             """
             while not self._stop_receive.is_set():
-                if not self._pause_blk_signal.is_set():
-                    self.send(DummyEvent())
-                    time.sleep(0.5)
+                if len(self._send_queue) > 0:
+                    super(MastermindClientUDP, self).send(JSONSerializer.serialize(self._send_queue.pop()), compression)
+                else:
+                    super(MastermindClientUDP, self).send(JSONSerializer.serialize(DummyEvent()), compression)
+                    time.sleep(1)
 
         def toggle_block_signal(self, toggle: bool):
             if toggle:
