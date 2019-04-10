@@ -4,6 +4,7 @@ import json
 from typing import Dict
 import logging
 
+from src.action_events.host_disconnect_event import HostDisconnectEvent
 from src.action_events.stop_command_event import StopCommandEvent
 from src.action_events.permission_reply_event import PermissionReplyEvent
 from src.action_events.turn_events.command_permission_event import CommandPermissionEvent
@@ -533,6 +534,8 @@ class JSONSerializer(object):
             return DummyEvent()
         elif object_type == DisconnectEvent.__name__:
             return JSONSerializer._deserialize_disconnect_event(payload)
+        elif object_type == HostDisconnectEvent.__name__:
+            return HostDisconnectEvent()
         elif object_type == ExtinguishEvent.__name__:
             return JSONSerializer._deserialize_extinguish_event(payload)
         elif object_type == NullModel.__name__:

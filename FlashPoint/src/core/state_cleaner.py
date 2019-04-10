@@ -1,3 +1,4 @@
+from src.controllers.veteran_controller import VeteranController
 from src.controllers.chop_controller import ChopController
 from src.controllers.door_controller import DoorController
 from src.controllers.tile_input_controller import TileInputController
@@ -16,3 +17,4 @@ class StateCleaner:
             TileInputController.destroy()
             ChopController._instance = None
             DoorController._instance = None
+            VeteranController._instance = None
