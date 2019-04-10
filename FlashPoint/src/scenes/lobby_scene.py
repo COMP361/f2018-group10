@@ -78,8 +78,6 @@ class LobbyScene(GameStateObserver):
             # Kill the broadcast
             for box in self.player_boxes:
                 box.delete_class()
-            Networking.get_instance().stop_broadcast.set()
-            Networking.get_instance().host.accepting_disallow()
             Networking.get_instance().send_to_all_client(StartGameEvent())
 
     def set_ready(self):
