@@ -21,7 +21,7 @@ class Main(object):
     def __init__(self):
         pygame.init()
         pygame.display.set_caption(MainConst.WINDOW_TITLE)
-        self.screen = pygame.display.set_mode(MainConst.SCREEN_RESOLUTION, flags=pygame.DOUBLEBUF)
+        self.screen = pygame.display.set_mode(MainConst.SCREEN_RESOLUTION, pygame.DOUBLEBUF)
         self.clock = pygame.time.Clock()
         SceneManager()
         EventQueue()
