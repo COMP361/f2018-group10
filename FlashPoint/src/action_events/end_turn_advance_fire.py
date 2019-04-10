@@ -552,39 +552,29 @@ class EndTurnAdvanceFireEvent(TurnEvent):
             if not player.allowed_to_dodge:
                 return False
 
-        # If it is the player's turn, they must have
-        # at least 1 AP to be able to dodge. For Rescue
-        # Specialist, they must have at least 1 AP overall
-        # (since their special AP can be used for moving).
-        if player == self.game_state.players_turn:
-            if player.role != PlayerRoleEnum.RESCUE:
-                if player.ap < 1:
-                    return False
-            else:
-                if player.ap + player.special_ap < 1:
-                    return False
+        # The player must have at least replenished AP + 1 saved AP
+        # (for Veteran) or 2 saved AP (for other roles) to be able to dodge.
 
-        # If it is not the player's turn, they must have
-        # at least replenished AP + 1 saved AP (for Veteran)
-        # or 2 saved AP (for other roles) to be able to dodge.
+        # Needs at least 1 saved AP
+        if player.role == PlayerRoleEnum.VETERAN:
+            if player.ap < 4+1:
+                return False
+
+        # All of the ones below need at least 2 saved AP
+        elif player.role in [PlayerRoleEnum.PARAMEDIC, PlayerRoleEnum.CAPTAIN, PlayerRoleEnum.IMAGING,
+                             PlayerRoleEnum.HAZMAT, PlayerRoleEnum.DRIVER, PlayerRoleEnum.RESCUE]:
+            if player.ap < 4+2:
+                return False
+
+        elif player.role == PlayerRoleEnum.CAFS:
+            if player.ap < 3+2:
+                return False
+
+        elif player.role == PlayerRoleEnum.GENERALIST:
+            if player.ap < 5+2:
+                return False
+
         else:
-            # Needs at least 1 saved AP
-            if player.role == PlayerRoleEnum.VETERAN:
-                if player.ap < 4+1:
-                    return False
-
-            # All of the ones below need at least 2 saved AP
-            elif player.role in [PlayerRoleEnum.PARAMEDIC, PlayerRoleEnum.CAPTAIN, PlayerRoleEnum.IMAGING,
-                                 PlayerRoleEnum.HAZMAT, PlayerRoleEnum.DRIVER, PlayerRoleEnum.RESCUE]:
-                if player.ap < 4+2:
-                    return False
-
-            elif player.role == PlayerRoleEnum.CAFS:
-                if player.ap < 3+2:
-                    return False
-
-            elif player.role == PlayerRoleEnum.GENERALIST:
-                if player.ap < 5+2:
-                    return False
+            pass
 
         return True
