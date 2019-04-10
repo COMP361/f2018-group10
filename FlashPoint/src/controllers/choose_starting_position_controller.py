@@ -39,8 +39,8 @@ class ChooseStartingPositionController(Controller):
         self.wait_prompt.change_bg_image('media/GameHud/wood2.png')
         self.wait_prompt.add_frame('media/GameHud/frame.png')
 
-        self.game_board_sprite.add(self.choose_prompt)
-        self.game_board_sprite.add(self.wait_prompt)
+        self.game_board_sprite.top_ui.add(self.choose_prompt)
+        self.game_board_sprite.top_ui.add(self.wait_prompt)
         ChooseStartingPositionController._instance = self
 
     @classmethod

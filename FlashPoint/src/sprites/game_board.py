@@ -24,6 +24,7 @@ class GameBoard(pygame.sprite.Group):
         self.rect = self.image.get_rect()
         self.grid = GridSprite(x_coord=self.rect.left, y_coord=self.rect.top, current_player=current_player)
         self.background = FileImporter.import_image("media/backgrounds/WoodBack.jpeg")
+        self.top_ui = pygame.sprite.Group()
         GameBoard._instance = self
 
     @classmethod
@@ -49,9 +50,15 @@ class GameBoard(pygame.sprite.Group):
             else:
                 sprite.draw_menu(self.image)
 
+        for sprite in self.top_ui.sprites():
+            self.image.blit(sprite.image, sprite.rect)
+
         screen.blit(self.image, self.rect)
 
     def update(self, event_q: EventQueue):
         self.grid.update(event_q)
         for sprite in self:
+            sprite.update(event_q)
+
+        for sprite in self.top_ui:
             sprite.update(event_q)

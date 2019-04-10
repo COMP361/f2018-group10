@@ -246,8 +246,8 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
         self._dodge_prompt.update(event_queue)
 
         if not (self.ignore_area() or self.ignore_board()):
-            TileInputController.update(event_queue)
             self._game_board_sprite.update(event_queue)
+            TileInputController.update(event_queue)
             ChopController.instance().update(event_queue)
             DoorController.instance().update(event_queue)
 

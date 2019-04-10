@@ -124,10 +124,10 @@ class VehiclePlacementController(Controller):
 
     def enable_prompts(self):
         if Networking.get_instance().is_host:
-            self.game_board_sprite.add(self.choose_engine_prompt)
-            self.game_board_sprite.add(self.choose_ambulance_prompt)
+            self.game_board_sprite.top_ui.add(self.choose_engine_prompt)
+            self.game_board_sprite.top_ui.add(self.choose_ambulance_prompt)
         else:
-            self.game_board_sprite.add(self.wait_prompt)
+            self.game_board_sprite.top_ui.add(self.wait_prompt)
 
     def update(self, event_queue: EventQueue):
         game: GameStateModel = GameStateModel.instance()

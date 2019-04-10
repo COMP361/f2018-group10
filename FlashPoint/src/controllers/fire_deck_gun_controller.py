@@ -254,7 +254,7 @@ class FireDeckGunController(Controller):
         targetTile: TileModel = self._set_target_tile()
         red_dice = targetTile.row
         black_dice = targetTile.column
-        boardSprite: GameBoard = GameBoard.instance()
+        boardSprite: GameBoard = GameBoard.instance().top_ui
         self.label = RectLabel(200, 400, 600, 200, Color.BLACK, 0, Text(pygame.font.SysFont('Agency FB',25), f"Roll: {red_dice}, {black_dice}",Color.GREEN2))
         self.label.change_bg_image('media/GameHud/wood2.png')
         self.label.add_frame('media/GameHud/frame.png')
@@ -293,7 +293,7 @@ class FireDeckGunController(Controller):
 
     def input2_process(self, tile: TileModel, red_dice: int, black_dice: int):
         self.max_input += 1
-        board_sprite: GameBoard = GameBoard.instance()
+        board_sprite: GameBoard = GameBoard.instance().top_ui
         self.kill_all()
         new_tile: TileModel = self._set_target_tile(red_dice)
         if self.max_input == 2:
@@ -323,7 +323,7 @@ class FireDeckGunController(Controller):
 
     def input3_process(self, tile: TileModel, red_dice: int, black_dice: int):
         self.max_input += 1
-        board_sprite: GameBoard = GameBoard.instance()
+        board_sprite: GameBoard = GameBoard.instance().top_ui
         self.kill_all()
         new_tile: TileModel = self._set_target_tile(-1,black_dice)
 

@@ -99,7 +99,7 @@ class CrewChangeController(Controller):
 
     def display_menu(self, tile: TileModel):
         self.kill_all()
-        board_sprite: GameBoard = GameBoard.instance()
+        board_sprite: GameBoard = GameBoard.instance().top_ui
         players = self.game.players
         offset = 70
         self.button_back = RectButton(1180, 30, 100, 40, Color.WOOD, 0,

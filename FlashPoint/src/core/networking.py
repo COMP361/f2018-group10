@@ -483,8 +483,11 @@ class Networking:
             self._pause_receive.set()
             self._stop_receive.set()
             self._pause_blk_signal.set()
-            self._receiver.join()
-            self._signaler.join()
+            # Terminates all the threads
+            if self._receiver.is_alive():
+                self._receiver.join()
+            if self._signaler.is_alive():
+                self._signaler.join()
             return super(MastermindClientUDP, self).disconnect()
 
         @staticmethod
