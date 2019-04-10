@@ -203,6 +203,7 @@ class VeteranController(Controller, PlayerObserver):
         # at most 3 spaces (all Safe spaces), the number of AP
         # that is required to reach the Veteran is at most 6
         # if carrying victim/hazmat or 3 if not carrying anything.
+        # (leading a victim doesn't change the cost for moving)
         # Setting the number of points this way will make sure
         # that the moveable tiles obtained for the player will
         # be no more than 3 spaces away from the player.
