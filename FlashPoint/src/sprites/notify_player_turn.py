@@ -15,7 +15,8 @@ from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 from src.observers.game_state_observer import GameStateObserver
 from src.UIComponents.text import Text
-
+import logging
+logger = logging.getLogger("FlashPoint")
 
 class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
 
@@ -68,6 +69,7 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
         self.enabled = (GameStateModel.instance().players[player_index] == self._current_player)
 
         if self.enabled:
+            logger.info(f"End_turn is instantiated For {Networking.Host}")
             self.your_turn = self._init_your_turn()
             self.btn = self._init_end_turn_button()
             self._active_sprites.remove(self.not_your_turn)
