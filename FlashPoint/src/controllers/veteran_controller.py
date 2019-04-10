@@ -43,22 +43,12 @@ class VeteranController(Controller, PlayerObserver):
     def instance(cls):
         return cls._instance
 
-<<<<<<< HEAD
-    def send_event(self):
-        pass
-        # event = VeteranGiveExperienceEvent(self._current_player)
-        # if Networking.get_instance().is_host:
-        #     Networking.get_instance().send_to_all_client(event)
-        # else:
-        #     Networking.get_instance().send_to_server(event)
-=======
     # def _disable_all_menus(self):
     #     grid = self.game_board_sprite.grid.grid
     #     for column in range(len(grid)):
     #         for row in range(len(grid[column])):
     #             tile = grid[column][row]
     #             tile.disable_all()
->>>>>>> parent of f4b5187... Possible fix for veteran give experience
 
     @staticmethod
     def __del__():
