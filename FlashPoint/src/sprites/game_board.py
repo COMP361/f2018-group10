@@ -1,3 +1,5 @@
+import itertools
+
 import pygame
 
 import src.constants.main_constants as MainConst
@@ -41,12 +43,7 @@ class GameBoard(pygame.sprite.Group):
             if isinstance(sprite, PlayerSprite):
                 self.image.blit(sprite.image, sprite.rect)
 
-        for sprite in self.grid:
-            if isinstance(sprite, RectButton) and not sprite.enabled:
-                pass
-            else:
-                sprite.draw_menu(self.image)
-        for sprite in self.grid.walls:
+        for sprite in itertools.chain(self.grid, self.grid.walls):
             if isinstance(sprite, RectButton) and not sprite.enabled:
                 pass
             else:
