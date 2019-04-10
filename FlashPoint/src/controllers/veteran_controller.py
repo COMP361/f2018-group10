@@ -4,6 +4,7 @@ from src.UIComponents.interactable import Interactable
 from src.action_events.veteran_give_experience_event import VeteranGiveExperienceEvent
 from src.constants.state_enums import PlayerRoleEnum, PlayerStatusEnum
 from src.controllers.controller import Controller
+from src.core.networking import Networking
 from src.models.game_board.tile_model import TileModel
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
