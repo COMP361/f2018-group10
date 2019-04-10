@@ -3,17 +3,19 @@ from typing import List
 import src.constants.color as Color
 from src.UIComponents.interactable import Interactable
 from src.action_events.turn_events.move_event import DijkstraTile, PriorityQueue, MoveEvent
-from src.constants.state_enums import PlayerStatusEnum, PlayerRoleEnum, WallStatusEnum
+from src.constants.state_enums import PlayerStatusEnum, PlayerRoleEnum, WallStatusEnum, VehicleOrientationEnum
 from src.controllers.controller import Controller
 from src.core.flashpoint_exceptions import TilePositionOutOfBoundsException
 from src.core.networking import Networking
 from src.models.game_board.wall_model import WallModel
 from src.models.game_units.hazmat_model import HazmatModel
+from src.models.game_units.poi_model import POIModel
 
 from src.models.game_units.victim_model import VictimModel
 from src.observers.player_observer import PlayerObserver
 from src.core.event_queue import EventQueue
 from src.models.game_board.null_model import NullModel
+from src.observers.vehicle_observer import VehicleObserver
 from src.sprites.tile_sprite import TileSprite
 from src.models.game_units.player_model import PlayerModel
 from src.constants.state_enums import DoorStatusEnum, SpaceStatusEnum, GameStateEnum
@@ -23,7 +25,16 @@ from src.models.game_state_model import GameStateModel
 from src.sprites.game_board import GameBoard
 
 
-class MoveController(PlayerObserver, Controller):
+class MoveController(VehicleObserver, PlayerObserver, Controller):
+
+    def notify_passengers(self, passengers: List[PlayerModel]):
+        self._update_moveable_tiles()
+
+    def notify_vehicle_pos(self, orientation: VehicleOrientationEnum, row: int, column: int):
+        pass
+
+    def notify_active_poi(self, active_pois: List[POIModel]):
+        pass
 
     _instance = None
 
@@ -44,7 +55,8 @@ class MoveController(PlayerObserver, Controller):
             self.current_player.row, self.current_player.column, ap)
         self.current_player.add_observer(self)
         GameStateModel.instance().game_board.reset_tiles_visit_count()
-
+        GameStateModel.instance().game_board.ambulance.add_observer(self)
+        GameStateModel.instance().game_board.engine.add_observer(self)
         MoveController._instance = self
 
     @classmethod

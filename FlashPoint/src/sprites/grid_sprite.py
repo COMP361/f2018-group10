@@ -124,7 +124,7 @@ class GridSprite(pygame.sprite.Group):
         for door in self.doors:
             door.update(event_queue)
 
-    def choose_board(self,type :GameBoardTypeEnum):
+    def choose_board(self, type :GameBoardTypeEnum):
         if type == GameBoardTypeEnum.ORIGINAL:
             str = "media/boards/board1.png"
             return str
@@ -132,6 +132,7 @@ class GridSprite(pygame.sprite.Group):
             return "media/boards/board3.png"
         elif type == GameBoardTypeEnum.ALTERNATIVE:
             str = "media/boards/board2.png"
+
             return str
 
     @property

@@ -21,7 +21,7 @@ from src.sprites.victim_lost_prompt import VictimLostPrompt
 from src.sprites.victim_saved_prompt import VictimSavedPrompt
 from src.sprites.victim_sprite import VictimSprite
 from src.models.game_units.poi_model import POIModel
-from src.observers.GameBoardObserver import GameBoardObserver
+from src.observers.game_board_observer import GameBoardObserver
 from src.observers.game_state_observer import GameStateObserver
 
 from src.controllers.chop_controller import ChopController
@@ -342,4 +342,4 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
         # Refresh the list of players in HUD
         self._player_hud_sprites.empty()
         for i, player in enumerate(self._game.players):
-            self._player_hud_sprites.add(PlayerState(0, 30 + 64 * i, player.nickname, player.color, player))
+            self._player_hud_sprites.add(PlayerState(0, 30 + 64 * i, player.nickname, player.color, player, self._game.rules))
