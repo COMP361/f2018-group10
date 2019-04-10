@@ -36,7 +36,13 @@ class VictimController(Controller):
 
     def check_lead(self, tile_model: TileModel) -> bool:
         """If there is a treated victim on this tile and the player is not leading a victim"""
+        if self._current_player != GameStateModel.instance().players_turn:
+            return False
+
         if self._current_player.role == PlayerRoleEnum.DOGE:
+            return False
+
+        if self._current_player.row != tile_model.row or self._current_player.column != tile_model.column:
             return False
 
         for model in tile_model.associated_models:

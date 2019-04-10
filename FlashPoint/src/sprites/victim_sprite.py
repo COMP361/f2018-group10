@@ -8,6 +8,7 @@ import logging
 
 logger = logging.getLogger("FlashPoint")
 
+
 class VictimSprite(pygame.sprite.Sprite, VictimObserver):
 
     """Visual representation of a Victim."""
@@ -23,14 +24,12 @@ class VictimSprite(pygame.sprite.Sprite, VictimObserver):
 
     def victim_state_changed(self, state: VictimStateEnum):
         if state == VictimStateEnum.LOST:
-            # TODO: Maybe make lost victims show up on the side
             self.kill()
         elif state == VictimStateEnum.RESCUED:
-            # TODO: Maybe put lost victims show up on the side
             self.kill()
         elif state == VictimStateEnum.TREATED:
             treat = FileImporter.import_image("media/all_markers/treated.png")
-            self.image.blit(treat,(0,0))
+            self.image.blit(treat, (0,0))
 
     def victim_position_changed(self, row: int, column: int):
         self.tile_sprite = GameBoard.instance().grid.grid[column][row]
