@@ -462,29 +462,15 @@ class EndTurnAdvanceFireEvent(TurnEvent):
             KnockDownEvent(player.ip).execute()
             return
 
-        if player.role not in [PlayerRoleEnum.VETERAN, PlayerRoleEnum.DOGE]:
-            pass
-
-        # If the player is a Veteran:
-        # 1. If it is their turn, they must have
-        # at least 1 AP to be able to dodge.
-        # 2. If it is not their turn, they must have
-        # at least 5 AP (so that they have 1 saved AP
-        # from the previous turn) to be able to dodge.
-        if player.role == PlayerRoleEnum.VETERAN:
-            if player == self.game_state.players_turn:
-                if player.ap < 1:
-                    return False
-            else:
-                if player.ap < 5:
-                    return False
+        if not self._valid_to_dodge(player):
+            return
 
         player_tile = self.game_state.game_board.get_tile_at(player.row, player.column)
         possible_dodge_target = NullModel()
         for dirn, nb_tile in player_tile.adjacent_tiles.items():
             if isinstance(nb_tile, TileModel):
-                has_obstacle = nb_tile.has_obstacle_in_direction(dirn)
-                obstacle = nb_tile.get_obstacle_in_direction(dirn)
+                has_obstacle = player_tile.has_obstacle_in_direction(dirn)
+                obstacle = player_tile.get_obstacle_in_direction(dirn)
                 is_open_door = isinstance(obstacle, DoorModel) and obstacle.door_status == DoorStatusEnum.OPEN
                 if not has_obstacle or is_open_door:
                     if nb_tile.space_status != SpaceStatusEnum.FIRE:
@@ -517,7 +503,12 @@ class EndTurnAdvanceFireEvent(TurnEvent):
 
         self._log_player_dodge(3, player)
         player.set_pos(possible_dodge_target.row, possible_dodge_target.column)
-        player.ap = player.ap - 1
+        # Costs 1 AP for Veteran to dodge
+        # and 2 AP for the rest of the roles
+        if player.role == PlayerRoleEnum.VETERAN:
+            player.ap = player.ap - 1
+        else:
+            player.ap = player.ap - 2
 
     def _log_player_dodge(self, status: int, player: PlayerModel, model = None, tile: TileModel = None):
         """
@@ -544,3 +535,56 @@ class EndTurnAdvanceFireEvent(TurnEvent):
             logger.info("Player at ({row}, {col}) is able to dodge".format(row=r, col=c))
 
         return
+
+    def _valid_to_dodge(self, player: PlayerModel) -> bool:
+        """
+        Determines whether the player can dodge
+        based on their role, saved AP and
+        permission to dodge.
+
+        :param player: player who is trying to dodge
+        :return: True if they have enough AP to dodge, False otherwise.
+        """
+        # Only the Veteran is allowed to dodge at
+        # all times. The rest of the roles can only
+        # dodge when they are in the vicinity of the Veteran.
+        if player.role != PlayerRoleEnum.VETERAN:
+            if not player.allowed_to_dodge:
+                return False
+
+        # If it is the player's turn, they must have
+        # at least 1 AP to be able to dodge. For Rescue
+        # Specialist, they must have at least 1 AP overall
+        # (since their special AP can be used for moving).
+        if player == self.game_state.players_turn:
+            if player.role != PlayerRoleEnum.RESCUE:
+                if player.ap < 1:
+                    return False
+            else:
+                if player.ap + player.special_ap < 1:
+                    return False
+
+        # If it is not the player's turn, they must have
+        # at least replenished AP + 1 saved AP (for Veteran)
+        # or 2 saved AP (for other roles) to be able to dodge.
+        else:
+            # Needs at least 1 saved AP
+            if player.role == PlayerRoleEnum.VETERAN:
+                if player.ap < 4+1:
+                    return False
+
+            # All of the ones below need at least 2 saved AP
+            elif player.role in [PlayerRoleEnum.PARAMEDIC, PlayerRoleEnum.CAPTAIN, PlayerRoleEnum.IMAGING,
+                                 PlayerRoleEnum.HAZMAT, PlayerRoleEnum.DRIVER, PlayerRoleEnum.RESCUE]:
+                if player.ap < 4+2:
+                    return False
+
+            elif player.role == PlayerRoleEnum.CAFS:
+                if player.ap < 3+2:
+                    return False
+
+            elif player.role == PlayerRoleEnum.GENERALIST:
+                if player.ap < 5+2:
+                    return False
+
+        return True
