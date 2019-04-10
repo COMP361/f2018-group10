@@ -52,6 +52,8 @@ class HazmatController(Controller):
 
     def run_checks_pickup(self, tile_model: TileModel):
         # Doge cannot pick up a hazmat
+        if not self._current_player == GameStateModel.instance().players_turn:
+            return False
         if self._current_player.role == PlayerRoleEnum.DOGE:
             return False
 
