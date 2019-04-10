@@ -443,7 +443,8 @@ class EndTurnAdvanceFireEvent(TurnEvent):
         :return:
         """
         logger.info("Attempting to dodge...")
-        if player.role != PlayerRoleEnum.VETERAN:
+        # Doge cannot dodge
+        if player.role == PlayerRoleEnum.DOGE:
             self._log_player_dodge(1, player)
             KnockDownEvent(player.ip).execute()
             return
