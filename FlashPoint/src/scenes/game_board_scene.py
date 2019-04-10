@@ -237,6 +237,8 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
             self._player_hud_sprites.update(event_queue)
 
         self._command_notification.update(event_queue)
+        self._permission_prompt.update(event_queue)
+        self._dodge_prompt.update(event_queue)
 
         if not self.ignore_area() and not self.ignore_board():
             TileInputController.update(event_queue)
@@ -246,9 +248,6 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
 
         if self._menu and not self._menu.is_closed:
             self._menu.update(event_queue)
-
-        self._permission_prompt.update(event_queue)
-        self._dodge_prompt.update(event_queue)
 
         for event in event_queue:
             if event.type == CustomEventEnum.ENABLE_KNOCKDOWN_PROMPT:

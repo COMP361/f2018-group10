@@ -73,8 +73,6 @@ class MenuWindow(object):
 
     #def remove_from_disable(self,component):
 
-
-
     def close(self):
         """Reenable all buttons under this window, and delete this object."""
         for group in self._buttons_to_disable:
