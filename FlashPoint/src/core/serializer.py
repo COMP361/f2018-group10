@@ -486,7 +486,7 @@ class JSONSerializer(object):
     @staticmethod
     def _deserialize_veteran_give_experience_event(payload: Dict) -> VeteranGiveExperienceEvent:
         player: PlayerModel = JSONSerializer._deserialize_player(payload['c_player'])
-        return VeteranGiveExperienceEvent(player)
+        return VeteranGiveExperienceEvent(player, payload['player_booleans'])
 
     @staticmethod
     def deserialize(payload: Dict) -> object:
