@@ -87,7 +87,7 @@ class Networking:
             :return:
             """
             # We use UDP to broadcast the host
-            self.host = Networking.Host(1, 2, 5)
+            self.host = Networking.Host(5, 5, 10)
 
             """
             # find unused ip address
