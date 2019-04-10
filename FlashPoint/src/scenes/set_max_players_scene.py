@@ -1,6 +1,7 @@
 import pygame
 
 import src.constants.color as Color
+from src.core.networking import Networking
 from src.constants.change_scene_enum import ChangeSceneEnum
 from src.core.custom_event import CustomEvent
 from src.core.event_queue import EventQueue
@@ -107,6 +108,7 @@ class SetMaxPlayers(object):
     @staticmethod
     def set_and_continue(desired_players: int):
         GameStateModel.instance().max_players = desired_players
+        Networking.get_instance().create_host()
         EventQueue.post(CustomEvent(ChangeSceneEnum.LOBBYSCENE))
 
     def draw(self, screen):

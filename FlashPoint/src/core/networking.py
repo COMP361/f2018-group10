@@ -65,18 +65,17 @@ class Networking:
         return getattr(self.__instance, name)
 
     class NetworkingInner:
-        TIMEOUT_CONNECT = 5
-        TIMEOUT_RECEIVE = 5
-
-        stop_broadcast = threading.Event()
-        stop_listen = threading.Event()
-
         def __init__(self):
             self.host = None
             self.client = None
             self.game = None
+            self.stop_broadcast = threading.Event()
+            self.stop_listen = threading.Event()
             self.stop_broadcast.set()
             self.server_reply = None
+
+            self.TIMEOUT_CONNECT = 5
+            self.TIMEOUT_RECEIVE = 5
 
         def create_host(self, port=20298):
             """
@@ -116,12 +115,12 @@ class Networking:
                 self.host.accepting_allow()
 
                 # Clear the broadcast blocker
-                self.stop_broadcast.clear()
-                broadcaster = threading.Thread(target=self.broadcast_game, args=(None, self.stop_broadcast))
-                broadcaster.start()
+                # self.stop_broadcast.clear()
+                # broadcaster = threading.Thread(target=self.broadcast_game, args=(None, self.stop_broadcast))
+                # broadcaster.start()
 
                 # The host also acts as a client
-                self.join_host(client_ip)
+                self.join_host(client_ip, 20298, GameStateModel.instance().host)
             except MastermindErrorSocket:
                 logger.error("Failed to create a host")
 
@@ -365,8 +364,8 @@ class Networking:
             :param data: Data received from the connection
             :return:
             """
-            if connection_object.address[0] == "127.0.0.1":
-                return
+            # if connection_object.address[0] == "127.0.0.1":
+            #     return
 
             data = JSONSerializer.deserialize(data)
             # If it's a dummy event, don't do anything
@@ -443,9 +442,10 @@ class Networking:
             :param compression: compression
             :return:
             """
-            self._pause_receive.set()
+            # pause_receive is irrelevant now
+            # self._pause_receive.set()
             super(MastermindClientUDP, self).send(JSONSerializer.serialize(data), compression)
-            self._pause_receive.clear()
+            # self._pause_receive.clear()
             return
 
         def receive_data_from_server(self):
@@ -454,22 +454,24 @@ class Networking:
             :return:
             """
             while not self._stop_receive.is_set():
-                if not self._pause_receive.is_set():
-                    try:
-                        _server_reply = self.receive(False)
-                        if _server_reply:
-                            self._reply_queue.append(_server_reply)
-                            self.callback_client_receive(_server_reply)
-                    except MastermindErrorClient:
-                        logger.error("Mastermind Error:")
-                        info = sys.exc_info()
-                        traceback.print_exception(*info)
-                        self.callback_disconnect()
-                    except OSError:
-                        logger.warning("OS ERROR, disconnecting client.")
-                        info = sys.exc_info()
-                        traceback.print_exception(*info)
-                        self.callback_disconnect()
+                # seems irrelevant now
+                # if not self._pause_receive.is_set():
+                try:
+                    # We are doing handshaking, so this is fine
+                    _server_reply = self.receive(True)
+                    if _server_reply:
+                        self._reply_queue.append(_server_reply)
+                        self.callback_client_receive(_server_reply)
+                except MastermindErrorClient:
+                    logger.error("Mastermind Error:")
+                    info = sys.exc_info()
+                    traceback.print_exception(*info)
+                    self.callback_disconnect()
+                except OSError:
+                    logger.warning("OS ERROR, disconnecting client.")
+                    info = sys.exc_info()
+                    traceback.print_exception(*info)
+                    self.callback_disconnect()
 
         def disconnect(self):
             self._pause_blk_signal.set()
@@ -519,10 +521,10 @@ class Networking:
             Define callback here when client's connection to host is interrupted.
             :return:
             """
-            if Networking.get_instance().is_host:
-                logger.warning("It seems that client is not connected...")
-                Networking.get_instance().disconnect()
-                EventQueue.post(CustomEvent(ChangeSceneEnum.DISCONNECT))
+            # if Networking.get_instance().is_host:
+            logger.warning("It seems that client is not connected...")
+            Networking.get_instance().disconnect()
+            EventQueue.post(CustomEvent(ChangeSceneEnum.DISCONNECT))
 
         class SocketError(Exception):
             pass

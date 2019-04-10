@@ -5,6 +5,8 @@ import pygame
 import src.constants.color as color
 import json
 
+from src.constants.state_enums import GameBoardTypeEnum
+from src.core.networking import Networking
 from src.core.custom_event import CustomEvent
 from src.UIComponents.rect_button import RectButton
 from src.UIComponents.rect_label import RectLabel
@@ -72,6 +74,7 @@ class LoadGameScene(object):
         # Restore GameBoard
         GameStateModel.set_game(game)
         game.game_board.is_loaded = True
+        Networking.get_instance().create_host()
         EventQueue.post(CustomEvent(ChangeSceneEnum.LOBBYSCENE))
 
     def _init_btn_back(self, x_pos: int, y_pos: int, text: str, color: color, color_text: color):

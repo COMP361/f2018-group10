@@ -9,7 +9,6 @@ from src.UIComponents.rect_label import RectLabel
 from src.UIComponents.text import Text
 from src.UIComponents.scene import Scene
 from src.constants.change_scene_enum import ChangeSceneEnum
-from src.core.networking import Networking
 
 
 class HostJoinScene(Scene):
@@ -22,12 +21,7 @@ class HostJoinScene(Scene):
         self._init_btn_back(20, 20, "Back", Color.STANDARDBTN, Color.GREEN2)
         self.buttonJoin.on_click(EventQueue.post, CustomEvent(ChangeSceneEnum.JOINSCENE))
         self.buttonBack.on_click(EventQueue.post, CustomEvent(ChangeSceneEnum.STARTSCENE))
-        self.buttonHost.on_click(self.host)
-
-    @staticmethod
-    def host():
-        Networking.get_instance().create_host()
-        EventQueue.post(CustomEvent(ChangeSceneEnum.HOSTMENUSCENE))
+        self.buttonHost.on_click(EventQueue.post, CustomEvent(ChangeSceneEnum.HOSTMENUSCENE))
 
     def _init_background(self):
         box_size = (self.resolution[0], self.resolution[1])
