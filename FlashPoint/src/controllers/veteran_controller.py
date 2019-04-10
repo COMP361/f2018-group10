@@ -201,17 +201,11 @@ class VeteranController(Controller, PlayerObserver):
 
         # Since the player has to reach the Veteran by moving
         # at most 3 spaces (all Safe spaces), the number of AP
-        # that is required to reach the Veteran is at most 6
-        # if carrying victim/hazmat or 3 if not carrying anything.
+        # that is required to reach the Veteran is at most 3.
         # Setting the number of points this way will make sure
         # that the moveable tiles obtained for the player will
         # be no more than 3 spaces away from the player.
-        if isinstance(player.carrying_victim, VictimModel) or isinstance(player.carrying_hazmat, HazmatModel):
-            max_ap_allowed = 6
-        else:
-            max_ap_allowed = 3
-
-
+        max_ap_allowed = 3
         if ap > max_ap_allowed:
             return max_ap_allowed
         else:
