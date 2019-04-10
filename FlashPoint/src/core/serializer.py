@@ -90,7 +90,7 @@ class JSONSerializer(object):
                 game.add_player(player_obj)
 
         JSONSerializer.restore_game_board(game, payload['_game_board'])
-        game.players_turn = payload['_players_turn_index']
+        # game.players_turn = payload['_players_turn_index']
         game.damage = payload['_damage']
         game.max_damage = payload['_max_damage']
         game.victims_lost = payload['_victims_lost']

@@ -68,6 +68,8 @@ class LoadGameScene(object):
         game: GameStateModel = JSONSerializer.deserialize(data)
         game.host = self._current_player
         game.players = [self._current_player]
+        game.players_turn_index = 0
+
 
         # Restore GameBoard
         GameStateModel.set_game(game)
