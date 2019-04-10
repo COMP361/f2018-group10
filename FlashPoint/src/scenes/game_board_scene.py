@@ -268,7 +268,8 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
                 if event.target == self._current_player:
                     self.display_permission_prompt(event.source, event.target)
             elif event.type == CustomEventEnum.DODGE_PROMPT:
-                self._dodge_prompt.enable()
+                if event.args[0] == self._current_player:
+                    self._dodge_prompt.enable()
 
     def ignore_board(self):
         return (self._menu and not self._menu.is_closed) or self._permission_prompt.enabled or self._dodge_prompt.enabled

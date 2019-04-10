@@ -491,7 +491,7 @@ class EndTurnAdvanceFireEvent(TurnEvent):
             return False
 
         # Pause the current event and ask player to dodge:
-        EventQueue.post(CustomEvent(CustomEventEnum.DODGE_PROMPT))
+        EventQueue.post(CustomEvent(CustomEventEnum.DODGE_PROMPT, player))
         logger.info(f"Thread {threading.current_thread().getName()} going to sleep")
         # Go to sleep
         switch.pause_event.clear()
