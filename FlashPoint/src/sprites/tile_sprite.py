@@ -72,7 +72,7 @@ class TileSprite(Interactable, TileObserver):
         pygame.draw.rect(self.extinguish_button.image, Color.YELLOW, [0, 0, 100, 25], 3)
 
         self.pickup_victim_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.WOOD, 0,
-                                               Text(pygame.font.SysFont('Arial', 15), "Carry Victim", Color.GREEN2))
+                                               Text(pygame.font.SysFont('Agency FB', 15), "Carry Victim", Color.GREEN2))
         pygame.draw.rect(self.pickup_victim_button.image, Color.YELLOW, [0, 0, 100, 25], 3)
 
         self.drop_victim_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.WOOD, 0,
@@ -111,7 +111,7 @@ class TileSprite(Interactable, TileObserver):
         pygame.draw.rect(self.ride_vehicle_button.image, Color.YELLOW, [0, 0, 100, 25], 3)
 
         self.remove_hazmat_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.WOOD, 0,
-                                        Text(pygame.font.SysFont('Agency FB', 20), "Remove Hazmat", Color.GREEN2))
+                                        Text(pygame.font.SysFont('Agency FB', 15), "Remove Hazmat", Color.GREEN2))
 
         pygame.draw.rect(self.remove_hazmat_button.image, Color.YELLOW, [0, 0, 100, 25], 3)
 
@@ -132,7 +132,7 @@ class TileSprite(Interactable, TileObserver):
         pygame.draw.rect(self.resuscitate_button.image, Color.YELLOW, [0, 0, 100, 25], 3)
 
         self.command_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.WOOD, 0,
-                                         Text(pygame.font.SysFont('Arial', 20), "Command", Color.GREEN2))
+                                         Text(pygame.font.SysFont('Agency FB', 15), "Command", Color.GREEN2))
 
         pygame.draw.rect(self.command_button.image, Color.YELLOW, [0, 0, 100, 25], 3)
 
