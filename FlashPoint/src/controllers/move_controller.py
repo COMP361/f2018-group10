@@ -25,7 +25,7 @@ from src.models.game_board.tile_model import TileModel
 from src.models.game_state_model import GameStateModel
 from src.sprites.game_board import GameBoard
 
-logger = logging.info("FlashPoint")
+logger = logging.getLogger("FlashPoint")
 
 
 class MoveController(VehicleObserver, PlayerObserver, Controller):
