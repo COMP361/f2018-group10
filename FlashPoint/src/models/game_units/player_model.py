@@ -30,7 +30,7 @@ class PlayerModel(Model, object):
         self._leading_victim = NullModel()
         self._carrying_hazmat = NullModel()
         self.has_moved = False
-        self._role = PlayerRoleEnum.FAMILY
+        self._role: PlayerRoleEnum = PlayerRoleEnum.FAMILY
         self._has_AP_from_veteran = False
         self._allowed_to_dodge = False
 

@@ -451,24 +451,25 @@ class EndTurnAdvanceFireEvent(TurnEvent):
             if tile.space_kind != SpaceKindEnum.INDOOR and tile.space_status == SpaceStatusEnum.FIRE:
                 tile.space_status = SpaceStatusEnum.SAFE
 
-    def dodge(self, player: PlayerModel):
+    def dodge(self, player: PlayerModel) -> bool:
         """
         Determines whether the player can
         dodge (out of turn) to avoid being
         knocked down and performs dodge.
+        Returns False otherwise.
 
         :param player: player that is attempting to dodge
-        :return:
+        :return: True if the player is able to dodge, False otherwise
         """
         logger.info("Attempting to dodge...")
         # Doge cannot dodge
         if player.role == PlayerRoleEnum.DOGE:
             self._log_player_dodge(1, player)
-            KnockDownEvent(player.ip).execute()
-            return
+            return False
 
         if not self._valid_to_dodge(player):
-            return
+            self._log_player_dodge(1, player)
+            return False
 
         player_tile = self.game_state.game_board.get_tile_at(player.row, player.column)
         possible_dodge_target = NullModel()
