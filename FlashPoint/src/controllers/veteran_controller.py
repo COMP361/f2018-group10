@@ -210,13 +210,13 @@ class VeteranController(Controller, PlayerObserver):
         pass
 
     def player_ap_changed(self, updated_ap: int):
-        pass
+        self.veteran_give_experience()
 
     def player_special_ap_changed(self, updated_ap: int):
-        pass
+        self.veteran_give_experience()
 
     def player_position_changed(self, row: int, column: int):
-        pass
+        self.veteran_give_experience()
 
     def player_wins_changed(self, wins: int):
         pass
@@ -225,10 +225,10 @@ class VeteranController(Controller, PlayerObserver):
         pass
 
     def player_carry_changed(self, carry):
-        pass
+        self.veteran_give_experience()
 
     def player_role_changed(self, role: PlayerRoleEnum):
-        pass
+        self.veteran_give_experience()
 
     def player_leading_victim_changed(self, leading_victim):
-        pass
+        self.veteran_give_experience()
