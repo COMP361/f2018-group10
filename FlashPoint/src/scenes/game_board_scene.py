@@ -71,6 +71,7 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
 
         # Initialize UI elements
         self._init_ui_elements()
+        self._init_menu()
 
         # Initialize controllers
         self._init_controllers()
@@ -154,6 +155,7 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
 
     def _save(self):
         """Save the current game state to the hosts machine"""
+        self._menu.close()
         if not os.path.exists(self._save_games_file):
             with open(self._save_games_file, mode="w+", encoding='utf-8') as myFile:
                 myFile.write("[]")
@@ -167,8 +169,8 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
         with open(self._save_games_file, mode='w', encoding='utf-8') as myFile:
             json.dump(temp, myFile)
 
-    @staticmethod
-    def _quit_btn_on_click():
+    def _quit_btn_on_click(self):
+        self._menu.close()
         Networking.get_instance().disconnect()
         TileInputController.__del__()
         ChopController._instance = None
@@ -182,30 +184,29 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
         btn.set_transparent_background(True)
         return btn
 
-    def _open_menu(self):
-        menu = MenuWindow([self._active_sprites, self._game_board_sprite], 500, 500, (400, 150))
+    def _init_menu(self):
+        self._menu = MenuWindow([self._active_sprites, self._game_board_sprite], 500, 500, (400, 150))
 
-        save_btn = RectButton(200, 150, 100, 50, Color.STANDARDBTN, 0,
+        save_btn = RectButton(200, 150, 100, 50, 'media/GameHud/wood2.png', 0,
                               Text(pygame.font.SysFont('Agency FB', 25), "Save", Color.GREEN2))
-        save_btn.change_bg_image('media/GameHud/wood2.png')
         save_btn.add_frame('media/GameHud/frame.png')
 
-        quit_btn = RectButton(200, 250, 100, 50, Color.STANDARDBTN, 0,
+        quit_btn = RectButton(200, 250, 100, 50, 'media/GameHud/wood2.png', 0,
                               Text(pygame.font.SysFont('Agency FB', 25), "Quit", Color.GREEN2))
-        quit_btn.change_bg_image('media/GameHud/wood2.png')
         quit_btn.add_frame('media/GameHud/frame.png')
 
         back_btn = RectButton(50, 50, 50, 50, "media/GameHud/crosss.png", 0)
 
-        back_btn.on_click(menu.close)
+        back_btn.on_click(self._menu.close)
         quit_btn.on_click(self._quit_btn_on_click)
         save_btn.on_click(self._save)
 
-        menu.add_component(back_btn)
-        menu.add_component(save_btn)
-        menu.add_component(quit_btn)
+        self._menu.add_component(back_btn)
+        self._menu.add_component(save_btn)
+        self._menu.add_component(quit_btn)
 
-        self._menu = menu
+    def _open_menu(self):
+        self._menu.open()
 
     def display_permission_prompt(self, source: PlayerModel, target: PlayerModel):
         self._permission_prompt.command = (source, target)
@@ -237,8 +238,10 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
             self._player_hud_sprites.update(event_queue)
 
         self._command_notification.update(event_queue)
+        self._permission_prompt.update(event_queue)
+        self._dodge_prompt.update(event_queue)
 
-        if not self.ignore_area() and not self.ignore_board():
+        if not (self.ignore_area() or self.ignore_board()):
             TileInputController.update(event_queue)
             self._game_board_sprite.update(event_queue)
             ChopController.instance().update(event_queue)
@@ -246,9 +249,6 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
 
         if self._menu and not self._menu.is_closed:
             self._menu.update(event_queue)
-
-        self._permission_prompt.update(event_queue)
-        self._dodge_prompt.update(event_queue)
 
         for event in event_queue:
             if event.type == CustomEventEnum.ENABLE_KNOCKDOWN_PROMPT:

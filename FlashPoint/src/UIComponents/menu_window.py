@@ -43,7 +43,6 @@ class MenuWindow(object):
         self._rect = self._image.get_rect().move(position[0], position[1])
         self._buttons_to_disable = buttons_to_disable
         self._components: pygame.sprite.Group = components if components else pygame.sprite.Group()
-        self._open()
 
     def add_component(self, component):
         component.rect.move_ip(self._rect.x, self._rect.y)
@@ -63,7 +62,7 @@ class MenuWindow(object):
     def update(self, event_queue: EventQueue):
         self._components.update(event_queue)
 
-    def _open(self):
+    def open(self):
         """Disable all buttons under this window."""
         self.is_closed = False
         for group in self._buttons_to_disable:
@@ -72,8 +71,6 @@ class MenuWindow(object):
                     button.disable()
 
     #def remove_from_disable(self,component):
-
-
 
     def close(self):
         """Reenable all buttons under this window, and delete this object."""
