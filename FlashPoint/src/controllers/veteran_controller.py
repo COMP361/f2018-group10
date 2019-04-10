@@ -8,9 +8,7 @@ from src.controllers.controller import Controller
 from src.controllers.move_controller import MoveController
 from src.models.game_board.tile_model import TileModel
 from src.models.game_state_model import GameStateModel
-from src.models.game_units.hazmat_model import HazmatModel
 from src.models.game_units.player_model import PlayerModel
-from src.models.game_units.victim_model import VictimModel
 from src.observers.player_observer import PlayerObserver
 from src.sprites.game_board import GameBoard
 from src.sprites.tile_sprite import TileSprite
@@ -31,24 +29,24 @@ class VeteranController(Controller, PlayerObserver):
         for player in GameStateModel.instance().players:
             player.add_observer(self)
 
-        self.move_cont = MoveController(current_player)
+        self.move_cont = MoveController.instance()
         self.game: GameStateModel = GameStateModel.instance()
         self.board = self.game.game_board
-        self.game.add_observer(self)
-        # Force notify observers
-        self.game.state = self.game.state
+        # self.game.add_observer(self)
+        # # Force notify observers
+        # self.game.state = self.game.state
         VeteranController._instance = self
 
     @classmethod
     def instance(cls):
         return cls._instance
 
-    def _disable_all_menus(self):
-        grid = self.game_board_sprite.grid.grid
-        for column in range(len(grid)):
-            for row in range(len(grid[column])):
-                tile = grid[column][row]
-                tile.disable_all()
+    # def _disable_all_menus(self):
+    #     grid = self.game_board_sprite.grid.grid
+    #     for column in range(len(grid)):
+    #         for row in range(len(grid[column])):
+    #             tile = grid[column][row]
+    #             tile.disable_all()
 
     @staticmethod
     def __del__():
