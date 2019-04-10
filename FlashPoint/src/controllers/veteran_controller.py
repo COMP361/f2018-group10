@@ -8,7 +8,9 @@ from src.controllers.controller import Controller
 from src.controllers.move_controller import MoveController
 from src.models.game_board.tile_model import TileModel
 from src.models.game_state_model import GameStateModel
+from src.models.game_units.hazmat_model import HazmatModel
 from src.models.game_units.player_model import PlayerModel
+from src.models.game_units.victim_model import VictimModel
 from src.observers.player_observer import PlayerObserver
 from src.sprites.game_board import GameBoard
 from src.sprites.tile_sprite import TileSprite
@@ -199,11 +201,17 @@ class VeteranController(Controller, PlayerObserver):
 
         # Since the player has to reach the Veteran by moving
         # at most 3 spaces (all Safe spaces), the number of AP
-        # that is required to reach the Veteran is at most 3.
+        # that is required to reach the Veteran is at most 6
+        # if carrying victim/hazmat or 3 if not carrying anything.
+        # (leading a victim doesn't change the cost for moving)
         # Setting the number of points this way will make sure
         # that the moveable tiles obtained for the player will
         # be no more than 3 spaces away from the player.
-        max_ap_allowed = 3
+        if isinstance(player.carrying_victim, VictimModel) or isinstance(player.carrying_hazmat, HazmatModel):
+            max_ap_allowed = 6
+        else:
+            max_ap_allowed = 3
+
         if ap > max_ap_allowed:
             return max_ap_allowed
         else:
