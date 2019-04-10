@@ -2,7 +2,7 @@ import pygame
 import logging as logger
 from src.UIComponents.rect_label import RectLabel
 from src.UIComponents.text import Text
-from src.constants.state_enums import PlayerRoleEnum, PlayerStatusEnum
+from src.constants.state_enums import PlayerRoleEnum, PlayerStatusEnum, GameStateEnum
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 from src.observers.player_observer import PlayerObserver
@@ -13,7 +13,7 @@ class PlayerBox(PlayerObserver):
 
     def __init__(self, text_position, background_position, username: str, player: PlayerModel, color: Color):
         super().__init__()
-        self._game = GameStateModel.instance()
+        self._game:GameStateModel = GameStateModel.instance()
         self._assoc_player = player
         self._assoc_player.add_observer(self)
         self.player_username = username
@@ -28,6 +28,8 @@ class PlayerBox(PlayerObserver):
         self.background.add_frame(self.get_path_from_character_enum(self._assoc_player.role))
         self.background.add_frame('media/GameHud/frame.png')
 
+    def delete_class(self):
+        self._assoc_player.remove_observer(self)
 
     def _init_text_box(self, color: Color):
 
@@ -67,6 +69,9 @@ class PlayerBox(PlayerObserver):
         self.text_box.draw(screen)
         if self.background:
             self.background.draw(screen)
+            self.background.change_bg_image('media/GameHud/wood2.png')
+            self.background.add_frame(self.get_path_from_character_enum(self._assoc_player.role))
+            self.background.add_frame('media/GameHud/frame.png')
 
     def player_status_changed(self, status: PlayerStatusEnum):
         pass
@@ -93,7 +98,9 @@ class PlayerBox(PlayerObserver):
         pass
 
     def player_role_changed(self, role: PlayerRoleEnum):
-        logger.info(f"new role: {role}")
-        role_path = self.get_path_from_character_enum(role)
-        self.background = (RectLabel(self.background_position[0], self.background_position[1], self.background_position[2],
-                                     self.background_position[3], role_path))
+        if self._game.state == GameStateEnum.READY_TO_JOIN:
+            logger.info(f"new role: {role}")
+            role_path = self.get_path_from_character_enum(role)
+            logger.info(f"Role Path is: {role_path}")
+            self.background = (RectLabel(self.background_position[0], self.background_position[1], self.background_position[2],
+                                         self.background_position[3], role_path))

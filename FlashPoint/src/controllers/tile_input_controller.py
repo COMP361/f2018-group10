@@ -1,6 +1,8 @@
 from src.controllers.command_player_controller import CommandPlayerController
 from src.controllers.controller import Controller
+from src.controllers.crew_change_controller import CrewChangeController
 from src.controllers.drive_vehicles_controller import DriveVehiclesController
+from src.controllers.fire_deck_gun_controller import FireDeckGunController
 from src.controllers.hazmat_controller import HazmatController
 from src.controllers.identify_controller import IdentifyController
 from src.controllers.resuscitate_controller import ResuscitateController
@@ -43,6 +45,8 @@ class TileInputController(GameStateObserver, Controller):
             HazmatController(current_player)
             CommandPlayerController(current_player)
             ResuscitateController(current_player)
+            CrewChangeController(current_player)
+            FireDeckGunController(current_player)
 
         GameStateModel.instance().add_observer(self)
         # Force notify observers
@@ -67,6 +71,8 @@ class TileInputController(GameStateObserver, Controller):
         HazmatController._instance = None
         CommandPlayerController._instance = None
         ResuscitateController._instance = None
+        CrewChangeController._instance = None
+        FireDeckGunController._instance = None
 
     def _disable_all_menus(self):
         grid = self.game_board_sprite.grid.grid
@@ -95,6 +101,8 @@ class TileInputController(GameStateObserver, Controller):
             HazmatController.instance().process_input(tile_sprite)
             CommandPlayerController.instance().process_input(tile_sprite)
             ResuscitateController.instance().process_input(tile_sprite)
+            CrewChangeController.instance().process_input(tile_sprite)
+            FireDeckGunController.instance().process_input(tile_sprite)
 
     def notify_player_index(self, player_index: int):
         pass
@@ -145,4 +153,5 @@ class TileInputController(GameStateObserver, Controller):
         ChooseStartingPositionController.instance().update(event_queue)
 
         if GameStateModel.instance().rules == GameKindEnum.EXPERIENCED:
+
             VehiclePlacementController.instance().update(event_queue)

@@ -7,6 +7,7 @@ from src.models.model import Model
 
 logger = logging.getLogger("FlashPoint")
 
+
 class VehicleModel(Model):
     """Base class for Ambulance and Engine.
         IMPORTANT NOTES:
@@ -36,6 +37,10 @@ class VehicleModel(Model):
         for obs in self._observers:
             obs.notify_vehicle_pos(self.orientation, self.row, self.column)
 
+    def _notify_passengers(self):
+        for obs in self._observers:
+            obs.notify_passengers(self._passengers)
+
     @property
     def row(self) -> int:
         return self._row
@@ -63,9 +68,12 @@ class VehicleModel(Model):
 
     def add_passenger(self, player: PlayerModel):
         self._passengers.append(player)
+        self._notify_passengers()
 
     def remove_passenger(self, player: PlayerModel):
         self._passengers.remove(player)
+        self._notify_passengers()
 
     def clear_passengers(self):
         self._passengers.clear()
+        self._notify_passengers()

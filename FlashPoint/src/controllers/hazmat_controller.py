@@ -17,6 +17,7 @@ from src.sprites.tile_sprite import TileSprite
 
 logger = logging.getLogger("FlashPoint")
 
+
 class HazmatController(Controller):
 
     _instance = None
@@ -51,6 +52,8 @@ class HazmatController(Controller):
 
     def run_checks_pickup(self, tile_model: TileModel):
         # Doge cannot pick up a hazmat
+        if not self._current_player == GameStateModel.instance().players_turn:
+            return False
         if self._current_player.role == PlayerRoleEnum.DOGE:
             return False
 

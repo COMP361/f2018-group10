@@ -24,7 +24,6 @@ class DodgePrompt(object):
         self.accept_button.change_bg_image('media/GameHud/wood2.png')
         self.accept_button.add_frame('media/GameHud/frame.png')
 
-
         self.deny_button = RectButton(550+200, 310, 75, 50, Color.ORANGE, 0,
                                       Text(pygame.font.SysFont('Agency FB', 25), "Deny", Color.GREEN2))
         self.deny_button.change_bg_image('media/GameHud/wood2.png')

@@ -1,6 +1,9 @@
+from typing import List
+
 import pygame
 
 from src.core.event_queue import EventQueue
+from src.models.game_units.player_model import PlayerModel
 from src.sprites.game_board import GameBoard
 from src.UIComponents.file_importer import FileImporter
 from src.constants.state_enums import VehicleOrientationEnum
@@ -9,6 +12,9 @@ from src.observers.vehicle_observer import VehicleObserver
 
 
 class EngineSprite(pygame.sprite.Sprite, VehicleObserver):
+
+    def notify_passengers(self, passengers: List[PlayerModel]):
+        pass
 
     def __init__(self, orientation: VehicleOrientationEnum, tile_sprite: TileSprite):
         super().__init__()

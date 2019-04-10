@@ -37,7 +37,8 @@ class DoorSprite(pygame.sprite.Sprite, DoorObserver):
         self._prev_x = self.tile_sprite.rect.x
         self._prev_y = self.tile_sprite.rect.y
         self.button_input = RectButton(self.tile_sprite.rect.x + 100, self.tile_sprite.rect.y + 100, 100, 25,
-                                       Color.BLACK, 0, Text(pygame.font.SysFont('Arial', 20), "Interact", Color.ORANGE))
+                                       Color.WOOD, 0, Text(pygame.font.SysFont('Agency FB', 15), "Interact", Color.GREEN2))
+        pygame.draw.rect(self.button_input.image,Color.YELLOW,[0,0,100,25],3)
         self.button_input.disable()
         self.menu_shown = False
 

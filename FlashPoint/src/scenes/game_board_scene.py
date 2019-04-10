@@ -6,6 +6,7 @@ from datetime import datetime
 from typing import List
 
 import pygame
+import logging
 
 from src.action_events.board_setup_event import BoardSetupEvent
 from src.constants.custom_event_enums import CustomEventEnum
@@ -22,7 +23,7 @@ from src.sprites.victim_lost_prompt import VictimLostPrompt
 from src.sprites.victim_saved_prompt import VictimSavedPrompt
 from src.sprites.victim_sprite import VictimSprite
 from src.models.game_units.poi_model import POIModel
-from src.observers.GameBoardObserver import GameBoardObserver
+from src.observers.game_board_observer import GameBoardObserver
 from src.observers.game_state_observer import GameStateObserver
 
 from src.controllers.chop_controller import ChopController
@@ -50,6 +51,7 @@ from src.UIComponents.text import Text
 from src.sprites.notify_player_turn import NotifyPlayerTurn
 import src.constants.color as Color
 
+logger = logging.getLogger("FlashPoint")
 
 class GameBoardScene(GameBoardObserver, GameStateObserver):
     """
@@ -72,6 +74,7 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
 
         # Initialize UI elements
         self._init_ui_elements()
+        self._init_menu()
 
         # Initialize controllers
         self._init_controllers()
@@ -122,6 +125,7 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
 
     def _init_loaded_sprites(self):
         """Find all models that were loaded but don't have corresponding observers/sprites."""
+        logger.info("Initializing loaded sprites...")
         self.notify_active_poi(self._game.game_board.active_pois)
         for tile in self._game.game_board.tiles:
             for obj in tile.associated_models:
@@ -132,6 +136,7 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
 
     def _init_controllers(self):
         """Instantiate all controllers."""
+        logger.info("Initializing controllers...")
         ChopController(self._current_player)
         DoorController(self._current_player)
         TileInputController(self._current_player)
@@ -156,6 +161,7 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
 
     def _save(self):
         """Save the current game state to the hosts machine"""
+        self._menu.close()
         if not os.path.exists(self._save_games_file):
             with open(self._save_games_file, mode="w+", encoding='utf-8') as myFile:
                 myFile.write("[]")
@@ -169,8 +175,8 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
         with open(self._save_games_file, mode='w', encoding='utf-8') as myFile:
             json.dump(temp, myFile)
 
-    @staticmethod
-    def _quit_btn_on_click():
+    def _quit_btn_on_click(self):
+        self._menu.close()
         Networking.get_instance().disconnect()
         TileInputController.__del__()
         ChopController._instance = None
@@ -184,26 +190,29 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
         btn.set_transparent_background(True)
         return btn
 
-    def _open_menu(self):
-        menu = MenuWindow([self._active_sprites, self._game_board_sprite], 500, 500, (400, 150))
+    def _init_menu(self):
+        self._menu = MenuWindow([self._active_sprites, self._game_board_sprite], 500, 500, (400, 150))
 
-        save_btn = RectButton(200, 150, 100, 50, Color.STANDARDBTN, 0,
-                              Text(pygame.font.SysFont('Agency FB', 20), "Save", Color.BLACK))
+        save_btn = RectButton(200, 150, 100, 50, 'media/GameHud/wood2.png', 0,
+                              Text(pygame.font.SysFont('Agency FB', 25), "Save", Color.GREEN2))
+        save_btn.add_frame('media/GameHud/frame.png')
 
-        quit_btn = RectButton(200, 250, 100, 50, Color.STANDARDBTN, 0,
-                              Text(pygame.font.SysFont('Agency FB', 20), "Quit", Color.BLACK))
+        quit_btn = RectButton(200, 250, 100, 50, 'media/GameHud/wood2.png', 0,
+                              Text(pygame.font.SysFont('Agency FB', 25), "Quit", Color.GREEN2))
+        quit_btn.add_frame('media/GameHud/frame.png')
 
         back_btn = RectButton(50, 50, 50, 50, "media/GameHud/crosss.png", 0)
 
-        back_btn.on_click(menu.close)
+        back_btn.on_click(self._menu.close)
         quit_btn.on_click(self._quit_btn_on_click)
         save_btn.on_click(self._save)
 
-        menu.add_component(back_btn)
-        menu.add_component(save_btn)
-        menu.add_component(quit_btn)
+        self._menu.add_component(back_btn)
+        self._menu.add_component(save_btn)
+        self._menu.add_component(quit_btn)
 
-        self._menu = menu
+    def _open_menu(self):
+        self._menu.open()
 
     def display_permission_prompt(self, source: PlayerModel, target: PlayerModel):
         self._permission_prompt.command = (source, target)
@@ -229,20 +238,21 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
 
     def update(self, event_queue: EventQueue):
         """Call the update() function of everything in this class."""
-        self._active_sprites.update(event_queue)
-        self._chat_box.update(event_queue)
-        self._player_hud_sprites.update(event_queue)
+        if not self.ignore_board():
+            self._active_sprites.update(event_queue)
+            self._chat_box.update(event_queue)
+            self._player_hud_sprites.update(event_queue)
 
         self._command_notification.update(event_queue)
-
         self._permission_prompt.update(event_queue)
         self._dodge_prompt.update(event_queue)
 
-        if not self.ignore_area():
+        if not (self.ignore_area() or self.ignore_board()):
             TileInputController.update(event_queue)
             self._game_board_sprite.update(event_queue)
             ChopController.instance().update(event_queue)
             DoorController.instance().update(event_queue)
+
         if self._menu and not self._menu.is_closed:
             self._menu.update(event_queue)
 
@@ -264,7 +274,11 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
                 if event.target == self._current_player:
                     self.display_permission_prompt(event.source, event.target)
             elif event.type == CustomEventEnum.DODGE_PROMPT:
-                self._dodge_prompt.enabled = True
+                if event.args[0] == self._current_player:
+                    self._dodge_prompt.enable()
+
+    def ignore_board(self):
+        return (self._menu and not self._menu.is_closed) or self._permission_prompt.enabled or self._dodge_prompt.enabled
 
     def ignore_area(self):
         """A region in which all inputs are ignored."""
@@ -335,4 +349,4 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
         # Refresh the list of players in HUD
         self._player_hud_sprites.empty()
         for i, player in enumerate(self._game.players):
-            self._player_hud_sprites.add(PlayerState(0, 30 + 64 * i, player.nickname, player.color, player))
+            self._player_hud_sprites.add(PlayerState(0, 30 + 64 * i, player.nickname, player.color, player, self._game.rules))

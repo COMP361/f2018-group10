@@ -1,7 +1,11 @@
 import random
 import logging
 import time
+
+import threading
 from threading import Thread
+
+import src.core.pause_event_switch as switch
 
 from src.UIComponents.file_importer import FileImporter
 from src.action_events.knock_down_event import KnockDownEvent
@@ -73,13 +77,13 @@ class EndTurnAdvanceFireEvent(TurnEvent):
             flare_up_will_occur = self.advance_on_tile(self.initial_tile)
             self.flashover()
             self.resolve_hazmat_explosions()
-            self.affect_damages()
             # Preparing the dice for the next
             # iteration if a flare up is going to occur
             self.red_dice = self.game_state.roll_red_dice()
             self.black_dice = self.game_state.roll_black_dice()
             x += 1
 
+        self.affect_damages()
         # Add a hotspot marker to the last
         # target space of the advance_on_tile()
         if self.board.hotspot_bank > 0 and x > 1:
@@ -375,13 +379,13 @@ class EndTurnAdvanceFireEvent(TurnEvent):
                     if isinstance(player.carrying_hazmat, HazmatModel):
                         logger.info("Hazmat explosion occured on {t}".format(t=tile))
                         self.explosion(tile)
-                        self.dodge(player)
+                        if not self.dodge(player):
+                            KnockDownEvent(player.ip).execute()
                         player.carrying_hazmat.set_pos(-7, -7)
                         player.carrying_hazmat = NullModel()
                         if self.board.hotspot_bank > 0:
                             tile.is_hotspot = True
                             self.board.hotspot_bank = self.board.hotspot_bank - 1
-
 
     def countdown(self):
         EventQueue.post(CustomEvent(CustomEventEnum.ENABLE_VICTIM_LOST_PROMPT))
@@ -438,7 +442,8 @@ class EndTurnAdvanceFireEvent(TurnEvent):
             for player in players_on_tile:
                 # Attempt to dodge and if it doesn't
                 # work, the player gets knocked down
-                self.dodge(player)
+                if not self.dodge(player):
+                    KnockDownEvent(player.ip).execute()
 
         # removing any fire markers that were
         # placed outside of the building
@@ -482,9 +487,21 @@ class EndTurnAdvanceFireEvent(TurnEvent):
         # knocked down.
         if isinstance(possible_dodge_target, NullModel):
             self._log_player_dodge(1, player)
-            KnockDownEvent(player.ip).execute()
-            return
+            return False
 
+        # Pause the current event and ask player to dodge:
+        EventQueue.post(CustomEvent(CustomEventEnum.DODGE_PROMPT, player))
+        logger.info(f"Thread {threading.current_thread().getName()} going to sleep")
+        # Go to sleep
+        switch.pause_event.clear()
+        switch.pause_event.wait()
+        logger.info(f"Thread {threading.current_thread().getName()} woke up")
+        if not GameStateModel.instance().dodge_reply:
+            logger.info("Reply was no, knocking player down")
+            return False
+
+        logger.info("Reply was yes, attempting to dodge...")
+        GameStateModel.instance().dodge_reply = False
         # Disassociate the victim/hazmat that the player
         # may be carrying since they cannot dodge with them
         player_victim = player.carrying_victim
@@ -509,6 +526,8 @@ class EndTurnAdvanceFireEvent(TurnEvent):
             player.ap = player.ap - 1
         else:
             player.ap = player.ap - 2
+
+        return True
 
     def _log_player_dodge(self, status: int, player: PlayerModel, model = None, tile: TileModel = None):
         """

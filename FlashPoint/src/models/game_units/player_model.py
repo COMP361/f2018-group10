@@ -29,6 +29,7 @@ class PlayerModel(Model, object):
         self._carrying_victim = NullModel()
         self._leading_victim = NullModel()
         self._carrying_hazmat = NullModel()
+        self.has_moved = False
         self._role = PlayerRoleEnum.FAMILY
         self._has_AP_from_veteran = False
         self._allowed_to_dodge = False
@@ -36,7 +37,6 @@ class PlayerModel(Model, object):
     def __eq__(self, other):
         if not isinstance(other, PlayerModel):
             return False
-        
         x = [other.ip == self.ip, other.nickname == self.nickname]
         return all(x)
 
@@ -132,6 +132,7 @@ class PlayerModel(Model, object):
             elif self.role == PlayerRoleEnum.DOGE:
                 self.ap = self.ap + 8
 
+
     @property
     def column(self) -> int:
         return self._column
@@ -192,6 +193,7 @@ class PlayerModel(Model, object):
     @ap.setter
     def ap(self, ap: int):
         self._ap = ap
+        self.has_moved = True
         logger.info("Player {nickname} AP: {ap}".format(nickname=self.nickname, ap=self.ap))
         self._notify_ap()
 
@@ -202,6 +204,7 @@ class PlayerModel(Model, object):
     @special_ap.setter
     def special_ap(self, special_ap: int):
         self._special_ap = special_ap
+        self.has_moved = True
         logger.info("Player {nickname} special AP: {sp_ap}".format(nickname=self.nickname, sp_ap=self.special_ap))
         self._notify_special_ap()
 

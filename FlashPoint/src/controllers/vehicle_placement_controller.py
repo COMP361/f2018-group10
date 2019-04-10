@@ -29,15 +29,21 @@ class VehiclePlacementController(Controller):
         if VehiclePlacementController._instance:
             raise Exception(f"{VehiclePlacementController.__name__} is a singleton!")
 
-        self.choose_engine_prompt = RectLabel(500, 0, 350, 75, Color.GREY, 0,
+        self.choose_engine_prompt = RectLabel(500, 30, 350, 75, Color.GREY, 0,
                                               Text(pygame.font.SysFont('Agency FB', 30), "Choose Engine Position",
-                                                   Color.ORANGE))
-        self.choose_ambulance_prompt = RectLabel(500, 0, 350, 75, Color.GREY, 0,
+                                                   Color.GREEN2))
+        self.choose_engine_prompt.change_bg_image('media/GameHud/wood2.png')
+        self.choose_engine_prompt.add_frame('media/GameHud/frame.png')
+        self.choose_ambulance_prompt = RectLabel(500, 30, 350, 75, Color.GREY, 0,
                                                  Text(pygame.font.SysFont('Agency FB', 30), "Choose Ambulance Position",
-                                                      Color.ORANGE))
-        self.wait_prompt = RectLabel(500, 400, 350, 75, Color.GREY, 0,
+                                                      Color.GREEN2))
+        self.choose_ambulance_prompt.change_bg_image('media/GameHud/wood2.png')
+        self.choose_ambulance_prompt.add_frame('media/GameHud/frame.png')
+        self.wait_prompt = RectLabel(500, 580, 350, 75, Color.GREY, 0,
                                      Text(pygame.font.SysFont('Agency FB', 30), "Host Is Placing Vehicles...",
-                                          Color.ORANGE))
+                                          Color.GREEN2))
+        self.wait_prompt.change_bg_image('media/GameHud/wood2.png')
+        self.wait_prompt.add_frame('media/GameHud/frame.png')
         self.game_board_sprite = GameBoard.instance()
         self.ambulance_placed = False
         self.engine_placed = False
@@ -116,9 +122,11 @@ class VehiclePlacementController(Controller):
         self.send_event_and_close_menu(tile_model, None)
 
     def enable_prompts(self):
-        self.game_board_sprite.add(self.choose_engine_prompt)
-        self.game_board_sprite.add(self.choose_ambulance_prompt)
-        self.game_board_sprite.add(self.wait_prompt)
+        if Networking.get_instance().is_host:
+            self.game_board_sprite.add(self.choose_engine_prompt)
+            self.game_board_sprite.add(self.choose_ambulance_prompt)
+        else:
+            self.game_board_sprite.add(self.wait_prompt)
 
     def update(self, event_queue: EventQueue):
         game: GameStateModel = GameStateModel.instance()
@@ -135,6 +143,8 @@ class VehiclePlacementController(Controller):
         engine: VehicleModel = GameStateModel.instance().game_board.engine
         if ambulance.orientation != VehicleOrientationEnum.UNSET and engine.orientation != VehicleOrientationEnum.UNSET:
             self.wait_prompt.kill()
+            self.choose_ambulance_prompt.kill()
+            self.choose_engine_prompt.kill()
 
         vehicle_type = "ENGINE" if self.ambulance_placed else "AMBULANCE"
         self._apply_highlight(vehicle_type)

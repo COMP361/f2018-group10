@@ -128,7 +128,8 @@ class GameStateModel(Model):
     @command.setter
     def command(self, command: Tuple[PlayerModel, PlayerModel]):
         self._command = command
-        if command[1].role is PlayerRoleEnum.CAFS:
+        # Since CAFS can only be commanded once, we need to keep track of it
+        if command[1] and command[1].role is PlayerRoleEnum.CAFS:
             self._commanded.append(command[1])
         self._notify_command()
 
@@ -233,6 +234,8 @@ class GameStateModel(Model):
 
     def next_player(self):
         """Rotate to the next player in the players list, round robin style."""
+        for player in self.players:
+            player.has_moved = False
         with GameStateModel.lock:
             self._players_turn_index = (self._players_turn_index + 1) % len(self._players)
             self._notify_player_index()

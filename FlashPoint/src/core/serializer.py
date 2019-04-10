@@ -8,21 +8,21 @@ from src.action_events.stop_command_event import StopCommandEvent
 from src.action_events.permission_reply_event import PermissionReplyEvent
 from src.action_events.turn_events.command_permission_event import CommandPermissionEvent
 from src.action_events.board_setup_event import BoardSetupEvent
+from src.action_events.too_many_players_event import TooManyPlayersEvent
 from src.action_events.disconnect_event import DisconnectEvent
 from src.action_events.dodge_reply_event import DodgeReplyEvent
 from src.action_events.end_game_event import EndGameEvent
-from src.action_events.fire_placement_event import FirePlacementEvent
 from src.action_events.choose_character_event import ChooseCharacterEvent
 from src.action_events.random_board_setup_event import RandomBoardSetupEvent
+from src.action_events.turn_events.crew_change_event import CrewChangeEvent
 from src.action_events.turn_events.drop_hazmat_event import DropHazmatEvent
 from src.action_events.turn_events.lead_victim_event import LeadVictimEvent
 from src.action_events.turn_events.pick_up_hazmat_event import PickupHazmatEvent
+from src.action_events.turn_events.fire_deck_gun_event import FireDeckGunEvent
 from src.action_events.turn_events.remove_hazmat_event import RemoveHazmatEvent
 from src.action_events.turn_events.identify_poi_event import IdentifyPOIEvent
 from src.action_events.place_hazmat_event import PlaceHazmatEvent
 from src.action_events.end_turn_advance_fire import EndTurnAdvanceFireEvent
-from src.action_events.set_initial_hotspot_event import SetInitialHotspotEvent
-from src.action_events.set_initial_poi_experienced_event import SetInitialPOIExperiencedEvent
 from src.action_events.set_initial_poi_family_event import SetInitialPOIFamilyEvent
 from src.action_events.turn_events.chop_event import ChopEvent
 from src.action_events.turn_events.close_door_event import CloseDoorEvent
@@ -58,13 +58,9 @@ from src.constants.state_enums import DifficultyLevelEnum, GameKindEnum, PlayerS
     POIIdentityEnum, POIStatusEnum, GameStateEnum
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
-from src.sprites.game_board import GameBoard
 from src.sprites.hazmat_sprite import HazmatSprite
 
 logger = logging.getLogger("FlashPoint")
-
-class EndTurnEvent(object):
-    pass
 
 
 class JSONSerializer(object):
@@ -101,7 +97,6 @@ class JSONSerializer(object):
 
         return game
 
-
     @staticmethod
     def _restore_carried_hazmats(game: GameStateModel):
         """Helper for restoring GameBoardModel"""
@@ -118,6 +113,15 @@ class JSONSerializer(object):
         picked_up_victims = [player.carrying_victim for player in game.players
                              if not isinstance(player.carrying_victim, NullModel)]
         for victim in picked_up_victims:
+            tile = game.game_board.get_tile_at(victim.row, victim.column)
+            tile.add_associated_model(victim)
+            game.game_board.active_pois.append(victim)
+
+    @staticmethod
+    def _restore_lead_victims(game: GameStateModel):
+        lead_victims = [player.leading_victim for player in game.players
+                        if not isinstance(player.leading_victim, NullModel)]
+        for victim in lead_victims:
             tile = game.game_board.get_tile_at(victim.row, victim.column)
             tile.add_associated_model(victim)
             game.game_board.active_pois.append(victim)
@@ -196,10 +200,14 @@ class JSONSerializer(object):
     @staticmethod
     def restore_game_board(game: GameStateModel, payload: Dict):
         """Special deserialize called from the GameStateModel deserializer."""
+        logger.info("Restoring game state from JSON...")
         if payload['_board_info']:
             game.game_board = GameBoardModel(GameBoardTypeEnum.RANDOM, payload['_board_info'])
+
+        game.game_board.is_loaded = payload['_is_loaded']
         JSONSerializer._restore_carried_hazmats(game)
         JSONSerializer._restore_carried_victims(game)
+        JSONSerializer._restore_lead_victims(game)
         JSONSerializer._restore_tile_state(game, payload)
         JSONSerializer._restore_parking_spots(game, payload) # Might not be necessary but oh well.
         JSONSerializer._restore_wall_and_door_states(game, payload)
@@ -212,7 +220,6 @@ class JSONSerializer(object):
         nickname = payload['_nickname']
 
         player = PlayerModel(ip, nickname)
-        #player.set_pos(payload['_row'], payload['_column'])
         player.set_pos(-1, -1)
         player.color = tuple(payload['_color'])
         player.status = PlayerStatusEnum(payload["_status"]["value"])
@@ -441,6 +448,10 @@ class JSONSerializer(object):
         return DisconnectEvent(player)
 
     @staticmethod
+    def _deserialize_fire_deck_gun_event(payload: Dict) -> FireDeckGunEvent:
+        return FireDeckGunEvent(payload['seed'], payload['row'], payload['col'])
+
+    @staticmethod
     def _deserialize_dodge_reply(payload: Dict) -> DodgeReplyEvent:
         return DodgeReplyEvent(payload['_reply'])
 
@@ -465,6 +476,10 @@ class JSONSerializer(object):
     @staticmethod
     def _deserialize_random_board_event(payload: Dict) -> RandomBoardSetupEvent:
         return RandomBoardSetupEvent(payload['_board_info'])
+
+    @staticmethod
+    def _deserialize_crew_change_event(payload: Dict) -> CrewChangeEvent:
+        return CrewChangeEvent(PlayerRoleEnum(payload['_role']['value']), payload['_player_index'])
 
     @staticmethod
     def deserialize(payload: Dict) -> object:
@@ -504,8 +519,6 @@ class JSONSerializer(object):
             return StartGameEvent()
         elif object_type == EndGameEvent.__name__:
             return JSONSerializer._deserialize_end_game_event(payload)
-        elif object_type == EndTurnEvent.__name__:
-            return JSONSerializer._deserialize_end_turn_event(payload)
         elif object_type == ChooseStartingPositionEvent.__name__:
             return JSONSerializer._deserialize_choose_position_event(payload)
         elif object_type == ChopEvent.__name__:
@@ -522,8 +535,6 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_disconnect_event(payload)
         elif object_type == ExtinguishEvent.__name__:
             return JSONSerializer._deserialize_extinguish_event(payload)
-        elif object_type == GameBoardModel.__name__:
-            return JSONSerializer._deserialize_game_board(payload)
         elif object_type == NullModel.__name__:
             return NullModel()
         elif object_type == DropVictimEvent.__name__:
@@ -572,6 +583,10 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_random_board_event(payload)
         elif object_type == BoardSetupEvent.__name__:
             return BoardSetupEvent(payload['seed'])
+        elif object_type == CrewChangeEvent.__name__:
+            return JSONSerializer._deserialize_crew_change_event(payload)
+        elif object_type == TooManyPlayersEvent.__name__:
+            return TooManyPlayersEvent()
         elif object_type == NullModel.__name__:
             return NullModel()
         elif object_type == CommandPermissionEvent.__name__:
@@ -580,6 +595,8 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_permission_reply(payload)
         elif object_type == StopCommandEvent.__name__:
             return JSONSerializer._deserialize_stop_command_event(payload)
+        elif object_type == FireDeckGunEvent.__name__:
+            return JSONSerializer._deserialize_fire_deck_gun_event(payload)
 
         logger.warning(f"Could not deserialize object {object_type}, not of recognized type.")
 
