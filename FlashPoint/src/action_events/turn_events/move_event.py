@@ -299,8 +299,6 @@ class MoveEvent(TurnEvent):
             return
 
         if isinstance(self.fireman.carrying_hazmat, HazmatModel):
-            thread = Thread(target=self.countdown)
-            thread.start()
             self.fireman.carrying_hazmat.set_pos(-7, -7)
             self.fireman.carrying_hazmat = NullModel()
 
