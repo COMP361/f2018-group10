@@ -56,6 +56,8 @@ class CrewChangeController(Controller):
             tile_sprite.change_crew_button.on_click(self.display_menu, assoc_model)
 
     def run_checks(self, tile_model: TileModel) -> bool:
+        if not self._current_player == GameStateModel.instance().players_turn:
+            return False
 
         valid_to_do_event = TurnEvent.has_required_AP(self._current_player.ap, 2)
 
