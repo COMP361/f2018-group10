@@ -29,7 +29,6 @@ class CreateGameMenuScene(Scene):
         self._init_btn_veteran(710, 500, "Veteran", Color.YELLOW, Color.YELLOW)
         self._init_btn_heroic(845, 500, "Heroic", Color.RED, Color.RED)
 
-
         self.buttonRecruit.on_click(self.create_new_game, GameKindEnum.EXPERIENCED, DifficultyLevelEnum.RECRUIT)
         self.buttonVeteran.on_click(self.create_new_game, GameKindEnum.EXPERIENCED, DifficultyLevelEnum.VETERAN)
         self.buttonHeroic.on_click(self.create_new_game, GameKindEnum.EXPERIENCED, DifficultyLevelEnum.HEROIC)

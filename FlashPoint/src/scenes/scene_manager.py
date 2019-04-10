@@ -1,6 +1,7 @@
 import pygame
 import logging
 
+from src.core.state_cleaner import StateCleaner
 from src.models.game_units.player_model import PlayerModel
 from src.UIComponents.file_importer import FileImporter
 from src.scenes.choose_board_scene import ChooseBoardScene
@@ -92,6 +93,7 @@ class SceneManager(object):
             self._active_scene.update(event_queue)
             for event in event_queue:
                 if event.type == ChangeSceneEnum.STARTSCENE:
+                    StateCleaner.clear()
                     self.next(StartScene)
                 elif event.type == ChangeSceneEnum.SETMAXPLAYERSCENE:
                     self.next(SetMaxPlayers, self._current_player)
@@ -100,8 +102,10 @@ class SceneManager(object):
                 elif event.type == ChangeSceneEnum.CHARACTERSCENE:
                     self.next(CharacterScene, self._current_player)
                 elif event.type == ChangeSceneEnum.CREATEGAMEMENU:
+                    StateCleaner.clear()
                     self.next(CreateGameMenuScene, self._current_player)
                 elif event.type == ChangeSceneEnum.HOSTJOINSCENE:
+                    StateCleaner.clear()
                     self._current_player = event.player
                     self.next(HostJoinScene, self._current_player)
                 elif event.type == ChangeSceneEnum.HOSTMENUSCENE:
@@ -114,8 +118,8 @@ class SceneManager(object):
                     self.next(LobbyScene, self._current_player)
                 elif event.type == ChangeSceneEnum.DISCONNECT:
                     # player won't be redirected if they are not in game or trying to enter a game when disconnected
-                    if self._active_scene is not (StartScene or HostJoinScene):
-                        self.next(StartScene)
+                    StateCleaner.clear()
+                    self.next(StartScene)
                 elif event.type == ChangeSceneEnum.GAMEBOARDSCENE:
                     EventQueue.unblock()
                     self.next(GameBoardScene, self._current_player)

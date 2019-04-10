@@ -59,7 +59,7 @@ class TileInputController(GameStateObserver, Controller):
         return cls._instance
 
     @staticmethod
-    def __del__():
+    def destroy():
         ExtinguishController._instance = None
         MoveController._instance = None
         ChooseStartingPositionController._instance = None

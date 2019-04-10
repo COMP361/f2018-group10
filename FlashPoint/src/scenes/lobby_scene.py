@@ -58,7 +58,7 @@ class LobbyScene(GameStateObserver):
     @staticmethod
     def go_back():
         Networking.get_instance().disconnect()
-        EventQueue.post(CustomEvent(ChangeSceneEnum.STARTSCENE))
+        EventQueue.post(CustomEvent(ChangeSceneEnum.SETMAXPLAYERSCENE))
 
     def start_game(self):
         """Callback for when the host tries to start the game."""
@@ -125,8 +125,10 @@ class LobbyScene(GameStateObserver):
         self._init_ip_addr()
         self.chat_box = ChatBox(self._current_player)
 
+        # self._init_btn_back(20, 20, "Exit", 'media/GameHud/wood2.png', Color.GREEN2)
+
         if not reuse:
-            self._init_btn_back(20, 20, "Exit", Color.STANDARDBTN, Color.GREEN2)
+            self._init_btn_back(20, 20, "Exit", 'media/GameHud/wood2.png', Color.GREEN2)
 
             if self._current_player.ip == GameStateModel.instance().host.ip:
                 self._init_start_game_button()
@@ -143,6 +145,8 @@ class LobbyScene(GameStateObserver):
                 self.sprite_grp.add(self.start_button)
             else:
                 self.sprite_grp.add(self.buttonReady, self.buttonBack)
+
+        self.sprite_grp.add(self.buttonBack)
 
         self._init_sprites()
 
@@ -220,11 +224,10 @@ class LobbyScene(GameStateObserver):
         self.buttonReady.add_frame('media/GameHud/frame.png')
         self.sprite_grp.add(self.buttonReady)
 
-    def _init_btn_back(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
+    def _init_btn_back(self, x_pos: int, y_pos: int, text: str, bg: str, color_text: Color):
         box_size = (130, 48)
-        self.buttonBack = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
+        self.buttonBack = RectButton(x_pos, y_pos, box_size[0], box_size[1], bg, 0,
                                      Text(pygame.font.SysFont('Agency FB', 25), text, color_text))
-        self.buttonBack.change_bg_image('media/GameHud/wood2.png')
         self.buttonBack.add_frame('media/GameHud/frame.png')
         self.sprite_grp.add(self.buttonBack)
 

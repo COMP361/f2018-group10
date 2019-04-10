@@ -8,6 +8,7 @@ import threading
 import logging
 import time
 
+from src.action_events.host_disconnect_event import HostDisconnectEvent
 from src.action_events.random_board_setup_event import RandomBoardSetupEvent
 from src.constants.state_enums import GameBoardTypeEnum
 from src.core.flashpoint_exceptions import TooManyPlayersException
@@ -75,7 +76,7 @@ class Networking:
             self.server_reply = None
 
             self.TIMEOUT_CONNECT = 5
-            self.TIMEOUT_RECEIVE = 5
+            self.TIMEOUT_RECEIVE = 1
 
         def create_host(self, port=20298):
             """
@@ -86,11 +87,11 @@ class Networking:
             :return:
             """
             # We use UDP to broadcast the host
-            self.host = Networking.Host(1, 2, 5)
+            self.host = Networking.Host(0.5, 0.5, 5)
 
             """
             # find unused ip address
-            for i in range(255, 0, -1):
+            for i in range(255, 0, -1):W
                 for j in range(255, 0, -1):
                     try:
                         print("Checking for free address at 192.168."+str(i)+"."+str(j))
@@ -148,7 +149,7 @@ class Networking:
 
         @staticmethod
         def broadcast_game(args, stop_event):
-            # TODO DON'T USE THIS YET
+            # TODO DON'T USE THIS
             b_caster = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             b_caster.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             b_caster.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
@@ -160,7 +161,7 @@ class Networking:
 
         @staticmethod
         def search_game(stop_event):
-            # TODO DON'T USE THIS YET
+            # TODO DON'T USE THIS
             listener = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             listener.bind('')
             while not stop_event.is_set():
@@ -201,11 +202,16 @@ class Networking:
             Disconnects the current machine. If the current machine is a host, it ends the game as well.
             :return:
             """
+            if self.client:
+                logger.info("Disconnecting client")
+                self.client.disconnect()
+                self.client.__del__()
+                self.client = None
             if self.is_host:
                 logger.info("Disconnecting host")
+                self.send_to_all_client(HostDisconnectEvent())
                 # Kill the broadcast
                 self.stop_broadcast.set()
-
                 # Stops accepting connection
                 self.host.accepting_disallow()
                 # Disconnects all clients
@@ -213,15 +219,6 @@ class Networking:
                 self.host.disconnect()
                 self.host.__del__()
                 self.host = None
-            if self.client:
-                logger.info("Disconnecting client")
-                self.client.disconnect()
-                self.client.__del__()
-                self.client = None
-
-            # Clears up game state model
-            if GameStateModel.instance():
-                GameStateModel._instance = None
 
         def send_to_server(self, data, compress=True, count: int = 0):
             """
@@ -285,7 +282,7 @@ class Networking:
 
     # Overridden classes
     class Host(MastermindServerUDP):
-        def __init__(self, time_server_refresh=1.0, time_connection_refresh=2.0, time_connection_timeout=5.0):
+        def __init__(self, time_server_refresh=0.5, time_connection_refresh=0.5, time_connection_timeout=5.0):
             MastermindServerUDP.__init__(self, time_server_refresh, time_connection_refresh, time_connection_timeout)
             self.client_list = {}
 
@@ -426,14 +423,14 @@ class Networking:
             self._pause_receive = threading.Event()
             self._stop_receive = threading.Event()
             self._pause_blk_signal = threading.Event()
+            self._signaler = threading.Thread(target=self.send_blocking_signal)
+            self._receiver = threading.Thread(target=self.receive_data_from_server)
             self._reply_queue = []
 
         def connect(self, ip, port):
             super(MastermindClientUDP, self).connect(ip, port)
-            signaler = threading.Thread(target=self.send_blocking_signal)
-            receiver = threading.Thread(target=self.receive_data_from_server)
-            signaler.start()
-            receiver.start()
+            self._signaler.start()
+            self._receiver.start()
 
         def send(self, data: Union[ActionEvent, TurnEvent], compression=None):
             """
@@ -474,9 +471,11 @@ class Networking:
                     self.callback_disconnect()
 
         def disconnect(self):
-            self._pause_blk_signal.set()
             self._pause_receive.set()
             self._stop_receive.set()
+            self._pause_blk_signal.set()
+            self._receiver.join()
+            self._signaler.join()
             return super(MastermindClientUDP, self).disconnect()
 
         @staticmethod
@@ -507,7 +506,7 @@ class Networking:
             while not self._stop_receive.is_set():
                 if not self._pause_blk_signal.is_set():
                     self.send(DummyEvent())
-                    time.sleep(1)
+                    time.sleep(0.5)
 
         def toggle_block_signal(self, toggle: bool):
             if toggle:

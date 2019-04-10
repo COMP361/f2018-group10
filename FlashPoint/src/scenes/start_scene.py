@@ -40,15 +40,6 @@ class StartScene(object):
                                 color.STANDARDBTN, color.GREEN2)
         self.update_profiles()
 
-        # Reset everything
-        if GameStateModel.instance():
-            GameStateModel.destroy()
-        if GameBoard.instance():
-            GameBoard._instance = None
-            TileInputController.__del__()
-            ChopController._instance = None
-            DoorController._instance = None
-
     def _init_background(self):
         box_size = (self.resolution[0], self.resolution[1])
         background_box = RectLabel(0, 0, box_size[0], box_size[1], "media/backgrounds/flashpoint_background.png")

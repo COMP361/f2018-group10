@@ -81,13 +81,8 @@ class ChooseBoardScene(object):
                                      Text(pygame.font.SysFont('Agency FB', 25), text, color_text))
         self.buttonBack.change_bg_image('media/GameHud/wood2.png')
         self.buttonBack.add_frame('media/GameHud/frame.png')
-        self.buttonBack.on_click(self.destroy_game_and_back)
+        self.buttonBack.on_click(EventQueue.post, CustomEvent(ChangeSceneEnum.CREATEGAMEMENU))
         self.sprite_grp.add(self.buttonBack)
-
-    @staticmethod
-    def destroy_game_and_back():
-        GameStateModel.instance().destroy()
-        EventQueue.post(CustomEvent(ChangeSceneEnum.CREATEGAMEMENU))
 
     @staticmethod
     def set_and_continue(board_type: GameBoardTypeEnum):
