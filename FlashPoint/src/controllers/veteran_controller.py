@@ -24,7 +24,7 @@ class VeteranController(Controller, PlayerObserver):
     def __init__(self, current_player: PlayerModel):
         super().__init__(current_player)
         if VeteranController._instance:
-            raise Exception("TileInputController is a singleton")
+            raise Exception("VeteranController is a singleton")
 
         self.game_board_sprite = GameBoard.instance()
 
@@ -57,8 +57,10 @@ class VeteranController(Controller, PlayerObserver):
 
     def veteran_give_experience(self):
         """
-        Give 1 free AP to the current player
+        Give 1 free AP to the CURRENT player
         in the vicinity of the veteran if applicable.
+        Give the dodge ability to ALL the players
+        in the vicinity of the veteran.
 
         :return:
         """
@@ -76,19 +78,36 @@ class VeteranController(Controller, PlayerObserver):
         if self._current_player == veteran:
             return
 
-        # Player can only receive
-        # extra AP once per turn
-        if self._current_player.has_AP_from_veteran:
-            return
-
         can_player_reach_vet = self._can_player_reach_veteran(self._current_player, veteran, veteran_vicinity)
         if not can_player_reach_vet:
+            # If player cannot reach Veteran,
+            # they can no longer dodge
+            self._current_player.allowed_to_dodge = False
             return
 
-        # Player gains an extra AP
-        # because of the Veteran
-        self._current_player.ap = self._current_player.ap + 1
-        self._current_player.has_AP_from_veteran = True
+        # Current player can only
+        # receive extra AP once per turn
+        if not self._current_player.has_AP_from_veteran:
+            self._current_player.ap = self._current_player.ap + 1
+            self._current_player.has_AP_from_veteran = True
+
+        # Player always allowed to dodge
+        # as long as in vicinity of Veteran
+        self._current_player.allowed_to_dodge = True
+
+        # Give the rest of the players the
+        # ability to dodge if they are in
+        # the vicinity of the Veteran else
+        # take that ability away
+        for p in self.game.players:
+            if p == veteran or p == self._current_player:
+                continue
+
+            can_player_reach_vet = self._can_player_reach_veteran(p, veteran, veteran_vicinity)
+            if can_player_reach_vet:
+                p.allowed_to_dodge = True
+            else:
+                p.allowed_to_dodge = False
 
     def _determine_vicinity_veteran(self, veteran_row: int, veteran_col: int) -> List[TileModel]:
         """
