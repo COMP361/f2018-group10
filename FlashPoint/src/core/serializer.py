@@ -38,6 +38,7 @@ from src.action_events.turn_events.resuscitate_victim_event import ResuscitateEv
 from src.action_events.turn_events.ride_vehicle_event import RideVehicleEvent
 from src.action_events.turn_events.stop_leading_victim_event import StopLeadingVictimEvent
 from src.action_events.vehicle_placed_event import VehiclePlacedEvent
+from src.action_events.veteran_give_experience_event import VeteranGiveExperienceEvent
 from src.models.game_board.door_model import DoorModel
 from src.models.game_board.game_board_model import GameBoardModel
 from src.models.game_board.null_model import NullModel
