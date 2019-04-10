@@ -30,6 +30,7 @@ class PlayerModel(Model, object):
         self._leading_victim = NullModel()
         self._carrying_hazmat = NullModel()
         self._role = PlayerRoleEnum.FAMILY
+        self._received_AP_from_veteran = False
 
     def __eq__(self, other):
         if not isinstance(other, PlayerModel):
@@ -257,3 +258,12 @@ class PlayerModel(Model, object):
         self._role = player_role
         logger.info("Player {nickname} role: {r}".format(nickname=self.nickname, r=player_role.name))
         self._notify_role()
+
+    @property
+    def received_AP_from_veteran(self) -> bool:
+        return self._received_AP_from_veteran
+
+    @received_AP_from_veteran.setter
+    def received_AP_from_veteran(self, recd: bool):
+        self._received_AP_from_veteran = recd
+        logger.info("Player {nickname} received AP from Veteran: {r}".format(nickname=self.nickname, r=recd))
