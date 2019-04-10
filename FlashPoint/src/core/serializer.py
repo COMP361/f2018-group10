@@ -62,8 +62,6 @@ from src.sprites.hazmat_sprite import HazmatSprite
 
 logger = logging.getLogger("FlashPoint")
 
-class EndTurnEvent(object):
-    pass
 
 
 class JSONSerializer(object):
@@ -117,6 +115,15 @@ class JSONSerializer(object):
         picked_up_victims = [player.carrying_victim for player in game.players
                              if not isinstance(player.carrying_victim, NullModel)]
         for victim in picked_up_victims:
+            tile = game.game_board.get_tile_at(victim.row, victim.column)
+            tile.add_associated_model(victim)
+            game.game_board.active_pois.append(victim)
+
+    @staticmethod
+    def _restore_lead_victims(game: GameStateModel):
+        lead_victims = [player.leading_victim for player in game.players
+                        if not isinstance(player.leading_victim, NullModel)]
+        for victim in lead_victims:
             tile = game.game_board.get_tile_at(victim.row, victim.column)
             tile.add_associated_model(victim)
             game.game_board.active_pois.append(victim)
@@ -199,6 +206,7 @@ class JSONSerializer(object):
             game.game_board = GameBoardModel(GameBoardTypeEnum.RANDOM, payload['_board_info'])
         JSONSerializer._restore_carried_hazmats(game)
         JSONSerializer._restore_carried_victims(game)
+        JSONSerializer._restore_lead_victims(game)
         JSONSerializer._restore_tile_state(game, payload)
         JSONSerializer._restore_parking_spots(game, payload) # Might not be necessary but oh well.
         JSONSerializer._restore_wall_and_door_states(game, payload)
