@@ -577,21 +577,21 @@ class EndTurnAdvanceFireEvent(TurnEvent):
 
         # Needs at least 1 saved AP
         if player.role == PlayerRoleEnum.VETERAN:
-            if player.ap < 4+1:
+            if player.ap < 1:
                 return False
 
         # All of the ones below need at least 2 saved AP
         elif player.role in [PlayerRoleEnum.PARAMEDIC, PlayerRoleEnum.CAPTAIN, PlayerRoleEnum.IMAGING,
                              PlayerRoleEnum.HAZMAT, PlayerRoleEnum.DRIVER, PlayerRoleEnum.RESCUE]:
-            if player.ap < 4+2:
+            if player.ap < 2:
                 return False
 
         elif player.role == PlayerRoleEnum.CAFS:
-            if player.ap < 3+2:
+            if player.ap < 2:
                 return False
 
         elif player.role == PlayerRoleEnum.GENERALIST:
-            if player.ap < 5+2:
+            if player.ap < 2:
                 return False
 
         else:

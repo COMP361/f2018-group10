@@ -606,6 +606,8 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_stop_command_event(payload)
         elif object_type == FireDeckGunEvent.__name__:
             return JSONSerializer._deserialize_fire_deck_gun_event(payload)
+        elif object_type == VeteranGiveExperienceEvent.__name__:
+            return JSONSerializer._deserialize_veteran_give_experience_event(payload)
 
         logger.warning(f"Could not deserialize object {object_type}, not of recognized type.")
 
