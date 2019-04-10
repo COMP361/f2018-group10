@@ -69,6 +69,9 @@ class PlayerBox(PlayerObserver):
         self.text_box.draw(screen)
         if self.background:
             self.background.draw(screen)
+            self.background.change_bg_image('media/GameHud/wood2.png')
+            self.background.add_frame(self.get_path_from_character_enum(self._assoc_player.role))
+            self.background.add_frame('media/GameHud/frame.png')
 
     def player_status_changed(self, status: PlayerStatusEnum):
         pass
