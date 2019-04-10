@@ -63,7 +63,6 @@ from src.sprites.hazmat_sprite import HazmatSprite
 logger = logging.getLogger("FlashPoint")
 
 
-
 class JSONSerializer(object):
     """Used for serializing and deserializing objects to JSON."""
 
@@ -97,7 +96,6 @@ class JSONSerializer(object):
         game.victims_saved = payload['_victims_saved']
 
         return game
-
 
     @staticmethod
     def _restore_carried_hazmats(game: GameStateModel):
@@ -202,8 +200,11 @@ class JSONSerializer(object):
     @staticmethod
     def restore_game_board(game: GameStateModel, payload: Dict):
         """Special deserialize called from the GameStateModel deserializer."""
+        logger.info("Restoring game state from JSON...")
         if payload['_board_info']:
             game.game_board = GameBoardModel(GameBoardTypeEnum.RANDOM, payload['_board_info'])
+
+        game.game_board.is_loaded = payload['_is_loaded']
         JSONSerializer._restore_carried_hazmats(game)
         JSONSerializer._restore_carried_victims(game)
         JSONSerializer._restore_lead_victims(game)

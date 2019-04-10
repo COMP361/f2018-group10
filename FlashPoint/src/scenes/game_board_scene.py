@@ -6,6 +6,7 @@ from datetime import datetime
 from typing import List
 
 import pygame
+import logging
 
 from src.action_events.board_setup_event import BoardSetupEvent
 from src.constants.custom_event_enums import CustomEventEnum
@@ -49,6 +50,7 @@ from src.UIComponents.text import Text
 from src.sprites.notify_player_turn import NotifyPlayerTurn
 import src.constants.color as Color
 
+logger = logging.getLogger("FlashPoint")
 
 class GameBoardScene(GameBoardObserver, GameStateObserver):
     """
@@ -122,6 +124,7 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
 
     def _init_loaded_sprites(self):
         """Find all models that were loaded but don't have corresponding observers/sprites."""
+        logger.info("Initializing loaded sprites...")
         self.notify_active_poi(self._game.game_board.active_pois)
         for tile in self._game.game_board.tiles:
             for obj in tile.associated_models:
@@ -132,6 +135,7 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
 
     def _init_controllers(self):
         """Instantiate all controllers."""
+        logger.info("Initializing controllers...")
         ChopController(self._current_player)
         DoorController(self._current_player)
         TileInputController(self._current_player)
