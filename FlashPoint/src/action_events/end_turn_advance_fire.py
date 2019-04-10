@@ -111,6 +111,7 @@ class EndTurnAdvanceFireEvent(TurnEvent):
                 self.player.ap = 6
 
             self.player.ap = self.player.ap + 12
+            self._take_away_AP_given_by_veteran()
             return
 
         if self.player.ap > 4:
@@ -134,6 +135,9 @@ class EndTurnAdvanceFireEvent(TurnEvent):
         else:
             pass
 
+        self._take_away_AP_given_by_veteran()
+
+    def _take_away_AP_given_by_veteran(self):
         if self.player.has_AP_from_veteran:
             if self.player.ap > 0:
                 logger.info("Taking away free AP given by Veteran to Player at ({r}, {c})".format(r=self.player.row, c=self.player.column))
@@ -457,6 +461,9 @@ class EndTurnAdvanceFireEvent(TurnEvent):
             self._log_player_dodge(1, player)
             KnockDownEvent(player.ip).execute()
             return
+
+        if player.role not in [PlayerRoleEnum.VETERAN, PlayerRoleEnum.DOGE]:
+            pass
 
         # If the player is a Veteran:
         # 1. If it is their turn, they must have
