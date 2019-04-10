@@ -63,7 +63,11 @@ class CommandNotification(object):
             target_msg = f"Commanded by: {self._source.nickname}"
 
         self._notification.change_text(Text(pygame.font.SysFont('Agency FB', 30), source_msg, Color.ORANGE))
+        self._notification.change_bg_image('media/GameHud/wood2.png')
+        self._notification.add_frame('media/GameHud/frame.png')
         self._wait_command.change_text(Text(pygame.font.SysFont('Agency FB', 30), target_msg, Color.ORANGE))
+        self._wait_command.change_bg_image('media/GameHud/wood2.png')
+        self._wait_command.add_frame('media/GameHud/frame.png')
 
     @property
     def is_source(self) -> bool:
