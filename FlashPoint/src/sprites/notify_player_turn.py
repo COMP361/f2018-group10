@@ -82,6 +82,7 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
             self._current_sprite.turn = False
             if self.btn:
                 self._active_sprites.remove(self.btn)
+                self.btn.kill()
             if self.your_turn:
                 self._active_sprites.remove(self.your_turn)
             self._active_sprites.add(self.not_your_turn)
