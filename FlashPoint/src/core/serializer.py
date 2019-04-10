@@ -38,7 +38,6 @@ from src.action_events.turn_events.resuscitate_victim_event import ResuscitateEv
 from src.action_events.turn_events.ride_vehicle_event import RideVehicleEvent
 from src.action_events.turn_events.stop_leading_victim_event import StopLeadingVictimEvent
 from src.action_events.vehicle_placed_event import VehiclePlacedEvent
-from src.action_events.veteran_give_experience_event import VeteranGiveExperienceEvent
 from src.models.game_board.door_model import DoorModel
 from src.models.game_board.game_board_model import GameBoardModel
 from src.models.game_board.null_model import NullModel
@@ -606,8 +605,6 @@ class JSONSerializer(object):
             return JSONSerializer._deserialize_stop_command_event(payload)
         elif object_type == FireDeckGunEvent.__name__:
             return JSONSerializer._deserialize_fire_deck_gun_event(payload)
-        elif object_type == VeteranGiveExperienceEvent.__name__:
-            return JSONSerializer._deserialize_veteran_give_experience_event(payload)
 
         logger.warning(f"Could not deserialize object {object_type}, not of recognized type.")
 

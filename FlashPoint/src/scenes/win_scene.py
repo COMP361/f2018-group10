@@ -14,6 +14,7 @@ class WinScene(Scene):
     def __init__(self, screen: pygame.Surface):
         Scene.__init__(self, screen)
         self._init_background()
+        self._init_continue_btn()
         self._init_title_text()
 
 
@@ -39,7 +40,7 @@ class WinScene(Scene):
 
     def _init_continue_btn(self):
         box_size = (200,50)
-        ctn_btn = RectButton(550,500,box_size[0],box_size[1],Color.GREY,0,Text(pygame.font.SysFont('Agency FB', 20), "Continue", Color.GREEN2))
+        ctn_btn = RectButton(550,500,box_size[0],box_size[1],'media/GameHud/wood2.png',0,Text(pygame.font.SysFont('Agency FB', 20), "Continue", Color.GREEN2))
         ctn_btn.add_frame('media/GameHud/frame.png')
         ctn_btn.on_click(self._continue)
         self.sprite_grp.add(ctn_btn)

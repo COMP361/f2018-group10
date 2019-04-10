@@ -2,6 +2,7 @@ import threading
 import pygame
 import time
 from threading import Thread
+import src.core.pause_event_switch as switch
 
 import src.constants.color as Color
 from src.action_events.stop_command_event import StopCommandEvent
@@ -55,6 +56,7 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
         self._should_advance_fire = False
         self.btn = None
         self.your_turn = None
+        switch.ABORT = False
 
         GameStateModel.instance().add_observer(self)
 
@@ -110,6 +112,8 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
 
     def countdown(self, count):
         while count and self.running:
+            if switch.ABORT:
+                return
             mins,secs = divmod(count, 60)
             temp = '{:02d}:{:02d}'.format(mins, secs)
             self.time_str = f"TIME LEFT: {temp}"

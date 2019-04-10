@@ -1,4 +1,3 @@
-
 import pygame
 from src.models.game_units.victim_model import VictimModel
 from src.sprites.victim_sprite import VictimSprite

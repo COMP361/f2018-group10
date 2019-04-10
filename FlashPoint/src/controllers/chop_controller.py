@@ -16,8 +16,6 @@ class ChopController(object):
     _instance = None
 
     def __init__(self, current_player: PlayerModel):
-        if ChopController._instance:
-            raise Exception("Chop Controller is a singleton")
         self.current_player = current_player
         self.game: GameStateModel = GameStateModel.instance()
         self.board = self.game.game_board

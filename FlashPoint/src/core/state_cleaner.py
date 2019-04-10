@@ -1,6 +1,7 @@
 from src.controllers.veteran_controller import VeteranController
 from src.controllers.chop_controller import ChopController
 from src.controllers.door_controller import DoorController
+import src.core.pause_event_switch as switch
 from src.controllers.tile_input_controller import TileInputController
 from src.models.game_state_model import GameStateModel
 from src.sprites.game_board import GameBoard
@@ -17,4 +18,5 @@ class StateCleaner:
             # TileInputController.destroy()
             ChopController._instance = None
             DoorController._instance = None
+            switch.ABORT = True
             VeteranController._instance = None
