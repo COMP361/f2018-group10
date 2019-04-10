@@ -29,9 +29,9 @@ class InGameStates(pygame.sprite.Sprite, GameStateObserver):
         self.damage_str = f"Damage: {current_damage}/24"
         self.victims_dead_str = f"Victims Lost: {victims_dead}/4"
         self.victims_saved_str = f"Victims Saved: {victims_saved}/7"
-        self.damage = self.font.render(self.damage_str, True, Color.WHITE)
-        self.victims_dead = self.font.render(self.victims_dead_str, True, Color.WHITE)
-        self.victims_saved = self.font.render(self.victims_saved_str, True, Color.WHITE)
+        self.damage = self.font.render(self.damage_str, True, Color.GREEN2)
+        self.victims_dead = self.font.render(self.victims_dead_str, True, Color.GREEN2)
+        self.victims_saved = self.font.render(self.victims_saved_str, True, Color.GREEN2)
 
         self.rect = self.image.get_rect()
         self.rect.move_ip(x, y)
@@ -51,15 +51,15 @@ class InGameStates(pygame.sprite.Sprite, GameStateObserver):
 
     def damage_changed(self, new_damage: int):
         self.damage_str = f"Damage: {new_damage}/24"
-        self.damage = self.font.render(self.damage_str, True, Color.WHITE)
+        self.damage = self.font.render(self.damage_str, True, Color.GREEN2)
 
     def saved_victims(self, victims_saved: int):
         self.victims_saved_str = f"Victims Saved: {victims_saved}/7"
-        self.victims_saved = self.font.render(self.victims_saved_str, True, Color.WHITE)
+        self.victims_saved = self.font.render(self.victims_saved_str, True, Color.GREEN2)
 
     def dead_victims(self, victims_dead: int):
         self.victims_dead_str = f"Victims Lost: {victims_dead}/4"
-        self.victims_dead = self.font.render(self.victims_dead_str, True, Color.WHITE)
+        self.victims_dead = self.font.render(self.victims_dead_str, True, Color.GREEN2)
 
     def notify_player_index(self, player_index: int):
         pass

@@ -62,9 +62,6 @@ from src.sprites.hazmat_sprite import HazmatSprite
 
 logger = logging.getLogger("FlashPoint")
 
-class EndTurnEvent(object):
-    pass
-
 
 class JSONSerializer(object):
     """Used for serializing and deserializing objects to JSON."""
@@ -100,7 +97,6 @@ class JSONSerializer(object):
 
         return game
 
-
     @staticmethod
     def _restore_carried_hazmats(game: GameStateModel):
         """Helper for restoring GameBoardModel"""
@@ -117,6 +113,15 @@ class JSONSerializer(object):
         picked_up_victims = [player.carrying_victim for player in game.players
                              if not isinstance(player.carrying_victim, NullModel)]
         for victim in picked_up_victims:
+            tile = game.game_board.get_tile_at(victim.row, victim.column)
+            tile.add_associated_model(victim)
+            game.game_board.active_pois.append(victim)
+
+    @staticmethod
+    def _restore_lead_victims(game: GameStateModel):
+        lead_victims = [player.leading_victim for player in game.players
+                        if not isinstance(player.leading_victim, NullModel)]
+        for victim in lead_victims:
             tile = game.game_board.get_tile_at(victim.row, victim.column)
             tile.add_associated_model(victim)
             game.game_board.active_pois.append(victim)
@@ -195,10 +200,14 @@ class JSONSerializer(object):
     @staticmethod
     def restore_game_board(game: GameStateModel, payload: Dict):
         """Special deserialize called from the GameStateModel deserializer."""
+        logger.info("Restoring game state from JSON...")
         if payload['_board_info']:
             game.game_board = GameBoardModel(GameBoardTypeEnum.RANDOM, payload['_board_info'])
+
+        game.game_board.is_loaded = payload['_is_loaded']
         JSONSerializer._restore_carried_hazmats(game)
         JSONSerializer._restore_carried_victims(game)
+        JSONSerializer._restore_lead_victims(game)
         JSONSerializer._restore_tile_state(game, payload)
         JSONSerializer._restore_parking_spots(game, payload) # Might not be necessary but oh well.
         JSONSerializer._restore_wall_and_door_states(game, payload)
@@ -219,6 +228,8 @@ class JSONSerializer(object):
         player.wins = payload['_wins']
         player.losses = payload['_losses']
         player.role = PlayerRoleEnum(payload["_role"]["value"])
+        player.has_AP_from_veteran = payload['_has_AP_from_veteran']
+        player.allowed_to_dodge = payload['_allowed_to_dodge']
         if payload['_carrying_hazmat']:
             player.carrying_hazmat = JSONSerializer.deserialize(payload['_carrying_hazmat'])
         if payload['_carrying_victim']:

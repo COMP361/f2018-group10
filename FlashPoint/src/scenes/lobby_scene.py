@@ -289,7 +289,7 @@ class LobbyScene(GameStateObserver):
         label_top = (pygame.display.get_surface().get_size()[1] - 50) - (label_height / 2)
         message = f"Not all players are ready!"
         prompt_label = RectLabel(label_left, label_top, label_width, label_height, Color.WHITE,
-                                 txt_obj=Text(pygame.font.SysFont('Arial', 24), message))
+                                 txt_obj=Text(pygame.font.SysFont('Agency FB', 24), message))
         prompt_label.set_transparent_background(True)
         self.players_not_ready_prompt = prompt_label
 

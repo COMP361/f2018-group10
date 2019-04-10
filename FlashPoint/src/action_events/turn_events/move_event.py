@@ -267,6 +267,7 @@ class MoveEvent(TurnEvent):
         shortest_path.pop(0)
         for d_tile in shortest_path:
             self._deduct_player_points(d_tile.tile_model)
+            self.resolve_hazmat_while_traveling(d_tile.tile_model)
             self.resolve_victim_while_traveling(d_tile.tile_model)
 
             # update the position of the fireman
@@ -285,6 +286,23 @@ class MoveEvent(TurnEvent):
             # Put to sleep so that we can see the
             # player move through the individual tiles
             time.sleep(0.75)
+
+    def resolve_hazmat_while_traveling(self, target_tile: TileModel):
+        """
+        If player goes out of the building carrying
+        a hazmat, dispose of that hazmat.
+
+        :param target_tile: tile player is heading to
+        :return:
+        """
+        if target_tile.space_kind == SpaceKindEnum.INDOOR:
+            return
+
+        if isinstance(self.fireman.carrying_hazmat, HazmatModel):
+            thread = Thread(target=self.countdown)
+            thread.start()
+            self.fireman.carrying_hazmat.set_pos(-7, -7)
+            self.fireman.carrying_hazmat = NullModel()
 
     def resolve_victim_while_traveling(self, target_tile: TileModel):
         """

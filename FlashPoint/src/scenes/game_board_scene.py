@@ -6,10 +6,12 @@ from datetime import datetime
 from typing import List
 
 import pygame
+import logging
 
 from src.action_events.board_setup_event import BoardSetupEvent
 from src.constants.custom_event_enums import CustomEventEnum
 from src.constants.state_enums import GameStateEnum
+from src.controllers.veteran_controller import VeteranController
 from src.models.game_units.hazmat_model import HazmatModel
 from src.models.game_units.victim_model import VictimModel
 from src.sprites.hud.command_notification import CommandNotification
@@ -49,6 +51,7 @@ from src.UIComponents.text import Text
 from src.sprites.notify_player_turn import NotifyPlayerTurn
 import src.constants.color as Color
 
+logger = logging.getLogger("FlashPoint")
 
 class GameBoardScene(GameBoardObserver, GameStateObserver):
     """
@@ -122,6 +125,7 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
 
     def _init_loaded_sprites(self):
         """Find all models that were loaded but don't have corresponding observers/sprites."""
+        logger.info("Initializing loaded sprites...")
         self.notify_active_poi(self._game.game_board.active_pois)
         for tile in self._game.game_board.tiles:
             for obj in tile.associated_models:
@@ -132,9 +136,11 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
 
     def _init_controllers(self):
         """Instantiate all controllers."""
+        logger.info("Initializing controllers...")
         ChopController(self._current_player)
         DoorController(self._current_player)
         TileInputController(self._current_player)
+        VeteranController(self._current_player)
 
     def _init_current_player(self, current_player: PlayerModel):
         """Set reference of the current player to point to the one in the game state."""
@@ -265,7 +271,8 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
                 if event.target == self._current_player:
                     self.display_permission_prompt(event.source, event.target)
             elif event.type == CustomEventEnum.DODGE_PROMPT:
-                self._dodge_prompt.enable()
+                if event.args[0] == self._current_player:
+                    self._dodge_prompt.enable()
 
     def ignore_board(self):
         return (self._menu and not self._menu.is_closed) or self._permission_prompt.enabled or self._dodge_prompt.enabled

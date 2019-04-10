@@ -29,8 +29,10 @@ class PlayerModel(Model, object):
         self._carrying_victim = NullModel()
         self._leading_victim = NullModel()
         self._carrying_hazmat = NullModel()
-        self._role: PlayerRoleEnum = PlayerRoleEnum.FAMILY
         self.has_moved = False
+        self._role: PlayerRoleEnum = PlayerRoleEnum.FAMILY
+        self._has_AP_from_veteran = False
+        self._allowed_to_dodge = False
 
     def __eq__(self, other):
         if not isinstance(other, PlayerModel):
@@ -258,5 +260,27 @@ class PlayerModel(Model, object):
     @role.setter
     def role(self, player_role: PlayerRoleEnum):
         self._role = player_role
-        logger.info("Player {nickname} role: {r}".format(nickname=self.nickname, r=player_role))
+        logger.info("Player {nickname} role: {r}".format(nickname=self.nickname, r=player_role.name))
         self._notify_role()
+
+    @property
+    def has_AP_from_veteran(self) -> bool:
+        return self._has_AP_from_veteran
+
+    @has_AP_from_veteran.setter
+    def has_AP_from_veteran(self, has: bool):
+        self._has_AP_from_veteran = has
+        logger.info("Player {nickname} has AP from Veteran: {h}".format(nickname=self.nickname, h=has))
+
+    @property
+    def allowed_to_dodge(self) -> bool:
+        return self._allowed_to_dodge
+
+    @allowed_to_dodge.setter
+    def allowed_to_dodge(self, permission: bool):
+        # Doge is not allowed to dodge
+        if self.role == PlayerRoleEnum.DOGE:
+            return
+        
+        self._allowed_to_dodge = permission
+        logger.info("Player {nickname} allowed to dodge: {p}".format(nickname=self.nickname, p=permission))
