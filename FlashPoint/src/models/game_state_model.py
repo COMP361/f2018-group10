@@ -211,6 +211,9 @@ class GameStateModel(Model):
     def remove_player(self, player: PlayerModel):
         """Remove a player from the current game."""
         with GameStateModel.lock:
+            remove_index = self.players.index(player)
+            if self.players_turn_index == remove_index:
+                self._players_turn_index += 1
             self._players.remove(player)
             self._notify_player_index()
             self._notify_player_removed(player)
