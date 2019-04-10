@@ -64,9 +64,9 @@ class FireDeckGunEvent(TurnEvent):
                 tile_sprite.fire_deck_gun = True
 
         if self.player.role == PlayerRoleEnum.DRIVER:
-            self.player.ap -= 2
+            self.player.ap = self.player.ap - 2
         else:
-            self.player.ap -= 4
+            self.player.ap = self.player.ap - 4
 
     def _set_target_tile(self):
         """

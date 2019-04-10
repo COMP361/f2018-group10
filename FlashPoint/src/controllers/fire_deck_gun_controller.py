@@ -74,6 +74,10 @@ class FireDeckGunController(Controller):
                 :return: True if it possible to perform
                         this event. False otherwise.
                 """
+        # Doge cannot fire the deck gun
+        if self.player.role == PlayerRoleEnum.DOGE:
+            return False
+
         if not TurnEvent.has_required_AP(self.player.ap, 4):
             return False
 
