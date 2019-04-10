@@ -31,6 +31,7 @@ class PlayerModel(Model, object):
         self._carrying_hazmat = NullModel()
         self._role = PlayerRoleEnum.FAMILY
         self._has_AP_from_veteran = False
+        self._allowed_to_dodge = False
 
     def __eq__(self, other):
         if not isinstance(other, PlayerModel):
@@ -267,3 +268,12 @@ class PlayerModel(Model, object):
     def has_AP_from_veteran(self, has: bool):
         self._has_AP_from_veteran = has
         logger.info("Player {nickname} has AP from Veteran: {h}".format(nickname=self.nickname, h=has))
+
+    @property
+    def allowed_to_dodge(self) -> bool:
+        return self._allowed_to_dodge
+
+    @allowed_to_dodge.setter
+    def allowed_to_dodge(self, permission: bool):
+        self._allowed_to_dodge = permission
+        logger.info("Player {nickname} allowed to dodge: {p}".format(nickname=self.nickname, p=permission))
