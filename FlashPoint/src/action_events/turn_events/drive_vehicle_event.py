@@ -21,7 +21,6 @@ class DriveVehicleEvent(TurnEvent):
         self._player: PlayerModel = GameStateModel.instance().players_turn
         self._row = min(tile.row for tile in parking_spot) if parking_spot else -1
         self._column = min(tile.column for tile in parking_spot) if parking_spot else -1
-        self._board_model: GameBoardModel = GameStateModel.instance().game_board
 
     def _check_for_rescued_victims(self, parking_spot):
         board: GameBoardModel = GameStateModel.instance().game_board
@@ -47,6 +46,7 @@ class DriveVehicleEvent(TurnEvent):
                 board.remove_poi_or_victim(player.carrying_victim)
 
     def execute(self, *args, **kwargs):
+        self._board_model: GameBoardModel = GameStateModel.instance().game_board
         logger.info("Executing DriveVehicle Event")
         destination_first_tile = self._board_model.get_tile_at(self._row, self._column)
         destination_second_tile = self._board_model.get_other_parking_tile(destination_first_tile)
