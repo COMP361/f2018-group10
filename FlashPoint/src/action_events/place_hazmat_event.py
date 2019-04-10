@@ -76,6 +76,6 @@ class PlaceHazmatEvent(ActionEvent):
             model = HazmatModel()
             sprite = HazmatSprite(tile)
             tile.add_associated_model(model)
-            GameBoard.instance().pois.add(sprite)
+            GameBoard.instance().add(sprite)
             model.add_observer(sprite)
             hazmat_to_place -= 1
