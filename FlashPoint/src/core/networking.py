@@ -76,7 +76,7 @@ class Networking:
             self.server_reply = None
 
             self.TIMEOUT_CONNECT = 5
-            self.TIMEOUT_RECEIVE = 1
+            self.TIMEOUT_RECEIVE = 3
 
         def create_host(self, port=20298):
             """
