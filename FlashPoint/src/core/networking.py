@@ -76,7 +76,7 @@ class Networking:
             self.server_reply = None
 
             self.TIMEOUT_CONNECT = 5
-            self.TIMEOUT_RECEIVE = 1
+            self.TIMEOUT_RECEIVE = 3
 
         def create_host(self, port=20298):
             """
@@ -374,6 +374,7 @@ class Networking:
 
             logger.debug(f"Client at {connection_object.address} sent a message: "
                          f"{data.__class__}")
+            print(f"Client at {connection_object.address} sent a message: "f"{data.__class__}")
             if isinstance(data, TurnEvent) or isinstance(data, ActionEvent):
                 if isinstance(data, DisconnectEvent):
                     # Kick the player that send the DC event and notify all other players.
@@ -414,6 +415,7 @@ class Networking:
             # define override here
             data = JSONSerializer.serialize(data)
             logger.debug(f"Sending message to client at {connection_object.address} : {data['class']}")
+            print(f"Sending message to client at {connection_object.address} : {data['class']}")
             return super(MastermindServerUDP, self).callback_client_send(connection_object, data, compression)
 
         class ClientNotFoundException(Exception):
@@ -485,6 +487,7 @@ class Networking:
             """Handle receiving data from host."""
             data: GameStateModel = JSONSerializer.deserialize(data)
             logger.debug(f"Client received {data.__class__.__name__} object from host.")
+            print(f"Client received {data.__class__.__name__} object from host.")
             if isinstance(data, GameStateModel):
                 GameStateModel.set_game(data)
                 return

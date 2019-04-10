@@ -24,11 +24,7 @@ class HostMenuScene(Scene):
 
         self.buttonNewGame.on_click(EventQueue.post, CustomEvent(ChangeSceneEnum.CREATEGAMEMENU))
         self.buttonLogin.on_click(EventQueue.post, CustomEvent(ChangeSceneEnum.LOADGAME))
-        self.buttonBack.on_click(self.go_back)
-
-    def go_back(self):
-        Networking.get_instance().disconnect()
-        EventQueue.post(CustomEvent(ChangeSceneEnum.STARTSCENE))
+        self.buttonBack.on_click(EventQueue.post, CustomEvent(ChangeSceneEnum.HOSTJOINSCENE, player=self._host))
 
     def _init_background(self):
         box_size = (self.resolution[0], self.resolution[1])
