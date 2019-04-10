@@ -207,6 +207,8 @@ class Networking:
                 self.client.disconnect()
                 self.client.__del__()
                 self.client = None
+                if self.is_host:
+                    self.host.kick_client('127.0.0.1')
             if self.is_host:
                 logger.info("Disconnecting host")
                 self.send_to_all_client(HostDisconnectEvent())

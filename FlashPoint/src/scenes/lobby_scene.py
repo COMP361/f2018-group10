@@ -53,12 +53,23 @@ class LobbyScene(GameStateObserver):
         else:
             self._current_player.status = PlayerStatusEnum.NOT_READY
             self.buttonReady.on_click(self.set_ready)
-        self.buttonBack.on_click(LobbyScene.go_back)
+        self.buttonBack.on_click(self.go_back)
 
     @staticmethod
-    def go_back():
+    def _init_disconnect_msg():
+        dc_msg = RectLabel(500, 30, 350, 75, 'media/GameHud/wood2.png', 0,
+                           Text(pygame.font.SysFont('Agency FB', 30), "Disconnecting...", Color.GREEN2))
+        dc_msg.add_frame('media/GameHud/frame.png')
+        dc_msg.draw(pygame.display.get_surface())
+
+    def go_back(self):
+        self._init_disconnect_msg()
+        if Networking.get_instance().is_host:
+            next_scene = ChangeSceneEnum.SETMAXPLAYERSCENE
+        else:
+            next_scene = ChangeSceneEnum.JOINSCENE
         Networking.get_instance().disconnect()
-        EventQueue.post(CustomEvent(ChangeSceneEnum.SETMAXPLAYERSCENE))
+        EventQueue.post(CustomEvent(next_scene))
 
     def start_game(self):
         """Callback for when the host tries to start the game."""

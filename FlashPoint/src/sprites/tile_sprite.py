@@ -62,22 +62,18 @@ class TileSprite(Interactable, TileObserver):
         self.identify_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.WOOD, 0,
                                           Text(pygame.font.SysFont('Agency FB', 15), "Identify", Color.GREEN2))
         pygame.draw.rect(self.identify_button.image, Color.YELLOW, [0, 0, 100, 25], 3)
-    
 
         self.move_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.WOOD, 0,
                                       Text(pygame.font.SysFont('Agency FB', 15), "Move Here", Color.GREEN2))
         pygame.draw.rect(self.move_button.image, Color.YELLOW, [0, 0, 100, 25], 3)
 
-
         self.extinguish_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.WOOD, 0,
                                             Text(pygame.font.SysFont('Agency FB', 15), "Extinguish", Color.GREEN2))
         pygame.draw.rect(self.extinguish_button.image, Color.YELLOW, [0, 0, 100, 25], 3)
 
-
         self.pickup_victim_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.WOOD, 0,
                                                Text(pygame.font.SysFont('Arial', 15), "Carry Victim", Color.GREEN2))
         pygame.draw.rect(self.pickup_victim_button.image, Color.YELLOW, [0, 0, 100, 25], 3)
-
 
         self.drop_victim_button = RectButton(self.rect.x, self.rect.y, 100, 25, Color.WOOD, 0,
                                              Text(pygame.font.SysFont('Agency FB', 15), "Leave Victim", Color.GREEN2))

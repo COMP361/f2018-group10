@@ -46,6 +46,12 @@ class GameBoard(pygame.sprite.Group):
                 pass
             else:
                 sprite.draw_menu(self.image)
+        for sprite in self.grid.walls:
+            if isinstance(sprite, RectButton) and not sprite.enabled:
+                pass
+            else:
+                sprite.draw_menu(self.image)
+
         screen.blit(self.image, self.rect)
 
     def update(self, event_q: EventQueue):

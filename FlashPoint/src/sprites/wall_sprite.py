@@ -86,10 +86,12 @@ class WallSprite(pygame.sprite.Sprite, WallObserver):
             self.damaged = False
             self.destroyed = True
 
-    def draw(self, screen):
+    def draw_menu(self, screen):
         self.button.draw(screen)
         if self.can_chop:
             self.button_input.draw(screen)
+
+    def draw(self, screen):
         x_offset1 = 0 if self.orientation == "vertical" else 25
         y_offset1 = 0 if self.orientation == "horizontal" else 25
         x_offset2 = 0 if self.orientation == "vertical" else 50
