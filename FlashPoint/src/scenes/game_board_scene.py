@@ -53,6 +53,7 @@ import src.constants.color as Color
 
 logger = logging.getLogger("FlashPoint")
 
+
 class GameBoardScene(GameBoardObserver, GameStateObserver):
     """
     Scene for displaying the main game view

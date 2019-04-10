@@ -40,7 +40,6 @@ class LobbyScene(GameStateObserver):
         self.sprite_grp = pygame.sprite.Group()
         self.players_not_ready_prompt = None
         self._init_all()
-        self._init_msg_box()
 
         if self._game.rules == GameKindEnum.EXPERIENCED:
             self.buttonSelChar.on_click(EventQueue.post, CustomEvent(ChangeSceneEnum.CHARACTERSCENE))
@@ -56,22 +55,8 @@ class LobbyScene(GameStateObserver):
             self.buttonReady.on_click(self.set_ready)
         self.buttonBack.on_click(self.go_back)
 
-    def _init_msg_box(self):
-        self._msg_box = RectLabel(500, 400, 300, 50, 'media/GameHud/wood2.png', 0,
-                                  Text(pygame.font.SysFont('Agency FB', 30), "Disconnecting...", Color.GREEN2))
-        self._msg_box.add_frame('media/GameHud/frame.png')
-        self._msg_box.draw(pygame.display.get_surface())
-        self._show_msg = False
-
-    def show_msg(self, msg: str):
-        self._msg_box.change_text(Text(pygame.font.SysFont('Agency FB', 30), msg, Color.GREEN2))
-        self._show_msg = True
-
-    def close_msg(self):
-        self._show_msg = False
-
-    def go_back(self):
-        self.show_msg("Disconnecting...")
+    @staticmethod
+    def go_back():
         if Networking.get_instance().is_host:
             next_scene = ChangeSceneEnum.SETMAXPLAYERSCENE
         else:
@@ -81,7 +66,6 @@ class LobbyScene(GameStateObserver):
 
     def start_game(self):
         """Callback for when the host tries to start the game."""
-        self.show_msg("Starting game...")
         game = GameStateModel.instance()
         players_ready = len([player for player in game.players if player.status == PlayerStatusEnum.READY])
 
@@ -295,9 +279,6 @@ class LobbyScene(GameStateObserver):
 
     def draw(self, screen):
         self.sprite_grp.draw(screen)
-
-        if self._show_msg:
-            self._msg_box.draw(screen)
 
         for box in self.player_boxes:
             box.draw(screen)
