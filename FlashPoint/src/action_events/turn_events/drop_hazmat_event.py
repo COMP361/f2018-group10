@@ -7,6 +7,7 @@ from src.models.game_units.hazmat_model import HazmatModel
 
 logger = logging.getLogger("FlashPoint")
 
+
 class DropHazmatEvent(TurnEvent):
 
     def __init__(self, hazmat_row: int, hazmat_column):
