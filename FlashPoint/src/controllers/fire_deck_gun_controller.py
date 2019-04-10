@@ -78,13 +78,13 @@ class FireDeckGunController(Controller):
         # Doge cannot fire the deck gun
         if self.player.role == PlayerRoleEnum.DOGE:
             return False
-        
+
         if not self.player == GameStateModel.instance().players_turn:
             return False
 
         ap_deduct = 2 if self.player.role == PlayerRoleEnum.DRIVER else 4
 
-        if not TurnEvent.has_required_AP(self.player.ap, 4):
+        if not TurnEvent.has_required_AP(self.player.ap, ap_deduct):
             return False
 
         # If the player is not located in the

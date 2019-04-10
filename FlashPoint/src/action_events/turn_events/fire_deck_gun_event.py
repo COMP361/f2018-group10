@@ -43,8 +43,8 @@ class FireDeckGunEvent(TurnEvent):
 
         if isinstance(self.target_tile, NullModel):
             self._set_target_tile()
-        else:
-            self.target_tile.space_status = SpaceStatusEnum.SAFE
+        
+        self.target_tile.space_status = SpaceStatusEnum.SAFE
 
         FileImporter.play_music("media/music/water_splash.mp3", 1)
         tile_sprite = GameBoard.instance().grid.grid[self.target_tile.column][self.target_tile.row]
