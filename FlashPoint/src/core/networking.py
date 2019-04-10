@@ -382,6 +382,8 @@ class Networking:
                     return super(MastermindServerUDP, self).callback_client_handle(connection_object, data)
 
                 if isinstance(data, JoinEvent):
+                    if connection_object.address[0] == '127.0.0.1':
+                        return super(MastermindServerUDP, self).callback_client_handle(connection_object, data)
                     try:
                         data.execute()
                         Networking.get_instance().send_to_all_client(GameStateModel.instance())
@@ -446,6 +448,7 @@ class Networking:
             """
             # pause_receive is irrelevant now
             # self._pause_receive.set()
+            print(f"Client sends {data.__class__.__name__}.")
             self._send_queue.append(data)
             # super(MastermindClientUDP, self).send(JSONSerializer.serialize(data), compression)
             # self._pause_receive.clear()
