@@ -20,7 +20,8 @@ class CommandPlayerController(Controller):
         self.game: GameStateModel = GameStateModel.instance()
         self.board: GameBoardModel = self.game.game_board
         if CommandPlayerController._instance:
-            raise Exception("CommandPlayerController is not a singleton!")
+            self._current_player = current_player
+            # raise Exception("CommandPlayerController is not a singleton!")
         if GameStateModel.instance().rules != GameKindEnum.EXPERIENCED:
             raise Exception("CommandPlayerController should not exist in Family Mode!")
 

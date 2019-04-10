@@ -19,7 +19,8 @@ class DriveVehiclesController(Controller):
     def __init__(self, current_player: PlayerModel):
         super().__init__(current_player)
         if DriveVehiclesController._instance:
-            raise Exception(f"{DriveVehiclesController.__name__} is a singleton!")
+            self._current_player = current_player
+            # raise Exception(f"{DriveVehiclesController.__name__} is a singleton!")
         DriveVehiclesController._instance = self
 
     @classmethod

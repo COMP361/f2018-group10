@@ -22,7 +22,8 @@ class IdentifyController(Controller):
         self.game: GameStateModel = GameStateModel.instance()
         self.board: GameBoardModel = self.game.game_board
         if IdentifyController._instance:
-            raise Exception("IndentifyController is not a singleton!")
+            self._current_player = current_player
+            # raise Exception("IndentifyController is not a singleton!")
         if GameStateModel.instance().rules != GameKindEnum.EXPERIENCED:
             raise Exception("IndentifyController should not exist in Family Mode!")
 

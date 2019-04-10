@@ -27,7 +27,8 @@ class ResuscitateController(Controller):
         self._current_player = current_player
 
         if ResuscitateController._instance:
-            raise Exception("ResuscitateController is not a singleton!")
+            self._current_player = current_player
+            # raise Exception("ResuscitateController is not a singleton!")
         if GameStateModel.instance().rules != GameKindEnum.EXPERIENCED:
             raise Exception("ResuscitateController should not exist in Family Mode!")
 

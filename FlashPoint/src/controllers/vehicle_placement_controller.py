@@ -27,7 +27,8 @@ class VehiclePlacementController(Controller):
         super().__init__(current_player)
 
         if VehiclePlacementController._instance:
-            raise Exception(f"{VehiclePlacementController.__name__} is a singleton!")
+            self._current_player = current_player
+            # raise Exception(f"{VehiclePlacementController.__name__} is a singleton!")
 
         self.choose_engine_prompt = RectLabel(500, 30, 350, 75, Color.GREY, 0,
                                               Text(pygame.font.SysFont('Agency FB', 30), "Choose Engine Position",

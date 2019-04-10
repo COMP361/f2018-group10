@@ -29,7 +29,8 @@ class HazmatController(Controller):
         self._current_player = current_player
 
         if HazmatController._instance:
-            raise Exception("HazmatController is not a singleton!")
+            self._current_player = current_player
+            # raise Exception("HazmatController is not a singleton!")
         if GameStateModel.instance().rules != GameKindEnum.EXPERIENCED:
             raise Exception("HazmatController should not exist in Family Mode!")
 

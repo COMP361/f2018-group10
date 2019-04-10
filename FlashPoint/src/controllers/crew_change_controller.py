@@ -26,7 +26,8 @@ class CrewChangeController(Controller):
         self.board: GameBoardModel = self.game.game_board
         self._current_player = current_player
         if CrewChangeController.instance():
-            raise Exception("CrewChangeController is not a singleton!")
+            self._current_player = current_player
+            # raise Exception("CrewChangeController is not a singleton!")
         if GameStateModel.instance().rules != GameKindEnum.EXPERIENCED:
             raise Exception("CrewChangeController should not exist in Family Mode!")
         CrewChangeController._instance = self

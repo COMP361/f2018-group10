@@ -22,7 +22,8 @@ class ExtinguishController(Controller):
         super().__init__(current_player)
 
         if ExtinguishController._instance:
-            raise Exception("ExtinguishController is a singleton")
+            self._current_player = current_player
+            # raise Exception("ExtinguishController is a singleton")
         self.game_board_sprite = GameBoard.instance()
         self.current_player = current_player
         game: GameStateModel = GameStateModel.instance()

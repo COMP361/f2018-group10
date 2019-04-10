@@ -17,6 +17,7 @@ import logging
 
 logger = logging.getLogger("FlashPoint")
 
+
 class VictimController(Controller):
 
     def send_event_and_close_menu(self, tile_model: TileModel, menu_to_close: Interactable):
@@ -27,7 +28,8 @@ class VictimController(Controller):
     def __init__(self, current_player: PlayerModel):
         super().__init__(current_player)
         if VictimController._instance:
-            raise Exception("Victim Controller is a singleton")
+            self._current_player = current_player
+            # raise Exception("Victim Controller is a singleton")
         VictimController._instance = self
 
     @classmethod

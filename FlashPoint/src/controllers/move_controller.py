@@ -45,7 +45,7 @@ class MoveController(VehicleObserver, PlayerObserver, Controller):
         super().__init__(current_player)
 
         if MoveController._instance:
-            raise Exception("MoveController is a singleton")
+            self._current_player = current_player
 
         self.game_board_sprite = GameBoard.instance()
         self.current_player = current_player
