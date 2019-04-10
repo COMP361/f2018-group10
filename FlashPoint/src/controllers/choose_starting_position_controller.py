@@ -24,7 +24,8 @@ class ChooseStartingPositionController(Controller):
         super().__init__(current_player)
 
         if ChooseStartingPositionController._instance:
-            raise Exception("ChooseStartingPositionController is a singleton")
+            self._current_player = current_player
+            # raise Exception("ChooseStartingPositionController is a singleton")
         self.current_player = current_player
         self.game_board_sprite = GameBoard.instance()
         self.choose_prompt = RectLabel(500, 30, 350, 75, Color.GREY, 0,

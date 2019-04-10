@@ -29,7 +29,7 @@ class TileInputController(GameStateObserver, Controller):
     def __init__(self, current_player: PlayerModel):
         super().__init__(current_player)
         if TileInputController._instance:
-            raise Exception("TileInputController is a singleton")
+            self._current_player = current_player
 
         self.game_board_sprite = GameBoard.instance()
 

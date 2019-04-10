@@ -14,7 +14,7 @@ class StateCleaner:
             GameStateModel.destroy()
         if GameBoard.instance():
             GameBoard._instance = None
-            TileInputController.destroy()
+            # TileInputController.destroy()
             ChopController._instance = None
             DoorController._instance = None
             VeteranController._instance = None

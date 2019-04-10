@@ -31,7 +31,8 @@ class FireDeckGunController(Controller):
         super().__init__(current_player)
 
         if FireDeckGunController._instance:
-            raise Exception("Victim Controller is a singleton")
+            self._current_player = current_player
+            # raise Exception("Victim Controller is a singleton")
 
         self._game: GameStateModel = GameStateModel.instance()
         self.player = current_player
