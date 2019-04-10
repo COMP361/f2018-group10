@@ -1,3 +1,4 @@
+import logging
 from typing import List
 
 import src.constants.color as Color
@@ -24,6 +25,8 @@ from src.models.game_board.tile_model import TileModel
 from src.models.game_state_model import GameStateModel
 from src.sprites.game_board import GameBoard
 
+logger = logging.info("FlashPoint")
+
 
 class MoveController(VehicleObserver, PlayerObserver, Controller):
 
@@ -46,6 +49,7 @@ class MoveController(VehicleObserver, PlayerObserver, Controller):
 
         self.game_board_sprite = GameBoard.instance()
         self.current_player = current_player
+        self._only_allow_safe_space = False
         ap = self.current_player.ap
         # Rescue specialist's special AP are used for moving
         if self.current_player.role == PlayerRoleEnum.RESCUE:
@@ -62,6 +66,15 @@ class MoveController(VehicleObserver, PlayerObserver, Controller):
     @classmethod
     def instance(cls):
         return cls._instance
+
+    @property
+    def only_allow_safe_space(self) -> bool:
+        return self._only_allow_safe_space
+
+    @only_allow_safe_space.setter
+    def only_allow_safe_space(self, permission: bool):
+        self._only_allow_safe_space = permission
+        logger.info("Move controller: Allowing only safe space: {tf}".format(tf=permission))
 
     @property
     def target(self) -> PlayerModel:
@@ -251,6 +264,8 @@ class MoveController(VehicleObserver, PlayerObserver, Controller):
         :return: True if player can go into this
                 fire space, False otherwise.
         """
+        if self._only_allow_safe_space:
+            return False
         if isinstance(self.target.carrying_victim, VictimModel):
             return False
         if isinstance(self.target.carrying_hazmat, HazmatModel):
@@ -277,6 +292,10 @@ class MoveController(VehicleObserver, PlayerObserver, Controller):
         :return: True if player can go into this
                 safe/smoke space, False otherwise.
         """
+        if self._only_allow_safe_space:
+            if second_tile.tile_model.space_status == SpaceStatusEnum.SMOKE:
+                return False
+
         # Can pass either Safe or Smoke to method
         cost_to_move = self._determine_cost_to_move(second_tile.tile_model)
         if ap < cost_to_move:

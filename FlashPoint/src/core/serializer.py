@@ -228,6 +228,8 @@ class JSONSerializer(object):
         player.wins = payload['_wins']
         player.losses = payload['_losses']
         player.role = PlayerRoleEnum(payload["_role"]["value"])
+        player.has_AP_from_veteran = payload['_has_AP_from_veteran']
+        player.allowed_to_dodge = payload['_allowed_to_dodge']
         if payload['_carrying_hazmat']:
             player.carrying_hazmat = JSONSerializer.deserialize(payload['_carrying_hazmat'])
         if payload['_carrying_victim']:

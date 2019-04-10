@@ -11,6 +11,7 @@ import logging
 from src.action_events.board_setup_event import BoardSetupEvent
 from src.constants.custom_event_enums import CustomEventEnum
 from src.constants.state_enums import GameStateEnum
+from src.controllers.veteran_controller import VeteranController
 from src.models.game_units.hazmat_model import HazmatModel
 from src.models.game_units.victim_model import VictimModel
 from src.sprites.hud.command_notification import CommandNotification
@@ -139,6 +140,7 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
         ChopController(self._current_player)
         DoorController(self._current_player)
         TileInputController(self._current_player)
+        VeteranController(self._current_player)
 
     def _init_current_player(self, current_player: PlayerModel):
         """Set reference of the current player to point to the one in the game state."""
