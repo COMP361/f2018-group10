@@ -18,6 +18,8 @@ Learning the game:
 
 > ***Flash Point: Fire Rescue*** has two different sets of rules. Family rules for learning the game and/or playing with younger children, and the Experienced rules for more seasoned players. The rules are quick to read, and you can even play the game by yourself before teaching it to others.
 
+## Rules
+
 The rules for the game can be found [here](./Flash_Point_Rulebook.pdf). You can also check out these helpful videos to see how the [Family](https://www.youtube.com/watch?v=eRAuAt0XBoE) and [Experienced](https://www.youtube.com/watch?v=aPs8D47iitM) modes work.
 
 The rules for the `Veteran` and `Rescue Dog` roles (only used in the `Experienced` mode) can be found [here](./Veteran_and_Rescue_Dog_Rules.pdf).
