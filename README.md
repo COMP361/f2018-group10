@@ -26,7 +26,8 @@ The rules for the `Veteran` and `Rescue Dog` roles (only used in the `Experience
 
 ## Limitations
 
-A multiplayer (co-op) game can only be initiated by devices over the same network. Technical issues have been observed when playing on a macOS device.
+* A multiplayer (co-op) game can only be initiated by devices over the same network.
+* Technical issues have been observed when playing on a macOS device.
 
 ## Dependencies
 
