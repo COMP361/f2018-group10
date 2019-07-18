@@ -24,6 +24,10 @@ The rules for the game can be found [here](./Flash_Point_Rulebook.pdf). You can 
 
 The rules for the `Veteran` and `Rescue Dog` roles (only used in the `Experienced` mode) can be found [here](./Veteran_and_Rescue_Dog_Rules.pdf).
 
+## Limitations
+
+A multiplayer (co-op) game can only be initiated by devices over the same network. Technical issues have been observed when playing on a macOS device.
+
 ## Dependencies
 
 [pygame](https://github.com/pygame/pygame)
