@@ -26,4 +26,4 @@ The rules for the `Veteran` and `Rescue Dog` roles (only used in the `Experience
 
 ## Dependencies
 
-<------ Have to fill in ------>
+[pygame](https://github.com/pygame/pygame)
