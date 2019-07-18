@@ -16,17 +16,6 @@ class DropHazmatEvent(TurnEvent):
         self.hazmat_tile = game.game_board.get_tile_at(hazmat_row, hazmat_column)
         self.player = game.players_turn
 
-    # TODO: Move this code to the controller.
-    def check(self):
-        """
-        If the player is not carrying a
-        hazmat, then they cannot drop it.
-
-        :return: True if player is carrying a
-                hazmat, False otherwise.
-        """
-        pass
-
     def execute(self):
         logger.info("Executing Drop Hazmat Event")
 

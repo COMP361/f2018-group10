@@ -21,18 +21,6 @@ class PickupHazmatEvent(TurnEvent):
 
         self.player: PlayerModel = game.players_turn
 
-    # TODO: Move this check code to the controller
-    def check(self) -> bool:
-        """
-        If the player is already carrying
-        another victim or a hazmat, then
-        they cannot pick up another hazmat.
-
-        :return: True if the player is carrying
-                nothing, False otherwise.
-        """
-        pass
-
     def execute(self):
         logger.info("Executing Pickup Hazmat Event")
         self.player.carrying_hazmat = self.hazmat
