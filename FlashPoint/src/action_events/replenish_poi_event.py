@@ -145,34 +145,28 @@ class ReplenishPOIEvent(ActionEvent):
         tile: TileModel = self.board.get_tile_at(row, column)
         # logger.info(f"Next tile at direction: {tile.arrow_dirn}")
 
-        if tile.arrow_dirn is ArrowDirectionEnum.NORTH:
-            dest: TileModel = tile.north_tile
-            return dest.row, dest.column
+        if tile.arrow_dirn == ArrowDirectionEnum.NORTH:
+            dest: TileModel = tile.get_tile_in_direction("North")
 
-        elif tile.arrow_dirn is ArrowDirectionEnum.EAST:
-            dest: TileModel = tile.east_tile
-            return dest.row, dest.column
+        elif tile.arrow_dirn == ArrowDirectionEnum.EAST:
+            dest: TileModel = tile.get_tile_in_direction("East")
 
-        elif tile.arrow_dirn is ArrowDirectionEnum.WEST:
-            dest: TileModel = tile.west_tile
-            return dest.row, dest.column
+        elif tile.arrow_dirn == ArrowDirectionEnum.WEST:
+            dest: TileModel = tile.get_tile_in_direction("West")
 
-        elif tile.arrow_dirn is ArrowDirectionEnum.SOUTH:
-            dest: TileModel = tile.south_tile
-            return dest.row, dest.column
+        elif tile.arrow_dirn == ArrowDirectionEnum.SOUTH:
+            dest: TileModel = tile.get_tile_in_direction("South")
 
-        elif tile.arrow_dirn is ArrowDirectionEnum.NORTH_EAST:
-            dest: TileModel = tile.east_tile.north_tile
-            return dest.row, dest.column
+        elif tile.arrow_dirn == ArrowDirectionEnum.NORTH_EAST:
+            dest: TileModel = tile.get_tile_in_direction("North").get_tile_in_direction("East")
 
-        elif tile.arrow_dirn is ArrowDirectionEnum.NORTH_WEST:
-            dest: TileModel = tile.west_tile.north_tile
-            return dest.row, dest.column
+        elif tile.arrow_dirn == ArrowDirectionEnum.NORTH_WEST:
+            dest: TileModel = tile.get_tile_in_direction("North").get_tile_in_direction("West")
 
-        elif tile.arrow_dirn is ArrowDirectionEnum.SOUTH_EAST:
-            dest: TileModel = tile.east_tile.south_tile
-            return dest.row, dest.column
+        elif tile.arrow_dirn == ArrowDirectionEnum.SOUTH_EAST:
+            dest: TileModel = tile.get_tile_in_direction("South").get_tile_in_direction("East")
 
-        elif tile.arrow_dirn is ArrowDirectionEnum.SOUTH_WEST:
-            dest: TileModel = tile.west_tile.south_tile
-            return dest.row, dest.column
+        elif tile.arrow_dirn == ArrowDirectionEnum.SOUTH_WEST:
+            dest: TileModel = tile.get_tile_in_direction("South").get_tile_in_direction("West")
+
+        return dest.row, dest.column

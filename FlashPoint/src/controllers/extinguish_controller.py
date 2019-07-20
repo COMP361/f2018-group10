@@ -68,7 +68,7 @@ class ExtinguishController(Controller):
         if tile_model.space_status == SpaceStatusEnum.SAFE:
             return False
 
-        if player_tile.south_tile == tile_model:
+        if player_tile.get_tile_in_direction("South") == tile_model:
             obs = player_tile.get_obstacle_in_direction('South')
             if isinstance(obs, WallModel):
                 if not obs.wall_status == WallStatusEnum.DESTROYED:
@@ -78,7 +78,7 @@ class ExtinguishController(Controller):
                 if obs.door_status == DoorStatusEnum.CLOSED:
                     return False
 
-        elif player_tile.north_tile == tile_model:
+        elif player_tile.get_tile_in_direction("North") == tile_model:
             obs = player_tile.get_obstacle_in_direction('North')
             if isinstance(obs, WallModel):
                 if not obs.wall_status == WallStatusEnum.DESTROYED:
@@ -88,7 +88,7 @@ class ExtinguishController(Controller):
                 if obs.door_status == DoorStatusEnum.CLOSED:
                     return False
 
-        elif player_tile.east_tile == tile_model:
+        elif player_tile.get_tile_in_direction("East") == tile_model:
             obs = player_tile.get_obstacle_in_direction('East')
             if isinstance(obs, WallModel):
                 if not obs.wall_status == WallStatusEnum.DESTROYED:
@@ -98,7 +98,7 @@ class ExtinguishController(Controller):
                 if obs.door_status == DoorStatusEnum.CLOSED:
                     return False
 
-        elif player_tile.west_tile == tile_model:
+        elif player_tile.get_tile_in_direction("West") == tile_model:
             obs = player_tile.get_obstacle_in_direction('West')
             if isinstance(obs, WallModel):
                 if not obs.wall_status == WallStatusEnum.DESTROYED:
