@@ -119,66 +119,6 @@ class TileModel(Model):
     def arrow_dirn(self, arrow_dirn: ArrowDirectionEnum):
         self._arrow_dirn = arrow_dirn
 
-    @property
-    def north_tile(self):
-        """
-        Get the TileModel to the North of this one.
-        :raise TilePositionOutOfBoundsException: If there is no Tile in that direction.
-        """
-        tile = self._adjacent_tiles.get("North", None)
-        if not tile:
-            raise TilePositionOutOfBoundsException(self, "North")
-        return tile
-
-    @north_tile.setter
-    def north_tile(self, tile):
-        self._adjacent_tiles["North"] = tile
-
-    @property
-    def east_tile(self):
-        """
-        Get the TileModel to the North of this one.
-        :raise TilePositionOutOfBoundsException: If there is no Tile in that direction.
-        """
-        tile = self._adjacent_tiles.get("East", None)
-        if not tile:
-            raise TilePositionOutOfBoundsException(self, "East")
-        return tile
-
-    @east_tile.setter
-    def east_tile(self, tile):
-        self._adjacent_tiles["East"] = tile
-
-    @property
-    def west_tile(self):
-        """
-        Get the TileModel to the  of this one.
-        :raise TilePositionOutOfBoundsException: If there is no Tile in that direction.
-        """
-        tile = self._adjacent_tiles.get("West", None)
-        if not tile:
-            raise TilePositionOutOfBoundsException(self, "West")
-        return tile
-
-    @west_tile.setter
-    def west_tile(self, tile):
-        self._adjacent_tiles["West"] = tile
-
-    @property
-    def south_tile(self):
-        """
-        Get the TileModel to the South of this one.
-        :raise TilePositionOutOfBoundsException: If there is no Tile in that direction.
-        """
-        tile = self._adjacent_tiles.get("South", None)
-        if not tile:
-            raise TilePositionOutOfBoundsException(self, "South")
-        return tile
-
-    @south_tile.setter
-    def south_tile(self, tile):
-        self._adjacent_tiles["South"] = tile
-
     def set_adjacent_edge_obstacle(self, direction: str, edge_obstacle: EdgeObstacleModel):
         self._adjacent_edge_objects[direction] = edge_obstacle
 
@@ -188,11 +128,12 @@ class TileModel(Model):
     def get_tile_in_direction(self, direction: str):
         """
         Get the TileModel in a specified direction.
-        "raise TilePositionOutOfBoundsException: If there is no Tile in that direction.
+        raise TilePositionOutOfBoundsException: If there is no TileModel set in that direction.
         """
-        tile = self._adjacent_tiles.get(direction, NullModel)
-        if isinstance(tile, NullModel):
+        tile = self._adjacent_tiles.get(direction, None)
+        if not tile:
             raise TilePositionOutOfBoundsException(tile, direction)
+
         return tile
 
     def get_obstacle_in_direction(self, direction: str) -> Optional['EdgeObstacleModel']:
