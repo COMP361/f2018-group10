@@ -9,10 +9,11 @@ logger = logging.getLogger("FlashPoint")
 
 
 class VehicleModel(Model):
-    """Base class for Ambulance and Engine.
-        IMPORTANT NOTES:
-        For horizontal vehicles, row is the topmost row of the parking spot
-        For vertical vehicles, column is the leftmost column of the parking spot
+    """
+    Base class for Ambulance and Engine.
+    IMPORTANT NOTES:
+    - For horizontal vehicles, row is the topmost row of the parking spot
+    - For vertical vehicles, column is the leftmost column of the parking spot
     """
 
     def __init__(self, board_dimensions: Tuple[int, int]):
