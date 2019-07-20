@@ -16,19 +16,6 @@ class DropVictimEvent(TurnEvent):
         self.victim_tile = game.game_board.get_tile_at(victim_row, victim_column)
         self.player = game.players_turn
 
-    def check(self):
-        """
-        If the player is not carrying a
-        victim, then they cannot drop it.
-
-        :return: True if player is carrying a
-                victim, False otherwise.
-        """
-        if isinstance(self.player.carrying_victim, VictimModel):
-            return True
-
-        return False
-
     def execute(self):
         logger.info("Executing Drop Victim Event")
         self.victim_tile.add_associated_model(self.player.carrying_victim)

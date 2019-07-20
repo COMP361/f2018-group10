@@ -59,8 +59,8 @@ class VictimController(Controller):
     def check_pickup(self, tile: TileModel) -> bool:
         game: GameStateModel = GameStateModel.instance()
 
-        if isinstance(self._current_player.carrying_hazmat, HazmatModel):
-            # Cant carry victim and hazmat at the same time
+        # Cannot carry a victim if already carrying a victim/hazmat
+        if isinstance(self._current_player.carrying_hazmat, HazmatModel) or isinstance(self._current_player.carrying_victim, VictimModel):
             return False
 
         victim_tile = game.game_board.get_tile_at(tile.row, tile.column)
