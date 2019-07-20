@@ -20,7 +20,7 @@ class PlayerModel(Model, object):
         self._row = -1
         self._column = -1
         self._nickname = nickname
-        self._color = Color.WHITE  # White by default (not racist I swear)
+        self._color = Color.WHITE
         self._status = PlayerStatusEnum.NOT_READY
         self._ap = 0
         self._special_ap = 0
@@ -113,24 +113,25 @@ class PlayerModel(Model, object):
         self._notify_position()
 
     def set_initial_ap(self, game_kind: GameKindEnum):
-        """Set the initial AP and special AP for this player"""
         self.ap = 4
-        if game_kind == GameKindEnum.EXPERIENCED:
-            if self.role == PlayerRoleEnum.CAPTAIN:
-                self.special_ap = 2
+        if game_kind != GameKindEnum.EXPERIENCED:
+            return
 
-            elif self.role == PlayerRoleEnum.CAFS:
-                self.ap = self.ap - 1
-                self.special_ap = 3
+        if self.role == PlayerRoleEnum.CAPTAIN:
+            self.special_ap = 2
 
-            elif self.role == PlayerRoleEnum.GENERALIST:
-                self.ap = self.ap + 1
+        elif self.role == PlayerRoleEnum.CAFS:
+            self.ap = self.ap - 1
+            self.special_ap = 3
 
-            elif self.role == PlayerRoleEnum.RESCUE:
-                self.special_ap = 3
+        elif self.role == PlayerRoleEnum.GENERALIST:
+            self.ap = self.ap + 1
 
-            elif self.role == PlayerRoleEnum.DOGE:
-                self.ap = self.ap + 8
+        elif self.role == PlayerRoleEnum.RESCUE:
+            self.special_ap = 3
+
+        elif self.role == PlayerRoleEnum.DOGE:
+            self.ap = self.ap + 8
 
 
     @property
