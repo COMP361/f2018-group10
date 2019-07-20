@@ -128,11 +128,12 @@ class TileModel(Model):
     def get_tile_in_direction(self, direction: str):
         """
         Get the TileModel in a specified direction.
-        "raise TilePositionOutOfBoundsException: If there is no Tile in that direction.
+        raise TilePositionOutOfBoundsException: If there is no TileModel set in that direction.
         """
-        tile = self._adjacent_tiles.get(direction, NullModel)
-        if isinstance(tile, NullModel):
+        tile = self._adjacent_tiles.get(direction, None)
+        if not tile:
             raise TilePositionOutOfBoundsException(tile, direction)
+
         return tile
 
     def get_obstacle_in_direction(self, direction: str) -> Optional['EdgeObstacleModel']:

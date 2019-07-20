@@ -8,7 +8,6 @@ from src.action_events.turn_events.turn_event import TurnEvent
 from src.constants.custom_event_enums import CustomEventEnum
 from src.constants.state_enums import SpaceStatusEnum, SpaceKindEnum, DoorStatusEnum, VictimStateEnum, \
     GameKindEnum, PlayerRoleEnum, WallStatusEnum
-from src.core.flashpoint_exceptions import TilePositionOutOfBoundsException
 
 from src.core.custom_event import CustomEvent
 from src.core.event_queue import EventQueue
@@ -502,10 +501,9 @@ class MoveEvent(TurnEvent):
         """
         directions = ["North", "East", "West", "South"]
         for dirn in directions:
-            try:
-                nb_src_tile: TileModel = src_tile.get_tile_in_direction(dirn)
-                if nb_src_tile.row == dest_tile.row and nb_src_tile.column == dest_tile.column:
-                    return dirn
-
-            except TilePositionOutOfBoundsException:
+            nb_src_tile: TileModel = src_tile.get_tile_in_direction(dirn)
+            if isinstance(nb_src_tile, NullModel):
                 continue
+
+            if nb_src_tile.row == dest_tile.row and nb_src_tile.column == dest_tile.column:
+                return dirn
