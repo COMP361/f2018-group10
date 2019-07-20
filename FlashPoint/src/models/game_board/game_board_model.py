@@ -301,10 +301,10 @@ class GameBoardModel(Model):
 
         for i in range(1, len(extended_grid) - 1):
             for j in range(1, len(extended_grid[0]) - 1):
-                extended_grid[i][j].north_tile = extended_grid[i - 1][j]
-                extended_grid[i][j].east_tile = extended_grid[i][j + 1]
-                extended_grid[i][j].west_tile = extended_grid[i][j - 1]
-                extended_grid[i][j].south_tile = extended_grid[i + 1][j]
+                extended_grid[i][j].set_adjacent_tile("North", extended_grid[i - 1][j])
+                extended_grid[i][j].set_adjacent_tile("East", extended_grid[i][j + 1])
+                extended_grid[i][j].set_adjacent_tile("West", extended_grid[i][j - 1])
+                extended_grid[i][j].set_adjacent_tile("South", extended_grid[i + 1][j])
 
     def set_parking_spaces(self, parking_spaces_file: str, tiles: List[List[TileModel]]):
         """
