@@ -59,10 +59,6 @@ class GameStateModel(Model):
         else:
             raise Exception("GameStateModel is a Singleton")
 
-    # def notify_all_observers(self):
-    #     self._notify_state()
-    #     self._game_board.notify_all_observers()
-
     def _notify_player_added(self, player: PlayerModel):
         for obs in self._observers:
             obs.player_added(player)
@@ -92,7 +88,6 @@ class GameStateModel(Model):
 
     @classmethod
     def instance(cls):
-        """Get the instance of this singleton"""
         return cls._instance
 
     @classmethod
@@ -158,13 +153,11 @@ class GameStateModel(Model):
             return self._chat_history
 
     def add_chat_message(self, message: str, sender_nickname: str):
-        """Add a chat message to the history."""
         with GameStateModel.lock:
             self._chat_history.append((message, sender_nickname))
 
     @property
     def host(self) -> PlayerModel:
-        """Get the PlayerModel assigned to the host of the current game."""
         with GameStateModel.lock:
             return self._host
 
@@ -194,7 +187,6 @@ class GameStateModel(Model):
             self._players = players
 
     def add_player(self, player: PlayerModel):
-        """Add a player to the current game."""
         with GameStateModel.lock:
             if len(self._players) == self._max_desired_players:
                 raise TooManyPlayersException(player)
@@ -209,7 +201,6 @@ class GameStateModel(Model):
             return matching_players[0]
 
     def remove_player(self, player: PlayerModel):
-        """Remove a player from the current game."""
         with GameStateModel.lock:
             remove_index = self.players.index(player)
             if self.players_turn_index <= remove_index:
@@ -262,24 +253,20 @@ class GameStateModel(Model):
 
     @property
     def rules(self) -> GameKindEnum:
-        """The Game rules, one of GameKindEnum.FAMILY or GameKindEnum.EXPERIENCED"""
         with GameStateModel.lock:
             return self._rules
 
     @rules.setter
     def rules(self, rules: GameKindEnum):
-        """Set the rules for this game. one of GameKindEnum.FAMILY or GameKindEnum.EXPERIENCED"""
         with GameStateModel.lock:
             self._rules = rules
             logger.info("Game rules: {r}".format(r=rules))
 
     def roll_black_dice(self) -> int:
-        """Roll the black dice to get a random number between 1-8"""
         with GameStateModel.lock:
             return random.randint(1, 8)
 
     def roll_red_dice(self) -> int:
-        """Roll the red dice to get a random number between 1-6"""
         with GameStateModel.lock:
             return random.randint(1, 6)
 
@@ -311,6 +298,7 @@ class GameStateModel(Model):
             logger.info("Game victims lost: {vl}".format(vl=victims_lost))
             for obs in self._observers:
                 obs.dead_victims(victims_lost)
+
             if self._victims_lost >= 4:
                 self._state = GameStateEnum.LOST
                 self.endgame()
@@ -327,6 +315,7 @@ class GameStateModel(Model):
             logger.info("Game damage: {d}".format(d=damage))
             for obs in self._observers:
                 obs.damage_changed(damage)
+
             if self._damage == self.max_damage:
                 self._state = GameStateEnum.LOST
                 self.endgame()
@@ -352,6 +341,7 @@ class GameStateModel(Model):
             self._state = game_state
             logger.info("Game state: {s}".format(s=game_state))
             self._notify_state()
+
             if self._state == GameStateEnum.LOST:
                 # TODO: More stuff here for what is supposed to happen when the game is lost.
                 pass
@@ -383,7 +373,6 @@ class GameStateModel(Model):
             return players_on_tile
 
     def all_players_have_chosen_location(self) -> bool:
-        """If all player locations are positive, then we know that they have chosen their position."""
         return all([player.column >= 0 and player.row >= 0 for player in self.players])
 
     def vehicles_have_been_placed(self) -> bool:
