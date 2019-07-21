@@ -24,6 +24,18 @@ The rules for the game can be found [here](./Flash_Point_Rulebook.pdf). You can 
 
 The rules for the `Veteran` and `Rescue Dog` roles (only used in the `Experienced` mode) can be found [here](./Veteran_and_Rescue_Dog_Rules.pdf).
 
+## Models
+
+The different models conceived during the development of the game are:
+
+*Note: These models may not necessarily reflect the game as it stands today. Rather, they provide an insight into the initial thought process that existed while the game was being developed.*
+
+- [Project Sketch](./Milestones/Project_Sketch.pdf)
+- [Use Cases](./Milestones/Use_Cases.pdf)
+- [Concept Model](./Milestones/Concept_Model.pdf)
+- [Environment Model](./Milestones/Environment_Model.pdf)
+- [Operational Model](./Milestones/Operational_Model.pdf)
+
 ## Limitations
 
 * A multiplayer (co-op) game can only be initiated by devices over the same network.
