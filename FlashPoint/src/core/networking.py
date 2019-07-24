@@ -388,7 +388,7 @@ class Networking:
                         data.execute()
                         Networking.get_instance().send_to_all_client(GameStateModel.instance())
                         if GameStateModel.instance().game_board.board_type == GameBoardTypeEnum.RANDOM:
-                            with open("media/board_layouts/random_inside_walls_doors.json", "r+") as f:
+                            with open("src/media/board_layouts/random_inside_walls_doors.json", "r+") as f:
 
                                 board_info = json.load(f)
                             Networking.get_instance().send_to_all_client(RandomBoardSetupEvent(board_info))

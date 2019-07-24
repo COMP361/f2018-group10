@@ -21,9 +21,9 @@ class CurrentPlayerState(pygame.sprite.Sprite, PlayerObserver):
     def __init__(self, x: int, y: int, name: str, color: Color, current: PlayerModel, rules: GameKindEnum):
         super().__init__()
         current.add_observer(self)
-        bg = pygame.image.load('media/GameHud/wood2.png')
+        bg = pygame.image.load('src/media/GameHud/wood2.png')
         self.bg = pygame.transform.scale(bg, (150, 150))
-        frame = pygame.image.load('media/GameHud/frame.png')
+        frame = pygame.image.load('src/media/GameHud/frame.png')
         self.frame = pygame.transform.scale(frame, (150, 150))
         self.image = pygame.Surface([150, 150])
         self.surface_for_text = pygame.Surface([150, 150])
@@ -59,12 +59,12 @@ class CurrentPlayerState(pygame.sprite.Sprite, PlayerObserver):
 
     def color_picker(self, color: Color):
         return {
-            Color.WHITE: pygame.image.load('media/GameHud/PWHITE.png'),
-            Color.BLUE: pygame.image.load('media/GameHud/Bleu.png'),
-            Color.RED: pygame.image.load('media/GameHud/PRED.png'),
-            Color.ORANGE: pygame.image.load('media/GameHud/PORANGE.png'),
-            Color.YELLOW: pygame.image.load('media/GameHud/PYELLOW.png'),
-            Color.GREEN: pygame.image.load('media/GameHud/PGREEN.png'),
+            Color.WHITE: pygame.image.load('src/media/GameHud/PWHITE.png'),
+            Color.BLUE: pygame.image.load('src/media/GameHud/Bleu.png'),
+            Color.RED: pygame.image.load('src/media/GameHud/PRED.png'),
+            Color.ORANGE: pygame.image.load('src/media/GameHud/PORANGE.png'),
+            Color.YELLOW: pygame.image.load('src/media/GameHud/PYELLOW.png'),
+            Color.GREEN: pygame.image.load('src/media/GameHud/PGREEN.png'),
         }[color]
 
     def update(self, event_queue: EventQueue):

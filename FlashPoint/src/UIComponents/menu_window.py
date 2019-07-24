@@ -35,11 +35,11 @@ class MenuWindow(object):
         self._grey.set_alpha(150)
         self._image = pygame.Surface((width, height))
         #self._bg_color = bg_color
-        self.bg = pygame.image.load("media/GameHud/wood2.png")
+        self.bg = pygame.image.load("src/media/GameHud/wood2.png")
         self.bg = pygame.transform.scale(self.bg,(width,height))
-        self.frame = pygame.image.load("media/GameHud/frame.png")
+        self.frame = pygame.image.load("src/media/GameHud/frame.png")
         self.frame = pygame.transform.scale(self.frame,(width,height))
-        self.cross = pygame.image.load("media/GameHud/crosss.png")
+        self.cross = pygame.image.load("src/media/GameHud/crosss.png")
         self._rect = self._image.get_rect().move(position[0], position[1])
         self._buttons_to_disable = buttons_to_disable
         self._components: pygame.sprite.Group = components if components else pygame.sprite.Group()

@@ -14,6 +14,6 @@ class RandomBoardSetupEvent(ActionEvent):
         self._board_info = board_json
 
     def execute(self, *args, **kwargs):
-        with open("media/random_inside_walls_doors.json", "w+") as f:
+        with open("src/media/random_inside_walls_doors.json", "w+") as f:
             json.dump(self._board_info, f)
         GameStateModel.instance().game_board = GameBoardModel(GameBoardTypeEnum.RANDOM, self._board_info)

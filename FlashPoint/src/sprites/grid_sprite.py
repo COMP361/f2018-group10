@@ -25,8 +25,8 @@ class GridSprite(pygame.sprite.Group):
                  tile_size: int = 128, tiles_x: int = 10, tiles_y: int = 8, current_player: PlayerModel):
         super().__init__(*sprites)
         self.current_player = current_player
-        self._fire_image = Spritesheet("media/All Markers/fire.png", 1, 1).cell_images[0][0]
-        self._smoke_image = Spritesheet("media/All Markers/smoke.png", 1, 1).cell_images[0][0]
+        self._fire_image = Spritesheet("src/media/All Markers/fire.png", 1, 1).cell_images[0][0]
+        self._smoke_image = Spritesheet("src/media/All Markers/smoke.png", 1, 1).cell_images[0][0]
 
         self.contains_player = False
         self.height = tiles_y
@@ -126,12 +126,12 @@ class GridSprite(pygame.sprite.Group):
 
     def choose_board(self, type :GameBoardTypeEnum):
         if type == GameBoardTypeEnum.ORIGINAL:
-            str = "media/boards/board1.png"
+            str = "src/media/boards/board1.png"
             return str
         elif type == GameBoardTypeEnum.RANDOM:
-            return "media/boards/board3.png"
+            return "src/media/boards/board3.png"
         elif type == GameBoardTypeEnum.ALTERNATIVE:
-            str = "media/boards/board2.png"
+            str = "src/media/boards/board2.png"
 
             return str
 

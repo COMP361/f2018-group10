@@ -40,10 +40,10 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
         self.countdown_thread = None
         self.image = pygame.Surface([250, 50])
         self.font_time = pygame.font.SysFont('Agency FB', 25)
-        bg = pygame.image.load('media/GameHud/wood2.png')
+        bg = pygame.image.load('src/media/GameHud/wood2.png')
         self.bg = pygame.transform.scale(bg, (250, 50))
         self.msg = "YOUR TURN"
-        frame = pygame.image.load('media/GameHud/frame.png')
+        frame = pygame.image.load('src/media/GameHud/frame.png')
         self.frame = pygame.transform.scale(frame, (250, 50))
         self.font_name = pygame.font.SysFont('Agency FB', 30)
         self.text = self.font_name.render(self.msg, True, Color.GREEN2)
@@ -91,22 +91,22 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
     def _init_your_turn(self):
         rct = RectLabel(880, 600, 250, 50, background=Color.ORANGE,
                         txt_obj=Text(pygame.font.SysFont('Agency FB', 30), "YOUR TURN", Color.GREEN2))
-        rct.change_bg_image('media/GameHud/wood2.png')
-        rct.add_frame('media/GameHud/frame.png')
+        rct.change_bg_image('src/media/GameHud/wood2.png')
+        rct.add_frame('src/media/GameHud/frame.png')
         return rct
 
     def init_not_your_turn(self):
         rct = RectLabel(880, 600, 250, 50, background=Color.ORANGE,
                         txt_obj=Text(pygame.font.SysFont('Agency FB', 30), "NOT YOUR TURN", Color.GREEN2))
-        rct.change_bg_image('media/GameHud/wood2.png')
-        rct.add_frame('media/GameHud/frame.png')
+        rct.change_bg_image('src/media/GameHud/wood2.png')
+        rct.add_frame('src/media/GameHud/frame.png')
         return rct
 
     def _init_end_turn_button(self):
         btn = RectButton(1130, 500, 150, 50, background=Color.ORANGE,
                          txt_obj=Text(pygame.font.SysFont('Arial', 23), "END TURN",Color.GREEN2))
-        btn.change_bg_image('media/GameHud/wood2.png')
-        btn.add_frame('media/GameHud/frame.png')
+        btn.change_bg_image('src/media/GameHud/wood2.png')
+        btn.add_frame('src/media/GameHud/frame.png')
         btn.on_click(self._end_turn)
         return btn
 

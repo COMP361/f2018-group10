@@ -21,9 +21,9 @@ class InGameStates(pygame.sprite.Sprite, GameStateObserver):
         self.image = pygame.Surface([880, 50])
         self.font = pygame.font.SysFont('Agency FB', 35)
 
-        self.bg = pygame.image.load('media/GameHud/wood2.png')
+        self.bg = pygame.image.load('src/media/GameHud/wood2.png')
         self.bg = pygame.transform.scale(self.bg, (880, 50))
-        self.frame = pygame.image.load('media/GameHud/frame.png')
+        self.frame = pygame.image.load('src/media/GameHud/frame.png')
         self.frame = pygame.transform.scale(self.frame, (880, 50))
 
         self.damage_str = f"Damage: {current_damage}/24"

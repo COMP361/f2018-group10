@@ -83,8 +83,8 @@ class GameStateModel(Model):
     def destroy():
         GameStateModel._instance = None
         logger.info("GameStateModel deleted")
-        if os.path.exists("media/board_layouts/random_inside_walls.json"):
-            os.rmdir("media/board_layouts/random_inside_walls.json")
+        if os.path.exists("src/media/board_layouts/random_inside_walls.json"):
+            os.rmdir("src/media/board_layouts/random_inside_walls.json")
 
     @classmethod
     def instance(cls):
@@ -408,7 +408,7 @@ class GameStateModel(Model):
 
     def endgame(self):
 
-        profiles = "media/profiles.json"
+        profiles = "src/media/profiles.json"
 
         if self._state == GameStateEnum.LOST:
             for player in self.players:

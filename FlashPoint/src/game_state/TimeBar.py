@@ -12,7 +12,7 @@ class TimeBar(pygame.sprite.Sprite):
         self.rect.move_ip(x, y)
 
     def update(self, event_queue: EventQueue):
-        wood = pygame.image.load('media/wood1.png')
+        wood = pygame.image.load('src/media/wood1.png')
         wood = pygame.transform.scale(wood, (1280, 30))
         self.image.blit(wood, self.rect)
 

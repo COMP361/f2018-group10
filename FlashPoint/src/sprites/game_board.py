@@ -23,7 +23,7 @@ class GameBoard(pygame.sprite.Group):
         self.image = pygame.Surface((MainConst.SCREEN_RESOLUTION[0], MainConst.SCREEN_RESOLUTION[1]))
         self.rect = self.image.get_rect()
         self.grid = GridSprite(x_coord=self.rect.left, y_coord=self.rect.top, current_player=current_player)
-        self.background = FileImporter.import_image("media/backgrounds/WoodBack.jpeg")
+        self.background = FileImporter.import_image("src/media/backgrounds/WoodBack.jpeg")
         self.top_ui = pygame.sprite.Group()
         GameBoard._instance = self
 

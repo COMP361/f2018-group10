@@ -46,7 +46,7 @@ class FireDeckGunEvent(TurnEvent):
         
         self.target_tile.space_status = SpaceStatusEnum.SAFE
 
-        FileImporter.play_music("media/music/water_splash.mp3", 1)
+        FileImporter.play_music("src/media/music/water_splash.mp3", 1)
         tile_sprite = GameBoard.instance().grid.grid[self.target_tile.column][self.target_tile.row]
         tile_sprite.fire_deck_gun = True
 

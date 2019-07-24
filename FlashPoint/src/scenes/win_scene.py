@@ -20,7 +20,7 @@ class WinScene(Scene):
 
     def _init_background(self):
         box_size = (self.resolution[0], self.resolution[1])
-        background_box = RectLabel(0, 0, box_size[0], box_size[1], "media/Win_Loose/happy.jpg")
+        background_box = RectLabel(0, 0, box_size[0], box_size[1], "src/media/Win_Loose/happy.jpg")
         self.sprite_grp.add(background_box)
     #
     # def _init_log_box(self):
@@ -34,14 +34,14 @@ class WinScene(Scene):
 
     def _init_title_text(self):
         box_size = (500, 50)
-        self.text_title = RectLabel(400, 350, box_size[0], box_size[1], "media/Win_Loose/WON.png"                                    )
+        self.text_title = RectLabel(400, 350, box_size[0], box_size[1], "src/media/Win_Loose/WON.png"                                    )
         self.sprite_grp.add(self.text_title)
 
 
     def _init_continue_btn(self):
         box_size = (200,50)
-        ctn_btn = RectButton(550,500,box_size[0],box_size[1],'media/GameHud/wood2.png',0,Text(pygame.font.SysFont('Agency FB', 20), "Continue", Color.GREEN2))
-        ctn_btn.add_frame('media/GameHud/frame.png')
+        ctn_btn = RectButton(550,500,box_size[0],box_size[1],'src/media/GameHud/wood2.png',0,Text(pygame.font.SysFont('Agency FB', 20), "Continue", Color.GREEN2))
+        ctn_btn.add_frame('src/media/GameHud/frame.png')
         ctn_btn.on_click(self._continue)
         self.sprite_grp.add(ctn_btn)
 
