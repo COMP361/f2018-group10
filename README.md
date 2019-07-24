@@ -26,9 +26,14 @@ The rules for the `Veteran` and `Rescue Dog` roles (only used in the `Experience
 
 ## Limitations
 
-* A multiplayer (co-op) game can only be initiated by devices over the same network.
+* A multiplayer (co-op) game only works out of the box on devices over the same network. (including VPN)
 * Technical issues have been observed when playing on a macOS device.
 
-## Dependencies
-
-[pygame](https://github.com/pygame/pygame)
+## Setup
+### Prerequisites
+* `python` version 3.6 or higher
+* `pip` version 9 or higher
+* `setuptools` version 39 or higher
+### Installation
+* Clone the repo, navigate to the `FlashPoint` directory and run `pip install .` to run the `setup.py` script.
+* You should now be able to run `FlashPoint` in your command prompt to launch the game
