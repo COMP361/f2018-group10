@@ -21,13 +21,13 @@ class CommandNotification(object):
         self._notification = RectLabel(500, 0, 350, 75, Color.GREY, 0,
                                        Text(pygame.font.SysFont('Agency FB', 30), f"Commanding: None",
                                             Color.GREEN2))
-        self._notification.change_bg_image('media/GameHud/wood2.png')
-        self._notification.add_frame('media/GameHud/frame.png')
+        self._notification.change_bg_image('src/media/GameHud/wood2.png')
+        self._notification.add_frame('src/media/GameHud/frame.png')
         self._wait_command = RectLabel(500, 400, 300, 50, Color.GREY, 0,
                                        Text(pygame.font.SysFont('Agency FB', 30), f"Commanded by: None",
                                             Color.GREEN2))
-        self._wait_command.change_bg_image('media/GameHud/wood2.png')
-        self._wait_command.add_frame('media/GameHud/frame.png')
+        self._wait_command.change_bg_image('src/media/GameHud/wood2.png')
+        self._wait_command.add_frame('src/media/GameHud/frame.png')
         self._init_end_command_btn()
         self._is_source = False
         self._is_target = False
@@ -36,8 +36,8 @@ class CommandNotification(object):
         # End command button
         self._end_command_btn = RectButton(1080, 450, 200, 50, background=Color.ORANGE,
                                            txt_obj=Text(pygame.font.SysFont('Agency FB', 23), "END COMMAND", Color.GREEN2))
-        self._end_command_btn.change_bg_image('media/GameHud/wood2.png')
-        self._end_command_btn.add_frame('media/GameHud/frame.png')
+        self._end_command_btn.change_bg_image('src/media/GameHud/wood2.png')
+        self._end_command_btn.add_frame('src/media/GameHud/frame.png')
         self._end_command_btn.on_click(self.end_command)
 
     def end_command(self):
@@ -63,11 +63,11 @@ class CommandNotification(object):
             target_msg = f"Commanded by: {self._source.nickname}"
 
         self._notification.change_text(Text(pygame.font.SysFont('Agency FB', 30), source_msg, Color.ORANGE))
-        self._notification.change_bg_image('media/GameHud/wood2.png')
-        self._notification.add_frame('media/GameHud/frame.png')
+        self._notification.change_bg_image('src/media/GameHud/wood2.png')
+        self._notification.add_frame('src/media/GameHud/frame.png')
         self._wait_command.change_text(Text(pygame.font.SysFont('Agency FB', 30), target_msg, Color.ORANGE))
-        self._wait_command.change_bg_image('media/GameHud/wood2.png')
-        self._wait_command.add_frame('media/GameHud/frame.png')
+        self._wait_command.change_bg_image('src/media/GameHud/wood2.png')
+        self._wait_command.add_frame('src/media/GameHud/frame.png')
 
     @property
     def is_source(self) -> bool:

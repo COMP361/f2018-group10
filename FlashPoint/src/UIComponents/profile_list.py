@@ -11,6 +11,7 @@ from src.UIComponents.text import Text
 import src.constants.color as color
 import src.constants.color as Color
 
+
 class ProfileList(pygame.sprite.Sprite, Components):
     def __init__(self,
                  x: int,
@@ -23,7 +24,7 @@ class ProfileList(pygame.sprite.Sprite, Components):
         pygame.sprite.Sprite.__init__(self)
         Components.__init__(self, x, y, width, height)
         self._limit = limit
-        self.background = 'media/GameHud/wood2.png'
+        self.background = 'src/media/GameHud/wood2.png'
         self.outer_width = outer_width
         self.image = None
         self.rect = None

@@ -26,34 +26,34 @@ class CharacterScene(Scene):
 
         self.create_label(0, 0, 100, 150, 1)
         self.create_butn_img(150, 150, 99, 150,
-                             "media/specialist_cards/cafs_firefighter.png", 1)
+                             "src/media/specialist_cards/cafs_firefighter.png", 1)
 
         self.create_butn_img(350, 150, 100, 150,
-                             "media/specialist_cards/driver_operator.png", 2)
+                             "src/media/specialist_cards/driver_operator.png", 2)
 
         self.create_butn_img(550, 150, 100, 150,
-                             "media/specialist_cards/fire_captain.png", 3)
+                             "src/media/specialist_cards/fire_captain.png", 3)
 
         self.create_butn_img(750, 150, 99, 150,
-                             "media/specialist_cards/generalist.png", 4)
+                             "src/media/specialist_cards/generalist.png", 4)
 
         self.create_butn_img(150, 450, 100, 150,
-                             "media/specialist_cards/hazmat_technician.png", 5)
+                             "src/media/specialist_cards/hazmat_technician.png", 5)
 
         self.create_butn_img(350, 450, 99, 150,
-                             "media/specialist_cards/imaging_technician.png", 6)
+                             "src/media/specialist_cards/imaging_technician.png", 6)
 
         self.create_butn_img(550, 450, 99, 150,
-                             "media/specialist_cards/paramedic.png", 7)
+                             "src/media/specialist_cards/paramedic.png", 7)
 
         self.create_butn_img(750, 450, 98, 150,
-                             "media/specialist_cards/rescue_specialist.png", 8)
+                             "src/media/specialist_cards/rescue_specialist.png", 8)
 
         self.create_butn_img(950, 150, 98, 150,
-                             "media/specialist_cards/doge.png", 9)
+                             "src/media/specialist_cards/doge.png", 9)
 
         self.create_butn_img(950, 450, 99, 150,
-                             "media/specialist_cards/veteran.png", 10)
+                             "src/media/specialist_cards/veteran.png", 10)
 
         self._init_btn_back(20, 20, "Back", Color.STANDARDBTN, Color.BLACK)
 
@@ -84,7 +84,7 @@ class CharacterScene(Scene):
 
     def _init_background(self):
         box_size = (self.resolution[0], self.resolution[1])
-        background_box = RectLabel(0, 0, box_size[0], box_size[1], "media/backgrounds/flashpoint_background.png")
+        background_box = RectLabel(0, 0, box_size[0], box_size[1], "src/media/backgrounds/flashpoint_background.png")
         self.sprite_grp.add(background_box)
 
     def create_butn_img(self, x, y, width, height, path: str, count: int):
@@ -137,24 +137,24 @@ class CharacterScene(Scene):
         box_size = (130, 48)
         self.buttonBack = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
                                      Text(pygame.font.SysFont('Agency FB', 25), text, Color.GREEN2))
-        self.buttonBack.change_bg_image('media/GameHud/wood2.png')
-        self.buttonBack.add_frame('media/GameHud/frame.png')
+        self.buttonBack.change_bg_image('src/media/GameHud/wood2.png')
+        self.buttonBack.add_frame('src/media/GameHud/frame.png')
         self.sprite_grp.add(self.buttonBack)
 
     def _init_title_text(self):
         box_size = (400, 50)
         self.text_title = RectButton(400, 60, box_size[0], box_size[1], Color.BLACK, 0,
                                      Text(pygame.font.SysFont('Agency FB', 35), "Character Selection", Color.GREEN2))
-        self.text_title.change_bg_image('media/GameHud/wood2.png')
-        self.text_title.add_frame('media/GameHud/frame.png')
+        self.text_title.change_bg_image('src/media/GameHud/wood2.png')
+        self.text_title.add_frame('src/media/GameHud/frame.png')
         self.sprite_grp.add(self.text_title)
 
     def _init_btn_confirm(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
         box_size = (130, 48)
         self.buttonConfirm = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
                                         Text(pygame.font.SysFont('Agency FB', 25), text, Color.GREEN2))
-        self.buttonConfirm.change_bg_image('media/GameHud/wood2.png')
-        self.buttonConfirm.add_frame('media/GameHud/frame.png')
+        self.buttonConfirm.change_bg_image('src/media/GameHud/wood2.png')
+        self.buttonConfirm.add_frame('src/media/GameHud/frame.png')
         self.sprite_grp.add(self.buttonConfirm)
 
     def create_label(self, x_pos: int, y_pos: int, width: int, height: int, count: int):
@@ -168,11 +168,11 @@ class CharacterScene(Scene):
 
         if not accept:
             label =  RectLabel(x_pos - 15, y_pos - 15, width + 30, height + 30, Color.RED)
-            label.change_bg_image('media/GameHud/wood2.png')
+            label.change_bg_image('src/media/GameHud/wood2.png')
             return label
         else:
             label =  RectLabel(x_pos - 15, y_pos - 15, width + 30, height + 30, Color.GREEN)
-            label.change_bg_image('media/GameHud/wood2.png')
+            label.change_bg_image('src/media/GameHud/wood2.png')
             return label
 
     def set_color(self, sprite: pygame.sprite.Sprite, i: int=0, enum:PlayerRoleEnum=None):

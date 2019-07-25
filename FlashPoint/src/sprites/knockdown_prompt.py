@@ -11,8 +11,8 @@ class KnockdownPrompt(object):
         self.rect = self.image.get_rect()
         self.rect.move_ip(480, 30)
 
-        self.bg = pygame.image.load('media/GameHud/wood2.png')
-        self.frame = pygame.image.load('media/GameHud/frame.png')
+        self.bg = pygame.image.load('src/media/GameHud/wood2.png')
+        self.frame = pygame.image.load('src/media/GameHud/frame.png')
         self.frame = pygame.transform.scale(self.frame,(400,100))
         self._name = "xuy"
         self.message = f"{self._name} has been knocked down"

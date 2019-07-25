@@ -11,9 +11,9 @@ class VictimLostPrompt(object):
         self.image = pygame.Surface([400, 100])
         self.rect = self.image.get_rect()
         self.rect.move_ip(480, 0)
-        self.bg = pygame.image.load('media/GameHud/wood2.png')
+        self.bg = pygame.image.load('src/media/GameHud/wood2.png')
 
-        self.frame = pygame.image.load('media/GameHud/frame.png')
+        self.frame = pygame.image.load('src/media/GameHud/frame.png')
         self.frame = pygame.transform.scale(self.frame,(400,100))
         self.message = f"A victim has been lost"
         self.font = pygame.font.SysFont('Agency FB', 30)

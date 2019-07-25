@@ -12,9 +12,9 @@ class TimeBar(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.move_ip(x, y)
         self._start_time = datetime.now()
-        wood = pygame.image.load('media/GameHud/wood1.png')
+        wood = pygame.image.load('src/media/GameHud/wood1.png')
         self.wood = pygame.transform.scale(wood, (1280, 30))
-        menu = pygame.image.load('media/GameHud/menu.png')
+        menu = pygame.image.load('src/media/GameHud/menu.png')
         self.menu = pygame.transform.scale(menu, (30, 30))
 
     def update(self, event_queue: EventQueue):

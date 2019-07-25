@@ -29,8 +29,8 @@ class Main(object):
     def main(self):
 
         # Run main loop
-        # FileImporter.play_music("media/music/intro_music/Kontrabandz-Get Down-kissvk.com.mp3", -1)
-        #  FileImporter.play_music("media/music/Get_Down.wav", -1)
+        # FileImporter.play_music("src/media/music/intro_music/Kontrabandz-Get Down-kissvk.com.mp3", -1)
+        #  FileImporter.play_music("src/media/music/Get_Down.wav", -1)
 
         while True:
             # Lock frame rate at 60 FPS
@@ -60,5 +60,9 @@ class Main(object):
                 traceback.print_exception(*info)
 
 
-if __name__ == '__main__':
+def run():
     Main().main()
+
+
+if __name__ == '__main__':
+    run()

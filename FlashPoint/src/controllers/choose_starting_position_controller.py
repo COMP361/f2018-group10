@@ -31,13 +31,13 @@ class ChooseStartingPositionController(Controller):
         self.choose_prompt = RectLabel(500, 30, 350, 75, Color.GREY, 0,
                                        Text(pygame.font.SysFont('Agency FB', 30), "Choose Starting Position",
                                             Color.GREEN2))
-        self.choose_prompt.change_bg_image('media/GameHud/wood2.png')
-        self.choose_prompt.add_frame('media/GameHud/frame.png')
+        self.choose_prompt.change_bg_image('src/media/GameHud/wood2.png')
+        self.choose_prompt.add_frame('src/media/GameHud/frame.png')
         self.wait_prompt = RectLabel(500, 400, 300, 50, Color.GREY, 0,
                                      Text(pygame.font.SysFont('Agency FB', 30), "Wait for your turn!",
                                           Color.GREEN2))
-        self.wait_prompt.change_bg_image('media/GameHud/wood2.png')
-        self.wait_prompt.add_frame('media/GameHud/frame.png')
+        self.wait_prompt.change_bg_image('src/media/GameHud/wood2.png')
+        self.wait_prompt.add_frame('src/media/GameHud/frame.png')
 
         self.game_board_sprite.top_ui.add(self.choose_prompt)
         self.game_board_sprite.top_ui.add(self.wait_prompt)

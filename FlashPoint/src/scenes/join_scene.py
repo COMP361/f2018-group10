@@ -81,22 +81,22 @@ class JoinScene(object):
 
         user_box = RectLabel(x_pos, y_pos, box_size[0], box_size[1], color, 0,
                              Text(pygame.font.SysFont('Agency FB', 25), text, color_text))
-        user_box.change_bg_image('media/GameHud/wood2.png')
-        user_box.add_frame('media/GameHud/frame.png')
+        user_box.change_bg_image('src/media/GameHud/wood2.png')
+        user_box.add_frame('src/media/GameHud/frame.png')
 
         self.sprite_grp.add(user_box)
 
     def _init_background(self):
         box_size = (self.resolution[0], self.resolution[1])
-        background_box = RectLabel(0, 0, box_size[0], box_size[1], "media/backgrounds/flashpoint_background.png")
+        background_box = RectLabel(0, 0, box_size[0], box_size[1], "src/media/backgrounds/flashpoint_background.png")
         self.sprite_grp.add(background_box)
 
     def _init_btn(self, x_pos, y_pos, text, color: Color, color_text: Color):
         box_size = (130, 48)
         self.buttonConnect = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
                                         Text(pygame.font.SysFont('Agency FB', 25), text, color_text))
-        self.buttonConnect.change_bg_image('media/GameHud/wood2.png')
-        self.buttonConnect.add_frame('media/GameHud/frame.png')
+        self.buttonConnect.change_bg_image('src/media/GameHud/wood2.png')
+        self.buttonConnect.add_frame('src/media/GameHud/frame.png')
         self.sprite_grp.add(self.buttonConnect)
 
     def _init_text_bar(self, x_pos, y_pos, width, height):
@@ -108,8 +108,8 @@ class JoinScene(object):
         box_size = (130, 48)
         self.buttonBack = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
                                      Text(pygame.font.SysFont('Agency FB', 25), text, color_text))
-        self.buttonBack.change_bg_image('media/GameHud/wood2.png')
-        self.buttonBack.add_frame('media/GameHud/frame.png')
+        self.buttonBack.change_bg_image('src/media/GameHud/wood2.png')
+        self.buttonBack.add_frame('src/media/GameHud/frame.png')
         self.sprite_grp.add(self.buttonBack)
 
     def init_error_message(self, msg):

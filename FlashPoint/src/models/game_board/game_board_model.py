@@ -202,7 +202,7 @@ class GameBoardModel(Model):
     @staticmethod
     def _load_family_fire_locations() -> List[Tuple[int, int]]:
         """Load the locations of the fires as a list of tuples from json file."""
-        with open("media/board_layouts/family_fire_locations.json", "r", encoding="utf-8") as f:
+        with open("src/media/board_layouts/family_fire_locations.json", "r", encoding="utf-8") as f:
             return [tuple(x) for x in json.load(f)]
 
     def _determine_tile_kind(self, row: int, column: int) -> SpaceKindEnum:
@@ -221,21 +221,21 @@ class GameBoardModel(Model):
         outside_doors_fname = ""
         inside_walls_doors_fname = ""
         if self.board_type == GameBoardTypeEnum.ORIGINAL:
-            amb_engine_parking_fname = "media/board_layouts/original_engine_ambulance_locations.json"
-            outside_doors_fname = "media/board_layouts/original_outside_door_locations.json"
-            inside_walls_doors_fname = "media/board_layouts/original_inside_walls_doors.json"
+            amb_engine_parking_fname = "src/media/board_layouts/original_engine_ambulance_locations.json"
+            outside_doors_fname = "src/media/board_layouts/original_outside_door_locations.json"
+            inside_walls_doors_fname = "src/media/board_layouts/original_inside_walls_doors.json"
 
         elif self.board_type == GameBoardTypeEnum.ALTERNATIVE:
-            amb_engine_parking_fname = "media/board_layouts/alternative_engine_ambulance_locations.json"
-            outside_doors_fname = "media/board_layouts/alternative_outside_door_locations.json"
-            inside_walls_doors_fname = "media/board_layouts/alternative_inside_walls_doors.json"
+            amb_engine_parking_fname = "src/media/board_layouts/alternative_engine_ambulance_locations.json"
+            outside_doors_fname = "src/media/board_layouts/alternative_outside_door_locations.json"
+            inside_walls_doors_fname = "src/media/board_layouts/alternative_inside_walls_doors.json"
 
         elif self.board_type == GameBoardTypeEnum.RANDOM:
             if not self._board_info:
                 BoardGenerator(8, 6, 1, 3).generate_inside_walls_doors()
-            amb_engine_parking_fname = "media/board_layouts/original_engine_ambulance_locations.json"
-            outside_doors_fname = "media/board_layouts/original_outside_door_locations.json"
-            inside_walls_doors_fname = "media/board_layouts/random_inside_walls_doors.json"
+            amb_engine_parking_fname = "src/media/board_layouts/original_engine_ambulance_locations.json"
+            outside_doors_fname = "src/media/board_layouts/original_outside_door_locations.json"
+            inside_walls_doors_fname = "src/media/board_layouts/random_inside_walls_doors.json"
 
         return self._init_all_tiles_board(amb_engine_parking_fname, outside_doors_fname, inside_walls_doors_fname)
 
@@ -285,7 +285,7 @@ class GameBoardModel(Model):
         self.set_inside_walls_doors(inside_walls_doors_fname, tiles)
 
         # setting the arrow directions given for the inside tiles
-        self.set_all_tiles_arrows("media/board_layouts/tile_arrow_directions.json", tiles)
+        self.set_all_tiles_arrows("src/media/board_layouts/tile_arrow_directions.json", tiles)
 
         return tiles
 

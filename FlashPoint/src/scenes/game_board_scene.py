@@ -66,7 +66,7 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
         """
 
         self._screen = screen
-        self._save_games_file = "media/saved_games.json"
+        self._save_games_file = "src/media/saved_games.json"
         self._game: GameStateModel = GameStateModel.instance()
         self._game.game_board.add_observer(self)
         self._init_current_player(current_player)
@@ -191,15 +191,15 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
     def _init_menu(self):
         self._menu = MenuWindow([self._active_sprites, self._game_board_sprite], 500, 500, (400, 150))
 
-        save_btn = RectButton(200, 150, 100, 50, 'media/GameHud/wood2.png', 0,
+        save_btn = RectButton(200, 150, 100, 50, 'src/media/GameHud/wood2.png', 0,
                               Text(pygame.font.SysFont('Agency FB', 25), "Save", Color.GREEN2))
-        save_btn.add_frame('media/GameHud/frame.png')
+        save_btn.add_frame('src/media/GameHud/frame.png')
 
-        quit_btn = RectButton(200, 250, 100, 50, 'media/GameHud/wood2.png', 0,
+        quit_btn = RectButton(200, 250, 100, 50, 'src/media/GameHud/wood2.png', 0,
                               Text(pygame.font.SysFont('Agency FB', 25), "Quit", Color.GREEN2))
-        quit_btn.add_frame('media/GameHud/frame.png')
+        quit_btn.add_frame('src/media/GameHud/frame.png')
 
-        back_btn = RectButton(50, 50, 50, 50, "media/GameHud/crosss.png", 0)
+        back_btn = RectButton(50, 50, 50, 50, "src/media/GameHud/crosss.png", 0)
 
         back_btn.on_click(self._menu.close)
         quit_btn.on_click(self._quit_btn_on_click)

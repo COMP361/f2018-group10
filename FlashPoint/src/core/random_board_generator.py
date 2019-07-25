@@ -376,5 +376,5 @@ class BoardGenerator(object):
 
         walls = self.remove_dups(walls)
 
-        with open("media/board_layouts/random_inside_walls_doors.json", mode="w", encoding='utf-8') as f:
+        with open("src/media/board_layouts/random_inside_walls_doors.json", mode="w", encoding='utf-8') as f:
             json.dump(walls, f)

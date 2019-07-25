@@ -84,7 +84,7 @@ class SceneManager(object):
                 self._current_player = args[0]
             self._active_scene = next_scene(self.screen, *args)
 
-            FileImporter.play_audio("media/soundeffects/ButtonClick.wav", fade_ms=10)
+            FileImporter.play_audio("src/media/soundeffects/ButtonClick.wav", fade_ms=10)
 
         def draw(self):
             self._active_scene.draw(self.screen)
