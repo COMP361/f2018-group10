@@ -22,7 +22,7 @@ class EndGameEvent(ActionEvent):
 
         state_model = GameStateModel.instance()
         players = state_model.players
-        profiles = "src/media/profiles.json"
+        profiles = "media/profiles.json"
 
         if self._state == GameStateEnum.LOST:
             for player in players:

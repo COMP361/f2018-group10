@@ -16,8 +16,8 @@ class POISprite(pygame.sprite.Sprite, POIObserver):
 
     def __init__(self, poi: POIModel):
         super().__init__()
-        self.image = FileImporter.import_image('src/media/all_markers/poi128.png')
-        self.small_image = FileImporter.import_image("src/media/all_markers/poi.png")
+        self.image = FileImporter.import_image('media/all_markers/poi128.png')
+        self.small_image = FileImporter.import_image("media/all_markers/poi.png")
         self.rect = self.image.get_rect()
         self.poi_model = poi
         self.row = poi.row
