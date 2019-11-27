@@ -15,6 +15,7 @@ from src.constants.state_enums import GameKindEnum, DifficultyLevelEnum, GameSta
     GameBoardTypeEnum, PlayerStatusEnum, PlayerRoleEnum
 from src.core.flashpoint_exceptions import TooManyPlayersException, InvalidGameKindException, PlayerNotFoundException
 from src.models.game_units.player_model import PlayerModel
+from src.media.media_constants import PROFILES
 
 logger = logging.getLogger("FlashPoint")
 
@@ -407,13 +408,10 @@ class GameStateModel(Model):
             return 3
 
     def endgame(self):
-
-        profiles = "media/profiles.json"
-
         if self._state == GameStateEnum.LOST:
             for player in self.players:
 
-                with open(profiles, mode='r+', encoding='utf-8') as file:
+                with open(PROFILES, mode='r+', encoding='utf-8') as file:
                     temp = json.load(file)
                     file.seek(0)
                     file.truncate()
@@ -431,7 +429,7 @@ class GameStateModel(Model):
         else:
             for player in self.players:
 
-                with open(profiles, mode='r+', encoding='utf-8') as file:
+                with open(PROFILES, mode='r+', encoding='utf-8') as file:
                     temp = json.load(file)
                     file.seek(0)
                     file.truncate()

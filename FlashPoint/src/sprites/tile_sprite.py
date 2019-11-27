@@ -13,6 +13,7 @@ from src.models.model import Model
 from src.observers.tile_observer import TileObserver
 import src.constants.color as Color
 from src.UIComponents.text import Text
+from src.media.media_constants import WATER, EXPLOSION
 
 
 class TileSprite(Interactable, TileObserver):
@@ -36,13 +37,12 @@ class TileSprite(Interactable, TileObserver):
 
         self.explosion = False
         self.explosion_image = image.copy()
-        self.explosion_image.blit(pygame.image.load('media/all_markers/explosian.png'), (0, 0, 128, 128))
+        self.explosion_image.blit(pygame.image.load(EXPLOSION), (0, 0, 128, 128))
         self.explosion_image.get_rect().move_ip(x_offset,y_offset)
 
         self.fire_deck_gun = False
         self.fire_deck_gun_image = image.copy()
-       # self.water = pygame.transform.scale(pygame.image.load('media/all_markers/water.png'),(128,128))
-        self.fire_deck_gun_image.blit(pygame.transform.scale(pygame.image.load('media/all_markers/water.png'),(128,128)), (0, 0, 128, 128))
+        self.fire_deck_gun_image.blit(pygame.transform.scale(pygame.image.load(WATER),(128,128)), (0, 0, 128, 128))
         self.fire_deck_gun_image.get_rect().move_ip(x_offset, y_offset)
 
         # Initialize if place is Fire, Smoke or Safe

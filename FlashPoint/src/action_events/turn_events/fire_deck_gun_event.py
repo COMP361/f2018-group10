@@ -12,6 +12,7 @@ from src.models.game_board.tile_model import TileModel
 from src.models.game_board.wall_model import WallModel
 from src.models.game_state_model import GameStateModel
 from src.sprites.game_board import GameBoard
+from src.media.media_constants import SPLASH_SOUND
 
 logger = logging.getLogger("FlashPoint")
 
@@ -46,7 +47,7 @@ class FireDeckGunEvent(TurnEvent):
         
         self.target_tile.space_status = SpaceStatusEnum.SAFE
 
-        FileImporter.play_music("media/music/water_splash.mp3", 1)
+        FileImporter.play_music(SPLASH_SOUND, 1)
         tile_sprite = GameBoard.instance().grid.grid[self.target_tile.column][self.target_tile.row]
         tile_sprite.fire_deck_gun = True
 

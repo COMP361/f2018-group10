@@ -10,7 +10,7 @@ from src.UIComponents.text import Text
 from src.UIComponents.scene import Scene
 from src.constants.change_scene_enum import ChangeSceneEnum
 from src.core.networking import Networking
-
+from src.media.media_constants import WOOD, FRAME, FLASHPOINT_BACKGROUND
 
 class HostMenuScene(Scene):
     def __init__(self, screen: pygame.Surface, host_player: PlayerModel):
@@ -28,7 +28,7 @@ class HostMenuScene(Scene):
 
     def _init_background(self):
         box_size = (self.resolution[0], self.resolution[1])
-        background_box = RectLabel(0, 0, box_size[0], box_size[1], "media/backgrounds/flashpoint_background.png")
+        background_box = RectLabel(0, 0, box_size[0], box_size[1], FLASHPOINT_BACKGROUND)
         self.sprite_grp.add(background_box)
 
     def _init_log_box(self):
@@ -42,22 +42,22 @@ class HostMenuScene(Scene):
         box_size = (130, 48)
         self.buttonNewGame = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
                                         Text(pygame.font.SysFont('Agency FB', 25), text, color_text))
-        self.buttonNewGame.change_bg_image('media/GameHud/wood2.png')
-        self.buttonNewGame.add_frame('media/GameHud/frame.png')
+        self.buttonNewGame.change_bg_image(WOOD)
+        self.buttonNewGame.add_frame(FRAME)
         self.sprite_grp.add(self.buttonNewGame)
 
     def _init_btn_login(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
         box_size = (130, 48)
         self.buttonLogin = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
                                     Text(pygame.font.SysFont('Agency FB', 25), text, color_text))
-        self.buttonLogin.change_bg_image('media/GameHud/wood2.png')
-        self.buttonLogin.add_frame('media/GameHud/frame.png')
+        self.buttonLogin.change_bg_image(WOOD)
+        self.buttonLogin.add_frame(FRAME)
         self.sprite_grp.add(self.buttonLogin)
 
     def _init_btn_back(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
         box_size = (130, 48)
         self.buttonBack = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
                                      Text(pygame.font.SysFont('Agency FB', 25), text, color_text))
-        self.buttonBack.change_bg_image('media/GameHud/wood2.png')
-        self.buttonBack.add_frame('media/GameHud/frame.png')
+        self.buttonBack.change_bg_image(WOOD)
+        self.buttonBack.add_frame(FRAME)
         self.sprite_grp.add(self.buttonBack)

@@ -22,6 +22,7 @@ from src.constants.change_scene_enum import ChangeSceneEnum
 import src.constants.main_constants as MainConst
 from src.scenes.win_scene import WinScene
 from src.scenes.lose_scene import LoseScene
+from src.media.media_constants import BUTTON_CLICK_SOUND
 
 logger = logging.getLogger("SManager")
 logger.setLevel(logging.INFO)
@@ -84,7 +85,7 @@ class SceneManager(object):
                 self._current_player = args[0]
             self._active_scene = next_scene(self.screen, *args)
 
-            FileImporter.play_audio("media/soundeffects/ButtonClick.wav", fade_ms=10)
+            FileImporter.play_audio(BUTTON_CLICK_SOUND, fade_ms=10)
 
         def draw(self):
             self._active_scene.draw(self.screen)

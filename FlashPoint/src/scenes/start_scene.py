@@ -23,11 +23,11 @@ from src.UIComponents.text import Text
 from src.UIComponents.input_box import InputBox
 from src.UIComponents.profile_list import ProfileList
 from src.constants.change_scene_enum import ChangeSceneEnum
-
+from src.media.media_constants import WOOD, FRAME, FLASHPOINT_BACKGROUND, PROFILES
 
 class StartScene(object):
     def __init__(self, screen):
-        self.profiles = "media/profiles.json"
+        self.profiles = PROFILES
         self.resolution = (1280, 700)
         self.sprite_grp = pygame.sprite.Group()
         self._init_background()
@@ -42,7 +42,7 @@ class StartScene(object):
 
     def _init_background(self):
         box_size = (self.resolution[0], self.resolution[1])
-        background_box = RectLabel(0, 0, box_size[0], box_size[1], "media/backgrounds/flashpoint_background.png")
+        background_box = RectLabel(0, 0, box_size[0], box_size[1], FLASHPOINT_BACKGROUND)
         self.sprite_grp.add(background_box)
 
     def _init_log_box(self, clr):
@@ -50,8 +50,8 @@ class StartScene(object):
         x_pos = self.resolution[0] / 2 - box_size[0] / 2
         y_pos = self.resolution[1] / 2 - box_size[1] / 2
         log_box = RectLabel(x_pos, y_pos, box_size[0], box_size[1], clr)
-        log_box.change_bg_image('media/GameHud/wood2.png')
-        log_box.add_frame('media/GameHud/frame.png')
+        log_box.change_bg_image(WOOD)
+        log_box.add_frame(FRAME)
         self.sprite_grp.add(log_box)
 
     def _init_text_box(self, x_pos, y_pos, text, clr, color_text):
@@ -65,8 +65,8 @@ class StartScene(object):
         box_size = (130, 48)
         self.buttonRegister = RectButton(x_pos, y_pos, box_size[0], box_size[1], clr, 0,
                                          Text(pygame.font.SysFont('Agency FB', 25), text, color_text))
-        self.buttonRegister.change_bg_image('media/GameHud/wood2.png')
-        self.buttonRegister.add_frame('media/GameHud/frame.png')
+        self.buttonRegister.change_bg_image(WOOD)
+        self.buttonRegister.add_frame(FRAME)
         self.buttonRegister.on_click(self.register_profile)
         self.sprite_grp.add(self.buttonRegister)
 

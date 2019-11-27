@@ -50,6 +50,7 @@ from src.UIComponents.rect_button import RectButton
 from src.UIComponents.text import Text
 from src.sprites.notify_player_turn import NotifyPlayerTurn
 import src.constants.color as Color
+from src.media.media_constants import WOOD, FRAME, CROSS
 
 logger = logging.getLogger("FlashPoint")
 
@@ -191,15 +192,15 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
     def _init_menu(self):
         self._menu = MenuWindow([self._active_sprites, self._game_board_sprite], 500, 500, (400, 150))
 
-        save_btn = RectButton(200, 150, 100, 50, 'media/GameHud/wood2.png', 0,
+        save_btn = RectButton(200, 150, 100, 50, WOOD, 0,
                               Text(pygame.font.SysFont('Agency FB', 25), "Save", Color.GREEN2))
-        save_btn.add_frame('media/GameHud/frame.png')
+        save_btn.add_frame(FRAME)
 
-        quit_btn = RectButton(200, 250, 100, 50, 'media/GameHud/wood2.png', 0,
+        quit_btn = RectButton(200, 250, 100, 50, WOOD, 0,
                               Text(pygame.font.SysFont('Agency FB', 25), "Quit", Color.GREEN2))
-        quit_btn.add_frame('media/GameHud/frame.png')
+        quit_btn.add_frame(FRAME)
 
-        back_btn = RectButton(50, 50, 50, 50, "media/GameHud/crosss.png", 0)
+        back_btn = RectButton(50, 50, 50, 50, CROSS, 0)
 
         back_btn.on_click(self._menu.close)
         quit_btn.on_click(self._quit_btn_on_click)
