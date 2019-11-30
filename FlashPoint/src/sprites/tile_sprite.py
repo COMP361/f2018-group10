@@ -13,7 +13,7 @@ from src.models.model import Model
 from src.observers.tile_observer import TileObserver
 import src.constants.color as Color
 from src.UIComponents.text import Text
-from src.media.media_constants import WATER, EXPLOSION
+from src.constants.media_constants import WATER, EXPLOSION
 
 
 class TileSprite(Interactable, TileObserver):

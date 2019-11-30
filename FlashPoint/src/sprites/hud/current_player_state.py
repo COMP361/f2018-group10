@@ -7,7 +7,7 @@ from src.constants.state_enums import PlayerStatusEnum, GameKindEnum
 from src.core.event_queue import EventQueue
 from src.models.game_units.player_model import PlayerModel
 from src.observers.player_observer import PlayerObserver
-import src.media.media_constants as MEDIA_CONSTS
+import src.constants.media_constants as MEDIA_CONSTS
 
 
 class CurrentPlayerState(pygame.sprite.Sprite, PlayerObserver):

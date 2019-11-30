@@ -9,7 +9,7 @@ from src.UIComponents.rect_label import RectLabel
 from src.UIComponents.text import Text
 from src.UIComponents.scene import Scene
 from src.constants.change_scene_enum import ChangeSceneEnum
-from src.media.media_constants import WOOD, FRAME, FLASHPOINT_BACKGROUND
+from src.constants.media_constants import WOOD, FRAME, FLASHPOINT_BACKGROUND
 
 class HostJoinScene(Scene):
     def __init__(self, screen: pygame.Surface, current_player: PlayerModel):

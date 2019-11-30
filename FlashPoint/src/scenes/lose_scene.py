@@ -8,7 +8,7 @@ from src.constants.change_scene_enum import ChangeSceneEnum
 from src.core.custom_event import CustomEvent
 from src.core.event_queue import EventQueue
 from src.core.networking import Networking
-from src.media.media_constants import LOST, WOOD, FRAME, LOSING_FIRE
+from src.constants.media_constants import LOST, WOOD, FRAME, LOSING_FIRE
 
 class LoseScene(Scene):
     def __init__(self, screen: pygame.Surface):

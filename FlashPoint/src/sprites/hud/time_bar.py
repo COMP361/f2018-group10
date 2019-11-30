@@ -2,7 +2,7 @@ import pygame
 from datetime import datetime
 import src.constants.color as Color
 from src.core.event_queue import EventQueue
-from src.media.media_constants import TIMEBAR_WOOD, MENU
+from src.constants.media_constants import TIMEBAR_WOOD, MENU
 
 
 class TimeBar(pygame.sprite.Sprite):

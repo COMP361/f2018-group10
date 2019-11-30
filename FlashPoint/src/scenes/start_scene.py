@@ -23,7 +23,7 @@ from src.UIComponents.text import Text
 from src.UIComponents.input_box import InputBox
 from src.UIComponents.profile_list import ProfileList
 from src.constants.change_scene_enum import ChangeSceneEnum
-from src.media.media_constants import WOOD, FRAME, FLASHPOINT_BACKGROUND, PROFILES
+from src.constants.media_constants import WOOD, FRAME, FLASHPOINT_BACKGROUND, PROFILES
 
 class StartScene(object):
     def __init__(self, screen):

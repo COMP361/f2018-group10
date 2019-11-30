@@ -18,7 +18,7 @@ from src.models.game_board.wall_model import WallModel
 from src.models.game_board.door_model import DoorModel
 from src.models.game_units.victim_model import VictimModel
 from src.models.model import Model
-import src.media.media_constants as MEDIA_CONSTS
+import src.constants.media_constants as MEDIA_CONSTS
 
 logger = logging.getLogger("FlashPoint")
 

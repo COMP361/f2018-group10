@@ -12,7 +12,7 @@ from src.models.game_board.tile_model import TileModel
 from src.models.game_board.wall_model import WallModel
 from src.models.game_state_model import GameStateModel
 from src.sprites.game_board import GameBoard
-from src.media.media_constants import SPLASH_SOUND
+from src.constants.media_constants import SPLASH_SOUND
 
 logger = logging.getLogger("FlashPoint")
 

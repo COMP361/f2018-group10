@@ -10,7 +10,7 @@ from src.models.game_units.player_model import PlayerModel
 from src.UIComponents.rect_button import RectButton
 from src.UIComponents.rect_label import RectLabel
 from src.UIComponents.text import Text
-from src.media.media_constants import WOOD, FRAME, FLASHPOINT_BACKGROUND
+from src.constants.media_constants import WOOD, FRAME, FLASHPOINT_BACKGROUND
 
 
 class SetMaxPlayers(object):

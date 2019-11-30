@@ -14,7 +14,7 @@ from src.UIComponents.scene import Scene
 from src.UIComponents.text import Text
 from src.models.game_units.player_model import PlayerModel
 from src.constants.change_scene_enum import ChangeSceneEnum
-import src.media.media_constants as MEDIA_CONSTS
+import src.constants.media_constants as MEDIA_CONSTS
 
 
 class CharacterScene(Scene):

@@ -7,7 +7,7 @@ from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 from src.observers.player_observer import PlayerObserver
 import src.constants.color as Color
-import src.media.media_constants as MEDIA_CONSTS
+import src.constants.media_constants as MEDIA_CONSTS
 
 
 class PlayerBox(PlayerObserver):

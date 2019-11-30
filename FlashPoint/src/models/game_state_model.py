@@ -15,7 +15,7 @@ from src.constants.state_enums import GameKindEnum, DifficultyLevelEnum, GameSta
     GameBoardTypeEnum, PlayerStatusEnum, PlayerRoleEnum
 from src.core.flashpoint_exceptions import TooManyPlayersException, InvalidGameKindException, PlayerNotFoundException
 from src.models.game_units.player_model import PlayerModel
-from src.media.media_constants import PROFILES
+from src.constants.media_constants import PROFILES
 
 logger = logging.getLogger("FlashPoint")
 

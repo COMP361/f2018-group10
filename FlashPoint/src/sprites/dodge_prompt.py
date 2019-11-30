@@ -8,7 +8,7 @@ from src.UIComponents.text import Text
 from src.action_events.dodge_reply_event import DodgeReplyEvent
 from src.core.event_queue import EventQueue
 from src.core.networking import Networking
-from src.media.media_constants import WOOD, FRAME
+from src.constants.media_constants import WOOD, FRAME
 
 
 class DodgePrompt(object):

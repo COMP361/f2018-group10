@@ -16,7 +16,7 @@ from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 from src.observers.game_state_observer import GameStateObserver
 from src.UIComponents.text import Text
-from src.media.media_constants import WOOD, FRAME
+from src.constants.media_constants import WOOD, FRAME
 
 
 class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):

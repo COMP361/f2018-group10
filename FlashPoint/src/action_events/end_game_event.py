@@ -5,7 +5,7 @@ from src.constants.change_scene_enum import ChangeSceneEnum
 from src.constants.state_enums import GameStateEnum, PlayerStatusEnum
 from src.core.custom_event import CustomEvent
 from src.core.event_queue import EventQueue
-from src.media.media_constants import PROFILES
+from src.constants.media_constants import PROFILES
 
 from src.models.game_state_model import GameStateModel
 

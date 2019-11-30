@@ -5,7 +5,7 @@ from src.constants.state_enums import GameStateEnum
 from src.core.event_queue import EventQueue
 from src.models.game_state_model import GameStateModel
 from src.observers.game_state_observer import GameStateObserver
-from src.media.media_constants import WOOD, FRAME
+from src.constants.media_constants import WOOD, FRAME
 
 
 class InGameStates(pygame.sprite.Sprite, GameStateObserver):

@@ -20,7 +20,7 @@ from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 from src.sprites.game_board import GameBoard
 from src.sprites.tile_sprite import TileSprite
-from src.media.media_constants import WOOD, FRAME
+from src.constants.media_constants import WOOD, FRAME
 
 logger = logging.getLogger("FlashPoint")
 

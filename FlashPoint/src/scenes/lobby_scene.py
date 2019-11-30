@@ -17,7 +17,7 @@ from src.core.networking import Networking
 from src.action_events.start_game_event import StartGameEvent
 from src.observers.game_state_observer import GameStateObserver
 from src.sprites.player_box import PlayerBox
-import src.media.media_constants as MEDIA_CONSTS
+import src.constants.media_constants as MEDIA_CONSTS
 
 class LobbyScene(GameStateObserver):
 

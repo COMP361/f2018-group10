@@ -10,7 +10,7 @@ from src.UIComponents.rect_button import RectButton
 from src.UIComponents.text import Text
 import src.constants.color as color
 import src.constants.color as Color
-from src.media.media_constants import WOOD
+from src.constants.media_constants import WOOD
 
 
 class ProfileList(pygame.sprite.Sprite, Components):

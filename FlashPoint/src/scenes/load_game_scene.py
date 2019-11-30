@@ -16,7 +16,7 @@ from src.core.event_queue import EventQueue
 from src.core.serializer import JSONSerializer
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
-from src.media.media_constants import WOOD, FRAME, FLASHPOINT_BACKGROUND
+from src.constants.media_constants import WOOD, FRAME, FLASHPOINT_BACKGROUND
 
 RESOLUTION = (1280, 700)
 

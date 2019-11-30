@@ -27,7 +27,7 @@ from src.constants.state_enums import GameStateEnum, SpaceStatusEnum, WallStatus
 from src.action_events.turn_events.turn_event import TurnEvent
 from src.models.game_state_model import GameStateModel
 from src.sprites.game_board import GameBoard
-from src.media.media_constants import EXPLOSION_SOUND
+from src.constants.media_constants import EXPLOSION_SOUND
 
 logger = logging.getLogger("FlashPoint")
 

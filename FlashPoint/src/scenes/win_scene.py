@@ -9,7 +9,7 @@ from src.UIComponents.rect_button import RectButton
 from src.UIComponents.rect_label import RectLabel
 from src.UIComponents.scene import Scene
 from src.core.networking import Networking
-from src.media.media_constants import WOOD, FRAME, HAPPY, WON
+from src.constants.media_constants import WOOD, FRAME, HAPPY, WON
 
 class WinScene(Scene):
     def __init__(self, screen: pygame.Surface):

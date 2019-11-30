@@ -10,7 +10,7 @@ from src.UIComponents.text import Text
 from src.models.game_units.player_model import PlayerModel
 from src.core.event_queue import EventQueue
 from src.core.networking import Networking
-from src.media.media_constants import WOOD, FRAME
+from src.constants.media_constants import WOOD, FRAME
 
 
 class PermissionPrompt(object):

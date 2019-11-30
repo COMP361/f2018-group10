@@ -14,7 +14,7 @@ from src.models.game_units.player_model import PlayerModel
 from src.sprites.game_board import GameBoard
 import src.constants.color as Color
 from src.UIComponents.text import Text
-from src.media.media_constants import WOOD, FRAME
+from src.constants.media_constants import WOOD, FRAME
 
 
 class ChooseStartingPositionController(Controller):

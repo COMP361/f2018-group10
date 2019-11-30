@@ -50,7 +50,7 @@ from src.UIComponents.rect_button import RectButton
 from src.UIComponents.text import Text
 from src.sprites.notify_player_turn import NotifyPlayerTurn
 import src.constants.color as Color
-from src.media.media_constants import WOOD, FRAME, CROSS
+from src.constants.media_constants import WOOD, FRAME, CROSS
 
 logger = logging.getLogger("FlashPoint")
 

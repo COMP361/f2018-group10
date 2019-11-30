@@ -22,7 +22,7 @@ from src.constants.change_scene_enum import ChangeSceneEnum
 import src.constants.main_constants as MainConst
 from src.scenes.win_scene import WinScene
 from src.scenes.lose_scene import LoseScene
-from src.media.media_constants import BUTTON_CLICK_SOUND
+from src.constants.media_constants import BUTTON_CLICK_SOUND
 
 logger = logging.getLogger("SManager")
 logger.setLevel(logging.INFO)

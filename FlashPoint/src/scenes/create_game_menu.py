@@ -13,7 +13,7 @@ from src.UIComponents.scene import Scene
 from src.constants.state_enums import GameKindEnum, DifficultyLevelEnum, GameBoardTypeEnum
 from src.constants.change_scene_enum import ChangeSceneEnum
 from src.core.networking import Networking
-from src.media.media_constants import WOOD, FRAME, FLASHPOINT_BACKGROUND
+from src.constants.media_constants import WOOD, FRAME, FLASHPOINT_BACKGROUND
 
 
 class CreateGameMenuScene(Scene):

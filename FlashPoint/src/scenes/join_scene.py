@@ -1,5 +1,4 @@
 import time
-
 import pygame
 
 import src.constants.color as Color
@@ -17,7 +16,7 @@ from src.UIComponents.rect_label import RectLabel
 from src.UIComponents.text import Text
 from src.UIComponents.input_box import InputBox
 from src.constants.change_scene_enum import ChangeSceneEnum
-from src.media.media_constants import WOOD, FRAME, FLASHPOINT_BACKGROUND
+from src.constants.media_constants import WOOD, FRAME, FLASHPOINT_BACKGROUND
 
 
 class JoinScene(object):
