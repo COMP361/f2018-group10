@@ -1,11 +1,10 @@
 import logging
 
+from src.action_events.turn_events.turn_event import TurnEvent
 from src.constants.custom_event_enums import CustomEventEnum
 from src.core.custom_event import CustomEvent
 from src.core.event_queue import EventQueue
-from src.action_events.turn_events.turn_event import TurnEvent
 from src.models.game_units.player_model import PlayerModel
-from src.models.game_state_model import GameStateModel
 
 logger = logging.getLogger("FlashPoint")
 

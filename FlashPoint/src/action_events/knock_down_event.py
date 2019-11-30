@@ -1,10 +1,8 @@
 import logging
 import random
-import threading
 import time
 from threading import Thread
-import pygame
-import src.constants.color as Color
+
 from src.action_events.action_event import ActionEvent
 from src.constants.custom_event_enums import CustomEventEnum
 from src.constants.state_enums import VictimStateEnum, GameKindEnum
