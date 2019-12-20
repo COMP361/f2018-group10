@@ -1,29 +1,23 @@
 import json
-
-import pygame
 import os.path
 
+import pygame
+
 import src.constants.color as color
-from src.controllers.chop_controller import ChopController
-from src.controllers.door_controller import DoorController
-from src.controllers.tile_input_controller import TileInputController
-from src.models.game_state_model import GameStateModel
-from src.sprites.game_board import GameBoard
-
-from src.models.game_board.null_model import NullModel
-from src.core.custom_event import CustomEvent
-from src.core.networking import Networking
-from src.core.serializer import JSONSerializer
-from src.models.game_units.player_model import PlayerModel
-from src.core.event_queue import EventQueue
-
+from src.UIComponents.input_box import InputBox
+from src.UIComponents.profile_list import ProfileList
 from src.UIComponents.rect_button import RectButton
 from src.UIComponents.rect_label import RectLabel
 from src.UIComponents.text import Text
-from src.UIComponents.input_box import InputBox
-from src.UIComponents.profile_list import ProfileList
 from src.constants.change_scene_enum import ChangeSceneEnum
 from src.constants.media_constants import WOOD, FRAME, FLASHPOINT_BACKGROUND, PROFILES
+from src.core.custom_event import CustomEvent
+from src.core.event_queue import EventQueue
+from src.core.networking import Networking
+from src.core.serializer import JSONSerializer
+from src.models.game_board.null_model import NullModel
+from src.models.game_units.player_model import PlayerModel
+
 
 class StartScene(object):
     def __init__(self, screen):

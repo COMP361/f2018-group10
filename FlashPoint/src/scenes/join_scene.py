@@ -1,22 +1,20 @@
-import time
 import pygame
 
 import src.constants.color as Color
-import src.constants.fonts as Font
-from src.core.serializer import JSONSerializer
-from src.core.networking import Networking
-from src.core.custom_event import CustomEvent
-from src.core.event_queue import EventQueue
-from src.core.flashpoint_exceptions import TooManyPlayersException
-from src.action_events.too_many_players_event import TooManyPlayersEvent
-from src.constants.state_enums import PlayerStatusEnum
-from src.models.game_units.player_model import PlayerModel
+from src.UIComponents.input_box import InputBox
 from src.UIComponents.rect_button import RectButton
 from src.UIComponents.rect_label import RectLabel
 from src.UIComponents.text import Text
-from src.UIComponents.input_box import InputBox
+from src.action_events.too_many_players_event import TooManyPlayersEvent
 from src.constants.change_scene_enum import ChangeSceneEnum
 from src.constants.media_constants import WOOD, FRAME, FLASHPOINT_BACKGROUND
+from src.constants.state_enums import PlayerStatusEnum
+from src.core.custom_event import CustomEvent
+from src.core.event_queue import EventQueue
+from src.core.flashpoint_exceptions import TooManyPlayersException
+from src.core.networking import Networking
+from src.core.serializer import JSONSerializer
+from src.models.game_units.player_model import PlayerModel
 
 
 class JoinScene(object):

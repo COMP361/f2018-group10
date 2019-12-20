@@ -4,7 +4,6 @@ from src.action_events.turn_events.turn_event import TurnEvent
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.hazmat_model import HazmatModel
 from src.models.game_units.player_model import PlayerModel
-from src.models.game_units.victim_model import VictimModel
 
 logger = logging.getLogger("FlashPoint")
 

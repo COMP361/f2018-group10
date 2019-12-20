@@ -1,16 +1,16 @@
 import pygame
 
 import src.constants.color as Color
+from src.UIComponents.rect_button import RectButton
+from src.UIComponents.rect_label import RectLabel
+from src.UIComponents.scene import Scene
+from src.UIComponents.text import Text
+from src.constants.change_scene_enum import ChangeSceneEnum
+from src.constants.media_constants import WOOD, FRAME, FLASHPOINT_BACKGROUND
 from src.core.custom_event import CustomEvent
 from src.core.event_queue import EventQueue
 from src.models.game_units.player_model import PlayerModel
-from src.UIComponents.rect_button import RectButton
-from src.UIComponents.rect_label import RectLabel
-from src.UIComponents.text import Text
-from src.UIComponents.scene import Scene
-from src.constants.change_scene_enum import ChangeSceneEnum
-from src.core.networking import Networking
-from src.constants.media_constants import WOOD, FRAME, FLASHPOINT_BACKGROUND
+
 
 class HostMenuScene(Scene):
     def __init__(self, screen: pygame.Surface, host_player: PlayerModel):

@@ -1,14 +1,12 @@
 import pygame
 
-from src.models.game_board.tile_model import TileModel
-from src.models.game_units.player_model import PlayerModel
-from src.models.game_units.victim_model import VictimModel
-from src.sprites.grid_sprite import GridSprite
-
+import src.constants.color as Color
 from src.UIComponents.file_importer import FileImporter
 from src.constants.state_enums import PlayerStatusEnum, PlayerRoleEnum
+from src.models.game_board.tile_model import TileModel
+from src.models.game_units.player_model import PlayerModel
 from src.observers.player_observer import PlayerObserver
-import src.constants.color as Color
+from src.sprites.grid_sprite import GridSprite
 
 
 class PlayerSprite(pygame.sprite.Sprite, PlayerObserver):

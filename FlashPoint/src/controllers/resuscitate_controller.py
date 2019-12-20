@@ -1,17 +1,13 @@
 from src.UIComponents.interactable import Interactable
 from src.action_events.turn_events.resuscitate_victim_event import ResuscitateEvent
 from src.action_events.turn_events.turn_event import TurnEvent
-from src.constants.state_enums import GameKindEnum, WallStatusEnum, DoorStatusEnum, PlayerRoleEnum, VictimStateEnum
+from src.constants.state_enums import GameKindEnum, PlayerRoleEnum, VictimStateEnum
 from src.controllers.controller import Controller
 from src.core.networking import Networking
-from src.models.game_board.door_model import DoorModel
 from src.models.game_board.game_board_model import GameBoardModel
 from src.models.game_board.tile_model import TileModel
-from src.models.game_board.wall_model import WallModel
 from src.models.game_state_model import GameStateModel
-from src.models.game_units.hazmat_model import HazmatModel
 from src.models.game_units.player_model import PlayerModel
-from src.models.game_units.poi_model import POIModel
 from src.models.game_units.victim_model import VictimModel
 from src.sprites.tile_sprite import TileSprite
 

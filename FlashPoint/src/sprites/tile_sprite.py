@@ -1,19 +1,18 @@
-import time
-from threading import Thread
 from typing import Tuple, List
 
 import pygame
-from src.UIComponents.file_importer import FileImporter
-from src.UIComponents.rect_button import RectButton
-from src.models.game_state_model import GameStateModel
-from src.constants.state_enums import SpaceStatusEnum
-from src.UIComponents.interactable import Interactable
-from src.core.event_queue import EventQueue
-from src.models.model import Model
-from src.observers.tile_observer import TileObserver
+
 import src.constants.color as Color
+from src.UIComponents.file_importer import FileImporter
+from src.UIComponents.interactable import Interactable
+from src.UIComponents.rect_button import RectButton
 from src.UIComponents.text import Text
 from src.constants.media_constants import WATER, EXPLOSION
+from src.constants.state_enums import SpaceStatusEnum
+from src.core.event_queue import EventQueue
+from src.models.game_state_model import GameStateModel
+from src.models.model import Model
+from src.observers.tile_observer import TileObserver
 
 
 class TileSprite(Interactable, TileObserver):

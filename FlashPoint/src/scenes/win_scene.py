@@ -1,15 +1,16 @@
 import pygame
-from src.UIComponents.text import Text
+
 import src.constants.color as Color
-from src.constants.change_scene_enum import ChangeSceneEnum
-from src.core.custom_event import CustomEvent
-from src.core.event_queue import EventQueue
-from src.models.game_units.player_model import PlayerModel
 from src.UIComponents.rect_button import RectButton
 from src.UIComponents.rect_label import RectLabel
 from src.UIComponents.scene import Scene
-from src.core.networking import Networking
+from src.UIComponents.text import Text
+from src.constants.change_scene_enum import ChangeSceneEnum
 from src.constants.media_constants import WOOD, FRAME, HAPPY, WON
+from src.core.custom_event import CustomEvent
+from src.core.event_queue import EventQueue
+from src.core.networking import Networking
+
 
 class WinScene(Scene):
     def __init__(self, screen: pygame.Surface):
