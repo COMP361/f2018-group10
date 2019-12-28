@@ -2,6 +2,7 @@ import pygame
 from datetime import datetime
 import src.constants.color as Color
 from src.core.event_queue import EventQueue
+from src.constants.media_constants import TIMEBAR_WOOD, MENU
 
 
 class TimeBar(pygame.sprite.Sprite):
@@ -12,9 +13,9 @@ class TimeBar(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.move_ip(x, y)
         self._start_time = datetime.now()
-        wood = pygame.image.load('src/media/GameHud/wood1.png')
+        wood = pygame.image.load(TIMEBAR_WOOD)
         self.wood = pygame.transform.scale(wood, (1280, 30))
-        menu = pygame.image.load('src/media/GameHud/menu.png')
+        menu = pygame.image.load(MENU)
         self.menu = pygame.transform.scale(menu, (30, 30))
 
     def update(self, event_queue: EventQueue):

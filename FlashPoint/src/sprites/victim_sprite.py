@@ -15,7 +15,7 @@ class VictimSprite(pygame.sprite.Sprite, VictimObserver):
 
     def __init__(self, row: int, column: int):
         super().__init__()
-        self.image = FileImporter.import_image("src/media/all_markers/victim.png")
+        self.image = FileImporter.import_image("media/all_markers/victim.png")
 
         self.rect = self.image.get_rect()
         self.row = row
@@ -28,7 +28,7 @@ class VictimSprite(pygame.sprite.Sprite, VictimObserver):
         elif state == VictimStateEnum.RESCUED:
             self.kill()
         elif state == VictimStateEnum.TREATED:
-            treat = FileImporter.import_image("src/media/all_markers/treated.png")
+            treat = FileImporter.import_image("media/all_markers/treated.png")
             self.image.blit(treat, (0,0))
 
     def victim_position_changed(self, row: int, column: int):

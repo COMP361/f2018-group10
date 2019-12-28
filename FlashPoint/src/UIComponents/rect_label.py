@@ -1,10 +1,10 @@
 from typing import Tuple, Optional, Union
 
 import pygame
-import src.constants.color as Color
-from src.UIComponents.text import Text
-from src.UIComponents.file_importer import FileImporter
+
 from src.UIComponents.components import Components
+from src.UIComponents.file_importer import FileImporter
+from src.UIComponents.text import Text
 
 
 class RectLabel(pygame.sprite.Sprite, Components):

@@ -111,13 +111,13 @@ class DoorSprite(pygame.sprite.Sprite, DoorObserver):
 
         if self.destroyed:
             self.marker = RectLabel(self.button.rect.x + x_offset1, self.button.rect.y + y_offset1, 50, 50,
-                                    "src/media/Threat_Markers/damageMarker.png")
+                                    "media/Threat_Markers/damageMarker.png")
             self.marker.draw(screen)
         if self.open:
             self.marker = RectLabel(self.button.rect.x + x_offset1, self.button.rect.y + y_offset1, 50, 50,
-                                    "src/media/Door_Markers/Open_Door.png")
+                                    "media/Door_Markers/Open_Door.png")
             self.marker.draw(screen)
         if self.closed:
             self.marker = RectLabel(self.button.rect.x + x_offset1, self.button.rect.y + y_offset1, 50, 50,
-                                    "src/media/Door_Markers/Closed_Door.png")
+                                    "media/Door_Markers/Closed_Door.png")
             self.marker.draw(screen)

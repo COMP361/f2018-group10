@@ -18,7 +18,7 @@ class EngineSprite(pygame.sprite.Sprite, VehicleObserver):
 
     def __init__(self, orientation: VehicleOrientationEnum, tile_sprite: TileSprite):
         super().__init__()
-        self.image = FileImporter.import_image("src/media/Vehicles/Fire_Engine.png")
+        self.image = FileImporter.import_image("media/Vehicles/Fire_Engine.png")
         self.rect = self.image.get_rect()
         self.tile_sprite = tile_sprite
         self.row = tile_sprite.row

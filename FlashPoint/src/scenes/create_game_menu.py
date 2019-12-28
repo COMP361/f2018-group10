@@ -13,6 +13,7 @@ from src.UIComponents.scene import Scene
 from src.constants.state_enums import GameKindEnum, DifficultyLevelEnum, GameBoardTypeEnum
 from src.constants.change_scene_enum import ChangeSceneEnum
 from src.core.networking import Networking
+from src.constants.media_constants import WOOD, FRAME, FLASHPOINT_BACKGROUND
 
 
 class CreateGameMenuScene(Scene):
@@ -51,7 +52,7 @@ class CreateGameMenuScene(Scene):
 
     def _init_background(self):
         box_size = (self.resolution[0], self.resolution[1])
-        background_box = RectLabel(0, 0, box_size[0], box_size[1], "src/media/backgrounds/flashpoint_background.png")
+        background_box = RectLabel(0, 0, box_size[0], box_size[1], FLASHPOINT_BACKGROUND)
         self.sprite_grp.add(background_box)
 
     def _init_text_box(self, x_pos, y_pos, w, h, text, color, color_text):
@@ -59,15 +60,15 @@ class CreateGameMenuScene(Scene):
 
         user_box = RectLabel(x_pos, y_pos, box_size[0], box_size[1], color, 0,
                              Text(pygame.font.SysFont('Agency FB', 25), text, color_text))
-        user_box.change_bg_image('src/media/GameHud/wood2.png')
-        user_box.add_frame('src/media/GameHud/frame.png')
+        user_box.change_bg_image(WOOD)
+        user_box.add_frame(FRAME)
         self.sprite_grp.add(user_box)
 
     def _init_btn_family(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
         box_size = (130, 48)
         self.buttonFamily = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
                                        Text(pygame.font.SysFont('Agency FB', 25), text, color_text))
-        self.buttonFamily.change_bg_image('src/media/GameHud/wood2.png')
+        self.buttonFamily.change_bg_image(WOOD)
         pygame.draw.rect(self.buttonFamily.image, Color.GREEN2, [0, 0, box_size[0], box_size[1]], 7)
         self.sprite_grp.add(self.buttonFamily)
 
@@ -75,7 +76,7 @@ class CreateGameMenuScene(Scene):
         box_size = (130, 48)
         self.buttonRecruit = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
                                     Text(pygame.font.SysFont('Agency FB', 25), text, color_text))
-        self.buttonRecruit.change_bg_image('src/media/GameHud/wood2.png')
+        self.buttonRecruit.change_bg_image(WOOD)
         pygame.draw.rect(self.buttonRecruit.image, Color.GREEN, [0, 0, box_size[0], box_size[1]], 7)
         self.sprite_grp.add(self.buttonRecruit)
 
@@ -83,7 +84,7 @@ class CreateGameMenuScene(Scene):
         box_size = (130, 48)
         self.buttonVeteran = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
                                     Text(pygame.font.SysFont('Agency FB', 25), text, color_text))
-        self.buttonVeteran.change_bg_image('src/media/GameHud/wood2.png')
+        self.buttonVeteran.change_bg_image(WOOD)
         pygame.draw.rect(self.buttonVeteran.image, Color.YELLOW, [0, 0, box_size[0], box_size[1]], 7)
         self.sprite_grp.add(self.buttonVeteran)
 
@@ -91,7 +92,7 @@ class CreateGameMenuScene(Scene):
         box_size = (130, 48)
         self.buttonHeroic = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
                                     Text(pygame.font.SysFont('Agency FB', 25), text, color_text))
-        self.buttonHeroic.change_bg_image('src/media/GameHud/wood2.png')
+        self.buttonHeroic.change_bg_image(WOOD)
         pygame.draw.rect(self.buttonHeroic.image, Color.RED, [0, 0, box_size[0], box_size[1]], 7)
         self.sprite_grp.add(self.buttonHeroic)
 
@@ -99,6 +100,6 @@ class CreateGameMenuScene(Scene):
         box_size = (130, 48)
         self.buttonBack = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
                                      Text(pygame.font.SysFont('Agency FB', 25), text, color_text))
-        self.buttonBack.change_bg_image('src/media/GameHud/wood2.png')
-        self.buttonBack.add_frame('src/media/GameHud/frame.png')
+        self.buttonBack.change_bg_image(WOOD)
+        self.buttonBack.add_frame(FRAME)
         self.sprite_grp.add(self.buttonBack)

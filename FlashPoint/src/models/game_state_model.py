@@ -15,6 +15,7 @@ from src.constants.state_enums import GameKindEnum, DifficultyLevelEnum, GameSta
     GameBoardTypeEnum, PlayerStatusEnum, PlayerRoleEnum
 from src.core.flashpoint_exceptions import TooManyPlayersException, InvalidGameKindException, PlayerNotFoundException
 from src.models.game_units.player_model import PlayerModel
+from src.constants.media_constants import PROFILES
 
 logger = logging.getLogger("FlashPoint")
 
@@ -83,8 +84,8 @@ class GameStateModel(Model):
     def destroy():
         GameStateModel._instance = None
         logger.info("GameStateModel deleted")
-        if os.path.exists("src/media/board_layouts/random_inside_walls.json"):
-            os.rmdir("src/media/board_layouts/random_inside_walls.json")
+        if os.path.exists("media/board_layouts/random_inside_walls.json"):
+            os.rmdir("media/board_layouts/random_inside_walls.json")
 
     @classmethod
     def instance(cls):
@@ -407,13 +408,10 @@ class GameStateModel(Model):
             return 3
 
     def endgame(self):
-
-        profiles = "src/media/profiles.json"
-
         if self._state == GameStateEnum.LOST:
             for player in self.players:
 
-                with open(profiles, mode='r+', encoding='utf-8') as file:
+                with open(PROFILES, mode='r+', encoding='utf-8') as file:
                     temp = json.load(file)
                     file.seek(0)
                     file.truncate()
@@ -431,7 +429,7 @@ class GameStateModel(Model):
         else:
             for player in self.players:
 
-                with open(profiles, mode='r+', encoding='utf-8') as file:
+                with open(PROFILES, mode='r+', encoding='utf-8') as file:
                     temp = json.load(file)
                     file.seek(0)
                     file.truncate()

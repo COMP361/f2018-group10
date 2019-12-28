@@ -5,6 +5,7 @@ from src.constants.change_scene_enum import ChangeSceneEnum
 from src.constants.state_enums import GameStateEnum, PlayerStatusEnum
 from src.core.custom_event import CustomEvent
 from src.core.event_queue import EventQueue
+from src.constants.media_constants import PROFILES
 
 from src.models.game_state_model import GameStateModel
 
@@ -22,12 +23,11 @@ class EndGameEvent(ActionEvent):
 
         state_model = GameStateModel.instance()
         players = state_model.players
-        profiles = "src/media/profiles.json"
 
         if self._state == GameStateEnum.LOST:
             for player in players:
 
-                with open(profiles, mode='r+', encoding='utf-8') as file:
+                with open(PROFILES, mode='r+', encoding='utf-8') as file:
                     temp = json.load(file)
                     file.seek(0)
                     file.truncate()
@@ -45,7 +45,7 @@ class EndGameEvent(ActionEvent):
         else:
             for player in players:
 
-                with open(profiles, mode='r+', encoding='utf-8') as file:
+                with open(PROFILES, mode='r+', encoding='utf-8') as file:
                     temp = json.load(file)
                     file.seek(0)
                     file.truncate()

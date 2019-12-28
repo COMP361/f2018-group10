@@ -10,6 +10,7 @@ from src.models.game_units.player_model import PlayerModel
 from src.UIComponents.rect_button import RectButton
 from src.UIComponents.rect_label import RectLabel
 from src.UIComponents.text import Text
+from src.constants.media_constants import WOOD, FRAME, FLASHPOINT_BACKGROUND
 
 
 class ChooseBoardScene(object):
@@ -37,13 +38,13 @@ class ChooseBoardScene(object):
         box_size = (500, 50)
         self.text_title = RectButton((int)(1280 / 2 - 250), 300, box_size[0], box_size[1], Color.BLACK, 0,
                                      Text(pygame.font.SysFont('Agency FB', 35), "Choose Board", Color.GREEN2))
-        self.text_title.change_bg_image('src/media/GameHud/wood2.png')
-        self.text_title.add_frame('src/media/GameHud/frame.png')
+        self.text_title.change_bg_image(WOOD)
+        self.text_title.add_frame(FRAME)
         self.sprite_grp.add(self.text_title)
 
     def _init_background(self):
         box_size = (self.resolution[0], self.resolution[1])
-        background_box = RectLabel(0, 0, box_size[0], box_size[1], "src/media/backgrounds/flashpoint_background.png")
+        background_box = RectLabel(0, 0, box_size[0], box_size[1], FLASHPOINT_BACKGROUND)
         self.sprite_grp.add(background_box)
 
     def _init_board1(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
@@ -51,8 +52,8 @@ class ChooseBoardScene(object):
         self.button_board1 = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
                                         Text(pygame.font.SysFont('Agency FB', 25), text, color_text))
 
-        self.button_board1.change_bg_image('src/media/GameHud/wood2.png')
-        self.button_board1.add_frame('src/media/GameHud/frame.png')
+        self.button_board1.change_bg_image(WOOD)
+        self.button_board1.add_frame(FRAME)
         self.button_board1.on_click(self.set_and_continue, GameBoardTypeEnum.ORIGINAL)
         self.sprite_grp.add(self.button_board1)
 
@@ -61,8 +62,8 @@ class ChooseBoardScene(object):
         self.button_board2 = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
                                         Text(pygame.font.SysFont('Agency FB', 25), text, color_text))
         self.button_board2.on_click(self.set_and_continue, GameBoardTypeEnum.ALTERNATIVE)
-        self.button_board2.change_bg_image('src/media/GameHud/wood2.png')
-        self.button_board2.add_frame('src/media/GameHud/frame.png')
+        self.button_board2.change_bg_image(WOOD)
+        self.button_board2.add_frame(FRAME)
         self.sprite_grp.add(self.button_board2)
 
     def _init_board3(self, x_pos, y_pos, text, color, color_text):
@@ -71,16 +72,16 @@ class ChooseBoardScene(object):
                                         Text(pygame.font.SysFont('Agency FB', 25), text, color_text))
 
         self.button_board3.on_click(self.set_and_continue, GameBoardTypeEnum.RANDOM)
-        self.button_board3.change_bg_image('src/media/GameHud/wood2.png')
-        self.button_board3.add_frame('src/media/GameHud/frame.png')
+        self.button_board3.change_bg_image(WOOD)
+        self.button_board3.add_frame(FRAME)
         self.sprite_grp.add(self.button_board3)
 
     def _init_btn_back(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
         box_size = (130, 48)
         self.buttonBack = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
                                      Text(pygame.font.SysFont('Agency FB', 25), text, color_text))
-        self.buttonBack.change_bg_image('src/media/GameHud/wood2.png')
-        self.buttonBack.add_frame('src/media/GameHud/frame.png')
+        self.buttonBack.change_bg_image(WOOD)
+        self.buttonBack.add_frame(FRAME)
         self.buttonBack.on_click(EventQueue.post, CustomEvent(ChangeSceneEnum.CREATEGAMEMENU))
         self.sprite_grp.add(self.buttonBack)
 

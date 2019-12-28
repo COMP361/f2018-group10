@@ -1,33 +1,27 @@
 import json
-
-import pygame
 import os.path
 
+import pygame
+
 import src.constants.color as color
-from src.controllers.chop_controller import ChopController
-from src.controllers.door_controller import DoorController
-from src.controllers.tile_input_controller import TileInputController
-from src.models.game_state_model import GameStateModel
-from src.sprites.game_board import GameBoard
-
-from src.models.game_board.null_model import NullModel
-from src.core.custom_event import CustomEvent
-from src.core.networking import Networking
-from src.core.serializer import JSONSerializer
-from src.models.game_units.player_model import PlayerModel
-from src.core.event_queue import EventQueue
-
+from src.UIComponents.input_box import InputBox
+from src.UIComponents.profile_list import ProfileList
 from src.UIComponents.rect_button import RectButton
 from src.UIComponents.rect_label import RectLabel
 from src.UIComponents.text import Text
-from src.UIComponents.input_box import InputBox
-from src.UIComponents.profile_list import ProfileList
 from src.constants.change_scene_enum import ChangeSceneEnum
+from src.constants.media_constants import WOOD, FRAME, FLASHPOINT_BACKGROUND, PROFILES
+from src.core.custom_event import CustomEvent
+from src.core.event_queue import EventQueue
+from src.core.networking import Networking
+from src.core.serializer import JSONSerializer
+from src.models.game_board.null_model import NullModel
+from src.models.game_units.player_model import PlayerModel
 
 
 class StartScene(object):
     def __init__(self, screen):
-        self.profiles = "src/media/profiles.json"
+        self.profiles = PROFILES
         self.resolution = (1280, 700)
         self.sprite_grp = pygame.sprite.Group()
         self._init_background()
@@ -42,7 +36,7 @@ class StartScene(object):
 
     def _init_background(self):
         box_size = (self.resolution[0], self.resolution[1])
-        background_box = RectLabel(0, 0, box_size[0], box_size[1], "src/media/backgrounds/flashpoint_background.png")
+        background_box = RectLabel(0, 0, box_size[0], box_size[1], FLASHPOINT_BACKGROUND)
         self.sprite_grp.add(background_box)
 
     def _init_log_box(self, clr):
@@ -50,8 +44,8 @@ class StartScene(object):
         x_pos = self.resolution[0] / 2 - box_size[0] / 2
         y_pos = self.resolution[1] / 2 - box_size[1] / 2
         log_box = RectLabel(x_pos, y_pos, box_size[0], box_size[1], clr)
-        log_box.change_bg_image('src/media/GameHud/wood2.png')
-        log_box.add_frame('src/media/GameHud/frame.png')
+        log_box.change_bg_image(WOOD)
+        log_box.add_frame(FRAME)
         self.sprite_grp.add(log_box)
 
     def _init_text_box(self, x_pos, y_pos, text, clr, color_text):
@@ -65,8 +59,8 @@ class StartScene(object):
         box_size = (130, 48)
         self.buttonRegister = RectButton(x_pos, y_pos, box_size[0], box_size[1], clr, 0,
                                          Text(pygame.font.SysFont('Agency FB', 25), text, color_text))
-        self.buttonRegister.change_bg_image('src/media/GameHud/wood2.png')
-        self.buttonRegister.add_frame('src/media/GameHud/frame.png')
+        self.buttonRegister.change_bg_image(WOOD)
+        self.buttonRegister.add_frame(FRAME)
         self.buttonRegister.on_click(self.register_profile)
         self.sprite_grp.add(self.buttonRegister)
 

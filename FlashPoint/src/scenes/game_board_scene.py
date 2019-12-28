@@ -1,55 +1,53 @@
 import itertools
 import json
+import logging
 import os
-import random
 from datetime import datetime
 from typing import List
 
 import pygame
-import logging
 
-from src.action_events.board_setup_event import BoardSetupEvent
-from src.constants.custom_event_enums import CustomEventEnum
-from src.constants.state_enums import GameStateEnum
-from src.controllers.veteran_controller import VeteranController
-from src.models.game_units.hazmat_model import HazmatModel
-from src.models.game_units.victim_model import VictimModel
-from src.sprites.hud.command_notification import CommandNotification
-from src.sprites.permission_prompt import PermissionPrompt
-from src.sprites.dodge_prompt import DodgePrompt
-from src.sprites.hazmat_sprite import HazmatSprite
-from src.sprites.knockdown_prompt import KnockdownPrompt
-from src.sprites.victim_lost_prompt import VictimLostPrompt
-from src.sprites.victim_saved_prompt import VictimSavedPrompt
-from src.sprites.victim_sprite import VictimSprite
-from src.models.game_units.poi_model import POIModel
-from src.observers.game_board_observer import GameBoardObserver
-from src.observers.game_state_observer import GameStateObserver
-
-from src.controllers.chop_controller import ChopController
-from src.controllers.door_controller import DoorController
-from src.sprites.poi_sprite import POISprite
-from src.controllers.tile_input_controller import TileInputController
-from src.constants.change_scene_enum import ChangeSceneEnum
-from src.core.custom_event import CustomEvent
-
+import src.constants.color as Color
 from src.UIComponents.chat_box import ChatBox
 from src.UIComponents.menu_window import MenuWindow
+from src.UIComponents.rect_button import RectButton
+from src.UIComponents.text import Text
+from src.action_events.board_setup_event import BoardSetupEvent
+from src.constants.change_scene_enum import ChangeSceneEnum
+from src.constants.custom_event_enums import CustomEventEnum
+from src.constants.media_constants import WOOD, FRAME, CROSS
+from src.constants.state_enums import GameStateEnum
+from src.controllers.chop_controller import ChopController
+from src.controllers.door_controller import DoorController
+from src.controllers.tile_input_controller import TileInputController
+from src.controllers.veteran_controller import VeteranController
+from src.core.custom_event import CustomEvent
 from src.core.event_queue import EventQueue
 from src.core.networking import Networking
 from src.core.serializer import JSONSerializer
 from src.models.game_state_model import GameStateModel
+from src.models.game_units.hazmat_model import HazmatModel
 from src.models.game_units.player_model import PlayerModel
+from src.models.game_units.poi_model import POIModel
+from src.models.game_units.victim_model import VictimModel
+from src.observers.game_board_observer import GameBoardObserver
+from src.observers.game_state_observer import GameStateObserver
+from src.sprites.dodge_prompt import DodgePrompt
 from src.sprites.game_board import GameBoard
-from src.sprites.hud.player_state import PlayerState
+from src.sprites.hazmat_sprite import HazmatSprite
+from src.sprites.hud.command_notification import CommandNotification
 from src.sprites.hud.current_player_state import CurrentPlayerState
-from src.sprites.hud.time_bar import TimeBar
 from src.sprites.hud.ingame_states import InGameStates
-from src.sprites.player_sprite import PlayerSprite
-from src.UIComponents.rect_button import RectButton
-from src.UIComponents.text import Text
+from src.sprites.hud.player_state import PlayerState
+from src.sprites.hud.time_bar import TimeBar
+from src.sprites.knockdown_prompt import KnockdownPrompt
 from src.sprites.notify_player_turn import NotifyPlayerTurn
-import src.constants.color as Color
+from src.sprites.permission_prompt import PermissionPrompt
+from src.sprites.player_sprite import PlayerSprite
+from src.sprites.poi_sprite import POISprite
+from src.sprites.victim_lost_prompt import VictimLostPrompt
+from src.sprites.victim_saved_prompt import VictimSavedPrompt
+from src.sprites.victim_sprite import VictimSprite
 
 logger = logging.getLogger("FlashPoint")
 
@@ -66,7 +64,7 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
         """
 
         self._screen = screen
-        self._save_games_file = "src/media/saved_games.json"
+        self._save_games_file = "media/saved_games.json"
         self._game: GameStateModel = GameStateModel.instance()
         self._game.game_board.add_observer(self)
         self._init_current_player(current_player)
@@ -191,15 +189,15 @@ class GameBoardScene(GameBoardObserver, GameStateObserver):
     def _init_menu(self):
         self._menu = MenuWindow([self._active_sprites, self._game_board_sprite], 500, 500, (400, 150))
 
-        save_btn = RectButton(200, 150, 100, 50, 'src/media/GameHud/wood2.png', 0,
+        save_btn = RectButton(200, 150, 100, 50, WOOD, 0,
                               Text(pygame.font.SysFont('Agency FB', 25), "Save", Color.GREEN2))
-        save_btn.add_frame('src/media/GameHud/frame.png')
+        save_btn.add_frame(FRAME)
 
-        quit_btn = RectButton(200, 250, 100, 50, 'src/media/GameHud/wood2.png', 0,
+        quit_btn = RectButton(200, 250, 100, 50, WOOD, 0,
                               Text(pygame.font.SysFont('Agency FB', 25), "Quit", Color.GREEN2))
-        quit_btn.add_frame('src/media/GameHud/frame.png')
+        quit_btn.add_frame(FRAME)
 
-        back_btn = RectButton(50, 50, 50, 50, "src/media/GameHud/crosss.png", 0)
+        back_btn = RectButton(50, 50, 50, 50, CROSS, 0)
 
         back_btn.on_click(self._menu.close)
         quit_btn.on_click(self._quit_btn_on_click)

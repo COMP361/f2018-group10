@@ -1,6 +1,7 @@
 import pygame
 import src.constants.color as Color
 from src.core.event_queue import EventQueue
+from src.constants.media_constants import WOOD, FRAME
 
 
 class KnockdownPrompt(object):
@@ -11,8 +12,8 @@ class KnockdownPrompt(object):
         self.rect = self.image.get_rect()
         self.rect.move_ip(480, 30)
 
-        self.bg = pygame.image.load('src/media/GameHud/wood2.png')
-        self.frame = pygame.image.load('src/media/GameHud/frame.png')
+        self.bg = pygame.image.load(WOOD)
+        self.frame = pygame.image.load(FRAME)
         self.frame = pygame.transform.scale(self.frame,(400,100))
         self._name = "xuy"
         self.message = f"{self._name} has been knocked down"

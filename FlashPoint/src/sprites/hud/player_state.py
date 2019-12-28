@@ -6,6 +6,7 @@ from src.constants.state_enums import PlayerStatusEnum, GameKindEnum, PlayerRole
 from src.core.event_queue import EventQueue
 from src.models.game_units.player_model import PlayerModel
 from src.observers.player_observer import PlayerObserver
+import src.constants.media_constants as MEDIA_CONSTS
 
 
 class PlayerState(Interactable, PlayerObserver):
@@ -21,8 +22,8 @@ class PlayerState(Interactable, PlayerObserver):
         current.add_observer(self)
 
         self.image = pygame.Surface([150, 64])
-        self.bg = pygame.image.load('src/media/GameHud/wood2-150x64.png')
-        self.frame = pygame.image.load('src/media/GameHud/frame150x64.png')
+        self.bg = pygame.image.load(MEDIA_CONSTS.WOOD_150x64)
+        self.frame = pygame.image.load(MEDIA_CONSTS.FRAME_150X64)
         self.player_icon = self.color_picker(color)
         self.player_icon = pygame.transform.scale(self.player_icon, (70, 70))
         super().__init__(self.image.get_rect())
@@ -71,12 +72,12 @@ class PlayerState(Interactable, PlayerObserver):
 
     def color_picker(self, color: Color):
         return {
-            Color.WHITE: pygame.image.load('src/media/GameHud/PWHITE.png'),
-            Color.BLUE: pygame.image.load('src/media/GameHud/Bleu.png'),
-            Color.RED: pygame.image.load('src/media/GameHud/PRED.png'),
-            Color.ORANGE: pygame.image.load('src/media/GameHud/PORANGE.png'),
-            Color.YELLOW: pygame.image.load('src/media/GameHud/PYELLOW.png'),
-            Color.GREEN: pygame.image.load('src/media/GameHud/PGREEN.png'),
+            Color.WHITE: pygame.image.load(MEDIA_CONSTS.P_WHITE),
+            Color.BLUE: pygame.image.load(MEDIA_CONSTS.P_BLUE),
+            Color.RED: pygame.image.load(MEDIA_CONSTS.P_RED),
+            Color.ORANGE: pygame.image.load(MEDIA_CONSTS.P_ORANGE),
+            Color.YELLOW: pygame.image.load(MEDIA_CONSTS.P_YELLOW),
+            Color.GREEN: pygame.image.load(MEDIA_CONSTS.P_GREEN),
         }[color]
 
     # def ability_description(self,role:PlayerRoleEnum):

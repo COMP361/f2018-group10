@@ -1,18 +1,18 @@
-import time
-from threading import Thread
 from typing import Tuple, List
 
 import pygame
+
+import src.constants.color as Color
 from src.UIComponents.file_importer import FileImporter
-from src.UIComponents.rect_button import RectButton
-from src.models.game_state_model import GameStateModel
-from src.constants.state_enums import SpaceStatusEnum
 from src.UIComponents.interactable import Interactable
+from src.UIComponents.rect_button import RectButton
+from src.UIComponents.text import Text
+from src.constants.media_constants import WATER, EXPLOSION
+from src.constants.state_enums import SpaceStatusEnum
 from src.core.event_queue import EventQueue
+from src.models.game_state_model import GameStateModel
 from src.models.model import Model
 from src.observers.tile_observer import TileObserver
-import src.constants.color as Color
-from src.UIComponents.text import Text
 
 
 class TileSprite(Interactable, TileObserver):
@@ -36,13 +36,12 @@ class TileSprite(Interactable, TileObserver):
 
         self.explosion = False
         self.explosion_image = image.copy()
-        self.explosion_image.blit(pygame.image.load('src/media/all_markers/explosian.png'), (0, 0, 128, 128))
+        self.explosion_image.blit(pygame.image.load(EXPLOSION), (0, 0, 128, 128))
         self.explosion_image.get_rect().move_ip(x_offset,y_offset)
 
         self.fire_deck_gun = False
         self.fire_deck_gun_image = image.copy()
-       # self.water = pygame.transform.scale(pygame.image.load('src/media/all_markers/water.png'),(128,128))
-        self.fire_deck_gun_image.blit(pygame.transform.scale(pygame.image.load('src/media/all_markers/water.png'),(128,128)), (0, 0, 128, 128))
+        self.fire_deck_gun_image.blit(pygame.transform.scale(pygame.image.load(WATER),(128,128)), (0, 0, 128, 128))
         self.fire_deck_gun_image.get_rect().move_ip(x_offset, y_offset)
 
         # Initialize if place is Fire, Smoke or Safe
@@ -395,14 +394,14 @@ class TileSprite(Interactable, TileObserver):
         new_surf.fill((0, 0, 0, 0), None, pygame.BLEND_RGBA_MULT)
 
         if status == SpaceStatusEnum.FIRE:
-            image_file = FileImporter.import_image("src/media/All Markers/fire.png")
+            image_file = FileImporter.import_image("media/All Markers/fire.png")
             new_surf.blit(image_file, (0, 0))
         elif status == SpaceStatusEnum.SMOKE:
-            image_file = FileImporter.import_image("src/media/All Markers/smoke.png")
+            image_file = FileImporter.import_image("media/All Markers/smoke.png")
             new_surf.blit(image_file, (0, 0))
 
         if is_hotspot:
-            hs_img = FileImporter.import_image("src/media/all_markers/hot_spot.png")
+            hs_img = FileImporter.import_image("media/all_markers/hot_spot.png")
             new_surf.blit(hs_img, (0, 0))
 
         self._non_highlight_image.blit(new_surf, (0, 0))

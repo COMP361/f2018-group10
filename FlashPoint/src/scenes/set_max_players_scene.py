@@ -10,6 +10,7 @@ from src.models.game_units.player_model import PlayerModel
 from src.UIComponents.rect_button import RectButton
 from src.UIComponents.rect_label import RectLabel
 from src.UIComponents.text import Text
+from src.constants.media_constants import WOOD, FRAME, FLASHPOINT_BACKGROUND
 
 
 class SetMaxPlayers(object):
@@ -41,22 +42,22 @@ class SetMaxPlayers(object):
         box_size = (500, 50)
         self.text_title = RectButton((int)(1280/2-250), 60, box_size[0], box_size[1], Color.BLACK, 0,
                                      Text(pygame.font.SysFont('Agency FB', 35), "Set Number of Max Players", Color.GREEN2))
-        self.text_title.change_bg_image('src/media/GameHud/wood2.png')
-        self.text_title.add_frame('src/media/GameHud/frame.png')
+        self.text_title.change_bg_image(WOOD)
+        self.text_title.add_frame(FRAME)
 
         self.sprite_grp.add(self.text_title)
 
     def _init_background(self):
         box_size = (self.resolution[0], self.resolution[1])
-        background_box = RectLabel(0, 0, box_size[0], box_size[1], "src/media/backgrounds/flashpoint_background.png")
+        background_box = RectLabel(0, 0, box_size[0], box_size[1], FLASHPOINT_BACKGROUND)
         self.sprite_grp.add(background_box)
 
     def _init_solo(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
         box_size = (130, 48)
         self.button_solo = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
                                      Text(pygame.font.SysFont('Agency FB', 25), text, color_text))
-        self.button_solo.change_bg_image('src/media/GameHud/wood2.png')
-        self.button_solo.add_frame('src/media/GameHud/frame.png')
+        self.button_solo.change_bg_image(WOOD)
+        self.button_solo.add_frame(FRAME)
         self.button_solo.on_click(self.set_and_continue, 1)
         self.sprite_grp.add(self.button_solo)
 
@@ -65,16 +66,16 @@ class SetMaxPlayers(object):
         self.button_players3 = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
                                      Text(pygame.font.SysFont('Agency FB', 25), text, color_text))
         self.button_players3.on_click(self.set_and_continue, 3)
-        self.button_players3.change_bg_image('src/media/GameHud/wood2.png')
-        self.button_players3.add_frame('src/media/GameHud/frame.png')
+        self.button_players3.change_bg_image(WOOD)
+        self.button_players3.add_frame(FRAME)
         self.sprite_grp.add(self.button_players3)
 
     def _init_button4(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
         box_size = (130, 48)
         self.button_players4 = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
                                      Text(pygame.font.SysFont('Agency FB', 25), text, color_text))
-        self.button_players4.change_bg_image('src/media/GameHud/wood2.png')
-        self.button_players4.add_frame('src/media/GameHud/frame.png')
+        self.button_players4.change_bg_image(WOOD)
+        self.button_players4.add_frame(FRAME)
         self.button_players4.on_click(self.set_and_continue, 4)
         self.sprite_grp.add(self.button_players4)
 
@@ -82,8 +83,8 @@ class SetMaxPlayers(object):
         box_size = (130, 48)
         self.button_players5 = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
                                      Text(pygame.font.SysFont('Agency FB', 25), text, color_text))
-        self.button_players5.change_bg_image('src/media/GameHud/wood2.png')
-        self.button_players5.add_frame('src/media/GameHud/frame.png')
+        self.button_players5.change_bg_image(WOOD)
+        self.button_players5.add_frame(FRAME)
         self.button_players5.on_click(self.set_and_continue, 5)
         self.sprite_grp.add(self.button_players5)
 
@@ -92,8 +93,8 @@ class SetMaxPlayers(object):
         self.button_players6 = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
                                      Text(pygame.font.SysFont('Agency FB', 25), text, color_text))
         self.button_players6.on_click(self.set_and_continue, 6)
-        self.button_players6.change_bg_image('src/media/GameHud/wood2.png')
-        self.button_players6.add_frame('src/media/GameHud/frame.png')
+        self.button_players6.change_bg_image(WOOD)
+        self.button_players6.add_frame(FRAME)
         self.sprite_grp.add(self.button_players6)
 
     def _init_btn_back(self, x_pos: int, y_pos: int, text: str, color: Color, color_text: Color):
@@ -101,8 +102,8 @@ class SetMaxPlayers(object):
         self.buttonBack = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
                                      Text(pygame.font.SysFont('Agency FB', 25), text, color_text))
         self.buttonBack.on_click(EventQueue.post, CustomEvent(ChangeSceneEnum.CHOOSEBOARDSCENE))
-        self.buttonBack.change_bg_image('src/media/GameHud/wood2.png')
-        self.buttonBack.add_frame('src/media/GameHud/frame.png')
+        self.buttonBack.change_bg_image(WOOD)
+        self.buttonBack.add_frame(FRAME)
         self.sprite_grp.add(self.buttonBack)
 
     @staticmethod
@@ -121,8 +122,8 @@ class SetMaxPlayers(object):
         box_size = (130, 48)
         self.button_duo= RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
                                       Text(pygame.font.SysFont('Agency FB', 25), text, color_text))
-        self.button_duo.change_bg_image('src/media/GameHud/wood2.png')
-        self.button_duo.add_frame('src/media/GameHud/frame.png')
+        self.button_duo.change_bg_image(WOOD)
+        self.button_duo.add_frame(FRAME)
         self.button_duo.on_click(self.set_and_continue, 2)
         self.sprite_grp.add(self.button_duo)
 

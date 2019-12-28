@@ -3,7 +3,6 @@ import logging
 from src.action_events.turn_events.turn_event import TurnEvent
 from src.models.game_board.null_model import NullModel
 from src.models.game_state_model import GameStateModel
-from src.models.game_units.victim_model import VictimModel
 
 logger = logging.getLogger("FlashPoint")
 

@@ -1,14 +1,12 @@
 import pygame
 
-from src.models.game_board.tile_model import TileModel
-from src.models.game_units.player_model import PlayerModel
-from src.models.game_units.victim_model import VictimModel
-from src.sprites.grid_sprite import GridSprite
-
+import src.constants.color as Color
 from src.UIComponents.file_importer import FileImporter
 from src.constants.state_enums import PlayerStatusEnum, PlayerRoleEnum
+from src.models.game_board.tile_model import TileModel
+from src.models.game_units.player_model import PlayerModel
 from src.observers.player_observer import PlayerObserver
-import src.constants.color as Color
+from src.sprites.grid_sprite import GridSprite
 
 
 class PlayerSprite(pygame.sprite.Sprite, PlayerObserver):
@@ -32,7 +30,7 @@ class PlayerSprite(pygame.sprite.Sprite, PlayerObserver):
         self.associated_player = current_player
         self.associated_player.add_observer(self)
         if self.associated_player.role == PlayerRoleEnum.DOGE:
-            self.associated_png = 'src/media/all_markers/DogePlayer.png'
+            self.associated_png = 'media/all_markers/DogePlayer.png'
         else:
             self.associated_png = self._associate_image(self.associated_player.color)
 
@@ -40,12 +38,12 @@ class PlayerSprite(pygame.sprite.Sprite, PlayerObserver):
 
     def _associate_image(self, color: Color):
         return {
-            Color.WHITE: "src/media/all_markers/whiteFighter.png",
-            Color.BLUE: "src/media/all_markers/blueFighter.png",
-            Color.RED: "src/media/all_markers/redFighter.png",
-            Color.ORANGE: "src/media/all_markers/orangeFighter.png",
-            Color.YELLOW: "src/media/all_markers/yellowFighter.png",
-            Color.GREEN: "src/media/all_markers/greenFighter.png",
+            Color.WHITE: "media/all_markers/whiteFighter.png",
+            Color.BLUE: "media/all_markers/blueFighter.png",
+            Color.RED: "media/all_markers/redFighter.png",
+            Color.ORANGE: "media/all_markers/orangeFighter.png",
+            Color.YELLOW: "media/all_markers/yellowFighter.png",
+            Color.GREEN: "media/all_markers/greenFighter.png",
         }[color]
 
     def player_ap_changed(self, updated_ap: int):
@@ -73,7 +71,7 @@ class PlayerSprite(pygame.sprite.Sprite, PlayerObserver):
     def player_role_changed(self, role: PlayerRoleEnum):
 
         if self.associated_player.role == PlayerRoleEnum.DOGE:
-            self.associated_png = 'src/media/all_markers/DogePlayer.png'
+            self.associated_png = 'media/all_markers/DogePlayer.png'
         else:
             self.associated_png = self._associate_image(self.associated_player.color)
 

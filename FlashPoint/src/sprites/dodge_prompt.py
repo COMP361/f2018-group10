@@ -8,6 +8,7 @@ from src.UIComponents.text import Text
 from src.action_events.dodge_reply_event import DodgeReplyEvent
 from src.core.event_queue import EventQueue
 from src.core.networking import Networking
+from src.constants.media_constants import WOOD, FRAME
 
 
 class DodgePrompt(object):
@@ -15,26 +16,26 @@ class DodgePrompt(object):
 
     def __init__(self):
 
-        self.bg = pygame.image.load('src/media/GameHud/wood2.png')
-        self.frame = pygame.image.load('src/media/GameHud/frame.png')
+        self.bg = pygame.image.load(WOOD)
+        self.frame = pygame.image.load(FRAME)
         self.frame = pygame.transform.scale(self.frame, (400, 100))
 
         self.accept_button = RectButton(550-75, 310, 75, 50, Color.ORANGE, 0,
                                         Text(pygame.font.SysFont('Agency FB', 25), "Accept", Color.GREEN2))
-        self.accept_button.change_bg_image('src/media/GameHud/wood2.png')
-        self.accept_button.add_frame('src/media/GameHud/frame.png')
+        self.accept_button.change_bg_image(WOOD)
+        self.accept_button.add_frame(FRAME)
 
         self.deny_button = RectButton(550+200, 310, 75, 50, Color.ORANGE, 0,
                                       Text(pygame.font.SysFont('Agency FB', 25), "Deny", Color.GREEN2))
-        self.deny_button.change_bg_image('src/media/GameHud/wood2.png')
-        self.deny_button.add_frame('src/media/GameHud/frame.png')
+        self.deny_button.change_bg_image(WOOD)
+        self.deny_button.add_frame(FRAME)
         self.accept_button.on_click(self._accept_on_click)
         self.deny_button.on_click(self._deny_on_click)
 
         self.background = RectLabel(550, 300, 200, 75, Color.GREY, 0,
                                     Text(pygame.font.SysFont('Agency FB', 25), "Dodge?", Color.GREEN2))
-        self.background.change_bg_image('src/media/GameHud/wood2.png')
-        self.background.add_frame('src/media/GameHud/frame.png')
+        self.background.change_bg_image(WOOD)
+        self.background.add_frame(FRAME)
         self.enabled = False
         self.disable()
 

@@ -7,6 +7,8 @@ import socket
 #   "json" (JSON): Comparable speed/size to pickle, but without the security vulnerabilities.  Default.
 #   "msgpack": Message Pack; a high-performance (de)serialization library.  Easily-installable with
 #       `pip install msgpack`, but not the default because of that.
+from src.external.Mastermind._mm_constants import MM_MAX
+
 if "MM_SERIALIZATION_TYPE" not in os.environ:
     os.environ["MM_SERIALIZATION_TYPE"] = "json"
 if   os.environ["MM_SERIALIZATION_TYPE"] == "pickle":

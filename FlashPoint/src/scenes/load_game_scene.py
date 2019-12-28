@@ -16,6 +16,7 @@ from src.core.event_queue import EventQueue
 from src.core.serializer import JSONSerializer
 from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
+from src.constants.media_constants import WOOD, FRAME, FLASHPOINT_BACKGROUND
 
 RESOLUTION = (1280, 700)
 
@@ -25,7 +26,7 @@ class LoadGameScene(object):
     def __init__(self, screen, current_player: PlayerModel):
         self._current_player = current_player
 
-        self._saved_games_path = "src/media/saved_games.json"
+        self._saved_games_path = "media/saved_games.json"
         if not os.path.exists(self._saved_games_path):
             with open(self._saved_games_path, mode="w+", encoding='utf-8') as myFile:
                 myFile.write("[]")
@@ -39,7 +40,7 @@ class LoadGameScene(object):
 
     def _init_background(self):
         box_size = (RESOLUTION[0], RESOLUTION[1])
-        background_box = RectLabel(0, 0, box_size[0], box_size[1], "src/media/backgrounds/flashpoint_background.png")
+        background_box = RectLabel(0, 0, box_size[0], box_size[1], FLASHPOINT_BACKGROUND)
         self.sprite_grp.add(background_box)
 
     def _init_log_box(self, clr):
@@ -54,7 +55,7 @@ class LoadGameScene(object):
 
         user_box = RectButton(x_pos, y_pos, box_size[0], box_size[1], clr, 0,
                               Text(pygame.font.SysFont('Agency FB', 20), text, color_text))
-        user_box.change_bg_image('src/media/GameHud/wood2.png')
+        user_box.change_bg_image(WOOD)
         pygame.draw.rect(user_box.image, color.YELLOW, [0, 0, 350, 32], 5)
 
         user_box.on_click(self.load_game, save_data)
@@ -82,15 +83,15 @@ class LoadGameScene(object):
         button_back = RectButton(x_pos, y_pos, box_size[0], box_size[1], color, 0,
                                      Text(pygame.font.SysFont('Agency FB', 25), text, color_text))
         button_back.on_click(EventQueue.post, CustomEvent(ChangeSceneEnum.HOSTMENUSCENE))
-        button_back.change_bg_image('src/media/GameHud/wood2.png')
-        button_back.add_frame('src/media/GameHud/frame.png')
+        button_back.change_bg_image(WOOD)
+        button_back.add_frame(FRAME)
         self.sprite_grp.add(button_back)
 
     def _init_load_menu(self, x_pos: int, y_pos: int, text: str, color: color, color_text: color):
         user_box = RectLabel(x_pos, y_pos, 500, 500, color, 0,
                              Text(pygame.font.SysFont('Agency FB', 25), text, color_text))
-        user_box.change_bg_image('src/media/GameHud/wood2.png')
-        user_box.add_frame('src/media/GameHud/frame.png')
+        user_box.change_bg_image(WOOD)
+        user_box.add_frame(FRAME)
         self.sprite_grp.add(user_box)
 
     @staticmethod

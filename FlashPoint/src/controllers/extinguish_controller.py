@@ -1,17 +1,16 @@
 from src.UIComponents.interactable import Interactable
 from src.action_events.turn_events.extinguish_event import ExtinguishEvent
 from src.action_events.turn_events.turn_event import TurnEvent
+from src.constants.state_enums import SpaceStatusEnum, WallStatusEnum, DoorStatusEnum, PlayerRoleEnum
 from src.controllers.controller import Controller
-from src.core.event_queue import EventQueue
 from src.core.networking import Networking
 from src.models.game_board.door_model import DoorModel
-from src.models.game_board.wall_model import WallModel
-from src.sprites.tile_sprite import TileSprite
-from src.models.game_units.player_model import PlayerModel
-from src.constants.state_enums import SpaceStatusEnum, GameStateEnum, WallStatusEnum, DoorStatusEnum, PlayerRoleEnum
 from src.models.game_board.tile_model import TileModel
+from src.models.game_board.wall_model import WallModel
 from src.models.game_state_model import GameStateModel
+from src.models.game_units.player_model import PlayerModel
 from src.sprites.game_board import GameBoard
+from src.sprites.tile_sprite import TileSprite
 
 
 class ExtinguishController(Controller):

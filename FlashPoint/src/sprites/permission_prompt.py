@@ -10,6 +10,7 @@ from src.UIComponents.text import Text
 from src.models.game_units.player_model import PlayerModel
 from src.core.event_queue import EventQueue
 from src.core.networking import Networking
+from src.constants.media_constants import WOOD, FRAME
 
 
 class PermissionPrompt(object):
@@ -18,12 +19,12 @@ class PermissionPrompt(object):
     def __init__(self):
         self.accept_button = RectButton(500-75, 310, 75, 50, Color.ORANGE, 0,
                                         Text(pygame.font.SysFont('Agency FB', 20), "Accept", Color.GREEN2))
-        self.accept_button.change_bg_image('src/media/GameHud/wood2.png')
-        self.accept_button.add_frame('src/media/GameHud/frame.png')
+        self.accept_button.change_bg_image(WOOD)
+        self.accept_button.add_frame(FRAME)
         self.deny_button = RectButton(500+300, 310, 75, 50, Color.ORANGE, 0,
                                       Text(pygame.font.SysFont('Agency FB', 20), "Deny", Color.GREEN2))
-        self.deny_button.change_bg_image('src/media/GameHud/wood2.png')
-        self.deny_button.add_frame('src/media/GameHud/frame.png')
+        self.deny_button.change_bg_image(WOOD)
+        self.deny_button.add_frame(FRAME)
         self.accept_button.on_click(self._accept_on_click)
         self.deny_button.on_click(self._deny_on_click)
 
@@ -31,8 +32,8 @@ class PermissionPrompt(object):
         self._target = None
         self.background = RectLabel(500, 300, 300, 75, Color.GREY, 0,
                                     Text(pygame.font.SysFont('Agency FB', 20), "Permission?", Color.GREEN2))
-        self.background.change_bg_image('src/media/GameHud/wood2.png')
-        self.background.add_frame('src/media/GameHud/frame.png')
+        self.background.change_bg_image(WOOD)
+        self.background.add_frame(FRAME)
 
         self._enabled = False
 
@@ -80,5 +81,5 @@ class PermissionPrompt(object):
         self._target = command[1]
         self.background.change_text(Text(pygame.font.SysFont('Agency FB', 20),
                                          f"{self._source.nickname} wants to command you", Color.GREEN2))
-        self.background.change_bg_image('src/media/GameHud/wood2.png')
-        self.background.add_frame('src/media/GameHud/frame.png')
+        self.background.change_bg_image(WOOD)
+        self.background.add_frame(FRAME)

@@ -1,27 +1,27 @@
-import pygame
 import logging
 
+import pygame
+
+import src.constants.main_constants as MainConst
+from src.UIComponents.file_importer import FileImporter
+from src.constants.change_scene_enum import ChangeSceneEnum
+from src.constants.media_constants import BUTTON_CLICK_SOUND
+from src.core.event_queue import EventQueue
 from src.core.state_cleaner import StateCleaner
 from src.models.game_units.player_model import PlayerModel
-from src.UIComponents.file_importer import FileImporter
+from src.scenes.character_scene import CharacterScene
 from src.scenes.choose_board_scene import ChooseBoardScene
+from src.scenes.create_game_menu import CreateGameMenuScene
 from src.scenes.game_board_scene import GameBoardScene
 from src.scenes.host_join_scene import HostJoinScene
 from src.scenes.host_menu_scene import HostMenuScene
 from src.scenes.join_scene import JoinScene
 from src.scenes.load_game_scene import LoadGameScene
-from src.scenes.lose_scene import LoseScene
-from src.scenes.start_scene import StartScene
-from src.scenes.set_max_players_scene import SetMaxPlayers
-from src.scenes.create_game_menu import CreateGameMenuScene
-from src.core.event_queue import EventQueue
-from src.scenes.character_scene import CharacterScene
 from src.scenes.lobby_scene import LobbyScene
-from src.constants.custom_event_enums import CustomEventEnum
-from src.constants.change_scene_enum import ChangeSceneEnum
-import src.constants.main_constants as MainConst
-from src.scenes.win_scene import WinScene
 from src.scenes.lose_scene import LoseScene
+from src.scenes.set_max_players_scene import SetMaxPlayers
+from src.scenes.start_scene import StartScene
+from src.scenes.win_scene import WinScene
 
 logger = logging.getLogger("SManager")
 logger.setLevel(logging.INFO)
@@ -84,7 +84,7 @@ class SceneManager(object):
                 self._current_player = args[0]
             self._active_scene = next_scene(self.screen, *args)
 
-            FileImporter.play_audio("src/media/soundeffects/ButtonClick.wav", fade_ms=10)
+            FileImporter.play_audio(BUTTON_CLICK_SOUND, fade_ms=10)
 
         def draw(self):
             self._active_scene.draw(self.screen)

@@ -16,6 +16,7 @@ from src.models.game_units.player_model import PlayerModel
 from src.models.game_units.vehicle_model import VehicleModel
 from src.sprites.game_board import GameBoard
 from src.sprites.tile_sprite import TileSprite
+from src.constants.media_constants import WOOD, FRAME
 
 
 class VehiclePlacementController(Controller):
@@ -33,18 +34,18 @@ class VehiclePlacementController(Controller):
         self.choose_engine_prompt = RectLabel(500, 30, 350, 75, Color.GREY, 0,
                                               Text(pygame.font.SysFont('Agency FB', 30), "Choose Engine Position",
                                                    Color.GREEN2))
-        self.choose_engine_prompt.change_bg_image('src/media/GameHud/wood2.png')
-        self.choose_engine_prompt.add_frame('src/media/GameHud/frame.png')
+        self.choose_engine_prompt.change_bg_image(WOOD)
+        self.choose_engine_prompt.add_frame(FRAME)
         self.choose_ambulance_prompt = RectLabel(500, 30, 350, 75, Color.GREY, 0,
                                                  Text(pygame.font.SysFont('Agency FB', 30), "Choose Ambulance Position",
                                                       Color.GREEN2))
-        self.choose_ambulance_prompt.change_bg_image('src/media/GameHud/wood2.png')
-        self.choose_ambulance_prompt.add_frame('src/media/GameHud/frame.png')
+        self.choose_ambulance_prompt.change_bg_image(WOOD)
+        self.choose_ambulance_prompt.add_frame(FRAME)
         self.wait_prompt = RectLabel(500, 580, 350, 75, Color.GREY, 0,
                                      Text(pygame.font.SysFont('Agency FB', 30), "Host Is Placing Vehicles...",
                                           Color.GREEN2))
-        self.wait_prompt.change_bg_image('src/media/GameHud/wood2.png')
-        self.wait_prompt.add_frame('src/media/GameHud/frame.png')
+        self.wait_prompt.change_bg_image(WOOD)
+        self.wait_prompt.add_frame(FRAME)
         self.game_board_sprite = GameBoard.instance()
         self.ambulance_placed = False
         self.engine_placed = False

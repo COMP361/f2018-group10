@@ -7,6 +7,7 @@ from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 from src.observers.player_observer import PlayerObserver
 import src.constants.color as Color
+import src.constants.media_constants as MEDIA_CONSTS
 
 
 class PlayerBox(PlayerObserver):
@@ -24,9 +25,9 @@ class PlayerBox(PlayerObserver):
                                     self.background_position[2],
                                     self.background_position[3],
                                     )
-        self.background.change_bg_image('src/media/GameHud/wood2.png')
+        self.background.change_bg_image(MEDIA_CONSTS.WOOD)
         self.background.add_frame(self.get_path_from_character_enum(self._assoc_player.role))
-        self.background.add_frame('src/media/GameHud/frame.png')
+        self.background.add_frame(MEDIA_CONSTS.FRAME)
 
     def delete_class(self):
         self._assoc_player.remove_observer(self)
@@ -37,41 +38,41 @@ class PlayerBox(PlayerObserver):
 
         user_box = RectLabel(self.txt_pos[0], self.txt_pos[1], box_size[0], box_size[1], color, 0,
                              Text(pygame.font.SysFont('Agency FB', 27), self.player_username, color))
-        user_box.change_bg_image('src/media/GameHud/wood2.png')
-        user_box.add_frame('src/media/GameHud/frame.png')
+        user_box.change_bg_image(MEDIA_CONSTS.WOOD)
+        user_box.add_frame(MEDIA_CONSTS.FRAME)
         return user_box
 
     def get_path_from_character_enum(self, enum: PlayerRoleEnum):
         if enum == PlayerRoleEnum.CAFS:
-            return "src/media/specialist_cards/cafs_firefighter.png"
+            return MEDIA_CONSTS.CAFS_FIREFIGHTER
         elif enum == PlayerRoleEnum.CAPTAIN:
-            return "src/media/specialist_cards/fire_captain.png"
+            return MEDIA_CONSTS.FIRE_CAPTAIN
         elif enum == PlayerRoleEnum.GENERALIST:
-            return "src/media/specialist_cards/generalist.png"
+            return MEDIA_CONSTS.GENERALIST
         elif enum == PlayerRoleEnum.DRIVER:
-            return "src/media/specialist_cards/driver_operator.png"
+            return MEDIA_CONSTS.DRIVER_OPERATOR
         elif enum == PlayerRoleEnum.HAZMAT:
-            return "src/media/specialist_cards/hazmat_technician.png"
+            return MEDIA_CONSTS.HAZMAT_TECHNICIAN
         elif enum == PlayerRoleEnum.IMAGING:
-            return "src/media/specialist_cards/imaging_technician.png"
+            return MEDIA_CONSTS.IMAGING_TECHNICIAN
         elif enum == PlayerRoleEnum.PARAMEDIC:
-            return "src/media/specialist_cards/paramedic.png"
+            return MEDIA_CONSTS.PARAMEDIC
         elif enum == PlayerRoleEnum.RESCUE:
-            return "src/media/specialist_cards/rescue_specialist.png"
+            return MEDIA_CONSTS.RESCUE_SPECIALIST
         elif enum == PlayerRoleEnum.FAMILY:
-            return "src/media/specialist_cards/family.png"
+            return MEDIA_CONSTS.FAMILY
         elif enum == PlayerRoleEnum.DOGE:
-            return "src/media/specialist_cards/doge.png"
+            return MEDIA_CONSTS.DOGE
         elif enum == PlayerRoleEnum.VETERAN:
-            return "src/media/specialist_cards/veteran.png"
+            return MEDIA_CONSTS.VETERAN
 
     def draw(self, screen):
         self.text_box.draw(screen)
         if self.background:
             self.background.draw(screen)
-            self.background.change_bg_image('src/media/GameHud/wood2.png')
+            self.background.change_bg_image(MEDIA_CONSTS.WOOD)
             self.background.add_frame(self.get_path_from_character_enum(self._assoc_player.role))
-            self.background.add_frame('src/media/GameHud/frame.png')
+            self.background.add_frame(MEDIA_CONSTS.FRAME)
 
     def player_status_changed(self, status: PlayerStatusEnum):
         pass

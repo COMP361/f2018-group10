@@ -7,6 +7,7 @@ from src.constants.state_enums import PlayerStatusEnum, GameKindEnum
 from src.core.event_queue import EventQueue
 from src.models.game_units.player_model import PlayerModel
 from src.observers.player_observer import PlayerObserver
+import src.constants.media_constants as MEDIA_CONSTS
 
 
 class CurrentPlayerState(pygame.sprite.Sprite, PlayerObserver):
@@ -21,9 +22,9 @@ class CurrentPlayerState(pygame.sprite.Sprite, PlayerObserver):
     def __init__(self, x: int, y: int, name: str, color: Color, current: PlayerModel, rules: GameKindEnum):
         super().__init__()
         current.add_observer(self)
-        bg = pygame.image.load('src/media/GameHud/wood2.png')
+        bg = pygame.image.load(MEDIA_CONSTS.WOOD)
         self.bg = pygame.transform.scale(bg, (150, 150))
-        frame = pygame.image.load('src/media/GameHud/frame.png')
+        frame = pygame.image.load(MEDIA_CONSTS.FRAME)
         self.frame = pygame.transform.scale(frame, (150, 150))
         self.image = pygame.Surface([150, 150])
         self.surface_for_text = pygame.Surface([150, 150])
@@ -59,12 +60,12 @@ class CurrentPlayerState(pygame.sprite.Sprite, PlayerObserver):
 
     def color_picker(self, color: Color):
         return {
-            Color.WHITE: pygame.image.load('src/media/GameHud/PWHITE.png'),
-            Color.BLUE: pygame.image.load('src/media/GameHud/Bleu.png'),
-            Color.RED: pygame.image.load('src/media/GameHud/PRED.png'),
-            Color.ORANGE: pygame.image.load('src/media/GameHud/PORANGE.png'),
-            Color.YELLOW: pygame.image.load('src/media/GameHud/PYELLOW.png'),
-            Color.GREEN: pygame.image.load('src/media/GameHud/PGREEN.png'),
+            Color.WHITE: pygame.image.load(MEDIA_CONSTS.P_WHITE),
+            Color.BLUE: pygame.image.load(MEDIA_CONSTS.P_BLUE),
+            Color.RED: pygame.image.load(MEDIA_CONSTS.P_RED),
+            Color.ORANGE: pygame.image.load(MEDIA_CONSTS.P_ORANGE),
+            Color.YELLOW: pygame.image.load(MEDIA_CONSTS.P_YELLOW),
+            Color.GREEN: pygame.image.load(MEDIA_CONSTS.P_GREEN),
         }[color]
 
     def update(self, event_queue: EventQueue):

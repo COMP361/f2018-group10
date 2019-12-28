@@ -6,6 +6,8 @@ import threading
 import _mm_netutil as netutil
 from _mm_constants import *
 from _mm_errors import *
+from src.external.Mastermind._mm_errors import MastermindWarningServer
+
 
 class MastermindServerCallbacksDebug(object):
     def callback_connect          (self                                          ):

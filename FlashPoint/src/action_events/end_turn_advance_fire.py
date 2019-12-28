@@ -27,6 +27,7 @@ from src.constants.state_enums import GameStateEnum, SpaceStatusEnum, WallStatus
 from src.action_events.turn_events.turn_event import TurnEvent
 from src.models.game_state_model import GameStateModel
 from src.sprites.game_board import GameBoard
+from src.constants.media_constants import EXPLOSION_SOUND
 
 logger = logging.getLogger("FlashPoint")
 
@@ -232,7 +233,7 @@ class EndTurnAdvanceFireEvent(TurnEvent):
         return flare_up_will_occur
 
     def explosion(self, origin_tile: TileModel):
-        FileImporter.play_music("src/media/music/explosion.mp3", 1)
+        FileImporter.play_music(EXPLOSION_SOUND, 1)
         logger.info(f"Explosion occurred on {origin_tile}")
         game_state = GameStateModel.instance()
         tile_sprite = GameBoard.instance().grid.grid[origin_tile.column][origin_tile.row]

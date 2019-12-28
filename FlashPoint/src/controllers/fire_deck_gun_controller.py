@@ -20,6 +20,7 @@ from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 from src.sprites.game_board import GameBoard
 from src.sprites.tile_sprite import TileSprite
+from src.constants.media_constants import WOOD, FRAME
 
 logger = logging.getLogger("FlashPoint")
 
@@ -256,25 +257,25 @@ class FireDeckGunController(Controller):
         black_dice = targetTile.column
         boardSprite: GameBoard = GameBoard.instance().top_ui
         self.label = RectLabel(200, 400, 600, 200, Color.BLACK, 0, Text(pygame.font.SysFont('Agency FB',25), f"Roll: {red_dice}, {black_dice}",Color.GREEN2))
-        self.label.change_bg_image('src/media/GameHud/wood2.png')
-        self.label.add_frame('src/media/GameHud/frame.png')
+        self.label.change_bg_image(WOOD)
+        self.label.add_frame(FRAME)
 
         self.input1 = RectButton(200, 350, 150, 50, Color.BLACK, 0,
                             Text(pygame.font.SysFont('Agency FB', 25), "Accept Roll", Color.GREEN2))
-        self.input1.change_bg_image('src/media/GameHud/wood2.png')
-        self.input1.add_frame('src/media/GameHud/frame.png')
+        self.input1.change_bg_image(WOOD)
+        self.input1.add_frame(FRAME)
         self.input2 = RectButton(350, 350, 150, 50, Color.BLACK, 0,
                             Text(pygame.font.SysFont('Agency FB', 25), "Re-Roll Black Dice", Color.GREEN2))
-        self.input2.change_bg_image('src/media/GameHud/wood2.png')
-        self.input2.add_frame('src/media/GameHud/frame.png')
+        self.input2.change_bg_image(WOOD)
+        self.input2.add_frame(FRAME)
         self.input3 = RectButton(500, 350, 150, 50, Color.BLACK, 0,
                             Text(pygame.font.SysFont('Agency FB', 25), "Re-Roll Red Dice", Color.GREEN2))
-        self.input3.change_bg_image('src/media/GameHud/wood2.png')
-        self.input3.add_frame('src/media/GameHud/frame.png')
+        self.input3.change_bg_image(WOOD)
+        self.input3.add_frame(FRAME)
         self.input4 = RectButton(650, 350, 150, 50, Color.BLACK, 0,
                             Text(pygame.font.SysFont('Agency FB', 25), "Re-Roll Both Die", Color.GREEN2))
-        self.input4.change_bg_image('src/media/GameHud/wood2.png')
-        self.input4.add_frame('src/media/GameHud/frame.png')
+        self.input4.change_bg_image(WOOD)
+        self.input4.add_frame(FRAME)
 
         self.input1.on_click(self.input1_process, tile_model, red_dice, black_dice)
         self.input2.on_click(self.input2_process, tile_model, red_dice, black_dice)
@@ -304,16 +305,16 @@ class FireDeckGunController(Controller):
             black_dice = new_tile.column
             self.label = RectLabel(200, 400, 600, 200, Color.BLACK, 0,
                                    Text(pygame.font.SysFont('Agency FB', 25), f"Roll: {red_dice}, {black_dice}",Color.GREEN2))
-            self.label.change_bg_image('src/media/GameHud/wood2.png')
-            self.label.add_frame('src/media/GameHud/frame.png')
+            self.label.change_bg_image(WOOD)
+            self.label.add_frame(FRAME)
             self.input1 = RectButton(200, 350, 150, 50, Color.BLACK, 0,
                                      Text(pygame.font.SysFont('Agency FB', 25), "Accept Roll", Color.GREEN2))
-            self.input1.change_bg_image('src/media/GameHud/wood2.png')
-            self.input1.add_frame('src/media/GameHud/frame.png')
+            self.input1.change_bg_image(WOOD)
+            self.input1.add_frame(FRAME)
             self.input3 = RectButton(350, 350, 150, 50, Color.BLACK, 0,
                                      Text(pygame.font.SysFont('Agency FB', 25), "Re-Roll Red Dice", Color.GREEN2))
-            self.input3.change_bg_image('src/media/GameHud/wood2.png')
-            self.input3.add_frame('src/media/GameHud/frame.png')
+            self.input3.change_bg_image(WOOD)
+            self.input3.add_frame(FRAME)
 
             self.input1.on_click(self.input1_process, tile, red_dice, new_tile.column)
             self.input3.on_click(self.input3_process, tile, red_dice, new_tile.column)
@@ -335,16 +336,16 @@ class FireDeckGunController(Controller):
             red_dice = new_tile.row
             self.label = RectLabel(200, 400, 600, 200, Color.BLACK, 0,
                                    Text(pygame.font.SysFont('Agency FB', 25), f"Roll: {red_dice}, {black_dice}", Color.GREEN2))
-            self.label.change_bg_image('src/media/GameHud/wood2.png')
-            self.label.add_frame('src/media/GameHud/frame.png')
+            self.label.change_bg_image(WOOD)
+            self.label.add_frame(FRAME)
             self.input1 = RectButton(200, 350, 150, 50, Color.BLACK, 0,
                                      Text(pygame.font.SysFont('Agency FB', 25), "Accept Roll", Color.GREEN2))
-            self.input1.change_bg_image('src/media/GameHud/wood2.png')
-            self.input1.add_frame('src/media/GameHud/frame.png')
+            self.input1.change_bg_image(WOOD)
+            self.input1.add_frame(FRAME)
             self.input2 = RectButton(350, 350, 150, 50, Color.BLACK, 0,
                                      Text(pygame.font.SysFont('Agency FB', 25), "Re-Roll Black Dice", Color.GREEN2))
-            self.input2.change_bg_image('src/media/GameHud/wood2.png')
-            self.input2.add_frame('src/media/GameHud/frame.png')
+            self.input2.change_bg_image(WOOD)
+            self.input2.add_frame(FRAME)
 
             self.input1.on_click(self.input1_process, tile, new_tile.row, black_dice)
             self.input2.on_click(self.input2_process, tile, new_tile.row, black_dice)

@@ -16,6 +16,7 @@ from src.models.game_state_model import GameStateModel
 from src.models.game_units.player_model import PlayerModel
 from src.observers.game_state_observer import GameStateObserver
 from src.UIComponents.text import Text
+from src.constants.media_constants import WOOD, FRAME
 
 
 class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
@@ -40,10 +41,10 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
         self.countdown_thread = None
         self.image = pygame.Surface([250, 50])
         self.font_time = pygame.font.SysFont('Agency FB', 25)
-        bg = pygame.image.load('src/media/GameHud/wood2.png')
+        bg = pygame.image.load(WOOD)
         self.bg = pygame.transform.scale(bg, (250, 50))
         self.msg = "YOUR TURN"
-        frame = pygame.image.load('src/media/GameHud/frame.png')
+        frame = pygame.image.load(FRAME)
         self.frame = pygame.transform.scale(frame, (250, 50))
         self.font_name = pygame.font.SysFont('Agency FB', 30)
         self.text = self.font_name.render(self.msg, True, Color.GREEN2)
@@ -91,22 +92,22 @@ class NotifyPlayerTurn(pygame.sprite.Sprite, GameStateObserver):
     def _init_your_turn(self):
         rct = RectLabel(880, 600, 250, 50, background=Color.ORANGE,
                         txt_obj=Text(pygame.font.SysFont('Agency FB', 30), "YOUR TURN", Color.GREEN2))
-        rct.change_bg_image('src/media/GameHud/wood2.png')
-        rct.add_frame('src/media/GameHud/frame.png')
+        rct.change_bg_image(WOOD)
+        rct.add_frame(FRAME)
         return rct
 
     def init_not_your_turn(self):
         rct = RectLabel(880, 600, 250, 50, background=Color.ORANGE,
                         txt_obj=Text(pygame.font.SysFont('Agency FB', 30), "NOT YOUR TURN", Color.GREEN2))
-        rct.change_bg_image('src/media/GameHud/wood2.png')
-        rct.add_frame('src/media/GameHud/frame.png')
+        rct.change_bg_image(WOOD)
+        rct.add_frame(FRAME)
         return rct
 
     def _init_end_turn_button(self):
         btn = RectButton(1130, 500, 150, 50, background=Color.ORANGE,
                          txt_obj=Text(pygame.font.SysFont('Arial', 23), "END TURN",Color.GREEN2))
-        btn.change_bg_image('src/media/GameHud/wood2.png')
-        btn.add_frame('src/media/GameHud/frame.png')
+        btn.change_bg_image(WOOD)
+        btn.add_frame(FRAME)
         btn.on_click(self._end_turn)
         return btn
 

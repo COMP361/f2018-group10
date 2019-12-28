@@ -5,6 +5,7 @@ from src.constants.state_enums import GameStateEnum
 from src.core.event_queue import EventQueue
 from src.models.game_state_model import GameStateModel
 from src.observers.game_state_observer import GameStateObserver
+from src.constants.media_constants import WOOD, FRAME
 
 
 class InGameStates(pygame.sprite.Sprite, GameStateObserver):
@@ -21,9 +22,9 @@ class InGameStates(pygame.sprite.Sprite, GameStateObserver):
         self.image = pygame.Surface([880, 50])
         self.font = pygame.font.SysFont('Agency FB', 35)
 
-        self.bg = pygame.image.load('src/media/GameHud/wood2.png')
+        self.bg = pygame.image.load(WOOD)
         self.bg = pygame.transform.scale(self.bg, (880, 50))
-        self.frame = pygame.image.load('src/media/GameHud/frame.png')
+        self.frame = pygame.image.load(FRAME)
         self.frame = pygame.transform.scale(self.frame, (880, 50))
 
         self.damage_str = f"Damage: {current_damage}/24"

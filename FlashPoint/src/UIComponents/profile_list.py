@@ -10,6 +10,7 @@ from src.UIComponents.rect_button import RectButton
 from src.UIComponents.text import Text
 import src.constants.color as color
 import src.constants.color as Color
+from src.constants.media_constants import WOOD
 
 
 class ProfileList(pygame.sprite.Sprite, Components):
@@ -24,7 +25,7 @@ class ProfileList(pygame.sprite.Sprite, Components):
         pygame.sprite.Sprite.__init__(self)
         Components.__init__(self, x, y, width, height)
         self._limit = limit
-        self.background = 'src/media/GameHud/wood2.png'
+        self.background = WOOD
         self.outer_width = outer_width
         self.image = None
         self.rect = None
